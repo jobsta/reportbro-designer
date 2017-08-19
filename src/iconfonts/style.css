@@ -1,0 +1,178 @@
+/* ReportBro IconFonts */
+
+@font-face {
+  font-family: 'reportbro';
+  src:  url('reportbro.eot?n46q2a');
+  src:  url('reportbro.eot?n46q2a#iefix') format('embedded-opentype'),
+    url('reportbro.woff2?n46q2a') format('woff2'),
+    url('reportbro.ttf?n46q2a') format('truetype'),
+    url('reportbro.woff?n46q2a') format('woff'),
+    url('reportbro.svg?n46q2a#reportbro') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="rbroIcon-"], [class*=" rbroIcon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'reportbro' !important;
+  speak: none;
+  font-style: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.rbroIcon-xlsx:before {
+  content: "\e92d";
+}
+.rbroIcon-arrow-line-up:before {
+  content: "\e92c";
+}
+.rbroIcon-xls:before {
+  content: "\e915";
+}
+.rbroIcon-barcode:before {
+  content: "\e92a";
+}
+.rbroIcon-download:before {
+  content: "\e92b";
+}
+.rbroIcon-edit:before {
+  content: "\e924";
+}
+.rbroIcon-magnifier:before {
+  content: "\e926";
+}
+.rbroIcon-play:before {
+  content: "\e927";
+}
+.rbroIcon-preview:before {
+  content: "\e928";
+}
+.rbroIcon-select:before {
+  content: "\e925";
+}
+.rbroIcon-page-break:before {
+  content: "\e91f";
+}
+.rbroIcon-line:before {
+  content: "\e91e";
+}
+.rbroIcon-border-table-frame:before {
+  content: "\e920";
+}
+.rbroIcon-border-table-frame-row:before {
+  content: "\e921";
+}
+.rbroIcon-border-table-row:before {
+  content: "\e922";
+}
+.rbroIcon-border-table-none:before {
+  content: "\e914";
+}
+.rbroIcon-border-table-grid:before {
+  content: "\e929";
+}
+.rbroIcon-border-all:before {
+  content: "\e91a";
+}
+.rbroIcon-border-right:before {
+  content: "\e916";
+}
+.rbroIcon-border-left:before {
+  content: "\e917";
+}
+.rbroIcon-border-top:before {
+  content: "\e918";
+}
+.rbroIcon-border-bottom:before {
+  content: "\e919";
+}
+.rbroIcon-grid:before {
+  content: "\e910";
+}
+.rbroIcon-code:before {
+  content: "\e911";
+}
+.rbroIcon-image:before {
+  content: "\e912";
+}
+.rbroIcon-text:before {
+  content: "\e913";
+}
+.rbroIcon-settings:before {
+  content: "\e901";
+}
+.rbroIcon-refresh:before {
+  content: "\e923";
+}
+.rbroIcon-save:before {
+  content: "\e90a";
+}
+.rbroIcon-undo:before {
+  content: "\e90e";
+}
+.rbroIcon-redo:before {
+  content: "\e90f";
+}
+.rbroIcon-align-center:before {
+  content: "\e91b";
+}
+.rbroIcon-align-middle:before {
+  content: "\e902";
+}
+.rbroIcon-align-bottom:before {
+  content: "\e91c";
+}
+.rbroIcon-align-left:before {
+  content: "\e91d";
+}
+.rbroIcon-align-right:before {
+  content: "\e903";
+}
+.rbroIcon-align-top:before {
+  content: "\e904";
+}
+.rbroIcon-table:before {
+  content: "\e905";
+}
+.rbroIcon-italic:before {
+  content: "\e906";
+}
+.rbroIcon-bold:before {
+  content: "\e907";
+}
+.rbroIcon-underline:before {
+  content: "\e908";
+}
+.rbroIcon-text-align-left:before {
+  content: "\e909";
+}
+.rbroIcon-text-align-center:before {
+  content: "\e90b";
+}
+.rbroIcon-text-align-right:before {
+  content: "\e90c";
+}
+.rbroIcon-text-align-justify:before {
+  content: "\e90d";
+}
+.rbroIcon-minus:before {
+  content: "\e805";
+}
+.rbroIcon-arrow-right:before {
+  content: "\e900";
+}
+.rbroIcon-arrow-down:before {
+  content: "\e60c";
+}
+.rbroIcon-cancel:before {
+  content: "\e604";
+}
+.rbroIcon-plus:before {
+  content: "\e611";
+}

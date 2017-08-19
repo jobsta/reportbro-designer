@@ -1,0 +1,138 @@
+@charset "UTF-8";
+/*
+*
+* Based on:
+* CSS TOGGLE SWITCH
+*
+* Ionuț Colceriu - ghinda.net
+* https://github.com/ghinda/css-toggle-switch
+*
+*/
+/* Hide by default
+ */
+.switch-toggle a,
+.switch-light span span {  display: none; }
+
+/* We can't test for a specific feature,
+ * so we only target browsers with support for media queries.
+ */
+@media only screen {
+  /* Checkbox
+ */
+  .switch-light {
+    position: relative;
+    display: block;
+    /* simulate default browser focus outlines on the switch,
+   * when the inputs are focused.
+   */ }
+    .switch-light::after {
+      clear: both;
+      content: '';
+      display: table; }
+    .switch-light *,
+    .switch-light *:before,
+    .switch-light *:after {
+      box-sizing: border-box; }
+    .switch-light a {
+      display: block;
+      transition: all 0.2s ease-out; }
+    .switch-light label,
+    .switch-light input:focus ~ span a,
+    .switch-light input:focus + label {
+      outline:none;
+    }
+}
+
+@media only screen {
+  /* don't hide the input from screen-readers and keyboard access
+ */
+  .switch-light input {
+    position: absolute;
+    opacity: 0;
+    z-index: 3;
+  }
+
+  .switch-light input:checked ~ span a {
+    right: 0;
+  }
+
+  /* inherit from label
+ */
+  .switch-light strong {
+    font-weight: inherit;
+  }
+
+  .switch-light > span {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    padding: 0;
+    text-align: left;
+  }
+
+  .switch-light span span {
+    position: relative;
+    z-index: 2;
+    display: block;
+    float: left;
+    width: 50%;
+    text-align: center;
+    user-select: none;
+  }
+
+  .switch-light a {
+    position: absolute;
+    right: 50%;
+    top: 0;
+    z-index: 1;
+    display: block;
+    width: 50%;
+    height: 100%;
+    padding: 0;
+  }
+}
+
+   /* Material Theme
+ */
+  /* switch-light
+ */
+@media only screen {
+  .switch-light.switch-material a {
+    top: -2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fafafa;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 2px -2px rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+    transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+  .switch-material.switch-light {
+    overflow: visible; }
+    .switch-material.switch-light::after {
+      clear: both;
+      content: '';
+      display: table; }
+  .switch-material.switch-light > span {
+    overflow: visible;
+    position: relative;
+    top: 3px;
+    width: 52px;
+    height: 24px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.26);
+  }
+
+  .switch-material.switch-light span span {
+    position: absolute;
+    clip: rect(0 0 0 0);
+  }
+
+  .switch-material.switch-light input:checked ~ span a {
+    right: 0;
+    background: #00ad69;
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 1px 6px 0 rgba(0, 0, 0, 0.12);
+  }
+
+  .switch-material.switch-light input:checked ~ span {
+    background: rgba(0, 173, 105, 0.3);
+  }
+}

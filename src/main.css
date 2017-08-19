@@ -1,0 +1,1103 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800');
+
+*, html {
+    font-family:inherit;
+}
+
+#reportbro {
+    font-family: 'Open Sans', sans-serif;
+    text-rendering: optimizelegibility;
+    color: #444444;
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+}
+
+#reportbro {
+    position: absolute;
+    width: 100%;
+    min-width: 980px; /* prevent broken layout too small screens */
+    height: 100%;
+    top: auto;
+    left: auto;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Main content container - general styles */
+
+.rbroContainer {
+    position: absolute;
+    width: 100%;
+    overflow: hidden;
+    top: 45px;
+    bottom: 0;
+    left: 0;
+    background-color: #E4E7EA;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.rbroContainer > div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.rbroContainer input, .rbroContainer select, .rbroContainer textarea {
+    width: 100%;
+    box-sizing: border-box;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background-color: #f1f3f4;
+    transition: all 0.2s linear;
+    padding: 0 4px;
+    outline: none;
+    font-size: 12px;
+}
+
+.rbroContainer input[type=checkbox] {
+    height: auto;
+    width: auto;
+    margin: 0;
+}
+
+.rbroContainer input[type=file] {
+    color: transparent;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    height: auto;
+}
+
+.rbroContainer textarea {
+    resize: none !important;
+    min-height: 34px;
+    padding: 5px;
+}
+
+.rbroContainer input:focus, .rbroContainer select:focus, .rbroContainer textarea:focus {
+    background: #ffffff;
+    border: 1px solid #004864;
+    outline: none;
+}
+
+.rbroContainer input[disabled], .rbroContainer select[disabled], .rbroContainer textarea[disabled] {
+    background: transparent;
+    color: #AAAAAA;
+}
+
+/* Menu panel */
+
+.rbroMenuPanel {
+    background-color: #ffffff;
+    position: absolute;
+    width: 100%;
+    height: 45px;
+    top: 0;
+    left: 0;
+    font-size: 15px;
+    z-index: 1;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.rbroMenuPanel > div {
+    position: absolute;
+    top: 0;
+}
+
+.rbroLogo {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 230px;
+    background-image: url("rb_logo.png");
+    background-repeat: no-repeat;
+    height: 45px;
+    background-size: auto 85%;
+    background-position: center;
+    background-color: rgba(113,171,218,0.3);
+    z-index: 10;
+}
+
+.rbroToolButtonContainer {
+    left: 230px;
+}
+
+.rbroElementButtonContainer {
+    left: 620px;
+    width: calc(100% - 630px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rbroActionButtons > div, .rbroElementButtons > div {
+    display: inline-block;
+}
+
+/* Sidebar menu enabled  */
+
+.rbroMenuPanelSidebar .rbroMainPanel {
+    height: calc(100% - 45px);
+}
+
+.rbroMenuPanelSidebar .rbroLogo {
+    top: auto;
+    bottom: 0;
+    background-color: rgba(113,171,218,0.3);
+}
+
+.rbroMenuPanelSidebar .rbroDocumentPanel {
+    right: 114px;
+    width: calc(100% - 744px);
+}
+
+.rbroMenuPanelSidebar .rbroMenuPanel {
+    right: 0;
+    top: 0;
+    left: auto;
+    width: 104px;
+    height: 100%;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+.rbroMenuPanelSidebar .rbroMenuPanel > div {
+    position: relative;
+    left: 0;
+}
+
+.rbroMenuPanelSidebar .rbroToolButtonContainer {
+    display: block;
+}
+
+.rbroMenuPanelSidebar .rbroElementButtonContainer {
+    display: block;
+    width: auto;
+}
+
+.rbroMenuPanelSidebar .rbroElementButtons {
+    border-top: 1px solid #E4E7EA;
+    border-bottom: 1px solid #E4E7EA;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.rbroMenuPanelSidebar .rbroMenuButton {
+    border: none;
+}
+
+.rbroMenuPanelSidebar .rbroActionButtons > div button {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.rbroMenuPanelSidebar .rbroContainer {
+    top: 0;
+}
+
+.rbroMenuPanelSidebar .rbroDetailPanel {
+    margin-top: 0;
+}
+
+.rbroMenuPanelSidebar .rbroGridButton {
+    display: block;
+}
+
+/* Main Panel - Navigation */
+
+.rbroMainPanel {
+    left: 0;
+    background-color: #004864;
+    width: 230px;
+    color: #f2f2f2;
+}
+
+.rbroMainPanel ul, .rbroMainPanel li {
+    list-style: none inside;
+    padding: 0;
+    margin: 0;
+}
+
+.rbroMainPanel > ul > li {
+    border-bottom: 1px solid;
+    border-color: rgba(255, 255, 255, 0.1);
+    line-height: 20px;
+}
+
+.rbroMainPanel > ul > li > ul > li:not(:empty) {
+    line-height: 20px;
+}
+
+.rbroMainPanel > div:hover {
+    background-color: rgba(116, 116, 130, 0.2);
+}
+
+.rbroMenuItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.rbroMenuItem > div {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.rbroMenuItem > div > span {
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 100%;
+}
+
+.rbroMenuItem:hover {
+    background-color: rgba(116, 116, 130, 0.2);
+}
+
+.rbroMenuItem.rbroError {
+    background-color: #FF9999;
+    color: #444444;
+}
+
+.rbroMenuItem.rbroMenuItemActive {
+    background-color: #ffffff;
+    color: #444444;
+}
+
+.rbroMenuItem.rbroMenuItemDragOver {
+    border-bottom: 3px solid #00ad69;
+}
+
+ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 20px;
+    font-size: 14px;
+    text-transform: none;
+    color: #DDDDDD;
+}
+
+ul ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 32px;
+    color: #95badc;
+}
+
+ul ul ul .rbroMenuItem.rbroMenuItemNoChildren {
+    padding: 2px 5px 2px 34px;
+}
+
+ul ul ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 48px;
+}
+
+ul ul .rbroMenuItemText {
+    width: 170px;
+}
+
+.rbroMenuArrow {
+    font-size: 12px;
+    margin-right: 2px;
+    transition:  all 0.2s linear;
+}
+
+.rbroMenuItem.rbroMenuItemOpen .rbroMenuArrow {
+    transform: rotate(90deg);
+}
+
+.rbroMenuItemNoChildren .rbroMenuArrow {
+    display: none;
+}
+
+/* Detail Panel */
+
+.rbroDetailPanel {
+    left: 230px;
+    width: 390px;
+    background-color: #ffffff;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.rbroEmptyDetailPanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.rbroEmptyDetailPanel .rbroLogo {
+    width: 390px;
+    height: 70px;
+    background-size: auto 80%;
+    opacity: 0.08;
+    position: relative;
+    background-color: transparent;
+}
+
+.rbroFormRowContainer { /* groups multiple rbroFormRow without borders within the group */
+    border-bottom: 1px solid #E4E7EA;
+}
+
+.rbroFormRowContainer .rbroFormRow {
+    border: none;
+}
+
+.rbroFormRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #E4E7EA;
+}
+
+.rbroFormRow label {
+    width: 35%;
+}
+
+.rbroFormRow label.rbroDisabled {
+    color: #AAAAAA;
+}
+
+.rbroFormField {
+    width: 65%;
+}
+
+.rbroFormField:not(.rbroSplit) > :nth-child(n+2) { /* add some top margin in case of multiline formField */
+    margin-top: 5px;
+}
+
+.rbroSplit, .rbroTripleSplit { /* splitting a formField */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.rbroSplit .rbroErrorMessage {
+    width: 100%;
+}
+
+.rbroSplit input {
+    width: 49%;
+}
+
+.rbroTripleSplit input, .rbroTripleSplit select {
+    width: 32%;
+}
+
+.rbroSplit textarea {
+    width: 85%;
+}
+
+.rbroSmallInput input {
+    width: 70px;
+}
+
+/* For styling font selection only */
+.rbroSelectFont select:first-child {
+    width: 70%;
+}
+
+.rbroSelectFont select:nth-child(2) {
+    width: 22%;
+}
+
+.rbroPanelSection, .rbroPanelSection.rbroPanelSectionHeaderOpen:hover {
+    justify-content: center;
+    cursor: pointer;
+    background-color: #D4E6F4
+}
+
+.rbroPanelSection:hover {
+    background-color: rgba(113,171,218,0.2);
+}
+
+.rbroPanelSection.rbroPanelSectionHeaderOpen {
+    border-bottom: none;
+}
+
+.rbroPanelSection .rbroPanelSectionHeader {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 18px;
+    color: #004864;
+}
+
+.rbroPanelSection .rbroPanelSectionHeader > span {
+    margin: 0 5px;
+}
+
+.rbroFormRow.rbroError {
+    background-color: #ffcccc;
+    align-items: flex-start;
+}
+
+/* Document Panel - Template layouting and PDF preview */
+
+.rbroDocumentPanel {
+    right: 5px;
+    width: calc(100% - 630px);
+}
+
+.rbroDocument {
+    background-color: #ffffff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+    margin: 10px auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.rbroHasTabs .rbroDocument {
+    margin: 0 auto 10px auto;
+}
+
+.rbroDocumentContent {
+    position: absolute;
+}
+
+.rbroDocumentGrid {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAEklEQVQYlWNgYGD4zzAKBh8AAJYTAQA4FYKbAAAAAElFTkSuQmCC);
+    background-repeat: repeat;
+    position: absolute;
+}
+
+.rbroDocumentPreview {
+    height: calc(100% - 50px);
+    width: 100%;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    z-index: -1;
+}
+
+.rbroDocumentBandDescription {
+    display: none;
+    -ms-user-select: none;	
+    user-select: none;
+}
+
+.rbroElementDragOver {
+    background-color: rgba(204,204,204,0.1);
+}
+
+.rbroElementDragOver .rbroDocumentBandDescription {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 32px;
+    font-weight: 600;
+    color: rgba(0,72,100,0.4);
+}
+
+/* Document Panel - Tabs to switch between layout and preview */
+.rbroDocumentTabs {
+    text-align: center;
+}
+
+.rbroTabButton {
+    height: 45px;
+    padding: 12px 14px;
+    text-align: center;
+    border-right: 1px solid #E4E7EA;
+    font-size: 16px;
+    font-weight: 400;
+    color: #3baae3;
+    background-color: #F9F9F9;
+    position: relative;
+}
+
+.rbroTabButton.rbroActive {
+    background-color: #FFFFFF;
+    color: #444444;
+    cursor: text;
+}
+
+.rbroTabButton > span {
+    color: #444444;
+    cursor: pointer;
+    font-weight: 400;
+    position: absolute;
+    padding: 9px;
+}
+
+.rbroTabButton:not(.rbroActive):hover {
+    background-color: #F9F9F9;
+    color: #004864;
+}
+
+.rbroTabButton .rbroIcon-cancel {
+    top: -4px;
+    right: -4px;
+}
+
+.rbroTabButton.rbroPdfPreview.rbroXlsxDownload {
+    padding-right: 85px;
+}
+
+.rbroTabButton.rbroPdfPreview {
+    padding-right: 35px;
+}
+
+.rbroXlsxDownlaodButton {
+    font-size: 26px;
+    top: 0;
+    right: 30px;
+}
+
+.rbroTabButton .rbroIcon-cancel:hover, .rbroXlsxDownlaodButton:hover {
+    color: #3baae3;
+}
+
+/* Document Panel - Elements */
+.rbroDocElement {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.rbroDocElement.rbroSelected {
+    cursor: move;
+}
+
+.rbroContentContainerHelper {
+    overflow: hidden;
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    display: flex;
+}
+
+.rbroImageElement .rbroContentContainerHelper {
+    height: calc(100% + 2px);
+    width: calc(100% + 2px);
+}
+
+.rbroDocElementContentText {
+    white-space: pre-line;
+    overflow: hidden;
+    display: flex;
+}
+
+.rbroDocElementAlignCenter, .rbroDocElementAlignCenter .rbroDocElementContentText {
+    justify-content: center;
+}
+
+.rbroDocElementAlignLeft,  .rbroDocElementAlignLeft .rbroDocElementContentText {
+    justify-content: flex-start;
+}
+
+.rbroDocElementAlignRight, .rbroDocElementAlignRight .rbroDocElementContentText {
+    justify-content: flex-end;
+}
+
+.rbroDocElementAlignJustify,  .rbroDocElementAlignJustify .rbroDocElementContentText {
+    justify-content: flex-start;
+}
+
+.rbroDocElementVAlignTop, .rbroDocElementVAlignTop .rbroDocElementContentText {
+    align-items: flex-start;
+}
+
+.rbroDocElementVAlignMiddle, .rbroDocElementVAlignMiddle .rbroDocElementContentText {
+    align-items: center;
+}
+
+.rbroDocElementVAlignBottom, .rbroDocElementVAlignBottom .rbroDocElementContentText {
+    align-items: flex-end;
+}
+
+.rbroTextElement, .rbroImageElement {
+    border: 1px dotted #B0B0B0;
+}
+
+.rbroTableElement table {
+    border-collapse: collapse;
+    position: relative;
+}
+
+.rbroTableTextElement {
+    padding: 0;
+    position: relative;
+}
+
+.rbroBorderTableFrameRow .rbroTableTextElement, .rbroBorderTableRow .rbroTableTextElement,
+.rbroBorderTableFrame .rbroTableTextElement, .rbroBorderTableNone .rbroTableTextElement {
+    border: 1px dotted #B0B0B0 !important;
+}
+
+.rbroBorderTableFrameRow .rbroTableTextElement.rbroSelected, .rbroBorderTableRow .rbroTableTextElement.rbroSelected,
+.rbroBorderTableFrame .rbroTableTextElement.rbroSelected, .rbroBorderTableNone .rbroTableTextElement.rbroSelected,
+.rbroBorderTableGrid .rbroTableTextElement.rbroSelected {
+    border: 1px solid #B0B0B0 !important;
+}
+
+.rbroTextElement.rbroSelected, .rbroImageElement.rbroSelected, .rbroBarCodeElement.rbroSelected {
+    border: 1px solid #B0B0B0;
+}
+
+.rbroPageBreakElement {
+    background-color: #000000;
+}
+
+
+/* Document template styling, element resizer  */
+.rbroDocumentBand {
+    position: absolute;
+    width: 100%;
+}
+
+.rbroDivider {
+    position: absolute;
+    overflow: hidden;
+}
+
+.rbroDividerMarginLeft, .rbroDividerMarginRight {
+    top: 0;
+    bottom: 0;
+    border-left: 1px dashed #999999;
+}
+
+.rbroDividerMarginTop, .rbroDividerMarginBottom, .rbroDividerFooter, .rbroDividerHeader {
+    left: 0;
+    right: 0;
+    border-top: 1px dashed #999999;
+}
+
+.rbroSizer {
+    width: 7px;
+    height: 7px;
+    position: absolute;
+    border: 1px solid #606060;
+    background-color: #F0F0F0;
+}
+
+.rbroSizerN {
+    top:-5px;
+    left: calc(50% - 5px);
+    cursor: ns-resize;
+}
+
+.rbroSizerNE {
+    top: -5px;
+    right: -5px;
+    cursor: nesw-resize;
+}
+
+.rbroSizerE {
+    top: calc(50% - 5px);
+    right: -5px;
+    cursor: ew-resize;
+}
+
+.rbroSizerSE {
+    bottom: -5px;
+    right: -5px;
+    cursor: nwse-resize;
+}
+
+.rbroSizerS {
+    bottom: -5px;
+    left: calc(50% - 5px);
+    cursor: ns-resize;
+}
+
+.rbroSizerSW {
+    bottom: -5px;
+    left: -5px;
+    cursor: nesw-resize;
+}
+
+.rbroSizerW {
+    top: calc(50% - 5px);
+    left: -5px;
+    cursor: ew-resize;
+}
+
+.rbroSizerNW {
+    top: -5px;
+    left: -5px;
+    cursor: nwse-resize;
+}
+
+/* Buttons */
+
+.rbroButton, button.rbroButton {
+    cursor: pointer;
+    transition: all 0.2s linear;
+    display: inline-block;
+    vertical-align: top;
+    box-sizing: border-box;
+    border: inherit;
+}
+
+.rbroMenuItem .rbroButton {
+    margin-left: 5px;
+}
+
+button.rbroActionButton {
+    background-color: #E4E7EA;
+    color: #444444;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 6px 11px;
+    margin-right: 2px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+}
+
+button.rbroActionButton:hover, button.rbroActionButton.rbroButtonActive {
+    background-color: rgba(0,0,0,0.15);
+}
+
+button.rbroActionButton.rbroButtonActive {
+    border: 2px solid #004864;
+}
+
+.rbroMenuButton {
+    height: 45px;
+    padding: 12px 14px;
+    text-align: center;
+    border-right: 1px solid #E4E7EA;
+    font-size: 16px;
+    font-weight: 400;
+    color: #444444;
+    background-color: #ffffff;
+}
+
+.rbroMenuButton:not(.rbroActive):hover {
+    background-color: #F9F9F9;
+    color: #004864;
+}
+
+.rbroMenuButton span {
+    margin: 0 1px;
+}
+
+button.rbroButton[disabled], button.rbroButton[disabled]:hover,
+button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover {
+    color: #cccccc;
+    background-color: #ffffff;
+    cursor: not-allowed;
+}
+
+.rbroDeleteButton {
+    color: #CCCCCC;
+}
+
+.rbroMenuItem.rbroError .rbroDeleteButton {
+    color: #444444;
+}
+
+.rbroDeleteButton:hover, .rbroMenuItem.rbroError .rbroDeleteButton:hover {
+    color: #fdc700;
+}
+
+.rbroRoundButton {
+    border-radius: 50%;
+    color: #ffffff;
+    background-color: #004864;
+    font-size: 14px;
+    padding: 5px;
+    border: none;
+}
+
+.rbroMenuItem .rbroRoundButton {
+    background-color: #336D83;
+}
+
+.rbroRoundButton:hover{
+    background-color: #fdc700;
+    color: #ffffff;
+}
+
+/* Common */
+.rbroColumnCenter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rbroErrorMessage {
+    color: #FF3B30;
+}
+
+.rbroErrorMessage:empty {
+    display: none;
+}
+
+.rbroBackgroundOverlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.rbroHidden {
+    display: none !important;
+}
+
+.rbroFixedBackground {
+    overflow: hidden;
+}
+
+.rbroLoadingIndicator {
+	background-color: rgba(255,255,255,0.9);
+    background-image: url("ajaxload.gif");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 40px auto;
+    left: 0;
+    top: 0;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+	z-index: 100000;
+}
+
+/* Drag & drop */
+
+.rbroDropTarget * { /* prevent dragleave from firing when dragging into a child element */
+    pointer-events: none;
+}
+
+/* Popup Window */
+.rbroPopupWindow {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    position: absolute;
+    background-color: white;
+    color: inherit;
+    box-sizing: border-box;
+    border: 2px solid #004864;
+    z-index: 999999;
+    border-radius: 4px;
+}
+
+.rbroPopupWindowContent {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.rbroPopupWindowCancel {
+    position: absolute;
+    top: -13px;
+    right: -13px;
+    background-color: #004864;
+}
+
+.rbroPopupWindow ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.rbroPopupWindow li {
+    list-style-type: none;
+    margin: 0;
+    padding: 4px 10px;
+    display: block;
+}
+
+.rbroPopupWindow li:not(.rbroPopupItemSeparator) {
+    cursor: pointer;
+}
+
+.rbroPopupWindow li:not(.rbroPopupItemSeparator):hover {
+    background-color: #f2f2f2;
+}
+
+.rbroPopupWindow .rbroPopupItemSeparator {
+    text-align: center;
+    background-color: #D4E6F4;
+    font-weight: 600;
+    padding: 8px 10px;
+}
+
+.rbroPopupWindow .rbroPopupItemSeparator:first-child {
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+.rbroPopupWindow .rbroPopupItemSeparator.rbroParameterGroup {
+    background-color: #B2E6D1;
+}
+
+.rbroPopupWindow .rbroPopupItemHeader {
+    font-size: 13px;
+}
+
+.rbroPopupWindow .rbroPopupItemDescription {
+    font-size: 11px;
+    color: #666666;
+}
+
+.rbroPopupWindowContent table {
+    width: 98%;
+    border-collapse: collapse;
+    margin: 10px auto 0;
+}
+
+.rbroPopupWindowContent table th:not(:first-child) {
+    background-color: #D4E6F4;
+    border: 1px solid #444444;
+    padding: 5px 0;
+    font-weight: 600;
+}
+
+.rbroPopupWindowContent table th:first-child {
+    width: 2%;
+}
+
+.rbroPopupWindowContent table td {
+    border: 1px solid #444444;
+    padding: 0;
+}
+
+.rbroPopupWindowContent table td.rbroHasFocus {
+    border: 1px solid #468FED;
+}
+
+.rbroPopupWindowContent table td.rbroHasFocus input {
+    border: 2px solid #468FED;
+    padding: 2px;
+}
+
+
+.rbroPopupWindowContent table input, .rbroPopupWindowContent table input:focus {
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    padding: 4px;
+    border: none;
+    font-size: 12px;
+}
+
+.rbroPopupWindowContent table .rbroButton {
+    vertical-align: baseline;
+}
+
+.rbroPopupWindowButton.rBFullWidthButton {
+    width: 96%;
+    margin-left: 3%;
+}
+
+.rbroPopupWindowButton {
+    padding: 12px;
+    text-align: center;
+    color: #444444;
+    background-color: #F9F9F9;
+    font-size: 16px;
+}
+
+.rbroPopupWindowButton:hover {
+    background-color: #E4E7EA;
+    color: #004864;
+}
+
+/* ReportBro spectrum color picker */
+.rbroColorPickerContainer {
+    transition: all 0.2s linear;
+    background-color: #f1f3f4;
+    border-radius: 20px 4px 4px 20px;
+    border: 1px solid rgba(0,0,0,0.1);
+    height: 28px;
+    position: relative;
+}
+
+.rbroColorPickerContainer.rbroActive {
+    border: 1px solid #004864;
+    background-color: #ffffff;
+}
+
+.rbroColorPickerContainer input, .rbroColorPickerContainer input:focus {
+    height: 28px;
+    margin: 0 0 0 30px;
+    width: calc(100% - 30px);
+    background-color: #f1f3f4;
+    border: none;
+    color: #444444;
+    display: block;
+    font-size: 13px;
+    padding: 0 5px;
+}
+
+.rbroColorPickerContainer.rbroActive input {
+    background-color: #ffffff;
+}
+
+.rbroColorContainer .sp-color, .rbroColorContainer .sp-hue, .rbroColorContainer .sp-clear {
+    border: none;
+}
+
+.rbroColorContainer .sp-clear {
+    cursor: pointer;
+}
+
+.rbroColorPicker.sp-replacer {
+    border-radius: 15px;
+    float: left;
+    left: 2px;
+    position: absolute;
+    top: 2px;
+}
+
+.rbroColorPicker.sp-replacer .sp-preview {
+    height: 24px;
+    width: 24px;
+}
+
+.rbroColorPicker.sp-replacer, .rbroColorPicker.sp-replacer * {
+    border: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.rbroColorPicker .sp-dd {
+    display: none;
+}
+
+.rbroColorPicker .sp-clear-display {
+    background: transparent;
+}
+
+.rbroColorContainer.sp-container {
+    background-color: #f1f3f4;
+    border: 1px solid #004864;
+    border-radius: 4px;
+}
+
+.rbroColorContainer .sp-dragger {
+    background-color: #ffffff;
+}
+
+.rbroColorContainer .sp-palette .sp-thumb-el {
+    border-radius: 10px;
+    border: none;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.rbroColorContainer .sp-palette .sp-thumb-el:hover, .sp-container .sp-palette .sp-thumb-el.sp-thumb-active {
+    border: 2px solid #004864;
+}
+
+.rbroColorContainer .sp-palette .sp-thumb-light.sp-thumb-active .sp-thumb-inner,
+.rbroColorContainer .sp-palette .sp-thumb-dark.sp-thumb-active .sp-thumb-inner{
+    background-image: none;
+}

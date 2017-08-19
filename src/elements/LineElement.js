@@ -1,0 +1,63 @@
+import DocElement from './DocElement';
+
+export default class LineElement extends DocElement {
+    constructor(id, initialData, rb) {
+        super(rb.getLabel('docElementLine'), id, 100, 1, rb);
+        this.color = '#000000';
+        this.setInitialData(initialData);
+    }
+
+    setup() {
+        super.setup();
+        this.createElement();
+        this.updateDisplay();
+        this.updateStyle();
+    }
+
+    setValue(field, value, elSelector, isShown) {
+        super.setValue(field, value, elSelector, isShown);
+        if (field === 'color') {
+            this.updateStyle();
+        }
+    }
+
+    getFields() {
+        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'color', 'printIf'];
+    }
+
+    getElementType() {
+        return DocElement.type.line;
+    }
+
+    updateStyle() {
+        let styleProperties = {};
+        styleProperties['background-color'] = this.getValue('color');
+        this.el.css(styleProperties);
+    }
+
+    getSizers() {
+        return ['E', 'W'];
+    }
+
+    getXTagId() {
+        return 'rbro_line_element_position_x';
+    }
+
+    getYTagId() {
+        return 'rbro_line_element_position_y';
+    }
+
+    getWidthTagId() {
+        return 'rbro_line_element_width';
+    }
+
+    getHeightTagId() {
+        return 'rbro_line_element_height';
+    }
+
+    createElement() {
+        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroLineElement"></div>`);
+        this.appendToContainer();
+        super.registerEventHandlers();
+    }
+}

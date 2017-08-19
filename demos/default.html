@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReportBro Demo</title>
+    <meta charset="utf-8"/>
+    <link href="base.css" rel="stylesheet" type="text/css"/>
+    <link href="../dist/ext/spectrum.css" rel="stylesheet" type="text/css"/>
+    <link href="../dist/reportbro.css" rel="stylesheet" type="text/css"/>
+    <script src="../dist/ext/jquery.js"></script>
+    <script src="../dist/ext/autosize.js"></script>
+    <script src="../dist/ext/JsBarcode.all.min.js"></script>
+    <script src="../dist/ext/spectrum.js"></script>
+    <script src="../dist/reportbro.js"></script>
+
+    <style type="text/css">
+        @font-face {
+            font-family: "tangerine";
+            src: url("fonts/tangerine.ttf");
+        }
+        @font-face {
+            font-family: "lobster";
+            src: url("fonts/lobster.ttf");
+        }
+    </style>
+
+
+    <script type="text/javascript">
+$(document).ready(function() {
+    var rb = $('#reportbro').reportBro({
+        localStorageReportKey: 'reportBroDemoDefault',
+        //remove reportServerUrl if you want to use the default report server for a quick start
+        reportServerUrl: 'http://localhost:8000/reportbro/report/run',
+        additionalFonts: [ { name: 'Tangerine', value: 'tangerine'}, { name: 'Lobster', value: 'lobster'} ] });
+    $('#reportbro').reportBro('loadLocalReport');
+});
+    </script> 
+</head>
+<body>
+    <div id="reportbro"></div>
+</body>
+</html>
