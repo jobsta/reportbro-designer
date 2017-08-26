@@ -8,6 +8,10 @@ import TableElement from '../elements/TableElement';
 import TextElement from '../elements/TextElement';
 import MainPanelItem from '../menu/MainPanelItem';
 
+/**
+ * Command to add and delete a doc element.
+ * @class
+ */
 export default class AddDeleteDocElementCmd {
     constructor(add, elementType, initialData, id, parentId, position, rb) {
         this.add = add;
@@ -18,7 +22,6 @@ export default class AddDeleteDocElementCmd {
         this.rb = rb;
         this.id = id;
         this.firstExecution = true;
-        this.skipFirstExecution = false;
     }
 
     getName() {
@@ -30,12 +33,10 @@ export default class AddDeleteDocElementCmd {
     }
 
     do() {
-        if (!(this.firstExecution && this.skipFirstExecution)) {
-            if (this.add) {
-                this.addElement();
-            } else {
-                this.deleteElement();
-            }
+        if (this.add) {
+            this.addElement();
+        } else {
+            this.deleteElement();
         }
         this.firstExecution = false;
     }
@@ -91,9 +92,5 @@ export default class AddDeleteDocElementCmd {
             this.rb.notifyEvent(element, Command.operation.remove);
             this.rb.deleteDocElement(element);
         }
-    }
-
-    setSkipFirstExecution() {
-        this.skipFirstExecution = true;
     }
 }

@@ -7,6 +7,10 @@ import TableTextElement from '../elements/TableTextElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all text properties.
+ * @class
+ */
 export default class TextElementPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -39,7 +43,7 @@ export default class TextElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elContent, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_text_element_content', 'parameter', PopupWindow.type.parameterAppend);
                 }
             });
@@ -205,7 +209,7 @@ export default class TextElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elPrintIf, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_text_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
                 }
             });
@@ -264,7 +268,7 @@ export default class TextElementPanel {
             .focus(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elPattern, this.rb.getPatterns(), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getPatterns(), this.selectedObjId,
                         'rbro_text_element_pattern', 'pattern', PopupWindow.type.pattern);
                 }
             })
@@ -320,7 +324,7 @@ export default class TextElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elCondStyleCondition, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_text_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
                 }
             });
@@ -453,6 +457,11 @@ export default class TextElementPanel {
         $('#rbro_text_element_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {TextElement|TableTextElement} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_text_element_content').prop('disabled', false);
@@ -575,6 +584,11 @@ export default class TextElementPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
         if (obj instanceof Style) {
             if (operation === Command.operation.add || operation === Command.operation.move) {
@@ -604,6 +618,9 @@ export default class TextElementPanel {
         }
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_text_element_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_text_element_panel .rbroPanelSection').removeClass('rbroError');

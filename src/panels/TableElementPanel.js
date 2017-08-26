@@ -5,6 +5,10 @@ import TableElement from '../elements/TableElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all table properties.
+ * @class
+ */
 export default class TableElementPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -28,7 +32,7 @@ export default class TableElementPanel {
             .focus(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elDataSource, this.rb.getArrayParameterItems(selectedObj),
+                    this.rb.getPopupWindow().show(this.rb.getArrayParameterItems(selectedObj),
                         this.selectedObjId, 'rbro_table_element_data_source', 'dataSource',
                         PopupWindow.type.parameterSet);
                 }
@@ -314,6 +318,11 @@ export default class TableElementPanel {
         $('#rbro_table_element_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {TableElement} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_table_element_data_source').prop('disabled', false);
@@ -367,9 +376,17 @@ export default class TableElementPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_table_element_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_table_element_panel .rbroErrorMessage').text('');

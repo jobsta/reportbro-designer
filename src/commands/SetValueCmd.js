@@ -1,5 +1,9 @@
 import Command from './Command';
 
+/**
+ * Command to set a single value of a data object.
+ * @class
+ */
 export default class SetValueCmd {
     constructor(objId, tagId, field, value, type, rb) {
         this.objId = objId;
@@ -75,10 +79,20 @@ export default class SetValueCmd {
         }
     }
 
+    /**
+     * Disables selection of the element containing the changed field. By default an element is automatically
+     * selected after one of its fields was changed.
+     */
     disableSelect() {
         this.select = false;
     }
 
+    /**
+     * Returns true if the given command targets the same field. This information can be useful to avoid separate
+     * commands for every keystroke in a text field and generate just one command for the whole changed text instead.
+     * @param {SetValueCmd} newCmd
+     * @returns {boolean}
+     */
     allowReplace(newCmd) {
         return (this.type === SetValueCmd.type.text && this.objId === newCmd.objId &&
             this.tagId === newCmd.tagId && this.field === newCmd.field);

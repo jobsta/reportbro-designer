@@ -2,6 +2,10 @@ import Document from '../Document';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
 
+/**
+ * Base class for all doc elements.
+ * @class
+ */
 export default class DocElement {
     constructor(name, id, defaultWidth, defaultHeight, rb) {
         this.rb = rb;
@@ -46,7 +50,9 @@ export default class DocElement {
         this.heightVal = utils.convertInputToNumber(this.height);
     }
 
-    // called after initialization is finished
+    /**
+     * Called after initialization is finished.
+     */
     setup() {
         let container = this.getContainer();
         if (container !== null) {
@@ -69,6 +75,9 @@ export default class DocElement {
         }
     }
 
+    /**
+     * Register event handlers so element can be selected, dragged and resized.
+     */
     registerEventHandlers() {
         this.el
             .mousedown(event => {
@@ -90,7 +99,10 @@ export default class DocElement {
         return this.id;
     }
 
-    // highest id of this component including all its child components
+    /**
+     * Returns highest id of this component including all its child components.
+     * @returns {Number}
+     */
     getMaxId() {
         return this.id;
     }
@@ -189,6 +201,10 @@ export default class DocElement {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return [];
     }
@@ -402,22 +418,42 @@ export default class DocElement {
         this.selected = false;
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
     }
 
+    /**
+     * Returns id for dom element of x value.
+     * @returns {String} Is empty in case doc element does not have x value.
+     */
     getXTagId() {
         return '';
     }
 
+    /**
+     * Returns id for dom element of y value.
+     * @returns {String} Is empty in case doc element does not have y value.
+     */
     getYTagId() {
         return '';
     }
 
+    /**
+     * Returns id for dom element of width value.
+     * @returns {String} Is empty in case doc element does not have width value.
+     */
     getWidthTagId() {
         return '';
     }
 
+    /**
+     * Returns id for dom element of height value.
+     * @returns {String} Is empty in case doc element does not have height value.
+     */
     getHeightTagId() {
         return '';
     }
@@ -430,6 +466,11 @@ export default class DocElement {
         return true;
     }
 
+    /**
+     * Returns maximum allowed width of element.
+     * This is needed when the element is resized by dragging so the resized element does not overflow its container.
+     * @returns {Number}.
+     */
     getMaxWidth() {
         let containerSize = this.getContainerSize();
         return containerSize.width;
@@ -446,6 +487,13 @@ export default class DocElement {
         return this.el;
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
     }
 

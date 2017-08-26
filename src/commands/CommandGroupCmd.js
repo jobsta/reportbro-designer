@@ -1,5 +1,9 @@
 import SetValueCmd from './SetValueCmd';
 
+/**
+ * Command container for multiple commands. All commands of this container will be executed in a single do/undo operation.
+ * @class
+ */
 export default class CommandGroupCmd {
     constructor(name, rb) {
         this.name;

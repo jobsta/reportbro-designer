@@ -3,6 +3,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
+/**
+ * Parameter data object. Contains all parameter settings including test data.
+ * @class
+ */
 export default class Parameter {
     constructor(id, initialData, rb) {
         this.rb = rb;
@@ -33,6 +37,9 @@ export default class Parameter {
         }
     }
 
+    /**
+     * Called after initialization is finished.
+     */
     setup() {
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
             for (let child of this.children) {
@@ -49,6 +56,10 @@ export default class Parameter {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'name', 'type', 'eval', 'pattern', 'expression', 'showOnlyNameType', 'testData'];
     }
@@ -57,7 +68,10 @@ export default class Parameter {
         return this.id;
     }
 
-    // highest id of this component including all its child components
+    /**
+     * Returns highest id of this component including all its child components.
+     * @returns {Number}
+     */
     getMaxId() {
         let maxId = this.id;
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
@@ -97,6 +111,10 @@ export default class Parameter {
         }
     }
 
+    /**
+     * Returns parent in case parameter is child of a map/array parameter.
+     * @returns {[Parameter]} parent parameter if available, null otherwise.
+     */
     getParent() {
         if (this.panelItem !== null && this.panelItem.getParent().getData() instanceof Parameter) {
             return this.panelItem.getParent().getData();
@@ -104,8 +122,15 @@ export default class Parameter {
         return null;
     }
 
-    // in case parameter is child of collection the returned name is parentName.name, otherwise only name.
-    // if parentName or name is not null then it is used instead of current parentName/name.
+    /**
+     * Returns the full parameter name.
+     * In case parameter is child of a map/array parameter the returned name is parentName.name, otherwise only name.
+     * @param {[String]} parentName - use this name for parent instead of current parent name. If null the
+     * current parent name is used.
+     * @param {[String]} name - use this name for the parameter instead of current name. If null the
+     * current parameter name is used.
+     * @returns {String}
+     */
     getFullName(parentName, name) {
         if (name === null) {
             name = this.getName();
@@ -141,6 +166,13 @@ export default class Parameter {
     deselect() {
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.expression.indexOf(oldParameterName) !== -1) {
             let cmd = new SetValueCmd(this.id, 'rbro_parameter_expression', 'expression',
@@ -152,8 +184,13 @@ export default class Parameter {
         }
     }
 
-    // update test data for arrays: adapt field names of list items so test data is still valid when a
-    // parameter of a list item is renamed
+    /**
+     * Update test data for arrays. Adapt field names of list items so test data is still valid when a
+     * parameter of a list item is renamed.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
+     */
     addUpdateTestDataCmdForChangedParameter(oldParameter, newParameter, cmdGroup) {
         if (this.type === Parameter.type.array) {
             let rows = [];
@@ -210,6 +247,14 @@ export default class Parameter {
         return children;
     }
 
+    /**
+     * In case of map parameter all child parameters are appended, for other parameter types except array the
+     * parameter itself is appended.
+     * Used for parameter popup window.
+     * @param {Object[]} parameters - list where parameter items will be appended to.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
+     * parameter list. If empty all parameter types are allowed.
+     */
     appendParameterItems(parameters, allowedTypes) {
         if (this.type === Parameter.type.map) {
             let parametersToAppend = [];
@@ -235,8 +280,15 @@ export default class Parameter {
         }
     }
 
+    /**
+     * Appends field parameters of array parameter.
+     * Used for parameter popup window of sum/average expression field.
+     * @param {Object[]} parameters - list where parameter items will be appended to.
+     * @param {String} fieldType - allowed parameter type which will be added to the
+     * parameter list. If empty all parameter types are allowed.
+     */
     appendFieldParameterItems(parameters, fieldType) {
-        if (this.type === Parameter.type.map || this.type === Parameter.type.array) {
+        if (this.type === Parameter.type.array) {
             for (let child of this.panelItem.getChildren()) {
                 let parameter = child.getData();
                 if (!fieldType || parameter.getValue('type') === fieldType) {
@@ -246,6 +298,10 @@ export default class Parameter {
         }
     }
 
+    /**
+     * Returns test data of array parameter as array.
+     * @returns {[Object[]]} rows of test data. Null in case parameter is not an array.
+     */
     getTestDataRows() {
         if (this.type !== Parameter.type.array) {
             return null;

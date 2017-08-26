@@ -2,6 +2,10 @@ import Command from './Command';
 import Style from '../data/Style';
 import MainPanelItem from '../menu/MainPanelItem';
 
+/**
+ * Command to add and delete a style.
+ * @class
+ */
 export default class AddDeleteStyleCmd {
     constructor(add, initialData, id, parentId, position, rb) {
         this.add = add;

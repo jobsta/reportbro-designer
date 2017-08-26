@@ -1,5 +1,9 @@
 import * as utils from '../utils';
 
+/**
+ * Data object containing all document properties like page size, margins, etc.
+ * @class
+ */
 export default class DocumentProperties {
     constructor(rb) {
         this.rb = rb;
@@ -54,6 +58,9 @@ export default class DocumentProperties {
         this.marginBottomVal = utils.convertInputToNumber(this.marginBottom);
     }
 
+    /**
+     * Called after initialization is finished.
+     */
     setup() {
         let size = this.getPageSize();
         this.updatePageSize(size);
@@ -64,6 +71,10 @@ export default class DocumentProperties {
         this.updateFooter();
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['pageFormat', 'pageWidth', 'pageHeight', 'unit', 'orientation',
             'contentHeight', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom',
@@ -141,7 +152,10 @@ export default class DocumentProperties {
         }
     }
 
-    // page size in pixel at 72 dpi
+    /**
+     * Returns page size in pixels at 72 dpi.
+     * @returns {Object} width, height
+     */
     getPageSize() {
         let pageWidth;
         let pageHeight;
@@ -193,6 +207,10 @@ export default class DocumentProperties {
         return { width: pageWidth, height: pageHeight };
     }
 
+    /**
+     * Returns size of content band without any margins.
+     * @returns {Object} width, height
+     */
     getContentSize() {
         let size = this.getPageSize();
         let height;

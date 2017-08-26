@@ -3,6 +3,10 @@ import TableTextElement from './TableTextElement';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
+/**
+ * Table band doc element. This is the header, content or footer of a table.
+ * @class
+ */
 export default class TableBandElement extends DocElement {
     constructor(id, initialData, tableBand, rb) {
         let name = (tableBand === 'header') ? rb.getLabel('bandHeader') : ((tableBand === 'footer') ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
@@ -37,6 +41,10 @@ export default class TableBandElement extends DocElement {
     registerEventHandlers() {
     }
 
+    /**
+     * Returns highest id of this component including all its child components.
+     * @returns {Number}
+     */
     getMaxId() {
         let maxId = this.id;
         for (let col of this.columnData) {
@@ -70,6 +78,10 @@ export default class TableBandElement extends DocElement {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         let fields = ['id', 'height', 'backgroundColor'];
         if (this.tableBand === 'header') {
@@ -88,6 +100,10 @@ export default class TableBandElement extends DocElement {
         this.el.css('background-color', this.backgroundColor);
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return [];
     }

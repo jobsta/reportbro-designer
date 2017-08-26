@@ -1,6 +1,11 @@
 import SetValueCmd from '../commands/SetValueCmd';
+import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all line properties.
+ * @class
+ */
 export default class LineElementPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -105,7 +110,7 @@ export default class LineElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elPrintIf, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_line_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
                 }
             });
@@ -131,6 +136,11 @@ export default class LineElementPanel {
         $('#rbro_line_element_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {LineElement} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_line_element_position_x').prop('disabled', false);
@@ -160,9 +170,17 @@ export default class LineElementPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_line_element_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_line_element_panel .rbroPanelSection').removeClass('rbroError');

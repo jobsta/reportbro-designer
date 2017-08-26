@@ -3,6 +3,11 @@ import DocumentProperties from './data/DocumentProperties';
 import DocElement from './elements/DocElement';
 import * as utils from './utils';
 
+/**
+ * Area to display all bands and its doc elements.
+ * Further handles dragging of doc elements.
+ * @class
+ */
 export default class Document {
     constructor(rootElement, showGrid, rb) {
         this.rootElement = rootElement;
@@ -254,10 +259,14 @@ export default class Document {
             $('#rbro_document_tab_pdf_layout').addClass('rbroActive');
             $('#rbro_document_pdf').removeClass('rbroHidden');
             $('#rbro_document_pdf_preview').css('z-index', '');
+            $('.rbroElementButtons .rbroMenuButton').removeClass('rbroDisabled').prop('draggable', true);
+            $('.rbroActionButtons .rbroActionButton').prop('disabled', false);
         } else if (this.pdfPreviewExists && tab === Document.tab.pdfPreview) {
             $('#rbro_document_tab_pdf_preview').addClass('rbroActive');
             $('#rbro_document_pdf').addClass('rbroHidden');
             $('#rbro_document_pdf_preview').css('z-index', '1');
+            $('.rbroElementButtons .rbroMenuButton').addClass('rbroDisabled').prop('draggable', false);
+            $('.rbroActionButtons .rbroActionButton').prop('disabled', true);
         }
     }
 
@@ -294,6 +303,12 @@ export default class Document {
         }
     }
 
+    /**
+     * Returns container for given absolute position.
+     * @param {Number} absPosX - absolute x position.
+     * @param {Number} absPosY - absolute y position.
+     * @returns {[Container]} Container or null in case no container was found for given position.
+     */
     getContainer(absPosX, absPosY) {
         let offset = this.elDocContent.offset();
         return this.rb.getContainer(absPosX - offset.left, absPosY - offset.top);

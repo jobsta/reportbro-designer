@@ -2,6 +2,10 @@ import SetValueCmd from './commands/SetValueCmd';
 import Parameter from './data/Parameter';
 import * as utils from './utils';
 
+/**
+ * Popup window to show selectable items (parameters, patterns, etc.) or to edit test data for array parameter.
+ * @class
+ */
 export default class PopupWindow {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -31,10 +35,20 @@ export default class PopupWindow {
         $('body').append(this.elWindow);
     }
 
-    show(input, items, objId, tagId, field, type) {
+    /**
+     * Shows a popup window for the given items.
+     * @param {Object[]} items - items to display in the popup window. Each item must contain a name (String), and
+     * optional a description (String) and separator (Boolean). If separator is true the item is not selectable.
+     * @param {String} objId - id of data object where the field belongs to.
+     * @param {String} tagId - id of DOM element in the panel for the given field. In case of empty string there is no
+     * input element available.
+     * @param {String} field - field of data object where selected item will be written into.
+     * @param {PopupWindow.type} type
+     */
+    show(items, objId, tagId, field, type) {
         let winWidth = $(window).width();
         let winHeight = $(window).height();
-        this.input = input;
+        this.input = (tagId !== '') ? $('#' + tagId) : null;
         this.objId = objId;
         this.type = type;
         this.elContent.empty();
@@ -116,11 +130,11 @@ export default class PopupWindow {
                 ul.append(li);
             }
             this.elContent.append(ul);
-            let offset = input.offset();
+            let offset = this.input.offset();
             let top = offset.top;
             // test if popup window should be shown above or below input field
             if (top < (winHeight / 2) || top < 300) {
-                top += input.height();
+                top += this.input.height();
             } else {
                 top -= 300;
             }

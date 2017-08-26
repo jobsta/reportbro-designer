@@ -5,6 +5,10 @@ import DocElement from '../elements/DocElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all barcode properties.
+ * @class
+ */
 export default class BarCodeElementPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -31,7 +35,7 @@ export default class BarCodeElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elContent, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_bar_code_element_content', 'parameter', PopupWindow.type.parameterAppend);
                 }
             });
@@ -157,7 +161,7 @@ export default class BarCodeElementPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(elPrintIf, this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
                         'rbro_bar_code_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
                 }
             });
@@ -274,6 +278,11 @@ export default class BarCodeElementPanel {
         $('#rbro_bar_code_element_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {BarCodeElement} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_bar_code_element_content').prop('disabled', false);
@@ -318,9 +327,17 @@ export default class BarCodeElementPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_bar_code_element_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_bar_code_element_panel .rbroPanelSection').removeClass('rbroError');

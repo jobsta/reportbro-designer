@@ -1,6 +1,10 @@
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 
+/**
+ * The menu panel contains all menu buttons.
+ * @class
+ */
 export default class MenuPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;

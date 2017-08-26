@@ -3,6 +3,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
 import * as utils from '../utils';
 
+/**
+ * Text doc element.
+ * @class
+ */
 export default class TextElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementText'), id, 100, 20, rb);
@@ -106,6 +110,10 @@ export default class TextElement extends DocElement {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'width', 'height', 'content', 'eval',
             'styleId', 'bold', 'italic', 'underline',
@@ -260,6 +268,13 @@ export default class TextElement extends DocElement {
         $(`#rbro_el_content_text${this.id}`).text(value);
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.content.indexOf(oldParameterName) !== -1) {
             let cmd = new SetValueCmd(this.id, 'rbro_text_element_content', 'content',

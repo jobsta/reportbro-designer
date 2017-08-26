@@ -2,6 +2,10 @@ import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all table band properties.
+ * @class
+ */
 export default class TableBandElementPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -107,6 +111,11 @@ export default class TableBandElementPanel {
         $('#rbro_table_band_element_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {TableBandElement} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_table_band_element_height').prop('disabled', false);
@@ -137,9 +146,17 @@ export default class TableBandElementPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_table_band_element_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_table_band_element_panel .rbroErrorMessage').text('');

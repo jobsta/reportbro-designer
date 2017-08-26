@@ -1,3 +1,7 @@
+/**
+ * Style data object. Contains all text styles (alignment, border, etc.):
+ * @class
+ */
 export default class Style {
     constructor(id, initialData, rb) {
         this.rb = rb;
@@ -38,6 +42,10 @@ export default class Style {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'name', 'bold', 'italic', 'underline', 'horizontalAlignment', 'verticalAlignment',
             'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
@@ -105,6 +113,16 @@ export default class Style {
         return ret;
     }
 
+    /**
+     * Updates GUI for border settings and borderAll setting of object.
+     * @param {Object} obj - document element of which the border settings will be updated.
+     * @param {String} field - border field which was modified.
+     * @param {String} fieldPrefix - prefix of field to reuse style settings for different
+     * sections (e.g. for conditional style).
+     * @param {Boolean} value - new value for specified field.
+     * @param {String} elSelector - jquery selector to specify the DOM element.
+     * @param {Boolean} isShown - true if the specified object is currently visible in the GUI.
+     */
     static setBorderValue(obj, field, fieldPrefix, value, elSelector, isShown) {
         if (field === `${fieldPrefix}borderAll`) {
             obj.borderLeft = obj.borderTop = obj.borderRight = obj.borderBottom = value;

@@ -3,6 +3,10 @@ import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all style properties.
+ * @class
+ */
 export default class StylePanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -441,6 +445,11 @@ export default class StylePanel {
         $('#rbro_style_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {Style} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_style_name').prop('disabled', false);
@@ -608,9 +617,17 @@ export default class StylePanel {
         }
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_style_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_style_panel .rbroErrorMessage').text('');

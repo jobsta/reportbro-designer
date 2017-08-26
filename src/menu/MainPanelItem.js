@@ -7,6 +7,11 @@ import Parameter from '../data/Parameter';
 import DocElement from '../elements/DocElement';
 import Document from '../Document';
 
+/**
+ * A main panel item either represents a data object (doc element, parameter, etc.) or a container (e.g. page header) for
+ * other panel items.
+ * @class
+ */
 export default class MainPanelItem {
     constructor(panelName, panelCategory, panelLabel, parent, data, properties, rb) {
         this.properties = { hasChildren: false, showAdd: false, showDelete: true, hasDetails: true, visible: true, draggable: false };
@@ -292,6 +297,11 @@ export default class MainPanelItem {
         return 0;
     }
 
+    /**
+     * Move panel item to another parent.
+     * The panel will be appended to the parent, i.e. added after all children of the parent.
+     * @param {MainPanelItem} parentPanelItem - new parent panel
+     */
     moveTo(parentPanelItem) {
         let el = this.element.detach();
         this.parent.removeChildInternal(this, false);
@@ -299,6 +309,11 @@ export default class MainPanelItem {
         parentPanelItem.appendChild(this);
     }
 
+    /**
+     * Move panel item to another parent at given position.
+     * @param {MainPanelItem} parentPanelItem - new parent panel
+     * @param {Number} pos - Position index in children list of new parent where the panel will be inserted.
+     */
     moveToPosition(parentPanelItem, pos) {
         let el = this.element.detach();
         this.parent.removeChildInternal(this, false);

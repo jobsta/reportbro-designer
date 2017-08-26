@@ -1,3 +1,7 @@
+/**
+ * Interface for all commands.
+ * @class
+ */
 export default class Command {
     getName() {}
     do() {}

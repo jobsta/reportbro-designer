@@ -1,3 +1,7 @@
+/**
+ * Empty panel which is shown when no data object is selected.
+ * @class
+ */
 export default class EmptyDetailPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;

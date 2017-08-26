@@ -5,6 +5,10 @@ import Parameter from '../data/Parameter';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all parameter properties.
+ * @class
+ */
 export default class ParameterPanel {
     constructor(rootElement, rb) {
         this.rootElement = rootElement;
@@ -127,7 +131,7 @@ export default class ParameterPanel {
                     } else {
                         patterns = this.rb.getProperty('patternNumbers');
                     }
-                    this.rb.getPopupWindow().show(elPattern, patterns, this.selectedObjId,
+                    this.rb.getPopupWindow().show(patterns, this.selectedObjId,
                         'rbro_parameter_pattern', 'pattern', PopupWindow.type.pattern);
                 }
                 event.preventDefault();
@@ -172,7 +176,7 @@ export default class ParameterPanel {
                         items = this.rb.getParameterItems(selectedObj);
                         popupType = PopupWindow.type.parameterAppend;
                     }
-                    this.rb.getPopupWindow().show(elExpression, items, this.selectedObjId,
+                    this.rb.getPopupWindow().show(items, this.selectedObjId,
                         'rbro_parameter_expression', 'expression', popupType);
                 }
             });
@@ -208,7 +212,7 @@ export default class ParameterPanel {
                     if (parameters.length > 0) {
                         let rows = selectedObj.getTestDataRows();
                         rows.unshift(parameters);
-                        this.rb.getPopupWindow().show(null, rows, this.selectedObjId, '', 'testData', PopupWindow.type.testData);
+                        this.rb.getPopupWindow().show(rows, this.selectedObjId, '', 'testData', PopupWindow.type.testData);
                     } else {
                         alert(this.rb.getLabel('parameterEditTestDataNoFields'));
                     }
@@ -235,6 +239,11 @@ export default class ParameterPanel {
         $('#rbro_parameter_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {Parameter} data
+     */
     updateData(data) {
         if (data !== null) {
             let editable = data.getValue('editable');
@@ -280,6 +289,11 @@ export default class ParameterPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
         if (obj instanceof Parameter && obj === this.rb.getDetailData() && operation === Command.operation.change) {
             this.updateVisibility(obj);
@@ -362,6 +376,9 @@ export default class ParameterPanel {
         }
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_parameter_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_parameter_panel .rbroErrorMessage').text('');

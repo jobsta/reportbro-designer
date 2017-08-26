@@ -2,6 +2,10 @@ import DocElement from './DocElement';
 import TextElement from './TextElement';
 import * as utils from '../utils';
 
+/**
+ * Table text doc element. A text element inside a table cell.
+ * @class
+ */
 export default class TableTextElement extends TextElement {
     constructor(id, initialData, rb) {
         super(id, initialData, rb);
@@ -59,6 +63,10 @@ export default class TableTextElement extends TextElement {
         this.updateDisplayInternalNotify(0, 0, this.widthVal, 0, false);
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         let fields = ['id', 'width', 'height', 'content',
             'styleId', 'bold', 'italic', 'underline',
@@ -103,6 +111,10 @@ export default class TableTextElement extends TextElement {
         }
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return ['E'];
     }
@@ -131,6 +143,11 @@ export default class TableTextElement extends TextElement {
         return false;
     }
 
+    /**
+     * Returns maximum allowed width of element.
+     * This is needed when the element is resized by dragging so the resized element does not overflow its container.
+     * @returns {Number}.
+     */
     getMaxWidth() {
         let tableObj = this.rb.getDataObject(this.tableId);
         let tableBandObj = this.rb.getDataObject(this.parentId);
@@ -148,6 +165,10 @@ export default class TableTextElement extends TextElement {
         return 0;
     }
 
+    /**
+     * Returns x-offset relative to table.
+     * @returns {Number}.
+     */
     getOffsetX() {
         let tableBandObj = this.rb.getDataObject(this.parentId);
         if (tableBandObj !== null) {

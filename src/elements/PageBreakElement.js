@@ -1,5 +1,9 @@
 import DocElement from './DocElement';
 
+/**
+ * Page break doc element. A page break triggers a new page when the document is printed.
+ * @class
+ */
 export default class PageBreakElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementPageBreak'), id, -1, 1, rb);
@@ -17,6 +21,10 @@ export default class PageBreakElement extends DocElement {
         super.setValue(field, value, elSelector, isShown);
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'containerId', 'y'];
     }
@@ -33,6 +41,10 @@ export default class PageBreakElement extends DocElement {
         }
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return [];
     }

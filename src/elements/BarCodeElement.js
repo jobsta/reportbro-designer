@@ -3,6 +3,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
 import * as utils from '../utils';
 
+/**
+ * Barcode doc element. Currently only Code-128 is supported.
+ * @class
+ */
 export default class BarCodeElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementImage'), id, 80, 80, rb);
@@ -36,6 +40,10 @@ export default class BarCodeElement extends DocElement {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'height', 'content', 'format', 'displayValue',
             'printIf', 'removeEmptyElement',
@@ -54,6 +62,10 @@ export default class BarCodeElement extends DocElement {
         }
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return ['N', 'S'];
     }
@@ -120,6 +132,13 @@ export default class BarCodeElement extends DocElement {
         this.width = '' + this.widthVal;
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.content.indexOf(oldParameterName) !== -1) {
             let cmd = new SetValueCmd(this.id, 'rbro_bar_code_element_content', 'content',

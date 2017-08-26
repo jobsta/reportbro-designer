@@ -3,6 +3,10 @@ import DocElement from '../elements/DocElement';
 import Document from '../Document';
 import * as utils from '../utils';
 
+/**
+ * Standard band container for header, content and footer band.
+ * @class
+ */
 export default class Band extends Container {
     constructor(band, rb) {
         super('', '', rb);
@@ -25,6 +29,9 @@ export default class Band extends Container {
         this.el = null;
     }
 
+    /**
+     * Called after initialization is finished.
+     */
     setup() {
         this.el = this.rb.getDocument().getElement(this.band);
     }
@@ -33,6 +40,10 @@ export default class Band extends Container {
         this.el.append(el);
     }
 
+    /**
+     * Returns true if the given element type can be added to this container.
+     * @param {String} elementType
+     */
     isElementAllowed(elementType) {
         if (elementType === DocElement.type.tableText) {
             return false;
@@ -41,12 +52,20 @@ export default class Band extends Container {
             (elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.table);
     }
 
+    /**
+     * Update container style when given element type is currently dragged over this container.
+     * @param {String} elementType
+     */
     dragOver(elementType) {
         if (this.isElementAllowed(elementType)) {
             this.el.addClass('rbroElementDragOver');
         }
     }
 
+    /**
+     * Returns absolute container offset.
+     * @returns {Object} x and y offset coordinates.
+     */
     getOffset() {
         let y = 0;
         let docProperties = this.rb.getDocumentProperties();
@@ -58,6 +77,10 @@ export default class Band extends Container {
         return { x: 0, y: y };
     }
 
+    /**
+     * Returns container size.
+     * @returns {Object} width and height of container.
+     */
     getSize() {
         let documentProperties = this.rb.getDocumentProperties();
         let width = documentProperties.getValue('width') -
@@ -75,6 +98,11 @@ export default class Band extends Container {
         return { width: width, height: height };
     }
 
+    /**
+     * Returns true if given absolute position is inside container.
+     * @param {Number} x - absolute x coordinate.
+     * @param {Number} y - absolute y coordinate.
+     */
     isInside(posX, posY) {
         let offset = this.getOffset();
         let size = this.getSize();

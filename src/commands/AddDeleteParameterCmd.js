@@ -2,6 +2,10 @@ import Command from './Command';
 import Parameter from '../data/Parameter';
 import MainPanelItem from '../menu/MainPanelItem';
 
+/**
+ * Command to add and delete a parameter.
+ * @class
+ */
 export default class AddDeleteParameterCmd {
     constructor(add, initialData, id, parentId, position, rb) {
         this.add = add;

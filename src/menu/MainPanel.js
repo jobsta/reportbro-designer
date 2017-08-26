@@ -2,6 +2,11 @@ import MainPanelItem from './MainPanelItem';
 import Container from '../container/Container';
 import Document from '../Document';
 
+/**
+ * Main panel which contains all report elements like doc elements, parameters and styles.
+ * The main panel shows the structure and all components of the report.
+ * @class
+ */
 export default class MainPanel {
     constructor(rootElement, headerBand, contentBand, footerBand, parameterContainer, styleContainer, rb) {
         this.rootElement = rootElement;

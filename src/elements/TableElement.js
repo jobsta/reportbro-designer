@@ -5,6 +5,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
+/**
+ * Table doc element. Each table cell consists of a text element.
+ * @class
+ */
 export default class TableElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementTable'), id, 200, 40, rb);
@@ -73,10 +77,14 @@ export default class TableElement extends DocElement {
         this.setupComplete = true;
         this.updateWidth();
         this.updateStyle();
-        this.updateDataSource(this.dataSource);
+        this.updateName();
         this.panelItem.open();
     }
 
+    /**
+     * Returns highest id of this component including all its child components.
+     * @returns {Number}
+     */
     getMaxId() {
         let maxId = this.id;
         let tempId;
@@ -98,7 +106,7 @@ export default class TableElement extends DocElement {
     setValue(field, value, elSelector, isShown) {
         super.setValue(field, value, elSelector, isShown);
         if (field === 'dataSource') {
-            this.updateDataSource(value);
+            this.updateName();
         } else if (field === 'header') {
             this.headerData.show(value);
             if (value) {
@@ -159,6 +167,10 @@ export default class TableElement extends DocElement {
         this.el.addClass('rbroBorderTable' + this.border.charAt(0).toUpperCase() + this.border.slice(1));
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'footer',
             'border', 'borderColor', 'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
@@ -176,6 +188,10 @@ export default class TableElement extends DocElement {
         }
     }
 
+    /**
+     * Returns allowed sizers when element is selected.
+     * @returns {String[]}
+     */
     getSizers() {
         return [];
     }
@@ -225,6 +241,12 @@ export default class TableElement extends DocElement {
         this.footerData = null;
     }
 
+    /**
+     * Is called when column width of a single column was changed to update the column width of all table bands.
+     * @param {Number} columnIndex - index of changed column.
+     * @param {Number} width - new column width.
+     * @param {Boolean} updateTableWidth - if true the table width will be updated as well.
+     */
     updateColumnWidth(columnIndex, width, updateTableWidth) {
         if (this.setupComplete) {
             this.headerData.updateColumnWidth(columnIndex, width);
@@ -236,6 +258,9 @@ export default class TableElement extends DocElement {
         }
     }
 
+    /**
+     * Update table width based on width of all cells of content band.
+     */
     updateWidth() {
         if (this.setupComplete) {
             let width = this.contentData.getWidth();
@@ -245,6 +270,12 @@ export default class TableElement extends DocElement {
         }
     }
 
+    /**
+     * Is called when column width of a cell was changed to update all DOM elements accordingly.
+     * @param {TableBandElement} tableBand - band containing the changed cell.
+     * @param {Number} columnIndex - column index of changed cell.
+     * @param {Number} newColumnWidth
+     */
     notifyColumnWidthResized(tableBand, columnIndex, newColumnWidth) {
         if (!this.setupComplete)
             return;
@@ -275,15 +306,18 @@ export default class TableElement extends DocElement {
         $(`#rbro_el_table${this.id}`).css('width', (width + 1) + 'px');
     }
 
-    updateDataSource(value) {
-        if (value.trim() === '') {
-            this.name = this.rb.getLabel('docElementTable');
-        } else {
-            this.name = this.rb.getLabel('docElementTable') + ' ' + value;
+    updateName() {
+        this.name = this.rb.getLabel('docElementTable');
+        if (this.dataSource.trim() !== '') {
+            this.name += ' ' + this.dataSource;
         }
         $(`#rbro_menu_item_name${this.id}`).text(this.name);
     }
 
+    /**
+     * Returns all child parameters of the data source parameter (which must be an array parameter).
+     * @returns {Parameter[]}
+     */
     getDataParameters() {
         let parameters = [];
         let dataSource = this.dataSource.trim();
@@ -307,6 +341,13 @@ export default class TableElement extends DocElement {
         this.footerData.addChildren(docElements);
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.dataSource.indexOf(oldParameterName) !== -1) {
             let cmd = new SetValueCmd(this.id, 'rbro_table_element_data_source', 'dataSource',
@@ -315,6 +356,13 @@ export default class TableElement extends DocElement {
         }
     }
 
+    /**
+     * Adds commands to command group parameter to recreate table with new column count.
+     * @param {Number} columns - requested new column count.
+     * @param {CommandGroupCmd} cmdGroup - possible commands will be added to this command group.
+     * @returns {Number} either new column count or existing column count in case there is not enough space
+     * for all column.
+     */
     addCommandsForChangedColumns(columns, cmdGroup) {
         const COLUMN_MIN_WIDTH = 20;
         let existingColumns = utils.convertInputToNumber(this.columns);

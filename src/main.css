@@ -2,6 +2,7 @@
 
 *, html {
     font-family:inherit;
+    outline:none;
 }
 
 #reportbro {
@@ -785,7 +786,8 @@ button.rbroActionButton.rbroButtonActive {
 }
 
 button.rbroButton[disabled], button.rbroButton[disabled]:hover,
-button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover {
+button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
+.rbroButton.rbroDisabled, .rbroButton.rbroDisabled:hover {
     color: #cccccc;
     background-color: #ffffff;
     cursor: not-allowed;

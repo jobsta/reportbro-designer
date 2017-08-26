@@ -3,6 +3,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
 import * as utils from '../utils';
 
+/**
+ * Image doc element. Supported formats are png and jpg.
+ * @class
+ */
 export default class ImageElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementImage'), id, 80, 80, rb);
@@ -43,6 +47,10 @@ export default class ImageElement extends DocElement {
         }
     }
 
+    /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
             'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
@@ -160,6 +168,13 @@ export default class ImageElement extends DocElement {
         $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
     }
 
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {String} oldParameterName
+     * @param {String} newParameterName
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.source.indexOf(oldParameterName) !== -1) {
             let cmd = new SetValueCmd(this.id, 'rbro_image_element_source', 'source',

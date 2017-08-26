@@ -3,6 +3,10 @@ import SetValueCmd from '../commands/SetValueCmd';
 import DocumentProperties from '../data/DocumentProperties';
 import * as utils from '../utils';
 
+/**
+ * Panel to edit all document properties.
+ * @class
+ */
 export default class DocumentPropertiesPanel {
     constructor(documentProperties, rootElement, rb) {
         this.documentProperties = documentProperties;
@@ -301,6 +305,11 @@ export default class DocumentPropertiesPanel {
         $('#rbro_document_properties_panel').addClass('rbroHidden');
     }
 
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {DocumentProperties} data
+     */
     updateData(data) {
         if (data !== null) {
             $('#rbro_document_properties_page_format').val(data.getValue('pageFormat'));
@@ -326,6 +335,11 @@ export default class DocumentPropertiesPanel {
         this.updateErrors();
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     */
     notifyEvent(obj, operation) {
         if (obj instanceof DocumentProperties && obj === this.rb.getDetailData() && operation === Command.operation.change) {
             this.updateVisibility(obj);
@@ -350,6 +364,9 @@ export default class DocumentPropertiesPanel {
         }
     }
 
+    /**
+     * Updates displayed errors of currently selected data object.
+     */
     updateErrors() {
         $('#rbro_document_properties_panel .rbroFormRow').removeClass('rbroError');
         $('#rbro_document_properties_panel .rbroErrorMessage').text('');

@@ -33,6 +33,10 @@ import TableElementPanel from './panels/TableElementPanel';
 import TableBandElementPanel from './panels/TableBandElementPanel';
 import TextElementPanel from './panels/TextElementPanel';
 
+/**
+ * Used for the main ReportBro instance.
+ * @class
+ */
 export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
@@ -454,6 +458,9 @@ export default class ReportBro {
         });
     }
 
+    /**
+     * Adds default parameters like page count/number.
+     */
     addDefaultParameters() {
         for (let parameterData of [
                 { name: 'page_count', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true },
@@ -523,6 +530,11 @@ export default class ReportBro {
         this.addDataObject(this.documentProperties);
     }
 
+    /**
+     * Returns the label for given key.
+     * @param {String} key
+     * @returns {String} Label for given key, if it does not exist then the key is returned.
+     */
     getLabel(key) {
         if (key in this.locale) {
             return this.locale[key];
@@ -534,6 +546,10 @@ export default class ReportBro {
         return this.properties[key];
     }
 
+    /**
+     * Returns a new unique id which can be used for any data object.
+     * @returns {Number}
+     */
     getUniqueId() {
         return this.nextId++;
     }
@@ -554,6 +570,10 @@ export default class ReportBro {
         return this.properties.fonts;
     }
 
+    /**
+     * Returns a list of all number and date patterns.
+     * @returns {Object[]} Each item contains name (String), optional description (String) and optional separator (Boolean).
+     */
     getPatterns() {
         let patterns = [];
         if (this.properties.patternNumbers.length > 0) {
@@ -571,6 +591,16 @@ export default class ReportBro {
         return patterns;
     }
 
+    /**
+     * Returns a list of parameter items.
+     * Used for parameter popup window.
+     * @param {DocElement} docElement - adds all parameters available for this element, e.g. array field parameters
+     * of a table data source.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
+     * parameters list. If empty all parameter types are allowed.
+     * @returns {Object[]} Each item contains name (String), optional description (String) and
+     * optional separator (Boolean).
+     */
     getParameterItems(docElement, allowedTypes) {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
@@ -578,7 +608,8 @@ export default class ReportBro {
         let panelItem = docElement.getPanelItem();
         while (panelItem !== null) {
             panelItem = panelItem.getParent();
-            if (panelItem !== null && panelItem.getData() instanceof TableBandElement && panelItem.getData().getValue('tableBand') === 'content') {
+            if (panelItem !== null && panelItem.getData() instanceof TableBandElement &&
+                    panelItem.getData().getValue('tableBand') === 'content') {
                 if (panelItem.getParent() !== null && panelItem.getParent().getData() instanceof TableElement) {
                     for (let dataParameter of panelItem.getParent().getData().getDataParameters()) {
                         dataParameter.appendParameterItems(parameters, allowedTypes);
@@ -599,6 +630,12 @@ export default class ReportBro {
         return parameters.concat(mapParameters);
     }
 
+    /**
+     * Returns a list of all array parameter items.
+     * Used for parameter popup window.
+     * @returns {Object[]} Each item contains name (String), optional description (String) and
+     * optional separator (Boolean).
+     */
     getArrayParameterItems() {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
@@ -612,6 +649,14 @@ export default class ReportBro {
         return parameters;
     }
 
+    /**
+     * Returns a list of all array field parameter items.
+     * Used for parameter popup window.
+     * @param {String} fieldType - allowed parameter type which will be added to the
+     * parameter list. If empty all parameter types are allowed.
+     * @returns {Object[]} Each item contains name (String), optional description (String) and
+     * optional separator (Boolean).
+     */
     getArrayFieldParameterItems(fieldType) {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
@@ -656,6 +701,12 @@ export default class ReportBro {
         this.detailPanels[this.activeDetailPanel].updateData(this.detailData);
     }
 
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     * @param {[String]} field - affected field in case of change operation.
+     */
     notifyEvent(obj, operation, field) {
         if (obj instanceof Parameter) {
             if (obj.getValue('type') === Parameter.type.array || obj.getValue('type') === Parameter.type.map) {
@@ -929,8 +980,10 @@ export default class ReportBro {
         return null;
     }
 
-    // store our own drag data because dataTransfer data of event is not available in
-    // dragenter/dragover/dragleave events (in some browsers)
+    /**
+     * Store our own drag data because dataTransfer data of event is not available in
+     * dragenter/dragover/dragleave events (in some browsers).
+     */
     startBrowserDrag(browserDragType, browserDragCategory, browserDragElementType, browserDragId) {
         this.browserDragType = browserDragType;
         this.browserDragCategory = browserDragCategory;
@@ -972,6 +1025,10 @@ export default class ReportBro {
         }
     }
 
+    /**
+     * Aligns all currently selected doc elements to each other.
+     * @param {Style.alignment} alignment
+     */
     alignSelections(alignment) {
         let alignVal = NaN;
         let x, y, width, height;
@@ -1050,6 +1107,12 @@ export default class ReportBro {
         }
     }
 
+    /**
+     * Converts given value to a string which can be used in css style attribute
+     * where a position or size must be specified.
+     * @param {String|Number} val - a number value, can also be given as a string.
+     * @returns {String}
+     */
     toPixel(val) {
         if (val === '') {
             return '0px';
@@ -1093,12 +1156,18 @@ export default class ReportBro {
         return element;
     }
 
+    /**
+     * Shows a global loading image which disables all controls.
+     */
     showLoading() {
         if ($('#rbro_loading_div').length == 0) {
             $('body').append('<div id="rbro_loading_div" class="rbroLoadingIndicator"></div>');
         }
     }
 
+    /**
+     * Hides global loading image.
+     */
     hideLoading() {
         $('#rbro_loading_div').remove();
     }
@@ -1140,7 +1209,13 @@ export default class ReportBro {
         }
     }
 
-    previewInternal(outputFormat, data, isTestData) {
+    /**
+     * Performs ajax request to upload the report and either update displayed errors or
+     * display report pdf in case report is valid.
+     * @param {Object} data - report data.
+     * @param {Boolean} isTestData - true if data contains test data from parameters.
+     */
+    previewInternal(data, isTestData) {
         let self = this;
         $('.rbroMenuItem').removeClass('rbroError');
         for (let objId in this.objectMap) {
@@ -1151,7 +1226,7 @@ export default class ReportBro {
         $.ajax(this.properties.reportServerUrl, {
             data: JSON.stringify({
                 report: this.getReport(),
-                outputFormat: outputFormat,
+                outputFormat: DocumentProperties.outputFormat.pdf,
                 data: data,
                 isTestData: isTestData
             }),
@@ -1190,6 +1265,11 @@ export default class ReportBro {
     ///////////////////////////////////////////////////////////////////////////
     // API functions
     ///////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Returns report object containing everything needed for the report.
+     * @returns {Object}
+     */
     getReport() {
         let ret = { docElements: [], parameters: [], styles: [], version: 1 };
         let i;
@@ -1212,6 +1292,9 @@ export default class ReportBro {
         return ret;
     }
 
+    /**
+     * Either calls saveCallback (if available) or stores report in local storage (if key is available).
+     */
     save() {
         if (this.properties.saveCallback) {
             this.properties.saveCallback();
@@ -1230,6 +1313,10 @@ export default class ReportBro {
         this.updateMenuButtons();
     }
 
+    /**
+     * Loads report object into ReportBro Designer.
+     * @param {Object} report - the report object.
+     */
     load(report) {
         for (let parameter of this.getParameters()) {
             this.deleteParameter(parameter);
@@ -1303,6 +1390,9 @@ export default class ReportBro {
         this.updateMenuButtons();
     }
 
+    /**
+     * Loads report from local storage (if key and report is available).
+     */
     loadLocalReport() {
         if (this.properties.localStorageReportKey) {
             if ('localStorage' in window && window['localStorage'] !== null) {
@@ -1319,13 +1409,16 @@ export default class ReportBro {
     }
   
     preview() {
-        this.previewInternal(DocumentProperties.outputFormat.pdf, this.getTestData(), true);
+        this.previewInternal(this.getTestData(), true);
     }
 
     previewWithData(data) {
-        this.previewInternal(DocumentProperties.outputFormat.pdf, data, false);
+        this.previewInternal(data, false);
     }
 
+    /**
+     * Downloads spreadsheet file for a report where a preview was executed before.
+     */
     downloadSpreadsheet() {
         if (this.reportKey !== null) {
             window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
