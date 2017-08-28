@@ -40,7 +40,6 @@ import TextElementPanel from './panels/TextElementPanel';
 export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
-        this.properties = properties;
         this.nextId = 1;
         this.locale = {
             bandContent: 'Content',
@@ -226,7 +225,6 @@ export default class ReportBro {
             textElementEval: 'Evaluate',
             textElementPattern: 'Pattern'
         };
-        $.extend( this.locale, properties['locale'] || {} );
 
         this.properties = {
             additionalFonts: [],
@@ -269,6 +267,7 @@ export default class ReportBro {
                     this.properties[prop] = properties[prop];
                 }
             }
+            $.extend( this.locale, properties['locale'] || {} );
         }
         if (this.properties.additionalFonts.length > 0) {
             this.properties.fonts = this.properties.fonts.concat(this.properties.additionalFonts);
@@ -1303,7 +1302,7 @@ export default class ReportBro {
             if ('localStorage' in window && window['localStorage'] !== null) {
                 try {
                     let report = this.getReport();
-                    console.log(JSON.stringify(report));
+                    // console.log(JSON.stringify(report));
                     window.localStorage.setItem(this.properties.localStorageReportKey, JSON.stringify(report));
                     this.modified = false;
                 } catch (e) {
