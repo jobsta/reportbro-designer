@@ -63,12 +63,23 @@ Transpiles javascript code from ES6 to ES5 to support older browsers and minifie
 
 ## Notes
 
+### Running demos from local filesystem
+
+You need to run
+
+`npm run build-prod`
+
+at least once before starting any local demos. This build step copies the external plugins to the ../dist/ext folder
+which are referenced in the demos.
+
 ### Running demos from local filesystem with Firefox
+
 Because of Firefox's strict origin policy the icon fonts cannot be loaded (from ../dist/iconfonts)
 with default settings. Go to `about:config` and make sure
 `security.fileuri.strict_origin_policy` is set to false.
 
 ### Testing with MS Edge on localhost
+
 You have to enable loopback first
 
 `CheckNetIsolation LoopbackExempt -a -n=Microsoft.MicrosoftEdge_8wekyb3d8bbwe`
