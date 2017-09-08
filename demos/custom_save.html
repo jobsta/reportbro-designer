@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ReportBro Demo</title>
+    <meta charset="utf-8"/>
+    <link href="base.css" rel="stylesheet" type="text/css"/>
+    <link href="../dist/ext/spectrum.css" rel="stylesheet" type="text/css"/>
+    <link href="../dist/reportbro.css" rel="stylesheet" type="text/css"/>
+    <script src="../dist/ext/jquery.js"></script>
+    <script src="../dist/ext/autosize.js"></script>
+    <script src="../dist/ext/JsBarcode.all.min.js"></script>
+    <script src="../dist/ext/spectrum.js"></script>
+    <script src="../dist/reportbro.js"></script>
+
+    <script type="text/javascript">
+
+///////////////////////////////////////////////////////////////////////////////
+// this demo shows how you can use the saveCallback for a custom save
+// function to upload the report to your server. You need to replace
+// '<your save controller url>' with your url where you save the report
+// in your web application. How you handle saving the report server-side is
+// up to you.
+///////////////////////////////////////////////////////////////////////////////
+
+function saveReport() {
+    var report = $('#reportbro').reportBro('getReport');
+
+    $.ajax('<your save controller url>', {
+        data: JSON.stringify(report),
+        type: "PUT", contentType: "application/json",
+        success: function(data) {
+            alert('report saved');
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert('saving report failed');
+        }
+    });
+}
+    
+$(document).ready(function() {
+    $('#reportbro').reportBro({
+        saveCallback: saveReport
+        //remove reportServerUrl if you want to use the default report server for a quick start
+        //reportServerUrl: 'http://localhost:8000/reportbro/report/run',
+    });
+
+    // load report saved in your application database
+    var report = null; // get report from server
+    if (report !== null) {
+        $('#reportbro').reportBro('load', report);
+    }
+});
+    </script> 
+</head>
+<body>
+    <div id="reportbro"></div>
+</body>
+</html>
