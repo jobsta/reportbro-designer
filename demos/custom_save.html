@@ -40,8 +40,8 @@ function saveReport() {
 $(document).ready(function() {
     $('#reportbro').reportBro({
         saveCallback: saveReport
-        //remove reportServerUrl if you want to use the default report server for a quick start
-        //reportServerUrl: 'http://localhost:8000/reportbro/report/run',
+        // uncomment if you have your own reportbro-lib installed
+        // reportServerUrl: 'http://localhost:8000/reportbro/report/run',
     });
 
     // load report saved in your application database
