@@ -89,6 +89,7 @@ export default class TextElement extends DocElement {
                 Style.setBorderValue(this, field, '', value, elSelector, isShown);
             }
         }
+
         super.setValue(field, value, elSelector, isShown);
 
         if (field === 'content') {

@@ -10,8 +10,6 @@ import * as utils from '../utils';
 export default class Band extends Container {
     constructor(band, rb) {
         super('', '', rb);
-        this.rb = rb;
-        this.id = '';
         this.panelItem = null;
         this.name = '';
         this.band = band;
@@ -34,10 +32,7 @@ export default class Band extends Container {
      */
     setup() {
         this.el = this.rb.getDocument().getElement(this.band);
-    }
-
-    appendElement(el) {
-        this.el.append(el);
+        this.elContent = this.el;
     }
 
     /**
@@ -50,16 +45,6 @@ export default class Band extends Container {
         }
         return this.band === Document.band.content ||
             (elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.table);
-    }
-
-    /**
-     * Update container style when given element type is currently dragged over this container.
-     * @param {String} elementType
-     */
-    dragOver(elementType) {
-        if (this.isElementAllowed(elementType)) {
-            this.el.addClass('rbroElementDragOver');
-        }
     }
 
     /**
@@ -96,21 +81,5 @@ export default class Band extends Container {
             height = documentProperties.getValue('footerSizeVal');
         }
         return { width: width, height: height };
-    }
-
-    /**
-     * Returns true if given absolute position is inside container.
-     * @param {Number} x - absolute x coordinate.
-     * @param {Number} y - absolute y coordinate.
-     */
-    isInside(posX, posY) {
-        let offset = this.getOffset();
-        let size = this.getSize();
-        posX -= offset.x;
-        posY -= offset.y;
-        if (posX >= 0 && posY >= 0 && posX < size.width && posY < size.height) {
-            return true;
-        }
-        return false;
     }
 }

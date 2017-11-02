@@ -618,7 +618,7 @@ ul ul .rbroMenuItemText {
     align-items: flex-end;
 }
 
-.rbroTextElement, .rbroImageElement {
+.rbroTextElement, .rbroImageElement, .rbroFrameElement {
     border: 1px dotted #B0B0B0;
 }
 
@@ -643,7 +643,8 @@ ul ul .rbroMenuItemText {
     border: 1px solid #B0B0B0 !important;
 }
 
-.rbroTextElement.rbroSelected, .rbroImageElement.rbroSelected, .rbroBarCodeElement.rbroSelected {
+.rbroTextElement.rbroSelected, .rbroImageElement.rbroSelected, .rbroBarCodeElement.rbroSelected,
+.rbroFrameElement.rbroSelected {
     border: 1px solid #B0B0B0;
 }
 
@@ -791,6 +792,7 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     color: #cccccc;
     background-color: #ffffff;
     cursor: not-allowed;
+    border-color: #E4E7EA;
 }
 
 .rbroDeleteButton {

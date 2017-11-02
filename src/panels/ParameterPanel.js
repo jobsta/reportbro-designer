@@ -46,7 +46,7 @@ export default class ParameterPanel {
                         }
                         // add commands to convert all values containing the currently changed parameter
                         for (let nameToConvert of namesToConvert) {
-                            let docElements = this.rb.getDocElements();
+                            let docElements = this.rb.getDocElements(true);
                             for (let docElement of docElements) {
                                 docElement.addCommandsForChangedParameter(
                                         '${' + nameToConvert.oldName + '}', '${' + nameToConvert.newName + '}', cmdGroup);

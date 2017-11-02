@@ -24,8 +24,9 @@ export default class Document {
         this.dragging = false;
         this.dragElementType = null;
         this.dragType = DocElement.dragType.none;
-        this.dragContainer = null;
-        this.dragCurrentContainer = null;
+        this.dragContainerId = null;
+        this.dragLinkedContainerId = null;
+        this.dragCurrentContainerId = null;
         this.dragStartX = 0;
         this.dragStartY = 0;
         this.dragCurrentX = 0;
@@ -76,13 +77,15 @@ export default class Document {
         let docProperties = this.rb.getDocumentProperties();
         this.elDocContent = $(`<div id="rbro_document_content"
             class="rbroDocumentContent ${this.gridVisible ? 'rbroDocumentGrid' : ''}"></div>`);
-        this.elHeader = $('<div id="rbro_header" class="rbroDocumentBand" style="top: 0px; left: 0px;"></div>');
+        this.elHeader = $(`<div id="rbro_header" class="rbroDocumentBand rbroElementContainer"
+            style="top: 0px; left: 0px;"></div>`);
         this.elHeader.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandHeader')}</div>`));
         this.elDocContent.append(this.elHeader);
-        this.elContent = $('<div id="rbro_content" class="rbroDocumentBand"></div>');
+        this.elContent = $('<div id="rbro_content" class="rbroDocumentBand rbroElementContainer"></div>');
         this.elContent.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandContent')}</div>`));
         this.elDocContent.append(this.elContent);
-        this.elFooter = $('<div id="rbro_footer" class="rbroDocumentBand" style="bottom: 0px; left 0px;"></div>');
+        this.elFooter = $(`<div id="rbro_footer" class="rbroDocumentBand rbroElementContainer"
+            style="bottom: 0px; left 0px;"></div>`);
         this.elFooter.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandFooter')}</div>`));
         this.elDocContent.append(this.elFooter);
         elDoc.append(this.elDocContent);
@@ -113,31 +116,45 @@ export default class Document {
         $('#rbro_document_panel').mousemove(event => {
             if (this.dragging) {
                 if (this.dragType === DocElement.dragType.element) {
-                    let container = this.getContainer(event.originalEvent.pageX, event.originalEvent.pageY);
-                    if (container !== this.dragCurrentContainer) {
-                        $('.rbroDocumentBand').removeClass('rbroElementDragOver');
-                        if (container !== null && container !== this.dragContainer) {
-                            container.dragOver(this.dragElementType);
+                    let container = this.getContainer(
+                        event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
+                    let containerId = null;
+                    if (container !== null) {
+                        containerId = container.getId();
+                        if (containerId === this.dragLinkedContainerId) {
+                            // container is the same as the linked container of dragged element, this is
+                            // the case when dragging container elements like frames
+                            container = container.getParent();
+                            containerId = (container !== null) ? container.getId() : null;
                         }
                     }
-                    this.dragCurrentContainer = container;
+                    if (containerId !== this.dragCurrentContainerId) {
+                        $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                        if (container !== null && containerId !== this.dragContainerId) {
+                            container.dragOver();
+                        }
+                    }
+                    this.dragCurrentContainerId = containerId;
                 }
                 this.dragCurrentX = event.originalEvent.pageX;
                 this.dragCurrentY = event.originalEvent.pageY;
                 this.dragSnapToGrid = !event.ctrlKey;
-                this.rb.updateSelectionDrag(event.originalEvent.pageX - this.dragStartX, event.originalEvent.pageY - this.dragStartY,
+                this.rb.updateSelectionDrag(event.originalEvent.pageX - this.dragStartX,
+                    event.originalEvent.pageY - this.dragStartY,
                     this.dragType, null, this.dragSnapToGrid, false);
             }
         });
         this.elDocContent.on('dragover', event => {
             if (this.rb.isBrowserDragActive('docElement')) {
-                let container = this.getContainer(event.originalEvent.pageX, event.originalEvent.pageY);
-                if (container !== this.dragContainer) {
-                    $('.rbroDocumentBand').removeClass('rbroElementDragOver');
+                let container = this.getContainer(
+                    event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
+                let containerId = (container !== null) ? container.getId() : null;
+                if (containerId !== this.dragContainerId) {
+                    $('.rbroElementContainer').removeClass('rbroElementDragOver');
                     if (container !== null) {
-                        container.dragOver(this.dragElementType);
+                        container.dragOver();
                     }
-                    this.dragContainer = container;
+                    this.dragContainerId = containerId;
                 }
                 // without preventDefault for dragover event, the drop event is not fired
                 event.preventDefault();
@@ -154,16 +171,20 @@ export default class Document {
             if (this.rb.isBrowserDragActive('docElement')) {
                 this.dragEnterCount--;
                 if (this.dragEnterCount === 0) {
-                    $('.rbroDocumentBand').removeClass('rbroElementDragOver');
-                    this.dragContainer = null;
+                    $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                    this.dragContainerId = null;
                 }
             }
         })
         .on('drop', event => {
             if (this.rb.isBrowserDragActive('docElement')) {
-                $('.rbroDocumentBand').removeClass('rbroElementDragOver');
+                $('.rbroElementContainer').removeClass('rbroElementDragOver');
                 let docProperties = this.rb.getDocumentProperties();
-                let container = this.getContainer(event.originalEvent.pageX, event.originalEvent.pageY);
+                let container = this.getContainer(
+                    event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
+                while (container !== null && !container.isElementAllowed(this.dragElementType)) {
+                    container = container.getParent();
+                }
                 if (container !== null && container.isElementAllowed(this.dragElementType)) {
                     let offset = this.elDocContent.offset();
                     let x = event.originalEvent.pageX - offset.left;
@@ -307,11 +328,13 @@ export default class Document {
      * Returns container for given absolute position.
      * @param {Number} absPosX - absolute x position.
      * @param {Number} absPosY - absolute y position.
+     * @param {String} elementType - needed for finding container, not all elements are allowed
+     * in all containers (e.g. a frame cannot contain another frame).
      * @returns {[Container]} Container or null in case no container was found for given position.
      */
-    getContainer(absPosX, absPosY) {
+    getContainer(absPosX, absPosY, elementType) {
         let offset = this.elDocContent.offset();
-        return this.rb.getContainer(absPosX - offset.left, absPosY - offset.top);
+        return this.rb.getContainer(absPosX - offset.left, absPosY - offset.top, elementType);
     }
 
     isGridVisible() {
@@ -354,14 +377,15 @@ export default class Document {
         return this.dragging && ((this.dragStartX !== this.dragCurrentX) || (this.dragStartY !== this.dragCurrentY));
     }
 
-    startDrag(x, y, container, elementType, dragType) {
+    startDrag(x, y, containerId, linkedContainerId, elementType, dragType) {
         this.dragging = true;
         this.dragStartX = this.dragCurrentX = x;
         this.dragStartY = this.dragCurrentY = y;
         this.dragElementType = elementType;
         this.dragType = dragType;
-        this.dragContainer = container;
-        this.dragCurrentContainer = null;
+        this.dragContainerId = containerId;
+        this.dragLinkedContainerId = linkedContainerId;
+        this.dragCurrentContainerId = null;
         this.dragSnapToGrid = false;
     }
 
@@ -369,20 +393,24 @@ export default class Document {
         let diffX = this.dragCurrentX - this.dragStartX;
         let diffY = this.dragCurrentY - this.dragStartY;
         if (diffX !== 0 || diffY !== 0) {
-            let container = (this.dragType === DocElement.dragType.element) ? this.dragCurrentContainer : null;
+            let container = null;
+            if (this.dragType === DocElement.dragType.element) {
+                container = this.rb.getDataObject(this.dragCurrentContainerId);
+            }
             this.rb.updateSelectionDrag(diffX, diffY, this.dragType, container, this.dragSnapToGrid, true);
         } else {
             this.rb.updateSelectionDrag(0, 0, this.dragType, null, this.dragSnapToGrid, false);
         }
         this.dragging = false;
         this.dragType = DocElement.dragType.none;
-        this.dragContainer = this.dragCurrentContainer = null;
-        $('.rbroDocumentBand').removeClass('rbroElementDragOver');
+        this.dragContainerId = this.dragCurrentContainerId = null;
+        $('.rbroElementContainer').removeClass('rbroElementDragOver');
     }
 
     startBrowserDrag(dragElementType) {
         this.dragEnterCount = 0;
-        this.dragContainer = null;
+        this.dragContainerId = null;
+        this.dragLinkedContainerId = null;
         this.dragElementType = dragElementType;
     }
 }

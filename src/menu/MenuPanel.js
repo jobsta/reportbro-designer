@@ -82,6 +82,17 @@ export default class MenuPanel {
                 event.stopPropagation();
             })
         );
+        elElementsDiv.append($(`<div id="rbro_menu_element_bar_code" class="rbroButton rbroMenuButton" draggable="true"
+                title="${this.rb.getLabel('docElementBarCode')}">
+                    <span class="rbroIcon-barcode"></span>
+                </div>`)
+            .on('dragstart', event => {
+                event.originalEvent.dataTransfer.setData('text/plain', '');
+                event.originalEvent.dataTransfer.effectAllowed = 'copy';
+                this.rb.startBrowserDrag('docElement', null, DocElement.type.barCode, '');
+                event.stopPropagation();
+            })
+        );
         elElementsDiv.append($(`<div id="rbro_menu_element_table" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementTable')}">
                     <span class="rbroIcon-table"></span>
@@ -93,14 +104,14 @@ export default class MenuPanel {
                 event.stopPropagation();
             })
         );
-        elElementsDiv.append($(`<div id="rbro_menu_element_bar_code" class="rbroButton rbroMenuButton" draggable="true"
-                title="${this.rb.getLabel('docElementBarCode')}">
-                    <span class="rbroIcon-barcode"></span>
+        elElementsDiv.append($(`<div id="rbro_menu_element_frame" class="rbroButton rbroMenuButton" draggable="true"
+                title="${this.rb.getLabel('docElementFrame')}">
+                    <span class="rbroIcon-frame"></span>
                 </div>`)
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.barCode, '');
+                this.rb.startBrowserDrag('docElement', null, DocElement.type.frame, '');
                 event.stopPropagation();
             })
         );

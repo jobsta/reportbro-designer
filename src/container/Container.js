@@ -8,12 +8,40 @@ export default class Container {
         this.id = id;
         this.panelItem = null;
         this.name = name;
+        this.el = null;
+        this.elContent = null;
+        this.owner = null;
+        this.level = 0;  // number of containers "above"
+        this.parent = null;  // parent container
+    }
+
+    init(owner) {
+        this.owner = owner;
+        this.el = owner.getElement();
+        this.elContent = owner.getContentElement();
+        this.panelItem = owner.getPanelItem();
+        this.parent = owner.getContainer();
+        this.level = 0;
+        let parent = this.parent;
+        while (parent !== null) {
+            this.level++;
+            parent = parent.getParent();
+        }
     }
 
     /**
      * Called after initialization is finished.
      */
     setup() {
+    }
+
+    remove() {
+    }
+
+    appendElement(el) {
+        if (this.elContent !== null) {
+            this.elContent.append(el);
+        }
     }
 
     getId() {
@@ -32,7 +60,19 @@ export default class Container {
         this.panelItem = panelItem;
     }
 
-    appendElement(el) {
+    getLevel() {
+        return this.level;
+    }
+
+    getParent() {
+        return this.parent;
+    }
+
+    isSelected() {
+        if (this.owner !== null && this.rb.isSelectedObject(this.owner.getId())) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -44,10 +84,12 @@ export default class Container {
     }
 
     /**
-     * Update container style when given element type is currently dragged over this container.
-     * @param {String} elementType
+     * Update container style when an element is currently dragged over this container.
      */
-    dragOver(elementType) {
+    dragOver() {
+        if (this.el !== null) {
+            this.el.addClass('rbroElementDragOver');
+        }
     }
 
     /**
@@ -59,8 +101,9 @@ export default class Container {
     }
 
     /**
-     * Returns container size.
-     * @returns {Object} width and height of container.
+     * Returns offset relative to other container.
+     * @param {Container} otherContainer
+     * @returns {Object} x and y offset coordinates.
      */
     getOffsetTo(otherContainer) {
         if (otherContainer !== null && otherContainer != this) {
@@ -71,6 +114,10 @@ export default class Container {
         return { x: 0, y: 0 };
     }
 
+    /**
+     * Returns container size.
+     * @returns {Object} width and height of container.
+     */
     getSize() {
         return { width: 0, height: 0 };
     }
@@ -81,6 +128,13 @@ export default class Container {
      * @param {Number} y - absolute y coordinate.
      */
     isInside(posX, posY) {
+        let offset = this.getOffset();
+        let size = this.getSize();
+        posX -= offset.x;
+        posY -= offset.y;
+        if (posX >= 0 && posY >= 0 && posX < size.width && posY < size.height) {
+            return true;
+        }
         return false;
     }
 

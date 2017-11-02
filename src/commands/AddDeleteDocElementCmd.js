@@ -1,6 +1,7 @@
 import Command from './Command';
 import BarCodeElement from '../elements/BarCodeElement';
 import DocElement from '../elements/DocElement';
+import FrameElement from '../elements/FrameElement';
 import ImageElement from '../elements/ImageElement';
 import LineElement from '../elements/LineElement';
 import PageBreakElement from '../elements/PageBreakElement';
@@ -64,6 +65,9 @@ export default class AddDeleteDocElementCmd {
                 element = new PageBreakElement(this.id, this.initialData, this.rb);
             } else if (this.elementType === DocElement.type.table) {
                 element = new TableElement(this.id, this.initialData, this.rb);
+                properties.hasChildren = true;
+            } else if (this.elementType === DocElement.type.frame) {
+                element = new FrameElement(this.id, this.initialData, this.rb);
                 properties.hasChildren = true;
             } else if (this.elementType === DocElement.type.barCode) {
                 element = new BarCodeElement(this.id, this.initialData, this.rb);

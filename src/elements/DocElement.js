@@ -1,4 +1,5 @@
 import Document from '../Document';
+import MovePanelItemCmd from '../commands/MovePanelItemCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
 
@@ -17,6 +18,8 @@ export default class DocElement {
         this.width = '' + defaultWidth;
         this.height = '' + defaultHeight;
         this.containerId = null;
+        // in case of frame or band element, this is the container represented by the element
+        this.linkedContainerId = null;
         this.printIf = '';
         this.removeEmptyElement = false;
 
@@ -80,19 +83,37 @@ export default class DocElement {
      */
     registerEventHandlers() {
         this.el
+            .dblclick(event => {
+                this.handleClick(event, true);
+            })
             .mousedown(event => {
-                if (!this.rb.isSelectedObject(this.id)) {
-                    this.rb.selectObject(this.id, !event.shiftKey);
-                } else {
-                    if (event.shiftKey) {
-                        this.rb.deselectObject(this.id);
-                    } else {
-                        this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
-                            this.getContainer(), this.getElementType(), DocElement.dragType.element);
-                    }
-                }
-                event.stopPropagation();
+                this.handleClick(event, false);
             });
+    }
+
+    /**
+     * Handle mouse click on this element so the element can be selected, dragged and resized.
+     * @param {jQuery.Event} event - browser event object.
+     * @param {Boolean} ignoreSelectedContainer - if true the element will always be selected in case it
+     * was not selected before. Otherwise the element will only be selected if it's container is
+     * not selected (e.g. the frame container when this element is inside a frame).
+     */
+    handleClick(event, ignoreSelectedContainer) {
+        if (!this.rb.isSelectedObject(this.id)) {
+            if (ignoreSelectedContainer || !this.isContainerSelected()) {
+                this.rb.selectObject(this.id, !event.shiftKey);
+                event.stopPropagation();
+            }
+        } else {
+            if (event.shiftKey) {
+                this.rb.deselectObject(this.id);
+            } else {
+                this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
+                    this.containerId, this.linkedContainerId,
+                    this.getElementType(), DocElement.dragType.element);
+            }
+            event.stopPropagation();
+        }
     }
 
     getId() {
@@ -127,6 +148,13 @@ export default class DocElement {
         return this.rb.getDataObject(this.getContainerId());
     }
 
+    getLinkedContainer() {
+        if (this.linkedContainerId !== null) {
+            return this.rb.getDataObject(this.linkedContainerId);
+        }
+        return null;
+    }
+
     getContainerSize() {
         let container = this.getContainer();
         return (container !== null) ? container.getSize() : { width: 0, height: 0 };
@@ -136,6 +164,85 @@ export default class DocElement {
         let container = this.getContainer();
         if (container !== null) {
             container.appendElement(this.el);
+        }
+    }
+
+    isContainerSelected() {
+        let container = this.getContainer();
+        if (container !== null) {
+            return container.isSelected();
+        }
+        return false;
+    }
+
+    /**
+     * Check element bounds within container and adapt position/size if necessary.
+     *
+     * This should be called when an element is resized or moved to another container to guarantee that
+     * the element is not out of bounds.
+     * @param {Number} x - x value of doc element.
+     * @param {Number} y - y value of doc element.
+     * @param {Number} width - width value of doc element.
+     * @param {Number} height - height value of doc element.
+     * @param {Object} containerSize - width and height of container where this doc element belongs to.
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
+    checkBounds(x, y, width, height, containerSize, cmdGroup) {
+        if ((x + width) > containerSize.width) {
+            x = containerSize.width - width;
+        }
+        if (x < 0)  {
+            x = 0;
+        }
+        if ((x + width) > containerSize.width) {
+            width = containerSize.width - x;
+        }
+        if ((y + height) > containerSize.height) {
+            y = containerSize.height - height;
+        }
+        if (y < 0)  {
+            y = 0;
+        }
+        if ((y + height) > containerSize.height) {
+            height = containerSize.height - y;
+        }
+
+        if (x !== this.xVal && this.getXTagId() !== '') {
+            let cmd = new SetValueCmd(this.id, this.getXTagId(), 'x',
+                '' + x, SetValueCmd.type.text, this.rb);
+            cmd.disableSelect();
+            cmdGroup.addCommand(cmd);
+        }
+        if (y !== this.yVal && this.getYTagId() !== '') {
+            let cmd = new SetValueCmd(this.id, this.getYTagId(), 'y',
+                '' + y, SetValueCmd.type.text, this.rb);
+            cmd.disableSelect();
+            cmdGroup.addCommand(cmd);
+        }
+        if (width !== this.widthVal && this.getWidthTagId() !== '') {
+            let cmd = new SetValueCmd(this.id, this.getWidthTagId(), 'width',
+                '' + width, SetValueCmd.type.text, this.rb);
+            cmd.disableSelect();
+            cmdGroup.addCommand(cmd);
+        }
+        if (height !== this.heightVal && this.getHeightTagId() !== '') {
+            let cmd = new SetValueCmd(this.id, this.getHeightTagId(), 'height',
+                '' + height, SetValueCmd.type.text, this.rb);
+            cmd.disableSelect();
+            cmdGroup.addCommand(cmd);
+        }
+
+        let linkedContainer = this.getLinkedContainer();
+        if (linkedContainer !== null && linkedContainer.getPanelItem() !== null) {
+            let linkedContainerSize = { width: width, height: height };
+            for (let child of linkedContainer.getPanelItem().getChildren()) {
+                if (child.getData() instanceof DocElement) {
+                    let docElement = child.getData();
+                    docElement.checkBounds(docElement.getValue('xVal'), docElement.getValue('yVal'),
+                        docElement.getValue('widthVal'), docElement.getValue('heightVal'),
+                        linkedContainerSize, cmdGroup);
+                }
+            }
         }
     }
 
@@ -150,54 +257,21 @@ export default class DocElement {
             this.updateDisplay();
         } else if (field === 'containerId') {
             if (this.el !== null) {
-                this.el.remove();
-            }
-            this.createElement();
-
-            // check element out of bounds of container
-            let containerSize = this.getContainerSize();
-            let y = this.yVal;
-            let height = this.heightVal;
-            if ((y + height) > containerSize.height) {
-                y = containerSize.height - height;
-            }
-            if (y < 0)  {
-                y = 0;
-            }
-            if ((y + height) > containerSize.height) {
-                height = containerSize.height - y;
-            }
-            let updatePanel = false;
-            if (y !== this.yVal) {
-                this.yVal = y;
-                this.y = '' + y;
-                updatePanel = true;
-            }
-            if (height !== this.heightVal) {
-                this.heightVal = height;
-                this.height = '' + height;
-                updatePanel = true;
-            }
-            if (this.rb.getDetailData() === this && updatePanel) {
-                this.rb.updateDetailPanel();
-            }
-
-            if (this.selected) {
-                // recreate selection divs for new element
-                this.select();
-            }
-            this.updateDisplay();
-            this.updateStyle();
-            let container = this.rb.getDataObject(value);
-            if (container !== null && container.getPanelItem() !== null) {
-                this.panelItem.moveTo(container.getPanelItem());
-                this.panelItem.openParentItems();
+                // detach dom node from container and then attach it to new container
+                this.el.detach();
+                this.appendToContainer();
             }
         } else if (['styleId', 'bold', 'italic', 'underline', 'horizontalAlignment', 'verticalAlignment',
                 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
                 'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
                 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'].indexOf(field) !== -1) {
+
             this.updateStyle();
+
+            if (['borderWidth', 'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
+                'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'].indexOf(field) !== -1) {
+                this.updateDisplay();
+            }
         }
     }
 
@@ -249,11 +323,6 @@ export default class DocElement {
             posX1 += diffX;
             if (gridSize !== 0) {
                 posX1 = utils.roundValueToInterval(posX1, gridSize);
-            }
-            if (posX1 < 0) {
-                posX1 = 0;
-            } else if ((posX1 + this.widthVal) > maxWidth) {
-                posX1 = maxWidth - this.widthVal;
             }
             posX2 = posX1 + this.widthVal;
             posY1 += diffY;
@@ -341,45 +410,18 @@ export default class DocElement {
             } else {
                 containerSize = container.getSize();
             }
-            if ((posX1 + width) > containerSize.width) {
-                posX1 = containerSize.width - width;
-            }
-            if (posX1 < 0) {
-                posX1 = 0;
-            }
-            if ((posY1 + height) > containerSize.height) {
-                posY1 = containerSize.height - height;
-            }
-            if (posY1 < 0) {
-                posY1 = 0;
-            }
             if (!containerChanged || dragContainer.isElementAllowed(this.getElementType())) {
-                // only add command if xTagId exists (PageBreak only has y attribute)
-                if (posX1 !== this.xVal && this.getXTagId() !== '') {
-                    let cmd = new SetValueCmd(this.id, this.getXTagId(), 'x',
-                        '' + posX1, SetValueCmd.type.text, this.rb);
-                    cmdGroup.addCommand(cmd);
-                }
-                if ((posY1 !== this.yVal || containerChanged) && this.getYTagId() !== '') {
-                    let cmd = new SetValueCmd(this.id, this.getYTagId(), 'y',
-                        '' + posY1, SetValueCmd.type.text, this.rb);
-                    cmdGroup.addCommand(cmd);
-                }
-                if (width !== this.widthVal && this.getWidthTagId() !== '') {
-                    let cmd = new SetValueCmd(this.id, this.getWidthTagId(), 'width',
-                        '' + width, SetValueCmd.type.text, this.rb);
-                    cmdGroup.addCommand(cmd);
-                }
-                if ((height !== this.heightVal || containerChanged) && this.getHeightTagId() !== '') {
-                    let cmd = new SetValueCmd(this.id, this.getHeightTagId(), 'height',
-                        '' + height, SetValueCmd.type.text, this.rb);
-                    cmdGroup.addCommand(cmd);
-                }
+                this.checkBounds(posX1, posY1, width, height, containerSize, cmdGroup);
+
                 if (containerChanged) {
                     let cmd = new SetValueCmd(this.id, null, 'containerId',
                         dragContainer.getId(), SetValueCmd.type.internal, this.rb);
                     cmdGroup.addCommand(cmd);
+                    cmd = new MovePanelItemCmd(this.getPanelItem(), dragContainer.getPanelItem(),
+                        dragContainer.getPanelItem().getChildren().length, this.rb);
+                    cmdGroup.addCommand(cmd);
                 }
+
                 if (cmdGroup.isEmpty()) {
                     // nothing was changed, make sure displayed element is updated to saved position/size after drag
                     this.updateDisplay();
@@ -399,7 +441,8 @@ export default class DocElement {
             let sizerVal = sizer;
             let elSizer = $(`<div class="rbroSizer rbroSizer${sizer}"></div>`)
                 .mousedown(event => {
-                    this.rb.getDocument().startDrag(event.pageX, event.pageY, this.getContainer(),
+                    this.rb.getDocument().startDrag(event.pageX, event.pageY,
+                        this.containerId, this.linkedContainerId,
                         this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
                     event.stopPropagation();
                 });
@@ -488,6 +531,15 @@ export default class DocElement {
     }
 
     /**
+     * Returns dom node where elements will be added if they are inside this element.
+     * Is null in case this element is not a container element like a frame or a band.
+     * @returns {[Object]} dom node
+     */
+    getContentElement() {
+        return null;
+    }
+
+    /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
      * @param {String} oldParameterName
@@ -548,7 +600,8 @@ DocElement.type = {
     table: 'table',
     pageBreak: 'page_break',
     tableText: 'table_text',
-    barCode: 'bar_code'
+    barCode: 'bar_code',
+    frame: 'frame'
 };
 
 DocElement.dragType = {

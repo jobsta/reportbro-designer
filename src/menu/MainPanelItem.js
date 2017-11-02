@@ -1,7 +1,9 @@
 import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import AddDeleteStyleCmd from '../commands/AddDeleteStyleCmd';
+import CommandGroupCmd from '../commands/CommandGroupCmd';
 import MovePanelItemCmd from '../commands/MovePanelItemCmd';
+import SetValueCmd from '../commands/SetValueCmd';
 import Container from '../container/Container';
 import Parameter from '../data/Parameter';
 import DocElement from '../elements/DocElement';
@@ -84,6 +86,7 @@ export default class MainPanelItem {
                         if (parentPanel !== draggedObj.getPanelItem().getParent() ||
                                 pos !== draggedObj.getPanelItem().getSiblingPosition()) {
                             let moveItem = false;
+                            let cmdGroup = new CommandGroupCmd('Move panel item', this.rb);
                             if (draggedObj instanceof Parameter) {
                                 // do not allow dragging array/map into other array/map parameter
                                 if ((draggedObj.getValue('type') !== Parameter.type.array &&
@@ -98,11 +101,27 @@ export default class MainPanelItem {
                                 } else {
                                     let destObj = parentPanel.getData();
                                     if (destObj instanceof DocElement) {
-                                        container = destObj.getContainer();
+                                        // get linked container if available (e.g. container of frame element),
+                                        // otherwise use the parent container
+                                        container = destObj.getLinkedContainer();
+                                        if (container === null) {
+                                            container = destObj.getContainer();
+                                        }
                                     }
                                 }
                                 if (container !== null) {
                                     moveItem = container.isElementAllowed(draggedObj.getElementType());
+                                    if (moveItem) {
+                                        if (draggedObj.getValue('containerId') !== container.getId()) {
+                                            draggedObj.checkBounds(draggedObj.getValue('xVal'), draggedObj.getValue('yVal'),
+                                                draggedObj.getValue('widthVal'), draggedObj.getValue('heightVal'),
+                                                container.getSize(), cmdGroup);
+
+                                            let cmd = new SetValueCmd(draggedObj.getId(), null, 'containerId',
+                                                container.getId(), SetValueCmd.type.internal, this.rb);
+                                            cmdGroup.addCommand(cmd);
+                                        }
+                                    }
                                 }
                             } else {
                                 moveItem = true;
@@ -110,7 +129,8 @@ export default class MainPanelItem {
 
                             if (moveItem) {
                                 let cmd = new MovePanelItemCmd(draggedObj.getPanelItem(), parentPanel, pos, this.rb);
-                                this.rb.executeCommand(cmd);
+                                cmdGroup.addCommand(cmd);
+                                this.rb.executeCommand(cmdGroup);
                             }
                         }
                     }

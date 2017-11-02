@@ -11,6 +11,7 @@ import Parameter from './data/Parameter';
 import Style from './data/Style';
 import BarCodeElement from './elements/BarCodeElement';
 import DocElement from './elements/DocElement';
+import FrameElement from './elements/FrameElement';
 import ImageElement from './elements/ImageElement';
 import LineElement from './elements/LineElement';
 import PageBreakElement from './elements/PageBreakElement';
@@ -21,6 +22,7 @@ import TextElement from './elements/TextElement';
 import BarCodeElementPanel from './panels/BarCodeElementPanel';
 import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
 import EmptyDetailPanel from './panels/EmptyDetailPanel';
+import FrameElementPanel from './panels/FrameElementPanel';
 import ImageElementPanel from './panels/ImageElementPanel';
 import LineElementPanel from './panels/LineElementPanel';
 import MainPanel from './menu/MainPanel';
@@ -55,8 +57,10 @@ export default class ReportBro {
             docElementColor: 'Color',
             docElementConditionalStyle: 'Conditional style',
             docElementConditionalStyleCondition: 'Condition',
+            docElementFrame: 'Frame',
             docElementHeight: 'Height',
             docElementImage: 'Image',
+            docElementLabel: 'Label',
             docElementLine: 'Line',
             docElementPageBreak: 'Page break',
             docElementPosition: 'Position (x, y)',
@@ -113,6 +117,7 @@ export default class ReportBro {
             footer: 'Footer',
             footerDisplay: 'Display',
             footerSize: 'Footer size',
+            frameElementShrinkToContentHeight: 'Shrink to content height',
             imageElementImage: 'Image file',
             imageElementLoadErrorMsg: 'Loading image failed',
             imageElementSource: 'Source',
@@ -298,6 +303,7 @@ export default class ReportBro {
         this.detailPanels = {
             'none': new EmptyDetailPanel(element, this),
             'bar_code': new BarCodeElementPanel(element, this),
+            'frame': new FrameElementPanel(element, this),
             'text': new TextElementPanel(element, this),
             'line': new LineElementPanel(element, this),
             'image': new ImageElementPanel(element, this),
@@ -679,13 +685,48 @@ export default class ReportBro {
         return null;
     }
 
-    getDocElements() {
-        let docElements = [];
-        for (let i=0; i < this.docElements.length; i++) {
-            let docElement = this.docElements[i];
-            docElements.push(docElement);
-            docElement.addChildren(docElements);
+    /**
+     * Append document elements of given container.
+     * @param {Container} container
+     * @param {Boolean} asObjects - if true the document element instances are returned, otherwise
+     * each instance is transformed to a js map.
+     * @param {DocElement[]} docElements - list where document elements will be appended to.
+     */
+    appendContainerDocElements(container, asObjects, docElements) {
+        let children = container.getPanelItem().getChildren();
+        for (let child of children) {
+            if (child.getData() instanceof DocElement) {
+                let docElement = child.getData();
+                if (asObjects) {
+                    docElements.push(docElement);
+                    // we are also adding all internal children (document elements which belong
+                    // to other document elements and cannot be created independently),
+                    // e.g. a table band or a table cell (table text) of a table element.
+                    docElement.addChildren(docElements);
+                } else {
+                    // js map also includes data of internal children
+                    docElements.push(docElement.toJS());
+                }
+                let linkedContainer = docElement.getLinkedContainer();
+                // add children of doc elements which represent containers, e.g. frames
+                if (linkedContainer !== null) {
+                    this.appendContainerDocElements(linkedContainer, asObjects, docElements);
+                }
+            }
         }
+    };
+
+    /**
+     * Get document elements of all bands.
+     * @param {Boolean} asObjects - if true the document element instances are returned, otherwise
+     * each instance is transformed to a js map.
+     * @returns {DocElement[]} List of document elements.
+     */
+    getDocElements(asObjects) {
+        let docElements = [];
+        this.appendContainerDocElements(this.headerBand, asObjects, docElements);
+        this.appendContainerDocElements(this.contentBand, asObjects, docElements);
+        this.appendContainerDocElements(this.footerBand, asObjects, docElements);
         return docElements;
     }
 
@@ -969,14 +1010,33 @@ export default class ReportBro {
         this.updateMenuAlignButtons();
     }
 
-    getContainer(posX, posY) {
-        for (let i = this.containers.length - 1; i >= 0; i--) {
+    getContainer(posX, posY, elementType) {
+        let bestMatch = null;
+        let bestMatchLevel = -1;
+        for (let i = 0; i < this.containers.length; i++) {
             let container = this.containers[i];
-            if (container.isInside(posX, posY)) {
-                return container;
+            if (container.getLevel() > bestMatchLevel && container.isElementAllowed(elementType) &&
+                    container.isInside(posX, posY)) {
+                bestMatch = container;
+                bestMatchLevel = container.getLevel();
             }
         }
-        return null;
+        return bestMatch;
+    }
+
+    addContainer(container) {
+        this.containers.push(container);
+        this.addDataObject(container);
+    }
+
+    deleteContainer(container) {
+        for (let i = 0; i < this.containers.length; i++) {
+            if (this.containers[i].getId() === container.getId()) {
+                this.containers.splice(i, 1);
+                break;
+            }
+        }
+        this.deleteDataObject(container);
     }
 
     /**
@@ -1134,13 +1194,16 @@ export default class ReportBro {
             element = new LineElement(docElementData.id, docElementData, this);
         } else if (docElementData.elementType === DocElement.type.image) {
             element = new ImageElement(docElementData.id, docElementData, this);
-        } else if (docElementData.elementType === DocElement.type.pageBreak) {
-            element = new PageBreakElement(docElementData.id, docElementData, this);
+        } else if (docElementData.elementType === DocElement.type.barCode) {
+            element = new BarCodeElement(docElementData.id, docElementData, this);
         } else if (docElementData.elementType === DocElement.type.table) {
             element = new TableElement(docElementData.id, docElementData, this);
             properties.hasChildren = true;
-        } else if (docElementData.elementType === DocElement.type.barCode) {
-            element = new BarCodeElement(docElementData.id, docElementData, this);
+        } else if (docElementData.elementType === DocElement.type.frame) {
+            element = new FrameElement(docElementData.id, docElementData, this);
+            properties.hasChildren = true;
+        } else if (docElementData.elementType === DocElement.type.pageBreak) {
+            element = new PageBreakElement(docElementData.id, docElementData, this);
         }
         this.addDocElement(element);
         let parentPanel = element.getContainer().getPanelItem();
@@ -1272,14 +1335,15 @@ export default class ReportBro {
     getReport() {
         let ret = { docElements: [], parameters: [], styles: [], version: 1 };
         let i;
-        let existingIds = {};
-        for (i=0; i < this.docElements.length; i++) {
-            let docElement = this.docElements[i];
-            if (!(docElement.getId() in existingIds)) {
-                existingIds[docElement.getId()] = true;
-                ret.docElements.push(docElement.toJS());
-            }
-        }
+        ret.docElements = this.getDocElements(false);
+        // let existingIds = {};
+        // for (i=0; i < this.docElements.length; i++) {
+        //     let docElement = this.docElements[i];
+        //     if (!(docElement.getId() in existingIds)) {
+        //         existingIds[docElement.getId()] = true;
+        //         ret.docElements.push(docElement.toJS());
+        //     }
+        // }
         for (let parameter of this.getParameters()) {
             ret.parameters.push(parameter.toJS());
         }

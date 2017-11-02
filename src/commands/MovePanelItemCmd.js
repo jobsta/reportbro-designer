@@ -16,7 +16,6 @@ export default class MovePanelItemCmd {
         this.oldPosition = panelItem.getSiblingPosition();
         this.oldContainerId = null;
         this.moveToContainerId = null;
-        this.docElementY = this.docElementHeight = 0;
         if (panelItem.getData() instanceof DocElement) {
             let docElement = panelItem.getData();
             this.oldContainerId = docElement.getValue('containerId');
@@ -24,8 +23,6 @@ export default class MovePanelItemCmd {
             if (moveToContainer !== null) {
                 this.moveToContainerId = moveToContainer.getId();
             }
-            this.docElementY = docElement.getValue('yVal');
-            this.docElementHeight = docElement.getValue('heightVal');
         }
         this.rb = rb;
     }
@@ -50,16 +47,8 @@ export default class MovePanelItemCmd {
         let obj = this.rb.getDataObject(this.objId);
         let parent = this.rb.getDataObject(toParentId);
         if (obj !== null && parent !== null) {
-            if (toContainerId !== null) {
-                if (obj.getValue('yVal') != this.docElementY) {
-                    obj.setValue('y', '' + this.docElementY);
-                }
-                if (obj.getValue('heightVal') != this.docElementHeight) {
-                    obj.setValue('height', '' + this.docElementHeight);
-                }
-                obj.setValue('containerId', toContainerId);
-            }
             obj.getPanelItem().moveToPosition(parent.getPanelItem(), toPosition);
+            obj.getPanelItem().openParentItems();
             this.rb.notifyEvent(obj, Command.operation.move);
         }
     }
