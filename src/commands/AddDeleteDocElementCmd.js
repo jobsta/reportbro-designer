@@ -1,4 +1,5 @@
 import Command from './Command';
+import BandElement from '../elements/BandElement';
 import BarCodeElement from '../elements/BarCodeElement';
 import DocElement from '../elements/DocElement';
 import FrameElement from '../elements/FrameElement';
@@ -69,12 +70,16 @@ export default class AddDeleteDocElementCmd {
             } else if (this.elementType === DocElement.type.frame) {
                 element = new FrameElement(this.id, this.initialData, this.rb);
                 properties.hasChildren = true;
+            } else if (this.elementType === DocElement.type.band) {
+                element = new BandElement(this.id, this.initialData, this.rb);
+                properties.hasChildren = true;
+                properties.showAdd = true;
+                // properties.draggable = false;
             } else if (this.elementType === DocElement.type.barCode) {
                 element = new BarCodeElement(this.id, this.initialData, this.rb);
             }
             this.rb.addDocElement(element);
-            let panelItem = new MainPanelItem(this.elementType, 'docElement', '',
-                parent.getPanelItem(), element, properties, this.rb);
+            let panelItem = new MainPanelItem(this.elementType, '', parent.getPanelItem(), element, properties, this.rb);
             panelItem.openParentItems();
             element.setPanelItem(panelItem);
             parent.getPanelItem().insertChild(this.position, panelItem);

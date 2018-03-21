@@ -54,13 +54,15 @@ export default class TableTextElement extends TextElement {
             if (tableObj !== null) {
                 tableObj.updateColumnWidth(this.columnIndex, value, true);
             }
+        } else if (field === 'height') {
+            this.updateDisplayInternalNotify(0, 0, this.widthVal, this.heightVal, false);
         }
     }
 
     updateColumnWidth(width) {
         this.width = width;
         this.widthVal = utils.convertInputToNumber(this.width);
-        this.updateDisplayInternalNotify(0, 0, this.widthVal, 0, false);
+        this.updateDisplayInternalNotify(0, 0, this.widthVal, this.heightVal, false);
     }
 
     /**
@@ -68,7 +70,7 @@ export default class TableTextElement extends TextElement {
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'width', 'height', 'content',
+        let fields = ['id', 'width', 'height', 'content', 'eval',
             'styleId', 'bold', 'italic', 'underline',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
@@ -100,7 +102,7 @@ export default class TableTextElement extends TextElement {
         }
         // update inner text element width
         let contentSize = this.getContentSize(width, height, this.getStyle());
-        $(`#rbro_el_content_text${this.id}`).css('width', this.rb.toPixel(contentSize.width));
+        $(`#rbro_el_content_text${this.id}`).css({ width: this.rb.toPixel(contentSize.width), height: this.rb.toPixel(contentSize.height) });
 
         if (notifyTableElement) {
             let tableObj = this.rb.getDataObject(this.tableId);

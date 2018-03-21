@@ -14,8 +14,8 @@ export default class PageBreakElementPanel {
 
     render() {
         let panel = $('<div id="rbro_page_break_element_panel" class="rbroHidden"></div>');
-        let elDiv = $('<div class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_page_break_element_position">${this.rb.getLabel('docElementPositionY')}:</label>`);
+        let elDiv = $('<div id="rbro_page_break_element_position_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_page_break_element_position_y">${this.rb.getLabel('docElementPositionY')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elPosY = $(`<input id="rbro_page_break_element_position_y">`)
             .change(event => {

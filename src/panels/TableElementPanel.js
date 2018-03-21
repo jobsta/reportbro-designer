@@ -1,5 +1,6 @@
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
+import Parameter from '../data/Parameter';
 import DocElement from '../elements/DocElement';
 import TableElement from '../elements/TableElement';
 import PopupWindow from '../PopupWindow';
@@ -19,7 +20,7 @@ export default class TableElementPanel {
     render() {
         let panel = $('<div id="rbro_table_element_panel" class="rbroHidden"></div>');
         let elDiv = $('<div class="rbroFormRow" id="rbro_table_element_data_source_row"></div>');
-        elDiv.append(`<label for="rbro_table_element_data_source">${this.rb.getLabel('tableElementDataSource')}:</label>`);
+        elDiv.append(`<label for="rbro_table_element_data_source">${this.rb.getLabel('docElementDataSource')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elDataSource = $(`<textarea id="rbro_table_element_data_source" rows="1"></textarea>`)
             .on('input', event => {
@@ -32,7 +33,7 @@ export default class TableElementPanel {
             .focus(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(this.rb.getArrayParameterItems(selectedObj),
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj, [Parameter.type.array]),
                         this.selectedObjId, 'rbro_table_element_data_source', 'dataSource',
                         PopupWindow.type.parameterSet);
                 }
@@ -123,6 +124,30 @@ export default class TableElementPanel {
         elHeaderSpan.append($('<a></a>'));
         elHeaderLabel.append(elHeaderSpan);
         elFormField.append(elHeaderLabel);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = $('<div class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_table_element_content_rows">${this.rb.getLabel('tableElementContentRows')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elContentRows = $(`<input id="rbro_table_element_content_rows" maxlength="1">`)
+            .change(event => {
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null) {
+                    let val = utils.checkInputDecimal(elContentRows.val(), 1, 9);
+                    if (val !== elContentRows.val()) {
+                        elContentRows.val(val);
+                    }
+                    let cmdGroup = new CommandGroupCmd('Set value');
+                    let contentRows = utils.convertInputToNumber(val);
+                    obj.addCommandsForChangedContentRows(contentRows, cmdGroup);
+                    if (!cmdGroup.isEmpty()) {
+                        this.rb.executeCommand(cmdGroup);
+                    }
+                }
+            });
+        utils.setInputPositiveInteger(elContentRows);
+        elFormField.append(elContentRows);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -346,6 +371,7 @@ export default class TableElementPanel {
             $('#rbro_table_element_position_y').val(data.getValue('y'));
             $('#rbro_table_element_columns').val(data.getValue('columns'));
             $('#rbro_table_element_header').prop('checked', data.getValue('header'));
+            $('#rbro_table_element_content_rows').val(data.getValue('contentRows'));
             $('#rbro_table_element_footer').prop('checked', data.getValue('footer'));
 
             $('#rbro_table_element_border').find('button').removeClass('rbroButtonActive');
@@ -361,6 +387,7 @@ export default class TableElementPanel {
             $('#rbro_table_element_position_y').prop('disabled', true);
             $('#rbro_table_element_columns').prop('disabled', true);
             $('#rbro_table_element_header').prop('disabled', true);
+            $('#rbro_table_element_content_rows').prop('disabled', true);
             $('#rbro_table_element_footer').prop('disabled', true);
             $('#rbro_table_element_border_grid').prop('disabled', true);
             $('#rbro_table_element_border_frame_row').prop('disabled', true);

@@ -6,6 +6,7 @@ import MovePanelItemCmd from '../commands/MovePanelItemCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Container from '../container/Container';
 import Parameter from '../data/Parameter';
+import BandElement from '../elements/BandElement';
 import DocElement from '../elements/DocElement';
 import Document from '../Document';
 
@@ -15,13 +16,13 @@ import Document from '../Document';
  * @class
  */
 export default class MainPanelItem {
-    constructor(panelName, panelCategory, panelLabel, parent, data, properties, rb) {
+    constructor(panelName, panelCategory, parent, data, properties, rb) {
         this.properties = { hasChildren: false, showAdd: false, showDelete: true, hasDetails: true, visible: true, draggable: false };
         $.extend( this.properties, properties );
         this.panelName = panelName;
         this.panelCategory = panelCategory;
-        let name = data.getName();
-        this.id = data.getId();
+        let name = (data !== null) ? data.getName() : '';
+        this.id = (data !== null) ? data.getId() : properties.id;
         this.parent = parent;
         this.data = data;
         this.rb = rb;
@@ -149,6 +150,24 @@ export default class MainPanelItem {
                     } else if (panelName === 'style') {
                         let cmd = new AddDeleteStyleCmd(true, {}, this.rb.getUniqueId(), this.getId(), -1, this.rb);
                         this.rb.executeCommand(cmd);
+                    } else if (panelName === 'band') {
+                        let obj = this.rb.getDataObject(this.getId());
+                        if (obj !== null) {
+                            let initialData = null;
+                            if (obj instanceof BandElement) {
+                                let linkedContainer = obj.getLinkedContainer();
+                                if (linkedContainer !== null) {
+                                    initialData = { containerId: linkedContainer.getId() };
+                                }
+                            } else {
+                                initialData = { containerId: this.getId() };
+                            }
+                            if (initialData !== null) {
+                                let cmd = new AddDeleteDocElementCmd(true,  DocElement.type.band, initialData,
+                                    this.rb.getUniqueId(), this.getId(), -1, this.rb);
+                                this.rb.executeCommand(cmd);
+                            }
+                        }
                     }
                     let newItem = this.children[this.children.length - 1];
                     this.rb.selectObject(newItem.getId(), true);
@@ -168,7 +187,8 @@ export default class MainPanelItem {
                         cmd = new AddDeleteStyleCmd(false, initialData, this.getId(), this.parent.getId(), pos, this.rb);
                     } else if (panelName === DocElement.type.text || panelName === DocElement.type.image ||
                             panelName === DocElement.type.line || panelName === DocElement.type.table ||
-                            panelName === DocElement.type.pageBreak) {
+                            panelName === DocElement.type.pageBreak ||
+                            panelName === DocElement.type.frame || panelName === DocElement.type.band) {
                         cmd = new AddDeleteDocElementCmd(false, panelName, initialData, this.getId(), this.parent.getId(), pos, this.rb);
                     }
                     if (cmd !== null) {
@@ -227,10 +247,18 @@ export default class MainPanelItem {
         return this.data;
     }
 
+    setData(data) {
+        this.data = data;
+        let name = (data !== null) ? data.getName() : '';
+        $(`#rbro_menu_item_name${this.id}`).text(name);
+    }
+
     setActive() {
         $('.rbroMenuItem').removeClass('rbroMenuItemActive');
         $(`#rbro_menu_item${this.id}`).addClass('rbroMenuItemActive');
-        this.rb.setDetailPanel(this.panelName, this.data);
+        if (this.properties.hasDetails) {
+            this.rb.setDetailPanel(this.panelName, this.data);
+        }
     }
 
     openParentItems() {

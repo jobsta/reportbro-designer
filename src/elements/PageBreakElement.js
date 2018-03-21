@@ -49,20 +49,8 @@ export default class PageBreakElement extends DocElement {
         return [];
     }
 
-    getXTagId() {
-        return '';
-    }
-
     getYTagId() {
         return 'rbro_page_break_element_position_y';
-    }
-
-    getWidthTagId() {
-        return '';
-    }
-
-    getHeightTagId() {
-        return '';
     }
 
     createElement() {

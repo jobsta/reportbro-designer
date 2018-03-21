@@ -16,7 +16,9 @@ export default class Parameter {
         this.errors = [];
         
         this.type = Parameter.type.string;
+        this.arrayItemType = Parameter.type.string;
         this.eval = !rb.getProperty('adminMode');  // if false value comes from database
+        this.nullable = false;
         this.pattern = '';
         this.expression = '';
         this.testData = '';
@@ -45,7 +47,7 @@ export default class Parameter {
             for (let child of this.children) {
                 let parameter = new Parameter(child.id || this.rb.getUniqueId(), child, this.rb);
                 this.rb.addParameter(parameter);
-                let panelItem = new MainPanelItem('parameter', 'parameter', '',
+                let panelItem = new MainPanelItem('parameter', '',
                     this.panelItem, parameter, { hasChildren: true, showAdd: this.editable, showDelete: this.editable, draggable: true },
                     this.rb);
                 parameter.setPanelItem(panelItem);
@@ -61,7 +63,7 @@ export default class Parameter {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'name', 'type', 'eval', 'pattern', 'expression', 'showOnlyNameType', 'testData'];
+        return ['id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression', 'showOnlyNameType', 'testData'];
     }
 
     getId() {
@@ -248,12 +250,13 @@ export default class Parameter {
     }
 
     /**
-     * In case of map parameter all child parameters are appended, for other parameter types except array the
-     * parameter itself is appended.
+     * In case of map parameter all child parameters are appended, for other parameter types the
+     * parameter itself is appended. Parameters with type array are only added if explicitly
+     * specified in allowedTypes parameter.
      * Used for parameter popup window.
      * @param {Object[]} parameters - list where parameter items will be appended to.
      * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
-     * parameter list. If empty all parameter types are allowed.
+     * parameter list. If not set all parameter types are allowed.
      */
     appendParameterItems(parameters, allowedTypes) {
         if (this.type === Parameter.type.map) {
@@ -277,6 +280,9 @@ export default class Parameter {
             if (!Array.isArray(allowedTypes) || allowedTypes.indexOf(this.type) !== -1) {
                 parameters.push({ name: this.name, description: '' });
             }
+        } else if (Array.isArray(allowedTypes) && allowedTypes.indexOf(this.type) !== -1) {
+            // add array parameter only if explicitly specified in allowedTypes
+            parameters.push({ name: this.name, description: '' });
         }
     }
 
@@ -303,12 +309,16 @@ export default class Parameter {
      * @returns {[Object[]]} rows of test data. Null in case parameter is not an array.
      */
     getTestDataRows() {
-        if (this.type !== Parameter.type.array) {
+        if (this.type !== Parameter.type.array && this.type !== Parameter.type.simpleArray) {
             return null;
         }
         let availableFields = {};
-        for (let child of this.getChildren()) {
-            availableFields[child.getName()] = true;
+        if (this.type === Parameter.type.simpleArray) {
+            availableFields['data'] = true;
+        } else {
+            for (let child of this.getChildren()) {
+                availableFields[child.getName()] = true;
+            }
         }
         let rows = [];
         try {
@@ -338,9 +348,11 @@ Parameter.type = {
     'none': 'none',
     'string': 'string',
     'number': 'number',
+    'boolean': 'boolean',
     'date': 'date',
     'image': 'image',
     'array': 'array',
+    'simpleArray': 'simpleArray',
     'map': 'map',
     'sum': 'sum',
     'average': 'average'

@@ -11,19 +11,23 @@ export default class MainPanel {
     constructor(rootElement, headerBand, contentBand, footerBand, parameterContainer, styleContainer, rb) {
         this.rootElement = rootElement;
         this.rb = rb;
-        this.headerItem = new MainPanelItem('docElement', 'docElement', 'bandHeader', null, headerBand,
+        this.headerItem = new MainPanelItem('band', 'bandHeader', null, headerBand,
             { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false,
                 visible: this.rb.getDocumentProperties().getValue('header') }, rb);
-        this.documentItem = new MainPanelItem('docElement', 'docElement', 'bandContent', null, contentBand,
-            { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false }, rb);
-        this.footerItem = new MainPanelItem('docElement', 'docElement', 'bandFooter', null, footerBand,
+        
+        this.documentItem = new MainPanelItem('band', 'bandContent', null, contentBand,
+            { hasChildren: true, showAdd: true, showDelete: false, hasDetails: false }, rb);
+        
+        this.footerItem = new MainPanelItem('band', 'bandFooter', null, footerBand,
             { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false,
                 visible: this.rb.getDocumentProperties().getValue('footer') }, rb);
-        this.parametersItem = new MainPanelItem('parameter', 'parameter', 'parameters', null, parameterContainer,
+
+        this.parametersItem = new MainPanelItem('parameter', 'parameters', null, parameterContainer,
             { hasChildren: true, showAdd: rb.getProperty('adminMode'), showDelete: false, hasDetails: false }, rb);
-        this.stylesItem = new MainPanelItem('style', 'style', 'styles', null, styleContainer,
+
+        this.stylesItem = new MainPanelItem('style', 'styles', null, styleContainer,
             { hasChildren: true, showAdd: true, showDelete: false, hasDetails: false }, rb);
-        this.documentPropertiesItem = new MainPanelItem('documentProperties', 'documentProperties', 'documentProperties',
+        this.documentPropertiesItem = new MainPanelItem('documentProperties', 'documentProperties',
             null, rb.getDocumentProperties(), { showDelete: false, hasDetails: true }, rb);
         this.items = [
             this.headerItem,

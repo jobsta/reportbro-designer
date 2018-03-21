@@ -9,6 +9,7 @@ import Container from './container/Container';
 import DocumentProperties from './data/DocumentProperties';
 import Parameter from './data/Parameter';
 import Style from './data/Style';
+import BandElement from './elements/BandElement';
 import BarCodeElement from './elements/BarCodeElement';
 import DocElement from './elements/DocElement';
 import FrameElement from './elements/FrameElement';
@@ -19,6 +20,7 @@ import TableBandElement from './elements/TableBandElement';
 import TableElement from './elements/TableElement';
 import TableTextElement from './elements/TableTextElement';
 import TextElement from './elements/TextElement';
+import BandElementPanel from './panels/BandElementPanel';
 import BarCodeElementPanel from './panels/BarCodeElementPanel';
 import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
 import EmptyDetailPanel from './panels/EmptyDetailPanel';
@@ -53,10 +55,12 @@ export default class ReportBro {
             contentHeight: 'Content height',
             contentHeightInfo: 'affects only GUI size to place elements and not the real page size',
             docElementAlwaysPrintOnSamePage: 'Always on same page',
+            docElementBand: 'Band',
             docElementBarCode: 'Bar code',
             docElementColor: 'Color',
             docElementConditionalStyle: 'Conditional style',
             docElementConditionalStyleCondition: 'Condition',
+            docElementDataSource: 'Data source',
             docElementFrame: 'Frame',
             docElementHeight: 'Height',
             docElementImage: 'Image',
@@ -106,6 +110,7 @@ export default class ReportBro {
             errorMsgInvalidPattern: 'Invalid pattern',
             errorMsgInvalidPosition: 'The position is outside the area',
             errorMsgInvalidSize: 'The element is outside the area',
+            errorMsgInvalidTestData: 'Invalid test data',
             errorMsgMissingData: 'Missing data',
             errorMsgMissingDataSourceParameter: 'Data source parameter not found',
             errorMsgMissingExpression: 'Expression must be set',
@@ -163,18 +168,22 @@ export default class ReportBro {
             parameterPattern: 'Pattern',
             parameters: 'Parameters',
             parameterAddTestData: 'Add row',
+            parameterArrayItemType: 'List item type',
             parameterEditTestData: 'Edit',
             parameterEditTestDataNoFields: 'No fields defined for this list',
             parameterEval: 'Evaluate',
+            parameterNullable: 'Nullable',
             parameterTestData: 'Test data',
             parameterTestDataDatePattern: 'YYYY-MM-DD',
             parameterType: 'Type',
             parameterTypeArray: 'List',
             parameterTypeAverage: 'Average',
+            parameterTypeBoolean: 'Boolean',
             parameterTypeDate: 'Date',
             parameterTypeImage: 'Image',
             parameterTypeMap: 'Collection',
             parameterTypeNumber: 'Number',
+            parameterTypeSimpleArray: 'Simple List',
             parameterTypeString: 'Text',
             parameterTypeSum: 'Sum',
             patternCurrencySymbol: 'Pattern currency symbol',
@@ -224,7 +233,8 @@ export default class ReportBro {
             tableElementBorderNone: 'None',
             tableElementBorderRow: 'Row',
             tableElementColumns: 'Columns',
-            tableElementDataSource: 'Data source',
+            tableElementContentRows: 'Content rows',
+            tableElementGroupExpression: 'Group expression',
             tableElementRepeatHeader: 'Repeat header',
             textElementContent: 'Text',
             textElementEval: 'Evaluate',
@@ -288,9 +298,9 @@ export default class ReportBro {
         this.document = new Document(element, this.properties.showGrid, this);
         this.popupWindow = new PopupWindow(element, this);
         this.docElements = [];
-        this.headerBand = new Band(Document.band.header, this);
-        this.contentBand = new Band(Document.band.content, this);
-        this.footerBand = new Band(Document.band.footer, this);
+        this.headerBand = new Band(Document.band.header, '', '', this);
+        this.contentBand = new Band(Document.band.content, '', '', this);
+        this.footerBand = new Band(Document.band.footer, '', '', this);
         this.parameterContainer = new Container('0_parameters', this.getLabel('parameters'), this);
         this.styleContainer = new Container('0_styles', this.getLabel('styles'), this);
         this.documentProperties = new DocumentProperties(this);
@@ -302,6 +312,7 @@ export default class ReportBro {
         this.activeDetailPanel = 'none';
         this.detailPanels = {
             'none': new EmptyDetailPanel(element, this),
+            'band': new BandElementPanel(element, this),
             'bar_code': new BarCodeElementPanel(element, this),
             'frame': new FrameElementPanel(element, this),
             'text': new TextElementPanel(element, this),
@@ -338,6 +349,8 @@ export default class ReportBro {
                         // Ctrl + C: copy
                         if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
                             let cleared = false;
+                            let idMap = {};
+                            let i;
                             for (let selectionId of this.selections) {
                                 let obj = this.getDataObject(selectionId);
                                 if (obj instanceof DocElement && !(obj instanceof TableTextElement)) {
@@ -345,7 +358,29 @@ export default class ReportBro {
                                         this.clipboardElements = [];
                                         cleared = true;
                                     }
-                                    this.clipboardElements.push(obj.toJS());
+                                    if (!(obj.getId() in idMap)) {
+                                        idMap[obj.getId()] = true;
+                                        this.clipboardElements.push(obj.toJS());
+                                        if (obj instanceof FrameElement) {
+                                            let nestedElements = [];
+                                            obj.appendContainerChildren(nestedElements);
+                                            for (let nestedElement of nestedElements) {
+                                                if (nestedElement.getId() in idMap) {
+                                                    // in case a nested element is also selected we make sure to add it only once to
+                                                    // the clipboard objects and to add it after its parent element
+                                                    for (i=0; i < this.clipboardElements.length; i++) {
+                                                        if (nestedElement.getId() === this.clipboardElements[i].id) {
+                                                            this.clipboardElements.splice(i, 1);
+                                                            break;
+                                                        }
+                                                    }
+                                                } else {
+                                                    idMap[nestedElement.getId()] = true;
+                                                }
+                                                this.clipboardElements.push(nestedElement.toJS());
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             event.preventDefault();
@@ -356,10 +391,22 @@ export default class ReportBro {
                         // Ctrl + V: paste
                         if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
                             let cleared = false;
+                            let mappedContainerIds = {};
                             for (let clipboardElement of this.clipboardElements) {
                                 clipboardElement.id = this.getUniqueId();
+                                if (clipboardElement.linkedContainerId) {
+                                    let linkedContainerId = this.getUniqueId();
+                                    mappedContainerIds[clipboardElement.linkedContainerId] = linkedContainerId;
+                                    clipboardElement.linkedContainerId = linkedContainerId;
+                                }
                                 if (clipboardElement.elementType === DocElement.type.table) {
                                     TableElement.removeIds(clipboardElement);
+                                }
+                            }
+                            for (let clipboardElement of this.clipboardElements) {
+                                // map id of container in case element is inside other pasted container (frame/band)
+                                if (clipboardElement.containerId in mappedContainerIds) {
+                                    clipboardElement.containerId = mappedContainerIds[clipboardElement.containerId];
                                 }
                                 clipboardElement.x = clipboardElement.y = 0;
                                 this.createDocElement(clipboardElement, true);
@@ -472,7 +519,7 @@ export default class ReportBro {
                 { name: 'page_number', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true }]) {
             let parameter = new Parameter(this.getUniqueId(), parameterData, this);
             let parentPanel = this.mainPanel.getParametersItem();
-            let panelItem = new MainPanelItem('parameter', 'parameter', '',
+            let panelItem = new MainPanelItem('parameter', '',
                 parentPanel, parameter, { hasChildren: false, showAdd: false, showDelete: false, draggable: false }, this);
             panelItem.openParentItems();
             parameter.setPanelItem(panelItem);
@@ -602,7 +649,7 @@ export default class ReportBro {
      * @param {DocElement} docElement - adds all parameters available for this element, e.g. array field parameters
      * of a table data source.
      * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
-     * parameters list. If empty all parameter types are allowed.
+     * parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
      * optional separator (Boolean).
      */
@@ -612,7 +659,6 @@ export default class ReportBro {
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         let panelItem = docElement.getPanelItem();
         while (panelItem !== null) {
-            panelItem = panelItem.getParent();
             if (panelItem !== null && panelItem.getData() instanceof TableBandElement &&
                     panelItem.getData().getValue('tableBand') === 'content') {
                 if (panelItem.getParent() !== null && panelItem.getParent().getData() instanceof TableElement) {
@@ -620,8 +666,12 @@ export default class ReportBro {
                         dataParameter.appendParameterItems(parameters, allowedTypes);
                     }
                 }
-                break;
+            } else if (panelItem !== null && panelItem.getData() instanceof BandElement) {
+                for (let dataParameter of panelItem.getData().getDataParameters()) {
+                    dataParameter.appendParameterItems(parameters, allowedTypes);
+                }
             }
+            panelItem = panelItem.getParent();
         }
         let mapParameters = []; // add all parameters of collections at end of list with a header containing the collection name
         for (let parameterItem of parameterItems) {
@@ -633,25 +683,6 @@ export default class ReportBro {
             }
         }
         return parameters.concat(mapParameters);
-    }
-
-    /**
-     * Returns a list of all array parameter items.
-     * Used for parameter popup window.
-     * @returns {Object[]} Each item contains name (String), optional description (String) and
-     * optional separator (Boolean).
-     */
-    getArrayParameterItems() {
-        let parameters = [];
-        let parameterItems = this.getMainPanel().getParametersItem().getChildren();
-        parameters.push({ separator: true, name: this.getLabel('parameters') });
-        for (let parameterItem of parameterItems) {
-            let parameter = parameterItem.getData();
-            if (parameter.getValue('type') === Parameter.type.array) {
-                parameters.push({ name: parameter.getName(), description: '' });
-            }
-        }
-        return parameters;
     }
 
     /**
@@ -1202,13 +1233,16 @@ export default class ReportBro {
         } else if (docElementData.elementType === DocElement.type.frame) {
             element = new FrameElement(docElementData.id, docElementData, this);
             properties.hasChildren = true;
+        } else if (docElementData.elementType === DocElement.type.band) {
+            element = new BandElement(docElementData.id, docElementData, this);
+            properties.hasChildren = true;
+            properties.showAdd = true;
         } else if (docElementData.elementType === DocElement.type.pageBreak) {
             element = new PageBreakElement(docElementData.id, docElementData, this);
         }
         this.addDocElement(element);
         let parentPanel = element.getContainer().getPanelItem();
-        let panelItem = new MainPanelItem(docElementData.elementType, 'docElement', '',
-            parentPanel, element, properties, this);
+        let panelItem = new MainPanelItem(docElementData.elementType, '', parentPanel, element, properties, this);
         if (openParentItems) {
             panelItem.openParentItems();
         }
@@ -1247,6 +1281,15 @@ export default class ReportBro {
                     ret[parameter.getName()] = testData;
                 } else if (type === Parameter.type.array) {
                     ret[parameter.getName()] = parameter.getTestDataRows();
+                } else if (type === Parameter.type.simpleArray) {
+                    let testDataRows = [];
+                    // because test data rows are stored as map items we convert the list to a list of simple values
+                    for (let testDataRow of parameter.getTestDataRows()) {
+                        if ('data' in testDataRow) {
+                            testDataRows.push(testDataRow['data']);
+                        }
+                    }
+                    ret[parameter.getName()] = testDataRows;
                 } else if (type === Parameter.type.string || type === Parameter.type.number || type === Parameter.type.date) {
                     ret[parameter.getName()] = parameter.getValue('testData');
                 }
@@ -1333,7 +1376,7 @@ export default class ReportBro {
      * @returns {Object}
      */
     getReport() {
-        let ret = { docElements: [], parameters: [], styles: [], version: 1 };
+        let ret = { docElements: [], parameters: [], styles: [], version: 2 };
         let i;
         ret.docElements = this.getDocElements(false);
         // let existingIds = {};
@@ -1401,13 +1444,22 @@ export default class ReportBro {
         this.getMainPanel().getParametersItem().close();
         this.getMainPanel().getStylesItem().close();
 
+        if (report.version < 2) {
+            for (let docElementData of report.docElements) {
+                if (docElementData.elementType === DocElement.type.table) {
+                    docElementData.contentDataRows = [docElementData.contentData];
+                    docElementData.contentRows = '1';
+                }
+            }
+        }
+
         this.documentProperties.setInitialData(report.documentProperties);
         this.documentProperties.setup();
 
         for (let styleData of report.styles) {
             let style = new Style(styleData.id, styleData, this);
             let parentPanel = this.mainPanel.getStylesItem();
-            let panelItem = new MainPanelItem('style', 'style', '', parentPanel, style, { draggable: true }, this);
+            let panelItem = new MainPanelItem('style', '', parentPanel, style, { draggable: true }, this);
             style.setPanelItem(panelItem);
             parentPanel.appendChild(panelItem);
             this.addStyle(style);
@@ -1418,7 +1470,7 @@ export default class ReportBro {
         for (let parameterData of report.parameters) {
             let parameter = new Parameter(parameterData.id, parameterData, this);
             let parentPanel = this.mainPanel.getParametersItem();
-            let panelItem = new MainPanelItem('parameter', 'parameter', '',
+            let panelItem = new MainPanelItem('parameter', '',
                 parentPanel, parameter, { hasChildren: true, showAdd: parameter.getValue('editable'),
                 showDelete: parameter.getValue('editable'), draggable: true }, this);
             parameter.setPanelItem(panelItem);

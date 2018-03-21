@@ -18,10 +18,10 @@ export default class TableElement extends DocElement {
         this.border = TableElement.border.grid;
         this.header = true;
         this.footer = false;
+        this.contentRows = '1';
         this.columns = '2';
-        this.elTable = null;
         this.headerData = null;
-        this.contentData = null;
+        this.contentDataRows = [];
         this.footerData = null;
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
@@ -33,52 +33,65 @@ export default class TableElement extends DocElement {
         super.setup();
         this.createElement();
         this.updateDisplay();
-        
-        for (let band of ['header', 'content', 'footer']) {
-            let data;
-            let dataKey = band + 'Data';
-            let dataId;
-            let panelItemProperties = { hasChildren: true, showDelete: false };
-            let hasData = false;
-            if (this[dataKey]) {
-                data = this[dataKey];
-                dataId = data.id;
-                hasData = true;
-            } else {
-                data = {};
-            }
-            data.parentId = this.id;
-            if (!dataId) {
-                dataId = this.rb.getUniqueId();
-            }
-            if ((band === 'header' && !this.header) || (band === 'footer' && !this.footer)) {
-                panelItemProperties.visible = false;
-            }
-            let bandElement = new TableBandElement(dataId, data, band, this.rb);
-        	this.rb.addDataObject(bandElement);
-            let panelItemBand = new MainPanelItem('table_band', 'tableBandElement', '',
-                this.panelItem, bandElement, panelItemProperties, this.rb);
-            bandElement.setPanelItem(panelItemBand);
-            this.panelItem.appendChild(panelItemBand);
-            bandElement.setup();
-            let columns = utils.convertInputToNumber(this.columns);
-            bandElement.createColumns(columns, false);
 
-            if (band === 'header') {
-                this.headerData = bandElement;
-                bandElement.show(this.header);
-            } else if (band === 'content') {
-                this.contentData = bandElement;
-            } else if (band === 'footer') {
-                this.footerData = bandElement;
-                bandElement.show(this.footer);
-            }
+        this.headerData = this.createBand('header', -1, null);
+        let contentRows = utils.convertInputToNumber(this.contentRows);
+        if (contentRows < 1) {
+            contentRows = 1;
         }
+        let contentDataRows = [];
+        for (let i=0; i < contentRows; i++) {
+            contentDataRows.push(this.createBand('content', i, null));
+        }
+        this.contentDataRows = contentDataRows;
+        this.footerData = this.createBand('footer', -1, null);
         this.setupComplete = true;
         this.updateWidth();
         this.updateStyle();
         this.updateName();
         this.panelItem.open();
+    }
+
+    createBand(band, index, dataValues) {
+        let data;
+        let dataKey = band + (band === 'content' ? 'DataRows' : 'Data');
+        let dataId;
+        let panelItemProperties = { hasChildren: true, showDelete: false };
+        if (dataValues) {
+            data = dataValues;
+        } else if (this[dataKey] && (band !== 'content' || index < this[dataKey].length)) {
+            if (band === 'content') {
+                data = this[dataKey][index];
+            } else {
+                data = this[dataKey];
+            }
+            dataId = data.id;
+        } else {
+            data = {};
+        }
+        data.parentId = this.id;
+        if (!dataId) {
+            dataId = this.rb.getUniqueId();
+        }
+        if ((band === 'header' && !this.header) || (band === 'footer' && !this.footer)) {
+            panelItemProperties.visible = false;
+        }
+        let bandElement = new TableBandElement(dataId, data, band, this.rb);
+        this.rb.addDataObject(bandElement);
+        let panelItemBand = new MainPanelItem(
+            'table_band', '', this.panelItem, bandElement, panelItemProperties, this.rb);
+        bandElement.setPanelItem(panelItemBand);
+        this.panelItem.appendChild(panelItemBand);
+        bandElement.setup();
+        let columns = utils.convertInputToNumber(this.columns);
+        bandElement.createColumns(columns, false);
+
+        if (band === 'header') {
+            bandElement.show(this.header);
+        } else if (band === 'footer') {
+            bandElement.show(this.footer);
+        }
+        return bandElement;
     }
 
     /**
@@ -92,9 +105,11 @@ export default class TableElement extends DocElement {
         if (tempId > maxId) {
             maxId = tempId;
         }
-        tempId = this.contentData.getMaxId();
-        if (tempId > maxId) {
-            maxId = tempId;
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            tempId = this.contentDataRows[i].getMaxId();
+            if (tempId > maxId) {
+                maxId = tempId;
+            }
         }
         tempId = this.footerData.getMaxId();
         if (tempId > maxId) {
@@ -135,6 +150,7 @@ export default class TableElement extends DocElement {
 
     updateStyle() {
         let elTable = this.el.find('table');
+        let i;
         if (this.border === TableElement.border.grid || this.border === TableElement.border.frameRow ||
                 this.border === TableElement.border.frame) {
             elTable.css({ 'border-style': 'solid', 'border-width': '1px', 'border-color': this.borderColor });
@@ -150,7 +166,9 @@ export default class TableElement extends DocElement {
             styleProperties = { 'border-style': 'none' };
         }
         this.headerData.getElement().css(styleProperties);
-        this.contentData.getElement().css(styleProperties);
+        for (i=0; i < this.contentDataRows.length; i++) {
+            this.contentDataRows[i].getElement().css(styleProperties);
+        }
         this.footerData.getElement().css(styleProperties);
 
         if (this.border === TableElement.border.grid) {
@@ -160,7 +178,9 @@ export default class TableElement extends DocElement {
             styleProperties = { 'border-style': 'none' };
         }
         this.headerData.getElement().find('td').css(styleProperties);
-        this.contentData.getElement().find('td').css(styleProperties);
+        for (i=0; i < this.contentDataRows.length; i++) {
+            this.contentDataRows[i].getElement().find('td').css(styleProperties);
+        }
         this.footerData.getElement().find('td').css(styleProperties);
 
         this.el.removeClass('rbroBorderTableGrid rbroBorderTableFrameRow rbroBorderTableFrame rbroBorderTableRow rbroBorderTableNone');
@@ -172,7 +192,7 @@ export default class TableElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'footer',
+        return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }
 
@@ -228,14 +248,15 @@ export default class TableElement extends DocElement {
     }
 
     remove() {
-        this.elTable = null;
         super.remove();
         this.rb.deleteDataObject(this.headerData);
         this.headerData.remove();
         this.headerData = null;
-        this.rb.deleteDataObject(this.contentData);
-        this.contentData.remove();
-        this.contentData = null;
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            this.rb.deleteDataObject(this.contentDataRows[i]);
+            this.contentDataRows[i].remove();
+        }
+        this.contentDataRows = [];
         this.rb.deleteDataObject(this.footerData);
         this.footerData.remove();
         this.footerData = null;
@@ -250,7 +271,9 @@ export default class TableElement extends DocElement {
     updateColumnWidth(columnIndex, width, updateTableWidth) {
         if (this.setupComplete) {
             this.headerData.updateColumnWidth(columnIndex, width);
-            this.contentData.updateColumnWidth(columnIndex, width);
+            for (let i=0; i < this.contentDataRows.length; i++) {
+                this.contentDataRows[i].updateColumnWidth(columnIndex, width);
+            }
             this.footerData.updateColumnWidth(columnIndex, width);
             if (updateTableWidth) {
                 this.updateWidth();
@@ -263,7 +286,7 @@ export default class TableElement extends DocElement {
      */
     updateWidth() {
         if (this.setupComplete) {
-            let width = this.contentData.getWidth();
+            let width = this.headerData.getWidth();
             this.width = '' + width;
             this.widthVal = width;
             $(`#rbro_el_table${this.id}`).css('width', (this.widthVal + 1) + 'px');
@@ -286,10 +309,12 @@ export default class TableElement extends DocElement {
                 column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
             }
         }
-        if (tableBand !== this.contentData) {
-            let column = this.contentData.getColumn(columnIndex);
-            if (column !== null) {
-                column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            if (tableBand !== this.contentDataRows[i]) {
+                let column = this.contentDataRows[i].getColumn(columnIndex);
+                if (column !== null) {
+                    column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
+                }
             }
         }
         if (tableBand !== this.footerData) {
@@ -298,8 +323,8 @@ export default class TableElement extends DocElement {
                 column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
             }
         }
-        let width = this.contentData.getWidth();
-        let column = this.contentData.getColumn(columnIndex);
+        let width = this.headerData.getWidth();
+        let column = this.headerData.getColumn(columnIndex);
         if (column !== null) {
             width -= column.getValue('widthVal') - newColumnWidth;
         }
@@ -333,11 +358,16 @@ export default class TableElement extends DocElement {
     }
 
     addChildren(docElements) {
+        let i;
         docElements.push(this.headerData);
-        docElements.push(this.contentData);
+        for (i=0; i < this.contentDataRows.length; i++) {
+            docElements.push(this.contentDataRows[i]);
+        }
         docElements.push(this.footerData);
         this.headerData.addChildren(docElements);
-        this.contentData.addChildren(docElements);
+        for (i=0; i < this.contentDataRows.length; i++) {
+            this.contentDataRows[i].addChildren(docElements);
+        }
         this.footerData.addChildren(docElements);
     }
 
@@ -383,7 +413,7 @@ export default class TableElement extends DocElement {
             // reduce width of all existing columns until there is enough space
             let i = existingColumns - 1;
             while (i >= 0) {
-                let column = this.contentData.getColumn(i);
+                let column = this.headerData.getColumn(i);
                 let freeSpace = column.getValue('widthVal') - COLUMN_MIN_WIDTH;
                 let newWidth = COLUMN_MIN_WIDTH;
                 if (freeSpace > spaceNeeded) {
@@ -398,10 +428,10 @@ export default class TableElement extends DocElement {
         } else if (columns < existingColumns) {
             let usedWidth = 0;
             for (let i=0; i < columns; i++) {
-                usedWidth += this.contentData.getColumn(i).getValue('widthVal');
+                usedWidth += this.headerData.getColumn(i).getValue('widthVal');
             }
             // add remaining space to last column
-            let column = this.contentData.getColumn(columns - 1);
+            let column = this.headerData.getColumn(columns - 1);
             if (this.widthVal - usedWidth > 0) {
                 this.updateColumnWidth(columns - 1, column.getValue('widthVal') + (this.widthVal - usedWidth), false);
             }
@@ -409,7 +439,9 @@ export default class TableElement extends DocElement {
 
         this.columns = columns;
         this.headerData.createColumns(columns, true);
-        this.contentData.createColumns(columns, true);
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            this.contentDataRows[i].createColumns(columns, true);
+        }
         this.footerData.createColumns(columns, true);
 
         // restore table with new column count and updated settings
@@ -420,22 +452,73 @@ export default class TableElement extends DocElement {
         return columns;
     }
 
+    /**
+     * Adds commands to command group parameter to recreate table with new content rows.
+     * @param {Number} contentRows - new content rows count.
+     * @param {CommandGroupCmd} cmdGroup - possible commands will be added to this command group.
+     */
+    addCommandsForChangedContentRows(contentRows, cmdGroup) {
+        if (contentRows === utils.convertInputToNumber(this.contentRows)) {
+            return;
+        }
+        // delete table with current settings and restore below with new columns, necessary for undo/redo
+        let cmd = new AddDeleteDocElementCmd(false, this.getPanelItem().getPanelName(),
+            this.toJS(), this.id, this.getContainerId(), -1, this.rb);
+        cmdGroup.addCommand(cmd);
+
+        let i;
+        if (contentRows < this.contentDataRows.length) {
+            for (i = contentRows; i < this.contentDataRows.length; i++) {
+                this.rb.deleteDataObject(this.contentDataRows[i]);
+                this.contentDataRows[i].remove();
+            }
+            this.contentDataRows.splice(contentRows, this.contentDataRows.length - contentRows);
+        } else {
+            let data;
+            if (this.contentDataRows.length > 0) {
+                data = { height: this.contentDataRows[0].height, columnData: [] };
+                for (let columnData of this.contentDataRows[0].columnData) {
+                    data.columnData.push({ width: columnData.width });
+                }
+            }
+            for (i = this.contentDataRows.length; i < contentRows; i++) {
+                this.contentDataRows.push(this.createBand('content', i, data));
+            }
+        }
+
+        this.contentRows = '' + contentRows;
+        // restore table with new content rows and updated settings
+        cmd = new AddDeleteDocElementCmd(true, this.getPanelItem().getPanelName(),
+            this.toJS(), this.id, this.getContainerId(), -1, this.rb);
+        cmdGroup.addCommand(cmd);
+    }
+
     toJS() {
         let ret = super.toJS();
         ret['headerData'] = this.headerData.toJS();
-        ret['contentData'] = this.contentData.toJS();
+        let contentDataRows = [];
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            contentDataRows.push(this.contentDataRows[i].toJS());
+        }
+        ret['contentDataRows'] = contentDataRows;
         ret['footerData'] = this.footerData.toJS();
         return ret;
     }
 
     static removeIds(data) {
-        for (let band of ['header', 'content', 'footer']) {
-            let bandKey = band + 'Data';
-            delete data[bandKey].id;
-            let columns = data[bandKey].columnData;
-            for (let column of columns) {
-                delete column.id;
-            }
+        for (let bandKey of ['headerData', 'footerData']) {
+            TableElement.removeBandIds(data[bandKey]);
+        }
+        for (let i=0; i < data.contentDataRows.length; i++) {
+            TableElement.removeBandIds(data.contentDataRows[i]);
+        }
+    }
+
+    static removeBandIds(bandData) {
+        delete bandData.id;
+        let columns = bandData.columnData;
+        for (let column of columns) {
+            delete column.id;
         }
     }
 }

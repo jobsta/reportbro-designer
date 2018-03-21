@@ -45,7 +45,7 @@ export default class SetValueCmd {
         let elSelector = `#${this.tagId}`;
         obj.setValue(this.field, value, elSelector, isShown);
 
-        if (this.field == 'name') {
+        if (this.field === 'name') {
             $(`#rbro_menu_item_name${this.objId}`).text(value);
             $(`#rbro_menu_item_name${this.objId}`).attr('title', value);
             this.rb.notifyEvent(obj, Command.operation.rename);
@@ -109,4 +109,4 @@ SetValueCmd.type = {
     buttonGroup: 'buttonGroup',  // one button inside a group of buttons with only one active button
     color: 'color',
     internal: 'internal'
-}
+};

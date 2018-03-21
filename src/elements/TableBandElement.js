@@ -16,6 +16,7 @@ export default class TableBandElement extends DocElement {
         this.alwaysPrintOnSamePage = true;
         this.backgroundColor = '';
         this.alternateBackgroundColor = '';
+        this.groupExpression = '';
         this.parentId = initialData.parentId;
         this.columnData = [];
 
@@ -88,6 +89,8 @@ export default class TableBandElement extends DocElement {
             fields.push('repeatHeader');
         } else if (this.tableBand === 'content') {
             fields.push('alternateBackgroundColor');
+            fields.push('groupExpression');
+            fields.push('printIf');
             fields.push('alwaysPrintOnSamePage');
         }
         return fields;
@@ -173,8 +176,7 @@ export default class TableBandElement extends DocElement {
             let textElement = new TableTextElement(dataId, data, this.rb);
             newColumnData.push(textElement);
         	this.rb.addDataObject(textElement);
-            let panelItemText = new MainPanelItem(DocElement.type.text, 'tableTextElement', '',
-                this.panelItem, textElement, { showDelete: false }, this.rb);
+            let panelItemText = new MainPanelItem(DocElement.type.text, '', this.panelItem, textElement, { showDelete: false }, this.rb);
             textElement.setPanelItem(panelItemText);
             this.panelItem.appendChild(panelItemText);
             textElement.setup();

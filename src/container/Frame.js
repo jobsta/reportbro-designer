@@ -24,7 +24,8 @@ export default class Frame extends Container {
      * @param {String} elementType
      */
     isElementAllowed(elementType) {
-        return elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.frame;
+        return elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.frame &&
+            elementType !== DocElement.type.band;
     }
 
     /**

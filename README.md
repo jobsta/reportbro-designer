@@ -49,13 +49,21 @@ Initialize ReportBro:
 
 ## Build
 
-development:
+### prerequisites:
+
+Install Node.js and npm.
+
+Troubleshooting for Ubuntu/Linux: If you get an error like "/usr/bin/env: node: No such file or directory" you can easily fix it with a symbolic link:
+
+`ln -s /usr/bin/nodejs /usr/bin/node`
+
+### development:
 
 `npm run build`
 
 This is a fast way to build ReportBro Designer and easily debug the code. You can use the generated reportbro.js file from the dist folder in any modern browser supporting ES6 (ECMAScript 2015).
 
-production:
+### production:
 
 `npm run build-prod`
 

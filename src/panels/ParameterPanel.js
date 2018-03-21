@@ -73,9 +73,11 @@ export default class ParameterPanel {
         let elType = $(`<select id="rbro_parameter_type">
                 <option value="string">${this.rb.getLabel('parameterTypeString')}</option>
                 <option value="number">${this.rb.getLabel('parameterTypeNumber')}</option>
+                <option value="boolean">${this.rb.getLabel('parameterTypeBoolean')}</option>
                 <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
                 <option value="image">${this.rb.getLabel('parameterTypeImage')}</option>
                 <option value="array">${this.rb.getLabel('parameterTypeArray')}</option>
+                <option value="simpleArray">${this.rb.getLabel('parameterTypeSimpleArray')}</option>
                 <option value="map">${this.rb.getLabel('parameterTypeMap')}</option>
                 <option value="sum">${this.rb.getLabel('parameterTypeSum')}</option>
                 <option value="average">${this.rb.getLabel('parameterTypeAverage')}</option>
@@ -89,6 +91,27 @@ export default class ParameterPanel {
             });
         elFormField.append(elType);
         elFormField.append('<div id="rbro_parameter_type_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = $('<div id="rbro_parameter_array_item_type_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_parameter_array_item_type_row">${this.rb.getLabel('parameterArrayItemType')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elArrayItemType = $(`<select id="rbro_parameter_array_item_type">
+                <option value="string">${this.rb.getLabel('parameterTypeString')}</option>
+                <option value="number">${this.rb.getLabel('parameterTypeNumber')}</option>
+                <option value="boolean">${this.rb.getLabel('parameterTypeBoolean')}</option>
+                <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
+            </select>`)
+            .change(event => {
+                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_array_item_type',
+                        'arrayItemType', elArrayItemType.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elArrayItemType);
+        elFormField.append('<div id="rbro_parameter_array_item_type_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -109,6 +132,22 @@ export default class ParameterPanel {
             elDiv.append(elFormField);
             panel.append(elDiv);
         }
+
+        elDiv = $('<div class="rbroFormRow" id="rbro_parameter_nullable_row"></div>');
+        elDiv.append(`<label for="rbro_parameter_nullable">${this.rb.getLabel('parameterNullable')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elNullable = $('<input id="rbro_parameter_nullable" type="checkbox">')
+            .change(event => {
+                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                    let cmd = new SetValueCmd(this.selectedObjId,
+                        'rbro_parameter_nullable', 'nullable',
+                        elNullable.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elNullable);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
 
         elDiv = $('<div class="rbroFormRow" id="rbro_parameter_pattern_row"></div>');
         elDiv.append(`<label for="rbro_parameter_pattern">${this.rb.getLabel('parameterPattern')}:</label>`);
@@ -206,8 +245,12 @@ export default class ParameterPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     let parameters = [];
-                    for (let child of selectedObj.getChildren()) {
-                        parameters.push({ name: child.getName(), type: child.getValue('type') });
+                    if (selectedObj.getValue('type') == Parameter.type.simpleArray) {
+                        parameters.push({ name: 'data', type: selectedObj.getValue('arrayItemType') });
+                    } else {
+                        for (let child of selectedObj.getChildren()) {
+                            parameters.push({ name: child.getName(), type: child.getValue('type') });
+                        }
                     }
                     if (parameters.length > 0) {
                         let rows = selectedObj.getTestDataRows();
@@ -250,18 +293,21 @@ export default class ParameterPanel {
             $('#rbro_parameter_name').prop('disabled', !editable);
             $('#rbro_parameter_type').prop('disabled', !editable);
             $('#rbro_parameter_eval').prop('disabled', !editable);
+            $('#rbro_parameter_nullable').prop('disabled', !editable);
             $('#rbro_parameter_pattern').prop('disabled', !editable);
             $('#rbro_parameter_expression').prop('disabled', !editable);
             if (editable) {
                 $('#rbro_parameter_name_row label').removeClass('rbroDisabled');
                 $('#rbro_parameter_type_row label').removeClass('rbroDisabled');
                 $('#rbro_parameter_eval_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_nullable_row label').removeClass('rbroDisabled');
                 $('#rbro_parameter_pattern_row label').removeClass('rbroDisabled');
                 $('#rbro_parameter_expression_row label').removeClass('rbroDisabled');
             } else {
                 $('#rbro_parameter_name_row label').addClass('rbroDisabled');
                 $('#rbro_parameter_type_row label').addClass('rbroDisabled');
                 $('#rbro_parameter_eval_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_nullable_row label').addClass('rbroDisabled');
                 $('#rbro_parameter_pattern_row label').addClass('rbroDisabled');
                 $('#rbro_parameter_expression_row label').addClass('rbroDisabled');
             }
@@ -270,6 +316,7 @@ export default class ParameterPanel {
             $('#rbro_parameter_name').val(data.getName());
             $('#rbro_parameter_type').val(data.getValue('type'));
             $('#rbro_parameter_eval').prop('checked', data.getValue('eval'));
+            $('#rbro_parameter_nullable').prop('checked', data.getValue('nullable'));
             $('#rbro_parameter_pattern').val(data.getValue('pattern'));
             $('#rbro_parameter_expression').val(data.getValue('expression'));
             $('#rbro_parameter_test_data').val(data.getValue('testData'));
@@ -280,6 +327,7 @@ export default class ParameterPanel {
             $('#rbro_parameter_name').prop('disabled', true);
             $('#rbro_parameter_type').prop('disabled', true);
             $('#rbro_parameter_eval').prop('disabled', true);
+            $('#rbro_parameter_nullable').prop('disabled', true);
             $('#rbro_parameter_pattern').prop('disabled', true);
             $('#rbro_parameter_expression').prop('disabled', true);
             $('#rbro_parameter_test_data').prop('disabled', true);
@@ -316,6 +364,17 @@ export default class ParameterPanel {
             parentParameter = obj.getPanelItem().getParent().getData();
         }
 
+        if (type === Parameter.type.simpleArray) {
+            $('#rbro_parameter_array_item_type_row').show();
+        } else {
+            $('#rbro_parameter_array_item_type_row').hide();
+        }
+        if (type === Parameter.type.string || type === Parameter.type.number || type === Parameter.type.boolean || type === Parameter.type.date ||
+                type === Parameter.type.array || type === Parameter.type.simpleArray || type === Parameter.type.map) {
+            $('#rbro_parameter_nullable_row').show();
+        } else {
+            $('#rbro_parameter_nullable_row').hide();
+        }
         if ((type === Parameter.type.number || type === Parameter.type.date ||
                 type === Parameter.type.sum || type === Parameter.type.average) && !showOnlyNameType) {
             $('#rbro_parameter_pattern_row').show();
@@ -327,7 +386,7 @@ export default class ParameterPanel {
             $('#rbro_parameter_eval_row').hide();
             $('#rbro_parameter_test_data_row').hide();
         } else {
-            if (type === Parameter.type.image || type === Parameter.type.array || type === Parameter.type.map) {
+            if (type === Parameter.type.image || type === Parameter.type.array || type === Parameter.type.simpleArray || type === Parameter.type.map) {
                 $('#rbro_parameter_eval_row').hide();
             } else {
                 $('#rbro_parameter_eval_row').show();
@@ -336,13 +395,13 @@ export default class ParameterPanel {
                     type === Parameter.type.map) {
                 $('#rbro_parameter_test_data_row').hide();
             } else {
-                if (type === Parameter.type.array || !obj.getValue('eval')) {
+                if (type === Parameter.type.array || type === Parameter.type.simpleArray || !obj.getValue('eval')) {
                     $('#rbro_parameter_test_data_row').show();
                 } else {
                     $('#rbro_parameter_test_data_row').hide();
                 }
             }
-            if (type === Parameter.type.array) {
+            if (type === Parameter.type.array || type === Parameter.type.simpleArray) {
                 $('#rbro_parameter_test_data').hide();
                 $('#rbro_parameter_edit_test_data').show();
             } else {
@@ -350,7 +409,8 @@ export default class ParameterPanel {
                 $('#rbro_parameter_edit_test_data').hide();
             }
         }
-        if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number || type === Parameter.type.date)) ||
+        if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||
+              type === Parameter.type.boolean || type === Parameter.type.date)) ||
                 (type === Parameter.type.sum || type === Parameter.type.average)) && !showOnlyNameType) {
             $('#rbro_parameter_expression_row').show();
         } else {

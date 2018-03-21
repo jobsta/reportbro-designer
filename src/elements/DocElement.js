@@ -175,6 +175,20 @@ export default class DocElement {
         return false;
     }
 
+    appendContainerChildren(elements) {
+        if (this.linkedContainerId !== null) {
+            if (this.panelItem !== null) {
+                let children = this.panelItem.getChildren();
+                for (let child of children) {
+                    if (child.getData() instanceof DocElement) {
+                        elements.push(child.getData());
+                        child.getData().appendContainerChildren(elements);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Check element bounds within container and adapt position/size if necessary.
      *
@@ -601,6 +615,7 @@ DocElement.type = {
     pageBreak: 'page_break',
     tableText: 'table_text',
     barCode: 'bar_code',
+    band: 'band',
     frame: 'frame'
 };
 

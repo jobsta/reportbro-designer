@@ -8,10 +8,9 @@ import * as utils from '../utils';
  * @class
  */
 export default class Band extends Container {
-    constructor(band, rb) {
-        super('', '', rb);
+    constructor(band, id, name, rb) {
+        super(id, name, rb);
         this.panelItem = null;
-        this.name = '';
         this.band = band;
         if (band === Document.band.header) {
             this.id = '0_header';
@@ -43,7 +42,7 @@ export default class Band extends Container {
         if (elementType === DocElement.type.tableText) {
             return false;
         }
-        return this.band === Document.band.content ||
+        return this.band === Document.band.content || this.band === Document.band.none ||
             (elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.table);
     }
 
@@ -53,11 +52,20 @@ export default class Band extends Container {
      */
     getOffset() {
         let y = 0;
-        let docProperties = this.rb.getDocumentProperties();
-        if (this.band === Document.band.content && docProperties.getValue('header')) {
-            y = utils.convertInputToNumber(docProperties.getValue('headerSize'));
-        } else if (this.band === Document.band.footer) {
-            y = this.rb.getDocument().getHeight() - utils.convertInputToNumber(docProperties.getValue('footerSize'));
+        if (this.band === Document.band.none) {
+            if (this.owner !== null) {
+                y = this.owner.getValue('yVal');
+            }
+            if (this.parent !== null) {
+                y += this.parent.getOffset().y;
+            }
+        } else {
+            let docProperties = this.rb.getDocumentProperties();
+            if (this.band === Document.band.content && docProperties.getValue('header')) {
+                y = utils.convertInputToNumber(docProperties.getValue('headerSize'));
+            } else if (this.band === Document.band.footer) {
+                y = this.rb.getDocument().getHeight() - utils.convertInputToNumber(docProperties.getValue('footerSize'));
+            }
         }
         return { x: 0, y: y };
     }
@@ -71,7 +79,11 @@ export default class Band extends Container {
         let width = documentProperties.getValue('width') -
             documentProperties.getValue('marginLeftVal') - documentProperties.getValue('marginRightVal');
         let height = 0;
-        if (this.band === Document.band.header) {
+        if (this.band === Document.band.none) {
+            if (this.owner !== null) {
+                height = this.owner.getValue('heightVal');
+            }
+        } else if (this.band === Document.band.header) {
             height = documentProperties.getValue('headerSizeVal');
         } else if (this.band === Document.band.content) {
             height = documentProperties.getValue('height') - documentProperties.getValue('headerSizeVal') -
