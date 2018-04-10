@@ -189,7 +189,10 @@ export default class MainPanelItem {
                             panelName === DocElement.type.line || panelName === DocElement.type.table ||
                             panelName === DocElement.type.pageBreak ||
                             panelName === DocElement.type.frame || panelName === DocElement.type.band) {
-                        cmd = new AddDeleteDocElementCmd(false, panelName, initialData, this.getId(), this.parent.getId(), pos, this.rb);
+                        if (this.getData() instanceof DocElement) {
+                            cmd = new CommandGroupCmd('Delete', this);
+                            this.getData().addCommandsForDelete(cmd);
+                        }
                     }
                     if (cmd !== null) {
                         this.rb.executeCommand(cmd);

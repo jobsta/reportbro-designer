@@ -442,9 +442,7 @@ export default class ReportBro {
                             for (let selectionId of this.selections) {
                                 let obj = this.getDataObject(selectionId);
                                 if (obj instanceof DocElement) {
-                                    let cmd = new AddDeleteDocElementCmd(false, obj.getPanelItem().getPanelName(),
-                                        obj.toJS(), obj.getId(), obj.getContainerId(), obj.getPanelItem().getSiblingPosition(), this);
-                                    cmdGroup.addCommand(cmd);
+                                    obj.addCommandsForDelete(cmdGroup);
                                 }
                             }
                             if (!cmdGroup.isEmpty()) {
@@ -1280,11 +1278,11 @@ export default class ReportBro {
                     }
                     ret[parameter.getName()] = testData;
                 } else if (type === Parameter.type.array) {
-                    ret[parameter.getName()] = parameter.getTestDataRows();
+                    ret[parameter.getName()] = parameter.getTestDataRows(false);
                 } else if (type === Parameter.type.simpleArray) {
                     let testDataRows = [];
                     // because test data rows are stored as map items we convert the list to a list of simple values
-                    for (let testDataRow of parameter.getTestDataRows()) {
+                    for (let testDataRow of parameter.getTestDataRows(false)) {
                         if ('data' in testDataRow) {
                             testDataRows.push(testDataRow['data']);
                         }

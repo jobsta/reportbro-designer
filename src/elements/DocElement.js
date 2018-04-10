@@ -1,5 +1,6 @@
 import Document from '../Document';
 import MovePanelItemCmd from '../commands/MovePanelItemCmd';
+import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
 
@@ -561,6 +562,24 @@ export default class DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
+    }
+
+    /**
+     * Adds AddDeleteDocElementCmd commands to command group parameter to delete this element and
+     * any possible existing children.
+     * @param {CommandGroupCmd} cmdGroup - AddDeleteDocElementCmd commands will be added to this command group.
+     */
+    addCommandsForDelete(cmdGroup) {
+        let elements = [];
+        this.appendContainerChildren(elements);
+        elements.push(this);
+        for (let element of elements) {
+            let cmd = new AddDeleteDocElementCmd(
+                false, element.getPanelItem().getPanelName(),
+                element.toJS(), element.getId(), element.getContainerId(),
+                element.getPanelItem().getSiblingPosition(), this.rb);
+            cmdGroup.addCommand(cmd);
+        }
     }
 
     addChildren(docElements) {
