@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.11.2] - 2018-04-10
+
+### Features
+* support for dynamic table column (column containing simple array parameter will be expanded to multiple columns)
+
+### Bug Fixes
+* text element styling when element uses predefined style with borders
+* fix undo of deleted frame element (restore nested elements)
+* fix display of table column texts when padding of a column text is modified
+
 ## [0.11.1] - 2018-03-21
 
 ### Features
