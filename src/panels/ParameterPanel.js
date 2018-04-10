@@ -25,7 +25,7 @@ export default class ParameterPanel {
             .change(event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null) {
-                    if (elParameterName.val().trim() != '') {
+                    if (elParameterName.val().trim() !== '') {
                         let newParameterName = elParameterName.val();
                         let cmdGroup = new CommandGroupCmd('Rename parameter');
                         let oldName = obj.getFullName(null, null);
@@ -77,7 +77,7 @@ export default class ParameterPanel {
                 <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
                 <option value="image">${this.rb.getLabel('parameterTypeImage')}</option>
                 <option value="array">${this.rb.getLabel('parameterTypeArray')}</option>
-                <option value="simpleArray">${this.rb.getLabel('parameterTypeSimpleArray')}</option>
+                <option value="simple_array">${this.rb.getLabel('parameterTypeSimpleArray')}</option>
                 <option value="map">${this.rb.getLabel('parameterTypeMap')}</option>
                 <option value="sum">${this.rb.getLabel('parameterTypeSum')}</option>
                 <option value="average">${this.rb.getLabel('parameterTypeAverage')}</option>
@@ -165,7 +165,9 @@ export default class ParameterPanel {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null) {
                     let patterns;
-                    if (obj.getValue('type') === Parameter.type.date) {
+                    let type = obj.getValue('type');
+                    let valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
+                    if (valueType === Parameter.type.date) {
                         patterns = this.rb.getProperty('patternDates');
                     } else {
                         patterns = this.rb.getProperty('patternNumbers');
@@ -244,18 +246,10 @@ export default class ParameterPanel {
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
-                    let parameters = [];
-                    if (selectedObj.getValue('type') == Parameter.type.simpleArray) {
-                        parameters.push({ name: 'data', type: selectedObj.getValue('arrayItemType') });
-                    } else {
-                        for (let child of selectedObj.getChildren()) {
-                            parameters.push({ name: child.getName(), type: child.getValue('type') });
-                        }
-                    }
-                    if (parameters.length > 0) {
-                        let rows = selectedObj.getTestDataRows();
-                        rows.unshift(parameters);
-                        this.rb.getPopupWindow().show(rows, this.selectedObjId, '', 'testData', PopupWindow.type.testData);
+                    let rows = selectedObj.getTestDataRows(true);
+                    if (rows.length > 0) {
+                        this.rb.getPopupWindow().show(
+                            rows, this.selectedObjId, '', 'testData', PopupWindow.type.testData);
                     } else {
                         alert(this.rb.getLabel('parameterEditTestDataNoFields'));
                     }
@@ -358,6 +352,7 @@ export default class ParameterPanel {
 
     updateVisibility(obj) {
         let type = obj.getValue('type');
+        let valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
         let showOnlyNameType = obj.getValue('showOnlyNameType');
         let parentParameter = null;
         if (obj.getPanelItem() !== null && obj.getPanelItem().getParent().getData() instanceof Parameter) {
@@ -375,8 +370,8 @@ export default class ParameterPanel {
         } else {
             $('#rbro_parameter_nullable_row').hide();
         }
-        if ((type === Parameter.type.number || type === Parameter.type.date ||
-                type === Parameter.type.sum || type === Parameter.type.average) && !showOnlyNameType) {
+        if ((valueType === Parameter.type.number || valueType === Parameter.type.date ||
+                valueType === Parameter.type.sum || valueType === Parameter.type.average) && !showOnlyNameType) {
             $('#rbro_parameter_pattern_row').show();
         } else {
             $('#rbro_parameter_pattern_row').hide();

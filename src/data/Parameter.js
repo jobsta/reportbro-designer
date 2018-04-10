@@ -306,39 +306,63 @@ export default class Parameter {
 
     /**
      * Returns test data of array parameter as array.
+     * @param {Boolean} includeFieldInfo - if true a row containing info about the fields will be inserted
+     * in the returned rows (first row).
      * @returns {[Object[]]} rows of test data. Null in case parameter is not an array.
      */
-    getTestDataRows() {
+    getTestDataRows(includeFieldInfo) {
         if (this.type !== Parameter.type.array && this.type !== Parameter.type.simpleArray) {
             return null;
         }
-        let availableFields = {};
+        let fields = [];
         if (this.type === Parameter.type.simpleArray) {
-            availableFields['data'] = true;
+            let fieldInfo = { name: 'data', type: this.arrayItemType, allowMultiple: false };
+            fields.push(fieldInfo);
         } else {
             for (let child of this.getChildren()) {
-                availableFields[child.getName()] = true;
+                let fieldInfo = { name: child.getName() };
+                if (child.getValue('type') === Parameter.type.simpleArray) {
+                    fieldInfo.type = child.getValue('arrayItemType');
+                    fieldInfo.allowMultiple = true;
+                    fieldInfo.arraySize = 1;
+                } else {
+                    fieldInfo.type = child.getValue('type');
+                    fieldInfo.allowMultiple = false;
+                }
+                fields.push(fieldInfo);
             }
         }
         let rows = [];
-        try {
-            let testData = JSON.parse(this.testData);
-            if (Array.isArray(testData)) {
-                for (let row of testData) {
-                    let itemRow = {};
-                    let hasData = false;
-                    for (let val in row) {
-                        if (val in availableFields) {
-                            hasData = true;
-                            itemRow[val] = row[val];
+        if (fields.length > 0) {
+            if (includeFieldInfo) {
+                rows.push(fields);
+            }
+            try {
+                let testData = JSON.parse(this.testData);
+                if (Array.isArray(testData)) {
+                    for (let row of testData) {
+                        let itemRow = {};
+                        let hasData = false;
+                        for (let field of fields) {
+                            if (field.name in row) {
+                                let fieldData = row[field.name];
+                                if((field.allowMultiple && Array.isArray(fieldData)) ||
+                                        (!field.allowMultiple && !Array.isArray(fieldData))) {
+                                    hasData = true;
+                                    itemRow[field.name] = fieldData;
+                                    if (field.allowMultiple && fieldData.length > 0) {
+                                        field.arraySize = fieldData.length;
+                                    }
+                                }
+                            }
+                        }
+                        if (hasData) {
+                            rows.push(itemRow);
                         }
                     }
-                    if (hasData) {
-                        rows.push(itemRow);
-                    }
                 }
+            } catch (e) {
             }
-        } catch (e) {
         }
         return rows;
     }
@@ -352,7 +376,7 @@ Parameter.type = {
     'date': 'date',
     'image': 'image',
     'array': 'array',
-    'simpleArray': 'simpleArray',
+    'simpleArray': 'simple_array',
     'map': 'map',
     'sum': 'sum',
     'average': 'average'

@@ -54,31 +54,9 @@ export default class PopupWindow {
         this.elContent.empty();
         $('#rbro_background_overlay').remove();
         if (type === PopupWindow.type.testData) {
-            let div = $('<div></div>');
-            let table = $('<table></table>');
-            let tableHeaderRow = $('<tr></tr>');
-            let tableBody = $('<tbody></tbody>');
-            let i;
-            tableHeaderRow.append('<th></th>');
             this.parameters = items[0];
-            for (let parameter of this.parameters) {
-                tableHeaderRow.append(`<th>${parameter.name}</th>`);
-            }
-            table.append($('<thead></thead>').append(tableHeaderRow));
-            if (items.length === 1) {
-                this.addTestDataRow(tableBody, this.parameters, null);
-            }
-            for (i=1; i < items.length; i++) {
-                this.addTestDataRow(tableBody, this.parameters, items[i]);
-            }
-            table.append(tableBody);
-            div.append(table);
-            div.append($(`<div class="rbroButton rbroPopupWindowButton rBFullWidthButton">${this.rb.getLabel('parameterAddTestData')}</div>`)
-                .click(event => {
-                    this.addTestDataRow(tableBody, this.parameters, null);
-                })
-            );
-            this.elContent.append(div);
+            items.splice(0, 1);
+            this.createTestDataTable(items);
             let width = Math.round(winWidth * 0.8);
             let height = Math.round(winHeight * 0.8);
             this.elWindow.css({ left: Math.round((winWidth - width) / 2) + 'px', top: Math.round((winHeight - height) / 2) + $(window).scrollTop() + 'px',
@@ -151,19 +129,7 @@ export default class PopupWindow {
                 this.input.focus();
             }
             if (this.type === PopupWindow.type.testData) {
-                let testData = [];
-                let rows = this.elContent.find('tbody').find('tr');
-                for (let row of rows) {
-                    let inputs = $(row).find('input');
-                    let rowData = {};
-                    let i = 0;
-                    for (let parameter of this.parameters) {
-                        let input = inputs.eq(i);
-                        rowData[parameter.name] = input.val().trim();
-                        i++;
-                    }
-                    testData.push(rowData);
-                }
+                let testData = this.getTestData(null, -1);
                 let obj = this.rb.getDataObject(this.objId);
                 let testDataStr = JSON.stringify(testData);
                 if (obj !== null && obj.getValue('testData') !== testDataStr) {
@@ -188,26 +154,131 @@ export default class PopupWindow {
             })
         ));
         for (let parameter of parameters) {
-            let data = '';
-            if (testData !== null && parameter.name in testData) {
-                data = testData[parameter.name];
+            if (parameter.allowMultiple && parameter.arraySize > 0) {
+                let values = null;
+                if (testData !== null && parameter.name in testData) {
+                    values = testData[parameter.name];
+                }
+                for (let i=0; i < parameter.arraySize; i++) {
+                    let data = '';
+                    if (Array.isArray(values) && i < values.length) {
+                        data = values[i];
+                    }
+                    this.appendColumn(newRow, parameter, data);
+                }
+            } else {
+                let data = '';
+                if (testData !== null && parameter.name in testData) {
+                    data = testData[parameter.name];
+                }
+                if (parameter.allowMultiple && parameter.arraySize > 0 && Array.isArray(data)) {
+                    for (let arrayItem of data) {
+                        this.appendColumn(newRow, parameter, arrayItem);
+                    }
+                } else {
+                    this.appendColumn(newRow, parameter, data);
+                }
             }
-            let input = $(`<input type="text" value="${data}">`)
-                .focus(event => {
-                    input.parent().addClass('rbroHasFocus');
-                })
-                .blur(event => {
-                    input.parent().removeClass('rbroHasFocus');
-                });
-            
-            if (parameter.type === Parameter.type.number) {
-                utils.setInputDecimal(input);
-            } else if (parameter.type === Parameter.type.date) {
-                input.attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
-            }
-            newRow.append($('<td></td>').append(input));
         }
         tableBody.append(newRow);
+    }
+
+    appendColumn(row, parameter, data) {
+        let input = $(`<input type="text" value="${data}">`)
+            .focus(event => {
+                input.parent().addClass('rbroHasFocus');
+            })
+            .blur(event => {
+                input.parent().removeClass('rbroHasFocus');
+            });
+
+        if (parameter.type === Parameter.type.number) {
+            utils.setInputDecimal(input);
+        } else if (parameter.type === Parameter.type.date) {
+            input.attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+        }
+        row.append($('<td></td>').append(input));
+    }
+
+    getTestData(excludeParameter, excludeParameterArrayItemIndex) {
+        let testData = [];
+        let rows = this.elContent.find('tbody').find('tr');
+        for (let row of rows) {
+            let inputs = $(row).find('input');
+            let rowData = {};
+            let i = 0;
+            for (let parameter of this.parameters) {
+                if (parameter.allowMultiple && parameter.arraySize > 0) {
+                    let fieldData = [];
+                    for (let j=0; j < parameter.arraySize; j++) {
+                        let input = inputs.eq(i);
+                        if (parameter !== excludeParameter || j !== excludeParameterArrayItemIndex) {
+                            fieldData.push(input.val().trim());
+                        }
+                        i++;
+                    }
+                    rowData[parameter.name] = fieldData;
+                } else {
+                    let input = inputs.eq(i);
+                    rowData[parameter.name] = input.val().trim();
+                    i++;
+                }
+            }
+            testData.push(rowData);
+        }
+        return testData;
+    }
+
+    createTestDataTable(items) {
+        let div = $('<div></div>');
+        let table = $('<table></table>');
+        let tableHeaderRow = $('<tr></tr>');
+        let tableBody = $('<tbody></tbody>');
+        let i;
+        tableHeaderRow.append('<th></th>');
+        for (let parameter of this.parameters) {
+            if (parameter.allowMultiple) {
+                for (let arrayIndex=0; arrayIndex < parameter.arraySize; arrayIndex++) {
+                    let th = $('<th></th>');
+                    th.append($(`<span>${parameter.name} ${arrayIndex + 1}</span>`));
+                    if (arrayIndex === 0) {
+                        th.append($(`<div class="rbroButton rbroRoundButton rbroIcon-plus"></div>`)
+                            .click(event => {
+                                let testData = this.getTestData(null, -1);
+                                parameter.arraySize++;
+                                this.createTestDataTable(testData);
+                            })
+                        );
+                    } else {
+                        th.append($(`<div class="rbroButton rbroRoundButton rbroIcon-minus"></div>`)
+                            .click(event => {
+                                let testData = this.getTestData(parameter, arrayIndex);
+                                parameter.arraySize--;
+                                this.createTestDataTable(testData);
+                            })
+                        );
+                    }
+                    tableHeaderRow.append(th);
+                }
+            } else {
+                tableHeaderRow.append(`<th>${parameter.name}</th>`);
+            }
+        }
+        table.append($('<thead></thead>').append(tableHeaderRow));
+        if (items.length === 0) {
+            this.addTestDataRow(tableBody, this.parameters, null);
+        }
+        for (i=0; i < items.length; i++) {
+            this.addTestDataRow(tableBody, this.parameters, items[i]);
+        }
+        table.append(tableBody);
+        div.append(table);
+        div.append($(`<div class="rbroButton rbroPopupWindowButton rBFullWidthButton">${this.rb.getLabel('parameterAddTestData')}</div>`)
+            .click(event => {
+                this.addTestDataRow(tableBody, this.parameters, null);
+            })
+        );
+        this.elContent.empty().append(div);
     }
 }
 
