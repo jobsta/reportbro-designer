@@ -163,17 +163,17 @@ export default class TextElement extends DocElement {
     getContentSize(width, height, style) {
         let borderWidth = utils.convertInputToNumber(style.getValue('borderWidth'));
         width -= utils.convertInputToNumber(style.getValue('paddingLeft')) + utils.convertInputToNumber(style.getValue('paddingRight'));
-        if (this.borderLeft) {
+        if (style.getValue('borderLeft')) {
             width -= borderWidth;
         }
-        if (this.borderRight) {
+        if (style.getValue('borderRight')) {
             width -= borderWidth;
         }
         height -= utils.convertInputToNumber(style.getValue('paddingTop')) + utils.convertInputToNumber(style.getValue('paddingBottom'));
-        if (this.borderTop) {
+        if (style.getValue('borderTop')) {
             height -= borderWidth;
         }
-        if (this.borderBottom) {
+        if (style.getValue('borderBottom')) {
             height -= borderWidth;
         }
         return { width: width, height: height };
@@ -211,8 +211,8 @@ export default class TextElement extends DocElement {
         } else {
             borderStyleProperties['border-style'] = 'none';
         }
-        if (style.getValue('paddingLeft') != '' || style.getValue('paddingTop') != '' ||
-                style.getValue('paddingRight') != '' || style.getValue('paddingBottom') != '') {
+        if (style.getValue('paddingLeft') !== '' || style.getValue('paddingTop') !== '' ||
+                style.getValue('paddingRight') !== '' || style.getValue('paddingBottom') !== '') {
             styleProperties['padding'] = this.rb.toPixel(style.getValue('paddingTop'));
             styleProperties['padding'] += ' ' + this.rb.toPixel(style.getValue('paddingRight'));
             styleProperties['padding'] += ' ' + this.rb.toPixel(style.getValue('paddingBottom'));

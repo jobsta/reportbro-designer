@@ -18,7 +18,7 @@
 #reportbro {
     position: absolute;
     width: 100%;
-    min-width: 980px; /* prevent broken layout too small screens */
+    min-width: 980px; /* prevent broken layout on too small screens */
     height: 100%;
     top: auto;
     left: auto;
@@ -59,6 +59,10 @@
     padding: 0 4px;
     outline: none;
     font-size: 12px;
+}
+
+.rbroContainer select {
+    transition: none;
 }
 
 .rbroContainer input[type=checkbox] {
@@ -620,11 +624,19 @@ ul ul .rbroMenuItemText {
 
 .rbroTextElement, .rbroImageElement, .rbroFrameElement {
     border: 1px dotted #B0B0B0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .rbroTableElement table {
     border-collapse: collapse;
     position: relative;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .rbroTableTextElement {
@@ -965,6 +977,10 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
 
 .rbroPopupWindowContent table th:first-child {
     width: 2%;
+}
+
+.rbroPopupWindowContent table th .rbroButton {
+    margin-left: 5px;
 }
 
 .rbroPopupWindowContent table td {

@@ -306,21 +306,21 @@ export default class TableElement extends DocElement {
         if (tableBand !== this.headerData) {
             let column = this.headerData.getColumn(columnIndex);
             if (column !== null) {
-                column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
+                column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
             }
         }
         for (let i=0; i < this.contentDataRows.length; i++) {
             if (tableBand !== this.contentDataRows[i]) {
                 let column = this.contentDataRows[i].getColumn(columnIndex);
                 if (column !== null) {
-                    column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
+                    column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
                 }
             }
         }
         if (tableBand !== this.footerData) {
             let column = this.footerData.getColumn(columnIndex);
             if (column !== null) {
-                column.updateDisplayInternalNotify(0, 0, newColumnWidth, 0, false);
+                column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
             }
         }
         let width = this.headerData.getWidth();
