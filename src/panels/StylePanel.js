@@ -417,19 +417,15 @@ export default class StylePanel {
             let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width">`)
                 .on('input', event => {
                     if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
-                        if (elBorderWidth.val().trim() !== '') {
-                            let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}border_width`,
-                                `${fieldPrefix}borderWidth`, elBorderWidth.val(), SetValueCmd.type.text, rb);
-                            rb.executeCommand(cmd);
-                        } else {
-                            elBorderWidth.val(rb.getDetailData().getValue('borderWidth'));
-                        }
+                        let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}border_width`,
+                            `${fieldPrefix}borderWidth`, elBorderWidth.val(), SetValueCmd.type.text, rb);
+                        rb.executeCommand(cmd);
                     }
                 });
             elFormField.append(elBorderWidth);
             elDiv.append(elFormField);
             elBorderDiv.append(elDiv);
-            utils.setInputPositiveInteger(elBorderWidth);
+            utils.setInputDecimal(elBorderWidth);
             elPanel.append(elBorderDiv);
 
             StylePanel.renderPaddingControls(elPanel, idPrefix, fieldPrefix, panel, rb);

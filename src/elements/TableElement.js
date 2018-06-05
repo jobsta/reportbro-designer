@@ -15,6 +15,7 @@ export default class TableElement extends DocElement {
         this.setupComplete = false;
         this.dataSource = '';
         this.borderColor = '#000000';
+        this.borderWidth = '1';
         this.border = TableElement.border.grid;
         this.header = true;
         this.footer = false;
@@ -26,11 +27,14 @@ export default class TableElement extends DocElement {
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_addEmptyRow = false;
+
         this.setInitialData(initialData);
+
+        this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
     }
 
-    setup() {
-        super.setup();
+    setup(openPanelItem) {
+        super.setup(openPanelItem);
         this.createElement();
         this.updateDisplay();
 
@@ -49,7 +53,9 @@ export default class TableElement extends DocElement {
         this.updateWidth();
         this.updateStyle();
         this.updateName();
-        this.panelItem.open();
+        if (openPanelItem) {
+            this.panelItem.open();
+        }
     }
 
     createBand(band, index, dataValues) {
@@ -78,13 +84,13 @@ export default class TableElement extends DocElement {
         }
         let bandElement = new TableBandElement(dataId, data, band, this.rb);
         this.rb.addDataObject(bandElement);
-        let panelItemBand = new MainPanelItem(
-            'table_band', '', this.panelItem, bandElement, panelItemProperties, this.rb);
+        let panelItemBand = new MainPanelItem('table_band', this.panelItem, bandElement, panelItemProperties, this.rb);
         bandElement.setPanelItem(panelItemBand);
         this.panelItem.appendChild(panelItemBand);
         bandElement.setup();
         let columns = utils.convertInputToNumber(this.columns);
         bandElement.createColumns(columns, false);
+        panelItemBand.open();
 
         if (band === 'header') {
             bandElement.show(this.header);
@@ -137,6 +143,9 @@ export default class TableElement extends DocElement {
                 this.footerData.getPanelItem().hide();
             }
         } else if (field.indexOf('border') !== -1) {
+            if (field === 'borderWidth') {
+                this.borderWidthVal = utils.convertInputToNumber(value);
+            }
             this.updateStyle();
         }
     }
@@ -153,15 +162,22 @@ export default class TableElement extends DocElement {
         let i;
         if (this.border === TableElement.border.grid || this.border === TableElement.border.frameRow ||
                 this.border === TableElement.border.frame) {
-            elTable.css({ 'border-style': 'solid', 'border-width': '1px', 'border-color': this.borderColor });
+            elTable.css({
+                'border-style': 'solid',
+                'border-width': this.borderWidthVal + 'px',
+                'border-color': this.borderColor
+            });
         } else {
             elTable.css({ 'border-style': 'none' });
         }
         let styleProperties;
         if (this.border === TableElement.border.grid || this.border === TableElement.border.frameRow ||
                 this.border === TableElement.border.row) {
-            styleProperties = { 'border-style': 'solid none solid none',
-                'border-width': '1px', 'border-color': this.borderColor };
+            styleProperties = {
+                'border-style': 'solid none solid none',
+                'border-width': this.borderWidthVal + 'px',
+                'border-color': this.borderColor
+            };
         } else {
             styleProperties = { 'border-style': 'none' };
         }
@@ -172,8 +188,11 @@ export default class TableElement extends DocElement {
         this.footerData.getElement().css(styleProperties);
 
         if (this.border === TableElement.border.grid) {
-            styleProperties = { 'border-style': 'none solid none solid',
-                'border-width': '1px', 'border-color': this.borderColor };
+            styleProperties = {
+                'border-style': 'none solid none solid',
+                'border-width': this.borderWidthVal + 'px',
+                'border-color': this.borderColor
+            };
         } else {
             styleProperties = { 'border-style': 'none' };
         }
@@ -193,7 +212,8 @@ export default class TableElement extends DocElement {
      */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
-            'border', 'borderColor', 'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'border', 'borderColor', 'borderWidth',
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }
 
     getElementType() {
@@ -230,6 +250,10 @@ export default class TableElement extends DocElement {
 
     getHeightTagId() {
         return 'rbro_table_element_height';
+    }
+
+    isDroppingAllowed() {
+        return false;
     }
 
     createElement() {

@@ -57,7 +57,7 @@ export default class DocElement {
     /**
      * Called after initialization is finished.
      */
-    setup() {
+    setup(openPanelItem) {
         let container = this.getContainer();
         if (container !== null) {
             // adapt position if new element is outside container
@@ -102,7 +102,21 @@ export default class DocElement {
     handleClick(event, ignoreSelectedContainer) {
         if (!this.rb.isSelectedObject(this.id)) {
             if (ignoreSelectedContainer || !this.isContainerSelected()) {
-                this.rb.selectObject(this.id, !event.shiftKey);
+                let allowSelection = true;
+                if (event.shiftKey) {
+                    // do not allow selecting element if one of its children is already selected
+                    let children = [];
+                    this.appendContainerChildren(children);
+                    for (let child of children) {
+                        if (this.rb.isSelectedObject(child.getId())) {
+                            allowSelection = false;
+                            break;
+                        }
+                    }
+                }
+                if (allowSelection) {
+                    this.rb.selectObject(this.id, !event.shiftKey);
+                }
                 event.stopPropagation();
             }
         } else {
@@ -110,7 +124,7 @@ export default class DocElement {
                 this.rb.deselectObject(this.id);
             } else {
                 this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
-                    this.containerId, this.linkedContainerId,
+                    this.id, this.containerId, this.linkedContainerId,
                     this.getElementType(), DocElement.dragType.element);
             }
             event.stopPropagation();
@@ -188,6 +202,21 @@ export default class DocElement {
                 }
             }
         }
+    }
+
+    /**
+     * Returns absolute position inside document.
+     * @returns {Object} x and y coordinates.
+     */
+    getAbsolutePosition() {
+        let pos = { x: this.xVal, y: this.yVal };
+        let container = this.getContainer();
+        if (container !== null) {
+            let offset = container.getOffset();
+            pos.x += offset.x;
+            pos.y += offset.y;
+        }
+        return pos;
     }
 
     /**
@@ -276,6 +305,12 @@ export default class DocElement {
                 this.el.detach();
                 this.appendToContainer();
             }
+            if (this.linkedContainerId !== null) {
+                let linkedContainer = this.getLinkedContainer();
+                if (linkedContainer !== null) {
+                    linkedContainer.setParent(this.getContainer());
+                }
+            }
         } else if (['styleId', 'bold', 'italic', 'underline', 'horizontalAlignment', 'verticalAlignment',
                 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
                 'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
@@ -322,12 +357,14 @@ export default class DocElement {
     }
 
     updateChangedStyle(styleId) {
-        if (this.styleId == styleId) {
+        if (this.styleId === styleId) {
             this.updateStyle();
         }
     }
 
-    updateDrag(diffX, diffY, dragType, dragContainer, gridSize, cmdGroup) {
+    getDragDiff(diffX, diffY, dragType, gridSize) {
+        let rv = { x: 0, y: 0 };
+        let dragX, dragY;
         let posX1 = this.xVal;
         let posY1 = this.yVal;
         let posX2 = posX1 + this.widthVal;
@@ -335,77 +372,132 @@ export default class DocElement {
         let maxWidth = this.getMaxWidth();
         const MIN_DRAG_SIZE = 20;
         if (dragType === DocElement.dragType.element) {
-            posX1 += diffX;
+            dragX = posX1 + diffX;
             if (gridSize !== 0) {
-                posX1 = utils.roundValueToInterval(posX1, gridSize);
+                dragX = utils.roundValueToInterval(dragX, gridSize);
             }
-            posX2 = posX1 + this.widthVal;
-            posY1 += diffY;
+            dragY = posY1 + diffY;
             if (gridSize !== 0) {
-                posY1 = utils.roundValueToInterval(posY1, gridSize);
+                dragY = utils.roundValueToInterval(dragY, gridSize);
             }
-            posY2 = posY1 + this.heightVal;
+            rv.x = dragX - posX1;
+            rv.y = dragY - posY1;
         } else {
             let containerSize = this.getContainerSize();
             if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN || dragType === DocElement.dragType.sizerNE) {
-                posY1 += diffY;
+                dragY = posY1 + diffY;
                 if (gridSize !== 0) {
-                    posY1 = utils.roundValueToInterval(posY1, gridSize);
+                    dragY = utils.roundValueToInterval(dragY, gridSize);
                 }
-                if (posY1 > posY2 - MIN_DRAG_SIZE) {
+                if (dragY > posY2 - MIN_DRAG_SIZE) {
                     if (gridSize !== 0) {
-                        posY1 = utils.roundValueToLowerInterval(posY2 - MIN_DRAG_SIZE, gridSize);
+                        dragY = utils.roundValueToLowerInterval(posY2 - MIN_DRAG_SIZE, gridSize);
                     } else {
-                        posY1 = posY2 - MIN_DRAG_SIZE;
+                        dragY = posY2 - MIN_DRAG_SIZE;
                     }
-                } else if (posY1 < 0) {
-                    posY1 = 0;
+                } else if (dragY < 0) {
+                    dragY = 0;
                 }
+                rv.y = dragY - posY1;
             }
             if (dragType === DocElement.dragType.sizerNE || dragType === DocElement.dragType.sizerE || dragType === DocElement.dragType.sizerSE) {
-                posX2 += diffX;
+                dragX = posX2 + diffX;
                 if (gridSize !== 0) {
-                    posX2 = utils.roundValueToInterval(posX2, gridSize);
+                    dragX = utils.roundValueToInterval(dragX, gridSize);
                 }
-                if (posX2 < posX1 + MIN_DRAG_SIZE) {
+                if (dragX < posX1 + MIN_DRAG_SIZE) {
                     if (gridSize !== 0) {
-                        posX2 = utils.roundValueToUpperInterval(posX1 + MIN_DRAG_SIZE, gridSize);
+                        dragX = utils.roundValueToUpperInterval(posX1 + MIN_DRAG_SIZE, gridSize);
                     } else {
-                        posX2 = posX1 + MIN_DRAG_SIZE;
+                        dragX = posX1 + MIN_DRAG_SIZE;
                     }
-                } else if (posX2 > maxWidth) {
-                    posX2 = maxWidth;
+                } else if (dragX > maxWidth) {
+                    dragX = maxWidth;
                 }
+                rv.x = dragX - posX2;
             }
             if (dragType === DocElement.dragType.sizerSE || dragType === DocElement.dragType.sizerS || dragType === DocElement.dragType.sizerSW) {
-                posY2 += diffY;
+                dragY = posY2 + diffY;
                 if (gridSize !== 0) {
-                    posY2 = utils.roundValueToInterval(posY2, gridSize);
+                    dragY = utils.roundValueToInterval(dragY, gridSize);
                 }
-                if (posY2 < posY1 + MIN_DRAG_SIZE) {
+                if (dragY < posY1 + MIN_DRAG_SIZE) {
                     if (gridSize !== 0) {
-                        posY2 = utils.roundValueToUpperInterval(posY1 + MIN_DRAG_SIZE, gridSize);
+                        dragY = utils.roundValueToUpperInterval(posY1 + MIN_DRAG_SIZE, gridSize);
                     } else {
-                        posY2 = posY1 + MIN_DRAG_SIZE;
+                        dragY = posY1 + MIN_DRAG_SIZE;
                     }
-                } else if (posY2 > containerSize.height) {
-                    posY2 = containerSize.height;
+                } else if (dragY > containerSize.height) {
+                    dragY = containerSize.height;
                 }
+                rv.y = dragY - posY2;
             }
             if (dragType === DocElement.dragType.sizerSW || dragType === DocElement.dragType.sizerW || dragType === DocElement.dragType.sizerNW) {
-                posX1 += diffX;
+                dragX = posX1 + diffX;
                 if (gridSize !== 0) {
-                    posX1 = utils.roundValueToInterval(posX1, gridSize);
+                    dragX = utils.roundValueToInterval(dragX, gridSize);
                 }
-                if (posX1 > posX2 - MIN_DRAG_SIZE) {
+                if (dragX > posX2 - MIN_DRAG_SIZE) {
                     if (gridSize !== 0) {
-                        posX1 = utils.roundValueToLowerInterval(posX2 - MIN_DRAG_SIZE, gridSize);
+                        dragX = utils.roundValueToLowerInterval(posX2 - MIN_DRAG_SIZE, gridSize);
                     } else {
-                        posX1 = posX2 - MIN_DRAG_SIZE;
+                        dragX = posX2 - MIN_DRAG_SIZE;
                     }
-                } else if (posX1 < 0) {
-                    posX1 = 0;
+                } else if (dragX < 0) {
+                    dragX = 0;
                 }
+                rv.x = dragX - posX1;
+            }
+        }
+        return rv;
+    }
+
+    updateDrag(diffX, diffY, dragType, dragContainer, cmdGroup) {
+        let posX1 = this.xVal;
+        let posY1 = this.yVal;
+        let posX2 = posX1 + this.widthVal;
+        let posY2 = posY1 + this.heightVal;
+        let maxWidth = this.getMaxWidth();
+        let containerSize = this.getContainerSize();
+        if (dragType === DocElement.dragType.element) {
+            posX1 += diffX;
+            posX2 = posX1 + this.widthVal;
+            posY1 += diffY;
+            posY2 = posY1 + this.heightVal;
+        } else {
+            if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN ||
+                dragType === DocElement.dragType.sizerNE) {
+                posY1 += diffY;
+            }
+            if (dragType === DocElement.dragType.sizerNE || dragType === DocElement.dragType.sizerE ||
+                dragType === DocElement.dragType.sizerSE) {
+                posX2 += diffX;
+            }
+            if (dragType === DocElement.dragType.sizerSE || dragType === DocElement.dragType.sizerS ||
+                dragType === DocElement.dragType.sizerSW) {
+                posY2 += diffY;
+            }
+            if (dragType === DocElement.dragType.sizerSW || dragType === DocElement.dragType.sizerW ||
+                dragType === DocElement.dragType.sizerNW) {
+                posX1 += diffX;
+            }
+            if (posX1 < 0) {
+                posX1 = 0;
+            }
+            if (posX2 < posX1) {
+                posX2 = posX1;
+            }
+            if (posY1 < 0) {
+                posY1 = 0;
+            }
+            if (posY2 < posY1) {
+                posY2 = posY1;
+            }
+            if (posX2 > maxWidth) {
+                posX2 = maxWidth;
+            }
+            if (posY2 > containerSize.height) {
+                posY2 = containerSize.height;
             }
         }
         let width = posX2 - posX1;
@@ -450,29 +542,33 @@ export default class DocElement {
     }
 
     select() {
-        let elSizerContainer = this.getSizerContainerElement();
-        let sizers = this.getSizers();
-        for (let sizer of sizers) {
-            let sizerVal = sizer;
-            let elSizer = $(`<div class="rbroSizer rbroSizer${sizer}"></div>`)
-                .mousedown(event => {
-                    this.rb.getDocument().startDrag(event.pageX, event.pageY,
-                        this.containerId, this.linkedContainerId,
-                        this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
-                    event.stopPropagation();
-                });
-            elSizerContainer.append(elSizer);
+        if (this.el !== null) {
+            let elSizerContainer = this.getSizerContainerElement();
+            let sizers = this.getSizers();
+            for (let sizer of sizers) {
+                let sizerVal = sizer;
+                let elSizer = $(`<div class="rbroSizer rbroSizer${sizer}"></div>`)
+                    .mousedown(event => {
+                        this.rb.getDocument().startDrag(event.pageX, event.pageY,
+                            this.id, this.containerId, this.linkedContainerId,
+                            this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
+                        event.stopPropagation();
+                    });
+                elSizerContainer.append(elSizer);
+            }
+            this.el.addClass('rbroSelected');
+            this.el.css('z-index', '10');
         }
-        this.el.addClass('rbroSelected');
-        this.el.css('z-index', '10');
         this.selected = true;
     }
 
     deselect() {
-        let elSizerContainer = this.getSizerContainerElement();
-        elSizerContainer.find('.rbroSizer').remove();
-        this.el.css('z-index', '');
-        this.el.removeClass('rbroSelected');
+        if (this.el !== null) {
+            let elSizerContainer = this.getSizerContainerElement();
+            elSizerContainer.find('.rbroSizer').remove();
+            this.el.css('z-index', '');
+            this.el.removeClass('rbroSelected');
+        }
         this.selected = false;
     }
 
@@ -521,6 +617,13 @@ export default class DocElement {
     }
 
     isDraggingAllowed() {
+        return true;
+    }
+
+    /**
+     * Returns true if another element can be dropped into this element (or its corresponding panel item).
+     */
+    isDroppingAllowed() {
         return true;
     }
 
@@ -634,8 +737,8 @@ DocElement.type = {
     pageBreak: 'page_break',
     tableText: 'table_text',
     barCode: 'bar_code',
-    band: 'band',
-    frame: 'frame'
+    frame: 'frame',
+    section: 'section'
 };
 
 DocElement.dragType = {

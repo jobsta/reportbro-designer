@@ -45,7 +45,7 @@ export default class MenuPanel {
         panel.append(panelLeft);
 
         let panelRight = $('<div class="rbroElementButtonContainer"></div>');
-        let elElementsDiv = $('<div class="rbroElementButtons"></div>');
+        let elElementsDiv = $('<div id="rbo_menu_elements" class="rbroElementButtons"></div>');
         elElementsDiv.append($(`<div id="rbro_menu_element_text" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementText')}">
                     <span class="rbroIcon-text"></span>
@@ -54,7 +54,7 @@ export default class MenuPanel {
                 event.originalEvent.dataTransfer.setData('text/plain', '');  // without setData dragging does not work in FF
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
 
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.text, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.text, '');
 
                 // avoid calling dragstart handler for main div which disables dragging for all other elements
                 event.stopPropagation();
@@ -67,7 +67,7 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.line, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.line, '');
                 event.stopPropagation();
             })
         );
@@ -78,7 +78,7 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.image, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.image, '');
                 event.stopPropagation();
             })
         );
@@ -89,7 +89,7 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.barCode, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.barCode, '');
                 event.stopPropagation();
             })
         );
@@ -100,7 +100,7 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.table, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.table, '');
                 event.stopPropagation();
             })
         );
@@ -111,7 +111,18 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.frame, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.frame, '');
+                event.stopPropagation();
+            })
+        );
+        elElementsDiv.append($(`<div id="rbro_menu_element_section" class="rbroButton rbroMenuButton" draggable="true"
+                title="${this.rb.getLabel('docElementSection')}">
+                    <span class="rbroIcon-section"></span>
+                </div>`)
+            .on('dragstart', event => {
+                event.originalEvent.dataTransfer.setData('text/plain', '');
+                event.originalEvent.dataTransfer.effectAllowed = 'copy';
+                this.rb.startBrowserDrag('docElement', DocElement.type.section, '');
                 event.stopPropagation();
             })
         );
@@ -122,7 +133,7 @@ export default class MenuPanel {
             .on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
-                this.rb.startBrowserDrag('docElement', null, DocElement.type.pageBreak, '');
+                this.rb.startBrowserDrag('docElement', DocElement.type.pageBreak, '');
                 event.stopPropagation();
             })
         );

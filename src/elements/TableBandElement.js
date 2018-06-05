@@ -123,6 +123,10 @@ export default class TableBandElement extends DocElement {
         return false;
     }
 
+    isDroppingAllowed() {
+        return false;
+    }
+
     createElement() {
         this.el = $(`<tr id="rbro_el_table_band${this.id}" class="rbroTableBandElement"></tr>`);
         $(`#rbro_el_table_${this.tableBand}${this.parentId}`).append(this.el);
@@ -176,10 +180,10 @@ export default class TableBandElement extends DocElement {
             let textElement = new TableTextElement(dataId, data, this.rb);
             newColumnData.push(textElement);
         	this.rb.addDataObject(textElement);
-            let panelItemText = new MainPanelItem(DocElement.type.text, '', this.panelItem, textElement, { showDelete: false }, this.rb);
+            let panelItemText = new MainPanelItem(DocElement.type.text, this.panelItem, textElement, { showDelete: false }, this.rb);
             textElement.setPanelItem(panelItemText);
             this.panelItem.appendChild(panelItemText);
-            textElement.setup();
+            textElement.setup(true);
         }
         this.columnData = newColumnData;
         this.getElement().find('td').css({ height: this.rb.toPixel(this.heightVal - 1) });

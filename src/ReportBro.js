@@ -1,6 +1,8 @@
 import Document from './Document';
 import PopupWindow from './PopupWindow';
 import AddDeleteDocElementCmd from './commands/AddDeleteDocElementCmd';
+import AddDeleteParameterCmd from './commands/AddDeleteParameterCmd';
+import AddDeleteStyleCmd from './commands/AddDeleteStyleCmd';
 import Command from './commands/Command';
 import CommandGroupCmd from './commands/CommandGroupCmd';
 import SetValueCmd from './commands/SetValueCmd';
@@ -9,24 +11,22 @@ import Container from './container/Container';
 import DocumentProperties from './data/DocumentProperties';
 import Parameter from './data/Parameter';
 import Style from './data/Style';
-import BandElement from './elements/BandElement';
-import BarCodeElement from './elements/BarCodeElement';
 import DocElement from './elements/DocElement';
 import FrameElement from './elements/FrameElement';
-import ImageElement from './elements/ImageElement';
-import LineElement from './elements/LineElement';
 import PageBreakElement from './elements/PageBreakElement';
+import SectionElement from './elements/SectionElement';
 import TableBandElement from './elements/TableBandElement';
 import TableElement from './elements/TableElement';
 import TableTextElement from './elements/TableTextElement';
 import TextElement from './elements/TextElement';
-import BandElementPanel from './panels/BandElementPanel';
 import BarCodeElementPanel from './panels/BarCodeElementPanel';
 import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
 import EmptyDetailPanel from './panels/EmptyDetailPanel';
 import FrameElementPanel from './panels/FrameElementPanel';
 import ImageElementPanel from './panels/ImageElementPanel';
 import LineElementPanel from './panels/LineElementPanel';
+import SectionBandElementPanel from './panels/SectionBandElementPanel';
+import SectionElementPanel from './panels/SectionElementPanel';
 import MainPanel from './menu/MainPanel';
 import MainPanelItem from './menu/MainPanelItem';
 import MenuPanel from './menu/MenuPanel';
@@ -55,7 +55,6 @@ export default class ReportBro {
             contentHeight: 'Content height',
             contentHeightInfo: 'affects only GUI size to place elements and not the real page size',
             docElementAlwaysPrintOnSamePage: 'Always on same page',
-            docElementBand: 'Band',
             docElementBarCode: 'Bar code',
             docElementColor: 'Color',
             docElementConditionalStyle: 'Conditional style',
@@ -74,9 +73,11 @@ export default class ReportBro {
             docElementPrintSettings: 'Print settings',
             docElementRemoveEmptyElement: 'Remove when empty',
             docElementRoot: 'Document',
+            docElementSection: 'Section',
             docElementSize: 'Size (width, height)',
             docElementSpreadsheet: 'Spreadsheet',
             docElementSpreadsheetAddEmptyRow: 'Add empty row below',
+            docElementSpreadsheetColspan: 'Column range',
             docElementSpreadsheetColumn: 'Fixed column',
             docElementSpreadsheetHide: 'Hide',
             docElementWidth: 'Width',
@@ -117,6 +118,7 @@ export default class ReportBro {
             errorMsgMissingImage: 'Missing image, no source or image file specified',
             errorMsgMissingParameter: 'Parameter not found',
             errorMsgMissingParameterData: 'Data for parameter {info} not found',
+            errorMsgSectionBandNotOnSamePage: 'Section band does not fit on same page',
             errorMsgUnicodeEncodeError: 'Text contains non printable character',
             errorMsgUnsupportedImageType: 'Image does not have supported image type (.jpg, .png)',
             footer: 'Footer',
@@ -173,6 +175,7 @@ export default class ReportBro {
             parameterEditTestDataNoFields: 'No fields defined for this list',
             parameterEval: 'Evaluate',
             parameterNullable: 'Nullable',
+            parameterSearchPlaceholder: 'Search parameters...',
             parameterTestData: 'Test data',
             parameterTestDataDatePattern: 'YYYY-MM-DD',
             parameterType: 'Type',
@@ -298,9 +301,9 @@ export default class ReportBro {
         this.document = new Document(element, this.properties.showGrid, this);
         this.popupWindow = new PopupWindow(element, this);
         this.docElements = [];
-        this.headerBand = new Band(Document.band.header, '', '', this);
-        this.contentBand = new Band(Document.band.content, '', '', this);
-        this.footerBand = new Band(Document.band.footer, '', '', this);
+        this.headerBand = new Band(Band.bandType.header, false, '', '', this);
+        this.contentBand = new Band(Band.bandType.content, false, '', '', this);
+        this.footerBand = new Band(Band.bandType.footer, false, '', '', this);
         this.parameterContainer = new Container('0_parameters', this.getLabel('parameters'), this);
         this.styleContainer = new Container('0_styles', this.getLabel('styles'), this);
         this.documentProperties = new DocumentProperties(this);
@@ -312,7 +315,6 @@ export default class ReportBro {
         this.activeDetailPanel = 'none';
         this.detailPanels = {
             'none': new EmptyDetailPanel(element, this),
-            'band': new BandElementPanel(element, this),
             'bar_code': new BarCodeElementPanel(element, this),
             'frame': new FrameElementPanel(element, this),
             'text': new TextElementPanel(element, this),
@@ -322,6 +324,8 @@ export default class ReportBro {
             'table': new TableElementPanel(element, this),
             'table_band': new TableBandElementPanel(element, this),
             'parameter': new ParameterPanel(element, this),
+            'section': new SectionElementPanel(element, this),
+            'section_band': new SectionBandElementPanel(element, this),
             'style': new StylePanel(element, this),
             'documentProperties': new DocumentPropertiesPanel(this.documentProperties, element, this)
         };
@@ -335,7 +339,6 @@ export default class ReportBro {
         this.reportKey = null;  // key of last report preview to allow download of xlsx file for this report
 
         this.browserDragType = '';
-        this.browserDragCategory = '';
         this.browserDragId = '';
 
         this.documentProperties.setPanelItem(this.mainPanel.getDocumentPropertiesItem());
@@ -350,35 +353,48 @@ export default class ReportBro {
                         if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
                             let cleared = false;
                             let idMap = {};
+                            let serializedObj;
                             let i;
                             for (let selectionId of this.selections) {
                                 let obj = this.getDataObject(selectionId);
-                                if (obj instanceof DocElement && !(obj instanceof TableTextElement)) {
+                                if ((obj instanceof DocElement && !(obj instanceof TableTextElement)) ||
+                                        (obj instanceof Parameter && !obj.showOnlyNameType) ||
+                                        (obj instanceof Style)) {
                                     if (!cleared) {
                                         this.clipboardElements = [];
                                         cleared = true;
                                     }
                                     if (!(obj.getId() in idMap)) {
                                         idMap[obj.getId()] = true;
-                                        this.clipboardElements.push(obj.toJS());
-                                        if (obj instanceof FrameElement) {
-                                            let nestedElements = [];
-                                            obj.appendContainerChildren(nestedElements);
-                                            for (let nestedElement of nestedElements) {
-                                                if (nestedElement.getId() in idMap) {
-                                                    // in case a nested element is also selected we make sure to add it only once to
-                                                    // the clipboard objects and to add it after its parent element
-                                                    for (i=0; i < this.clipboardElements.length; i++) {
-                                                        if (nestedElement.getId() === this.clipboardElements[i].id) {
-                                                            this.clipboardElements.splice(i, 1);
-                                                            break;
+                                        serializedObj = obj.toJS();
+                                        this.clipboardElements.push(serializedObj);
+                                        if (obj instanceof DocElement) {
+                                            serializedObj.baseClass = 'DocElement';
+                                            if (obj instanceof FrameElement) {
+                                                let nestedElements = [];
+                                                obj.appendContainerChildren(nestedElements);
+                                                for (let nestedElement of nestedElements) {
+                                                    if (nestedElement.getId() in idMap) {
+                                                        // in case a nested element is also selected we make sure to add it only once to
+                                                        // the clipboard objects and to add it after its parent element
+                                                        for (i = 0; i < this.clipboardElements.length; i++) {
+                                                            if (nestedElement.getId() === this.clipboardElements[i].id) {
+                                                                this.clipboardElements.splice(i, 1);
+                                                                break;
+                                                            }
                                                         }
+                                                    } else {
+                                                        idMap[nestedElement.getId()] = true;
                                                     }
-                                                } else {
-                                                    idMap[nestedElement.getId()] = true;
+                                                    serializedObj = nestedElement.toJS();
+                                                    serializedObj.baseClass = 'DocElement';
+                                                    this.clipboardElements.push(serializedObj);
                                                 }
-                                                this.clipboardElements.push(nestedElement.toJS());
                                             }
+                                        } else if (obj instanceof Parameter) {
+                                            serializedObj.baseClass = 'Parameter';
+                                        } else if (obj instanceof Style) {
+                                            serializedObj.baseClass = 'Style';
                                         }
                                     }
                                 }
@@ -390,28 +406,57 @@ export default class ReportBro {
                     case 86: {
                         // Ctrl + V: paste
                         if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
-                            let cleared = false;
+                            let cmd;
+                            let cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
                             let mappedContainerIds = {};
                             for (let clipboardElement of this.clipboardElements) {
                                 clipboardElement.id = this.getUniqueId();
-                                if (clipboardElement.linkedContainerId) {
-                                    let linkedContainerId = this.getUniqueId();
-                                    mappedContainerIds[clipboardElement.linkedContainerId] = linkedContainerId;
-                                    clipboardElement.linkedContainerId = linkedContainerId;
-                                }
-                                if (clipboardElement.elementType === DocElement.type.table) {
-                                    TableElement.removeIds(clipboardElement);
+                                if (clipboardElement.baseClass === 'DocElement') {
+                                    if (clipboardElement.linkedContainerId) {
+                                        let linkedContainerId = this.getUniqueId();
+                                        mappedContainerIds[clipboardElement.linkedContainerId] = linkedContainerId;
+                                        clipboardElement.linkedContainerId = linkedContainerId;
+                                    }
+                                    if (clipboardElement.elementType === DocElement.type.table) {
+                                        TableElement.removeIds(clipboardElement);
+                                    }
                                 }
                             }
                             for (let clipboardElement of this.clipboardElements) {
-                                // map id of container in case element is inside other pasted container (frame/band)
-                                if (clipboardElement.containerId in mappedContainerIds) {
-                                    clipboardElement.containerId = mappedContainerIds[clipboardElement.containerId];
+                                if (clipboardElement.baseClass === 'DocElement') {
+                                    // map id of container in case element is inside other pasted container (frame/band)
+                                    if (clipboardElement.containerId in mappedContainerIds) {
+                                        clipboardElement.containerId = mappedContainerIds[clipboardElement.containerId];
+                                        // since element is inside pasted container we can keep x/y coordinates
+                                    } else {
+                                        // paste new element at top/left of container
+                                        clipboardElement.x = clipboardElement.y = 0;
+                                    }
+                                    cmd = new AddDeleteDocElementCmd(
+                                        true, clipboardElement.elementType, clipboardElement,
+                                        clipboardElement.id, clipboardElement.containerId, -1, this);
+                                    cmdGroup.addCommand(cmd);
+
+                                } else if (clipboardElement.baseClass === 'Parameter') {
+                                    Parameter.removeIds(clipboardElement);
+                                    cmd = new AddDeleteParameterCmd(
+                                        true, clipboardElement, clipboardElement.id,
+                                        this.parameterContainer.getId(), -1, this);
+                                    cmdGroup.addCommand(cmd);
+                                } else if (clipboardElement.baseClass === 'Style') {
+                                    cmd = new AddDeleteStyleCmd(
+                                        true, clipboardElement, clipboardElement.id,
+                                        this.styleContainer.getId(), -1, this);
+                                    cmdGroup.addCommand(cmd);
                                 }
-                                clipboardElement.x = clipboardElement.y = 0;
-                                this.createDocElement(clipboardElement, true);
-                                this.selectObject(clipboardElement.id, !cleared);
-                                cleared = true;
+                            }
+                            if (!cmdGroup.isEmpty()) {
+                                this.executeCommand(cmdGroup);
+                                let clearSelection = true;
+                                for (let clipboardElement of this.clipboardElements) {
+                                    this.selectObject(clipboardElement.id, clearSelection);
+                                    clearSelection = false;
+                                }
                             }
                             event.preventDefault();
                         }
@@ -517,9 +562,8 @@ export default class ReportBro {
                 { name: 'page_number', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true }]) {
             let parameter = new Parameter(this.getUniqueId(), parameterData, this);
             let parentPanel = this.mainPanel.getParametersItem();
-            let panelItem = new MainPanelItem('parameter', '',
-                parentPanel, parameter, { hasChildren: false, showAdd: false, showDelete: false, draggable: false }, this);
-            panelItem.openParentItems();
+            let panelItem = new MainPanelItem(
+                'parameter', parentPanel, parameter, { hasChildren: false, showAdd: false, showDelete: false, draggable: false }, this);
             parameter.setPanelItem(panelItem);
             parentPanel.appendChild(panelItem);
             parameter.setup();
@@ -551,9 +595,7 @@ export default class ReportBro {
         this.updateMenuButtons();
 
         $(document).mouseup(event => {
-            if (this.document.isDragging()) {
-                this.document.stopDrag();
-            }
+            this.document.mouseUp(event);
             this.popupWindow.hide();
         });
         this.element
@@ -664,7 +706,7 @@ export default class ReportBro {
                         dataParameter.appendParameterItems(parameters, allowedTypes);
                     }
                 }
-            } else if (panelItem !== null && panelItem.getData() instanceof BandElement) {
+            } else if (panelItem !== null && panelItem.getData() instanceof SectionElement) {
                 for (let dataParameter of panelItem.getData().getDataParameters()) {
                     dataParameter.appendParameterItems(parameters, allowedTypes);
                 }
@@ -736,10 +778,18 @@ export default class ReportBro {
                     // js map also includes data of internal children
                     docElements.push(docElement.toJS());
                 }
-                let linkedContainer = docElement.getLinkedContainer();
-                // add children of doc elements which represent containers, e.g. frames
-                if (linkedContainer !== null) {
-                    this.appendContainerDocElements(linkedContainer, asObjects, docElements);
+                let containers = [];
+                if (docElement instanceof SectionElement) {
+                    containers = docElement.getLinkedContainers();
+                } else {
+                    let linkedContainer = docElement.getLinkedContainer();
+                    if (linkedContainer !== null) {
+                        containers.push(linkedContainer);
+                    }
+                }
+                // add children of doc elements which represent containers, e.g. frames or section bands
+                for (let container of containers) {
+                    this.appendContainerDocElements(container, asObjects, docElements);
                 }
             }
         }
@@ -906,31 +956,44 @@ export default class ReportBro {
 
     updateMenuAlignButtons() {
         let elementCount = 0;
-        let previousContainerId = '';
-        let elementDifferentContainers = false;
+        let previousContainerOffset = { x: 0, y: 0 };
+        let elementSameContainerOffsetX = true;
+        let elementSameContainerOffsetY = true;
         for (let selectionId of this.selections) {
             let obj = this.getDataObject(selectionId);
             if (obj instanceof DocElement && obj.getXTagId() !== '') {
                 elementCount++;
+                let container = obj.getContainer();
+                let offset = container.getOffset();
                 if (elementCount === 1) {
-                    previousContainerId = obj.getValue('containerId');
+                    previousContainerOffset = offset;
                 } else {
-                    if (previousContainerId !== obj.getValue('containerId')) {
-                        elementDifferentContainers = true;
+                    if (offset.x !== previousContainerOffset.x) {
+                        elementSameContainerOffsetX = false;
+                    }
+                    if (offset.y !== previousContainerOffset.y) {
+                        elementSameContainerOffsetY = false;
                     }
                 }
             }
         }
         if (elementCount > 1) {
-            $('#rbro_menu_align').show();
-            if (elementDifferentContainers) {
-                $('#rbro_menu_valign').hide();
+            // allow alignment of elements if their parent container has the same x/y offset
+            if (elementSameContainerOffsetX) {
+                $('#rbro_menu_align').show();
             } else {
-                $('#rbro_menu_valign').show();
+                $('#rbro_menu_align').hide();
             }
+            if (elementSameContainerOffsetY) {
+                $('#rbro_menu_valign').show();
+            } else {
+                $('#rbro_menu_valign').hide();
+            }
+            $('#rbo_menu_elements .rbroMenuButton').hide();
         } else {
             $('#rbro_menu_align').hide();
             $('#rbro_menu_valign').hide();
+            $('#rbo_menu_elements .rbroMenuButton').show();
         }
     }
 
@@ -1072,9 +1135,8 @@ export default class ReportBro {
      * Store our own drag data because dataTransfer data of event is not available in
      * dragenter/dragover/dragleave events (in some browsers).
      */
-    startBrowserDrag(browserDragType, browserDragCategory, browserDragElementType, browserDragId) {
+    startBrowserDrag(browserDragType, browserDragElementType, browserDragId) {
         this.browserDragType = browserDragType;
-        this.browserDragCategory = browserDragCategory;
         this.browserDragId = browserDragId;
         this.getDocument().startBrowserDrag(browserDragElementType);
     }
@@ -1083,28 +1145,20 @@ export default class ReportBro {
         return this.browserDragType === browserDragType;
     }
 
-    getBrowserDragCategory() {
-        return this.browserDragCategory;
-    }
-
     getBrowserDragId() {
         return this.browserDragId;
     }
 
-    updateSelectionDrag(diffX, diffY, dragType, dragContainer, snapToGrid, store) {
+    updateSelectionDrag(diffX, diffY, dragType, dragContainer, store) {
         let cmdGroup;
         if (store) {
             cmdGroup = new CommandGroupCmd(dragType === DocElement.dragType.element ? 'Update position' : 'Resize', this);
-        }
-        let gridSize = 0;
-        if (snapToGrid && this.document.isGridVisible()) {
-            gridSize = this.document.getGridSize();
         }
         for (let selectionId of this.selections) {
             let obj = this.getDataObject(selectionId);
             if (obj !== null) {
                 if (dragType !== DocElement.dragType.element || obj.isDraggingAllowed()) {
-                    obj.updateDrag(diffX, diffY, dragType, dragContainer, gridSize, store ? cmdGroup : null);
+                    obj.updateDrag(diffX, diffY, dragType, dragContainer, store ? cmdGroup : null);
                 }
             }
         }
@@ -1207,47 +1261,54 @@ export default class ReportBro {
         }
         if ($.type(val) === 'string') {
             val = parseFloat(val.replace(',', '.'));
-            if (val === NaN) {
+            if (isNaN(val)) {
                 return '0px';
             }
         }
         return val + 'px';
     }
 
-    createDocElement(docElementData, openParentItems) {
-        let properties = { draggable: true };
-        let element = null;
-        if (docElementData.elementType === DocElement.type.text) {
-            element = new TextElement(docElementData.id, docElementData, this);
-        } else if (docElementData.elementType === DocElement.type.line) {
-            element = new LineElement(docElementData.id, docElementData, this);
-        } else if (docElementData.elementType === DocElement.type.image) {
-            element = new ImageElement(docElementData.id, docElementData, this);
-        } else if (docElementData.elementType === DocElement.type.barCode) {
-            element = new BarCodeElement(docElementData.id, docElementData, this);
-        } else if (docElementData.elementType === DocElement.type.table) {
-            element = new TableElement(docElementData.id, docElementData, this);
-            properties.hasChildren = true;
-        } else if (docElementData.elementType === DocElement.type.frame) {
-            element = new FrameElement(docElementData.id, docElementData, this);
-            properties.hasChildren = true;
-        } else if (docElementData.elementType === DocElement.type.band) {
-            element = new BandElement(docElementData.id, docElementData, this);
-            properties.hasChildren = true;
-            properties.showAdd = true;
-        } else if (docElementData.elementType === DocElement.type.pageBreak) {
-            element = new PageBreakElement(docElementData.id, docElementData, this);
+    createDocElement(docElementData) {
+        let element = AddDeleteDocElementCmd.createElement(
+            docElementData.id, docElementData, docElementData.elementType, -1, false, this);
+        let maxId = element.getMaxId();
+        if (maxId >= this.nextId) {
+            this.nextId = maxId + 1;
         }
-        this.addDocElement(element);
-        let parentPanel = element.getContainer().getPanelItem();
-        let panelItem = new MainPanelItem(docElementData.elementType, '', parentPanel, element, properties, this);
-        if (openParentItems) {
-            panelItem.openParentItems();
-        }
-        element.setPanelItem(panelItem);
-        parentPanel.appendChild(panelItem);
-        element.setup();
         return element;
+    }
+
+    createParameter(parameterData) {
+        let parameter = new Parameter(parameterData.id, parameterData, this);
+        let parentPanel = this.mainPanel.getParametersItem();
+        let panelItem = new MainPanelItem(
+            'parameter', parentPanel, parameter,
+            { hasChildren: true, showAdd: parameter.getValue('editable'), showDelete: parameter.getValue('editable'), draggable: true }, this);
+        parameter.setPanelItem(panelItem);
+        parentPanel.appendChild(panelItem);
+        parameter.setup();
+        if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
+            $(`#rbro_menu_item_add${parameter.getId()}`).hide();
+            $(`#rbro_menu_item_children${parameter.getId()}`).hide();
+            $(`#rbro_menu_item_children_toggle${parameter.getId()}`).hide();
+        }
+        this.addParameter(parameter);
+        let maxId = parameter.getMaxId();
+        if (maxId >= this.nextId) {
+            this.nextId = maxId + 1;
+        }
+    }
+
+    createStyle(styleData) {
+        let style = new Style(styleData.id, styleData, this);
+        let parentPanel = this.mainPanel.getStylesItem();
+        let panelItem = new MainPanelItem('style', parentPanel, style, { draggable: true }, this);
+        style.setPanelItem(panelItem);
+        parentPanel.appendChild(panelItem);
+        this.addStyle(style);
+        if (styleData.id >= this.nextId) {
+            this.nextId = styleData.id + 1;
+        }
     }
 
     /**
@@ -1377,14 +1438,6 @@ export default class ReportBro {
         let ret = { docElements: [], parameters: [], styles: [], version: 2 };
         let i;
         ret.docElements = this.getDocElements(false);
-        // let existingIds = {};
-        // for (i=0; i < this.docElements.length; i++) {
-        //     let docElement = this.docElements[i];
-        //     if (!(docElement.getId() in existingIds)) {
-        //         existingIds[docElement.getId()] = true;
-        //         ret.docElements.push(docElement.toJS());
-        //     }
-        // }
         for (let parameter of this.getParameters()) {
             ret.parameters.push(parameter.toJS());
         }
@@ -1455,46 +1508,16 @@ export default class ReportBro {
         this.documentProperties.setup();
 
         for (let styleData of report.styles) {
-            let style = new Style(styleData.id, styleData, this);
-            let parentPanel = this.mainPanel.getStylesItem();
-            let panelItem = new MainPanelItem('style', '', parentPanel, style, { draggable: true }, this);
-            style.setPanelItem(panelItem);
-            parentPanel.appendChild(panelItem);
-            this.addStyle(style);
-            if (styleData.id >= this.nextId) {
-                this.nextId = styleData.id + 1;
-            }
+            this.createStyle(styleData);
         }
         for (let parameterData of report.parameters) {
-            let parameter = new Parameter(parameterData.id, parameterData, this);
-            let parentPanel = this.mainPanel.getParametersItem();
-            let panelItem = new MainPanelItem('parameter', '',
-                parentPanel, parameter, { hasChildren: true, showAdd: parameter.getValue('editable'),
-                showDelete: parameter.getValue('editable'), draggable: true }, this);
-            parameter.setPanelItem(panelItem);
-            parentPanel.appendChild(panelItem);
-            parameter.setup();
-            if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
-                $(`#rbro_menu_item_add${parameter.getId()}`).hide();
-                $(`#rbro_menu_item_children${parameter.getId()}`).hide();
-                $(`#rbro_menu_item_children_toggle${parameter.getId()}`).hide();
-            }
-            this.addParameter(parameter);
-            let maxId = parameter.getMaxId();
-            if (maxId >= this.nextId) {
-                this.nextId = maxId + 1;
-            }
+            this.createParameter(parameterData);
         }
         for (let docElementData of report.docElements) {
-            let element = this.createDocElement(docElementData, false);
-            let maxId = element.getMaxId();
-            if (maxId >= this.nextId) {
-                this.nextId = maxId + 1;
-            }
+            this.createDocElement(docElementData);
         }
 
         this.browserDragType = '';
-        this.browserDragCategory = '';
         this.browserDragId = '';
 
         this.commandStack = [];

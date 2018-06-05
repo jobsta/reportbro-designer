@@ -35,6 +35,6 @@ export default class CommandGroupCmd {
     }
 
     isEmpty() {
-        return this.commands.length == 0;
+        return this.commands.length === 0;
     }
 }

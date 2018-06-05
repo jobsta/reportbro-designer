@@ -18,7 +18,7 @@
 #reportbro {
     position: absolute;
     width: 100%;
-    min-width: 980px; /* prevent broken layout on too small screens */
+    min-width: 1060px; /* prevent menu item wrap on too small screens */
     height: 100%;
     top: auto;
     left: auto;
@@ -139,6 +139,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.rbroElementButtons {
+    height: 45px;
 }
 
 .rbroActionButtons > div, .rbroElementButtons > div {
@@ -262,7 +266,7 @@
     -ms-text-overflow: ellipsis;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: 100%;
+    max-width: 100%;
 }
 
 .rbroMenuItem:hover {
@@ -284,23 +288,27 @@
 }
 
 ul ul .rbroMenuItem {
-    padding: 2px 5px 2px 20px;
+    padding: 2px 5px;
     font-size: 14px;
     text-transform: none;
     color: #DDDDDD;
 }
 
 ul ul ul .rbroMenuItem {
-    padding: 2px 5px 2px 32px;
+    padding: 2px 5px 2px 12px;
     color: #95badc;
 }
 
-ul ul ul .rbroMenuItem.rbroMenuItemNoChildren {
-    padding: 2px 5px 2px 34px;
+ul ul ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 20px;
 }
 
-ul ul ul ul .rbroMenuItem {
-    padding: 2px 5px 2px 48px;
+ul ul ul ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 30px;
+}
+
+ul ul ul ul ul ul .rbroMenuItem {
+    padding: 2px 5px 2px 40px;
 }
 
 ul ul .rbroMenuItemText {
@@ -311,6 +319,7 @@ ul ul .rbroMenuItemText {
     font-size: 12px;
     margin-right: 2px;
     transition:  all 0.2s linear;
+    margin-left: 2px;
 }
 
 .rbroMenuItem.rbroMenuItemOpen .rbroMenuArrow {
@@ -400,7 +409,7 @@ ul ul .rbroMenuItemText {
     width: 32%;
 }
 
-.rbroSplit textarea {
+.rbroSelector textarea, .rbroSelector input {
     width: 85%;
 }
 
@@ -490,13 +499,14 @@ ul ul .rbroMenuItemText {
     display: none;
     -ms-user-select: none;	
     user-select: none;
+    pointer-events: none;
 }
 
 .rbroElementDragOver {
-    background-color: rgba(204,204,204,0.1);
+    background-color: rgba(204,204,204,0.2);
 }
 
-.rbroElementDragOver .rbroDocumentBandDescription {
+.rbroElementDragOver > .rbroDocumentBandDescription {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -566,6 +576,15 @@ ul ul .rbroMenuItemText {
 }
 
 /* Document Panel - Elements */
+.rbroSectionElement {
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.rbroSectionBandElement {
+    position: absolute;
+}
+
 .rbroDocElement {
     position: absolute;
     box-sizing: border-box;
@@ -583,15 +602,23 @@ ul ul .rbroMenuItemText {
     display: flex;
 }
 
+.rbroFrameElement .rbroContentContainerHelper {
+    overflow: initial;
+}
+
 .rbroImageElement .rbroContentContainerHelper {
     height: calc(100% + 2px);
     width: calc(100% + 2px);
 }
 
 .rbroDocElementContentText {
-    white-space: pre-line;
+    white-space: pre-wrap;
     overflow: hidden;
     display: flex;
+}
+
+.rbroDocElementContentText span {
+    width: 100%;
 }
 
 .rbroDocElementAlignCenter, .rbroDocElementAlignCenter .rbroDocElementContentText {
@@ -664,6 +691,10 @@ ul ul .rbroMenuItemText {
     background-color: #000000;
 }
 
+.rbroSelectionArea {
+    position: absolute;
+    border: 1px solid #000000;
+}
 
 /* Document template styling, element resizer  */
 .rbroDocumentBand {
@@ -686,6 +717,19 @@ ul ul .rbroMenuItemText {
     left: 0;
     right: 0;
     border-top: 1px dashed #999999;
+}
+
+.rbroDividerSection, .rbroDividerSectionBand {
+    left: 0;
+    right: 0;
+}
+
+.rbroDividerSection {
+    border-top: 1px solid #95badc;
+}
+
+.rbroDividerSectionBand {
+    border-top: 1px dashed #95badc;
 }
 
 .rbroSizer {
@@ -944,11 +988,6 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     padding: 8px 10px;
 }
 
-.rbroPopupWindow .rbroPopupItemSeparator:first-child {
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-}
-
 .rbroPopupWindow .rbroPopupItemSeparator.rbroParameterGroup {
     background-color: #B2E6D1;
 }
@@ -1029,6 +1068,23 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     color: #004864;
 }
 
+.rbroPopupSearch {
+    width: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 28px;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.2s linear;
+    padding: 0 4px;
+    outline: none;
+    font-size: 12px;
+}
+
+.rbroPopupSearch:focus {
+    border: 1px solid #004864;
+}
 /* ReportBro spectrum color picker */
 .rbroColorPickerContainer {
     transition: all 0.2s linear;

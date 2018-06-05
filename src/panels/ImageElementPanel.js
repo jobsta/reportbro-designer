@@ -21,7 +21,7 @@ export default class ImageElementPanel {
         let panel = $('<div id="rbro_image_element_panel" class="rbroHidden"></div>');
         let elDiv = $('<div id="rbro_image_element_source_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_image_element_source">${this.rb.getLabel('imageElementSource')}:</label>`);
-        let elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        let elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elSource = $(`<textarea id="rbro_image_element_source" rows="1"></textarea>`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -38,7 +38,7 @@ export default class ImageElementPanel {
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj,
                         [Parameter.type.image, Parameter.type.string]), this.selectedObjId,
-                        'rbro_image_element_source', 'parameter', PopupWindow.type.parameterSet);
+                        'rbro_image_element_source', 'source', PopupWindow.type.parameterSet);
                 }
             });
         elFormField.append(elParameterButton);
@@ -210,7 +210,7 @@ export default class ImageElementPanel {
         let elPrintSectionDiv = $('<div id="rbro_image_element_print_section" class="rbroHidden"></div>');
         elDiv = $('<div id="rbro_image_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_image_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPrintIf = $(`<textarea id="rbro_image_element_print_if" rows="1"></textarea>`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -227,7 +227,7 @@ export default class ImageElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_image_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_image_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);

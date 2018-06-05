@@ -16,14 +16,15 @@ export default class BarCodeElement extends DocElement {
         this.displayValue = true;
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
+        this.spreadsheet_colspan = '';
         this.spreadsheet_addEmptyRow = false;
         this.setInitialData(initialData);
         this.name = this.rb.getLabel('docElementBarCode');
         $(`#rbro_menu_item_name${this.id}`).text(this.name);
     }
 
-    setup() {
-        super.setup();
+    setup(openPanelItem) {
+        super.setup(openPanelItem);
         this.createElement();
         if (this.content !== '') {
             this.updateBarCode();
@@ -47,7 +48,7 @@ export default class BarCodeElement extends DocElement {
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'height', 'content', 'format', 'displayValue',
             'printIf', 'removeEmptyElement',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }
 
     getElementType() {

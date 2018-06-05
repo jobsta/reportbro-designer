@@ -151,7 +151,7 @@ export default class ParameterPanel {
 
         elDiv = $('<div class="rbroFormRow" id="rbro_parameter_pattern_row"></div>');
         elDiv.append(`<label for="rbro_parameter_pattern">${this.rb.getLabel('parameterPattern')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPattern = $('<input id="rbro_parameter_pattern">')
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -161,22 +161,6 @@ export default class ParameterPanel {
                     this.rb.executeCommand(cmd);
                 }
             })
-            .focus(event => {
-                let obj = this.rb.getDataObject(this.selectedObjId);
-                if (obj !== null) {
-                    let patterns;
-                    let type = obj.getValue('type');
-                    let valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
-                    if (valueType === Parameter.type.date) {
-                        patterns = this.rb.getProperty('patternDates');
-                    } else {
-                        patterns = this.rb.getProperty('patternNumbers');
-                    }
-                    this.rb.getPopupWindow().show(patterns, this.selectedObjId,
-                        'rbro_parameter_pattern', 'pattern', PopupWindow.type.pattern);
-                }
-                event.preventDefault();
-            })
             .blur(event => {
                 this.rb.getPopupWindow().hide();
             })
@@ -185,13 +169,30 @@ export default class ParameterPanel {
                 event.stopPropagation();
             });
         elFormField.append(elPattern);
+        let elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    let patterns;
+                    let type = selectedObj.getValue('type');
+                    let valueType = (type === Parameter.type.simpleArray) ? selectedObj.getValue('arrayItemType') : type;
+                    if (valueType === Parameter.type.date) {
+                        patterns = this.rb.getProperty('patternDates');
+                    } else {
+                        patterns = this.rb.getProperty('patternNumbers');
+                    }
+                    this.rb.getPopupWindow().show(patterns, this.selectedObjId,
+                        'rbro_parameter_pattern', 'pattern', PopupWindow.type.pattern);
+                }
+            });
+        elFormField.append(elParameterButton);
         elFormField.append('<div id="rbro_parameter_pattern_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
         elDiv = $('<div class="rbroFormRow" id="rbro_parameter_expression_row"></div>');
         elDiv.append(`<label for="rbro_parameter_expression">${this.rb.getLabel('parameterExpression')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elExpression = $('<textarea id="rbro_parameter_expression" rows="1"></textarea>')
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -202,7 +203,7 @@ export default class ParameterPanel {
             });
         autosize(elExpression);
         elFormField.append(elExpression);
-        let elParameterButton = $(`<div id="rbro_parameter_expression_param_button"
+        elParameterButton = $(`<div id="rbro_parameter_expression_param_button"
         class="rbroButton rbroRoundButton rbroIcon-select"></div>`)
             .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);

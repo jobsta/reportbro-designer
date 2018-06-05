@@ -205,19 +205,15 @@ export default class FrameElementPanel {
         let elBorderWidth = $(`<input id="rbro_frame_element_border_width">`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.getSelectedObjId()) !== null) {
-                    if (elBorderWidth.val().trim() !== '') {
-                        let cmd = new SetValueCmd(this.getSelectedObjId(), 'rbro_frame_element_border_width',
-                            'borderWidth', elBorderWidth.val(), SetValueCmd.type.text, this.rb);
-                        this.rb.executeCommand(cmd);
-                    } else {
-                        elBorderWidth.val(this.rb.getDetailData().getValue('borderWidth'));
-                    }
+                    let cmd = new SetValueCmd(this.getSelectedObjId(), 'rbro_frame_element_border_width',
+                        'borderWidth', elBorderWidth.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
                 }
             });
         elFormField.append(elBorderWidth);
         elDiv.append(elFormField);
         elBorderDiv.append(elDiv);
-        utils.setInputPositiveInteger(elBorderWidth);
+        utils.setInputDecimal(elBorderWidth);
         panel.append(elBorderDiv);
 
         let elPrintHeader = $('<div class="rbroPanelSectionHeader"></div>');
@@ -241,7 +237,7 @@ export default class FrameElementPanel {
         let elPrintSectionDiv = $('<div id="rbro_frame_element_print_section" class="rbroHidden"></div>');
         elDiv = $('<div id="rbro_frame_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_frame_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPrintIf = $(`<textarea id="rbro_frame_element_print_if" rows="1"></textarea>`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -258,7 +254,7 @@ export default class FrameElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_frame_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_frame_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);

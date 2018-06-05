@@ -37,7 +37,7 @@ export default class FrameElement extends DocElement {
         this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
     }
 
-    setup() {
+    setup(openPanelItem) {
         this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
         super.setup();
         this.createElement();
@@ -53,7 +53,9 @@ export default class FrameElement extends DocElement {
         this.setupComplete = true;
         this.updateStyle();
         this.updateName();
-        this.panelItem.open();
+        if (openPanelItem){
+            this.panelItem.open();
+        }
     }
 
     /**
@@ -119,7 +121,7 @@ export default class FrameElement extends DocElement {
             borderStyleProperties['border-style'] += this.getValue('borderRight') ? ' solid' : ' none';
             borderStyleProperties['border-style'] += this.getValue('borderBottom') ? ' solid' : ' none';
             borderStyleProperties['border-style'] += this.getValue('borderLeft') ? ' solid' : ' none';
-            borderStyleProperties['border-width'] = this.getValue('borderWidth') + 'px';
+            borderStyleProperties['border-width'] = this.getValue('borderWidthVal') + 'px';
             borderStyleProperties['border-color'] = this.getValue('borderColor');
         } else {
             borderStyleProperties['border-style'] = 'none';
@@ -203,10 +205,5 @@ export default class FrameElement extends DocElement {
                 utils.replaceAll(this.printIf, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
             cmdGroup.addCommand(cmd);
         }
-    }
-
-    toJS() {
-        let ret = super.toJS();
-        return ret;
     }
 }

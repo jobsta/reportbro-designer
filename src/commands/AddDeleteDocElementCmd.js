@@ -1,11 +1,11 @@
 import Command from './Command';
-import BandElement from '../elements/BandElement';
 import BarCodeElement from '../elements/BarCodeElement';
 import DocElement from '../elements/DocElement';
 import FrameElement from '../elements/FrameElement';
 import ImageElement from '../elements/ImageElement';
 import LineElement from '../elements/LineElement';
 import PageBreakElement from '../elements/PageBreakElement';
+import SectionElement from '../elements/SectionElement';
 import TableElement from '../elements/TableElement';
 import TextElement from '../elements/TextElement';
 import MainPanelItem from '../menu/MainPanelItem';
@@ -54,36 +54,8 @@ export default class AddDeleteDocElementCmd {
     addElement() {
         let parent = this.rb.getDataObject(this.parentId);
         if (parent !== null) {
-            let element;
-            let properties = { draggable: true };
-            if (this.elementType === DocElement.type.text) {
-                element = new TextElement(this.id, this.initialData, this.rb);
-            } else if (this.elementType === DocElement.type.line) {
-                element = new LineElement(this.id, this.initialData, this.rb);
-            } else if (this.elementType === DocElement.type.image) {
-                element = new ImageElement(this.id, this.initialData, this.rb);
-            } else if (this.elementType === DocElement.type.pageBreak) {
-                element = new PageBreakElement(this.id, this.initialData, this.rb);
-            } else if (this.elementType === DocElement.type.table) {
-                element = new TableElement(this.id, this.initialData, this.rb);
-                properties.hasChildren = true;
-            } else if (this.elementType === DocElement.type.frame) {
-                element = new FrameElement(this.id, this.initialData, this.rb);
-                properties.hasChildren = true;
-            } else if (this.elementType === DocElement.type.band) {
-                element = new BandElement(this.id, this.initialData, this.rb);
-                properties.hasChildren = true;
-                properties.showAdd = true;
-                // properties.draggable = false;
-            } else if (this.elementType === DocElement.type.barCode) {
-                element = new BarCodeElement(this.id, this.initialData, this.rb);
-            }
-            this.rb.addDocElement(element);
-            let panelItem = new MainPanelItem(this.elementType, '', parent.getPanelItem(), element, properties, this.rb);
-            panelItem.openParentItems();
-            element.setPanelItem(panelItem);
-            parent.getPanelItem().insertChild(this.position, panelItem);
-            element.setup();
+            let element = AddDeleteDocElementCmd.createElement(this.id, this.initialData, this.elementType, this.position, true, this.rb);
+            
             this.rb.notifyEvent(element, Command.operation.add);
             this.rb.selectObject(this.id, true);
 
@@ -101,5 +73,37 @@ export default class AddDeleteDocElementCmd {
             this.rb.notifyEvent(element, Command.operation.remove);
             this.rb.deleteDocElement(element);
         }
+    }
+
+    static createElement(id, data, elementType, panelPos, openPanelItem, rb) {
+        let element;
+        let properties = { draggable: true };
+        if (elementType === DocElement.type.text) {
+            element = new TextElement(id, data, rb);
+        } else if (elementType === DocElement.type.line) {
+            element = new LineElement(id, data, rb);
+        } else if (elementType === DocElement.type.image) {
+            element = new ImageElement(id, data, rb);
+        } else if (elementType === DocElement.type.pageBreak) {
+            element = new PageBreakElement(id, data, rb);
+        } else if (elementType === DocElement.type.table) {
+            element = new TableElement(id, data, rb);
+            properties.hasChildren = true;
+        } else if (elementType === DocElement.type.frame) {
+            element = new FrameElement(id, data, rb);
+            properties.hasChildren = true;
+        } else if (elementType === DocElement.type.section) {
+            element = new SectionElement(id, data, rb);
+            properties.hasChildren = true;
+        } else if (elementType === DocElement.type.barCode) {
+            element = new BarCodeElement(id, data, rb);
+        }
+        rb.addDocElement(element);
+        let parentPanel = element.getContainer().getPanelItem();
+        let panelItem = new MainPanelItem(elementType, parentPanel, element, properties, rb);
+        element.setPanelItem(panelItem);
+        parentPanel.insertChild(panelPos, panelItem);
+        element.setup(openPanelItem);
+        return element;
     }
 }

@@ -17,6 +17,7 @@ export default class PopupWindow {
         this.type = null;
         this.parameters = null;
         this.visible = false;
+        this.items = null;
     }
 
     render() {
@@ -48,9 +49,11 @@ export default class PopupWindow {
     show(items, objId, tagId, field, type) {
         let winWidth = $(window).width();
         let winHeight = $(window).height();
+        let elSearch = null;
         this.input = (tagId !== '') ? $('#' + tagId) : null;
         this.objId = objId;
         this.type = type;
+        this.items = items;
         this.elContent.empty();
         $('#rbro_background_overlay').remove();
         if (type === PopupWindow.type.testData) {
@@ -64,6 +67,11 @@ export default class PopupWindow {
             $('body').append($('<div id="rbro_background_overlay" class="rbroBackgroundOverlay"></div>'));
             $('body').addClass('rbroFixedBackground'); // no scroll bars for background while popup is shown
         } else {
+            elSearch = $(`<input class="rbroPopupSearch" placeholder="${this.rb.getLabel('parameterSearchPlaceholder')}">`)
+                .on('input', event => {
+                    this.filterParameters(elSearch.val());
+                });
+            this.elContent.append(elSearch);
             let ul = $('<ul></ul>')
                 .mousedown(event => {
                     // prevent default so blur event of input is not triggered,
@@ -74,12 +82,20 @@ export default class PopupWindow {
             for (let item of items) {
                 let li = $('<li></li>');
                 if (item.separator) {
+                    if ((type === PopupWindow.type.parameterSet ||
+                            type === PopupWindow.type.parameterAppend) && item.id) {
+                        li.attr('id', 'parameter_group_' + item.id);
+                    }
                     let separatorClass = 'rbroPopupItemSeparator';
                     if (item.separatorClass) {
                         separatorClass += ' ' + item.separatorClass;
                     }
                     li.attr('class', separatorClass);
                 } else {
+                    if ((type === PopupWindow.type.parameterSet ||
+                            type === PopupWindow.type.parameterAppend) && item.id) {
+                        li.attr('id', 'parameter_' + item.id);
+                    }
                     li.mousedown(event => {
                         if (type === PopupWindow.type.pattern) {
                             this.input.val(item.name);
@@ -121,6 +137,9 @@ export default class PopupWindow {
 
         this.elWindow.removeClass('rbroHidden');
         this.visible = true;
+        if (elSearch !== null) {
+            elSearch.focus();
+        }
     }
 
     hide() {
@@ -143,6 +162,7 @@ export default class PopupWindow {
             this.elContent.empty();
             $('body').removeClass('rbroFixedBackground');
             this.visible = false;
+            this.items = null;
         }
     }
 
@@ -279,6 +299,51 @@ export default class PopupWindow {
             })
         );
         this.elContent.empty().append(div);
+    }
+
+    /**
+     * Filters list of displayed parameter items. Only parameters containing given search value are
+     * shown.
+     * @param {String} searchVal - search value.
+     */
+    filterParameters(searchVal) {
+        let currentGroupId = -1;
+        let groupCount = 0;
+        if (this.items !== null) {
+            searchVal = searchVal.toLowerCase();
+            for (let item of this.items) {
+                if (item.separator) {
+                    if (item.id) {
+                        if (currentGroupId !== -1) {
+                            // hide groups (parameter maps) if they do not contain any visible items
+                            if (groupCount > 0) {
+                                $('#parameter_group_' + currentGroupId).show();
+                            } else {
+                                $('#parameter_group_' + currentGroupId).hide();
+                            }
+                        }
+                        currentGroupId = item.id;
+                        groupCount = 0;
+                    }
+                } else {
+                    if (item.nameLowerCase.indexOf(searchVal) !== -1) {
+                        $('#parameter_' + item.id).show();
+                        if (currentGroupId !== -1) {
+                            groupCount++;
+                        }
+                    } else {
+                        $('#parameter_' + item.id).hide();
+                    }
+                }
+            }
+            if (currentGroupId !== -1) {
+                if (groupCount > 0) {
+                    $('#parameter_group_' + currentGroupId).show();
+                } else {
+                    $('#parameter_group_' + currentGroupId).hide();
+                }
+            }
+        }
     }
 }
 

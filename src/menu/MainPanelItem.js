@@ -6,7 +6,7 @@ import MovePanelItemCmd from '../commands/MovePanelItemCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Container from '../container/Container';
 import Parameter from '../data/Parameter';
-import BandElement from '../elements/BandElement';
+import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import Document from '../Document';
 
@@ -16,11 +16,10 @@ import Document from '../Document';
  * @class
  */
 export default class MainPanelItem {
-    constructor(panelName, panelCategory, parent, data, properties, rb) {
+    constructor(panelName, parent, data, properties, rb) {
         this.properties = { hasChildren: false, showAdd: false, showDelete: true, hasDetails: true, visible: true, draggable: false };
         $.extend( this.properties, properties );
         this.panelName = panelName;
-        this.panelCategory = panelCategory;
         let name = (data !== null) ? data.getName() : '';
         this.id = (data !== null) ? data.getId() : properties.id;
         this.parent = parent;
@@ -39,104 +38,68 @@ export default class MainPanelItem {
             itemDiv.on('dragstart', event => {
                 event.originalEvent.dataTransfer.setData('text/plain', '');  // without setData dragging does not work in FF
                 event.originalEvent.dataTransfer.effectAllowed = 'move';
-                this.rb.startBrowserDrag('panelItem', this.panelCategory, null, this.id);
+                this.rb.startBrowserDrag('panelItem', null, this.id);
                 // avoid calling dragstart handler for main div which disables dragging for all other elements
                 event.stopPropagation();
             });
         }
         itemDiv
             .on('dragover', event => {
-                if (this.rb.isBrowserDragActive('panelItem') &&
-                        this.rb.getBrowserDragCategory() === this.panelCategory && this.rb.getBrowserDragId() !== this.id) {
-                    // without preventDefault for dragover event, the drop event is not fired
-                    event.preventDefault();
-                    event.stopPropagation();
+                if (this.rb.isBrowserDragActive('panelItem') && this.rb.getBrowserDragId() !== this.id) {
+                    let dropInfo = this.getDropObjectInfo();
+                    if (dropInfo.allowDrop) {
+                        // without preventDefault for dragover event, the drop event is not fired
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
                 }
             })
             .on('dragenter', event => {
-                if (this.rb.isBrowserDragActive('panelItem') &&
-                        this.rb.getBrowserDragCategory() === this.panelCategory && this.rb.getBrowserDragId() !== this.id) {
-                    itemDiv.addClass('rbroMenuItemDragOver');
-                    this.dragEnterCount++;
-                    event.preventDefault(); // needed for IE
+                if (this.rb.isBrowserDragActive('panelItem') && this.rb.getBrowserDragId() !== this.id) {
+                    let dropInfo = this.getDropObjectInfo();
+                    if (dropInfo.allowDrop) {
+                        itemDiv.addClass('rbroMenuItemDragOver');
+                        this.dragEnterCount++;
+                        event.preventDefault(); // needed for IE
+                    }
                 }
             })
             .on('dragleave', event => {
-                if (this.rb.isBrowserDragActive('panelItem') &&
-                        this.rb.getBrowserDragCategory() === this.panelCategory && this.rb.getBrowserDragId() !== this.id) {
-                    this.dragEnterCount--;
-                    if (this.dragEnterCount === 0) {
-                        itemDiv.removeClass('rbroMenuItemDragOver');
+                if (this.rb.isBrowserDragActive('panelItem') && this.rb.getBrowserDragId() !== this.id) {
+                    let dropInfo = this.getDropObjectInfo();
+                    if (dropInfo.allowDrop) {
+                        this.dragEnterCount--;
+                        if (this.dragEnterCount === 0) {
+                            itemDiv.removeClass('rbroMenuItemDragOver');
+                        }
                     }
                 }
             })
             .on('drop', event => {
-                if (this.rb.isBrowserDragActive('panelItem') &&
-                        this.rb.getBrowserDragCategory() === this.panelCategory && this.rb.getBrowserDragId() !== this.id) {
-                    this.dragEnterCount--;
-                    itemDiv.removeClass('rbroMenuItemDragOver');
-                    let draggedId = this.rb.getBrowserDragId();
-                    let draggedObj = this.rb.getDataObject(draggedId);
-                    if (draggedObj !== null) {
-                        let pos = this.getSiblingPosition();
-                        let parentPanel = this;
-                        if (this.getParent() !== null) {
-                            parentPanel = this.getParent();
-                            pos++;
-                        }
-                        if (parentPanel !== draggedObj.getPanelItem().getParent() ||
-                                pos !== draggedObj.getPanelItem().getSiblingPosition()) {
-                            let moveItem = false;
-                            let cmdGroup = new CommandGroupCmd('Move panel item', this.rb);
-                            if (draggedObj instanceof Parameter) {
-                                // do not allow dragging array/map into other array/map parameter
-                                if ((draggedObj.getValue('type') !== Parameter.type.array &&
-                                        draggedObj.getValue('type') !== Parameter.type.map) ||
-                                        parentPanel === this.rb.getMainPanel().getParametersItem()) {
-                                    moveItem = true;
-                                }
-                            } else if (draggedObj instanceof DocElement) {
-                                let container = null;
-                                if (parentPanel.getData() instanceof Container) {
-                                    container = parentPanel.getData();
-                                } else {
-                                    let destObj = parentPanel.getData();
-                                    if (destObj instanceof DocElement) {
-                                        // get linked container if available (e.g. container of frame element),
-                                        // otherwise use the parent container
-                                        container = destObj.getLinkedContainer();
-                                        if (container === null) {
-                                            container = destObj.getContainer();
-                                        }
-                                    }
-                                }
-                                if (container !== null) {
-                                    moveItem = container.isElementAllowed(draggedObj.getElementType());
-                                    if (moveItem) {
-                                        if (draggedObj.getValue('containerId') !== container.getId()) {
-                                            draggedObj.checkBounds(draggedObj.getValue('xVal'), draggedObj.getValue('yVal'),
-                                                draggedObj.getValue('widthVal'), draggedObj.getValue('heightVal'),
-                                                container.getSize(), cmdGroup);
+                if (this.rb.isBrowserDragActive('panelItem') && this.rb.getBrowserDragId() !== this.id) {
+                    let dropInfo = this.getDropObjectInfo();
+                    if (dropInfo.allowDrop) {
+                        this.dragEnterCount--;
+                        itemDiv.removeClass('rbroMenuItemDragOver');
 
-                                            let cmd = new SetValueCmd(draggedObj.getId(), null, 'containerId',
-                                                container.getId(), SetValueCmd.type.internal, this.rb);
-                                            cmdGroup.addCommand(cmd);
-                                        }
-                                    }
-                                }
-                            } else {
-                                moveItem = true;
-                            }
+                        let cmdGroup = new CommandGroupCmd('Move panel item', this.rb);
 
-                            if (moveItem) {
-                                let cmd = new MovePanelItemCmd(draggedObj.getPanelItem(), parentPanel, pos, this.rb);
-                                cmdGroup.addCommand(cmd);
-                                this.rb.executeCommand(cmdGroup);
-                            }
+                        let draggedObj = this.rb.getDataObject(this.rb.getBrowserDragId());
+                        if (draggedObj instanceof DocElement && draggedObj.getValue('containerId') !== dropInfo.container.getId()) {
+                            draggedObj.checkBounds(draggedObj.getValue('xVal'), draggedObj.getValue('yVal'),
+                                draggedObj.getValue('widthVal'), draggedObj.getValue('heightVal'),
+                                dropInfo.container.getSize(), cmdGroup);
+
+                            let cmd = new SetValueCmd(draggedObj.getId(), null, 'containerId',
+                                dropInfo.container.getId(), SetValueCmd.type.internal, this.rb);
+                            cmdGroup.addCommand(cmd);
                         }
+                        let cmd = new MovePanelItemCmd(draggedObj.getPanelItem(), dropInfo.panel, dropInfo.position, this.rb);
+                        cmdGroup.addCommand(cmd);
+                        this.rb.executeCommand(cmdGroup);
+                        event.preventDefault();
+                        return false;
                     }
-                    event.preventDefault();
-                    return false;
                 }
             });
         
@@ -150,24 +113,6 @@ export default class MainPanelItem {
                     } else if (panelName === 'style') {
                         let cmd = new AddDeleteStyleCmd(true, {}, this.rb.getUniqueId(), this.getId(), -1, this.rb);
                         this.rb.executeCommand(cmd);
-                    } else if (panelName === 'band') {
-                        let obj = this.rb.getDataObject(this.getId());
-                        if (obj !== null) {
-                            let initialData = null;
-                            if (obj instanceof BandElement) {
-                                let linkedContainer = obj.getLinkedContainer();
-                                if (linkedContainer !== null) {
-                                    initialData = { containerId: linkedContainer.getId() };
-                                }
-                            } else {
-                                initialData = { containerId: this.getId() };
-                            }
-                            if (initialData !== null) {
-                                let cmd = new AddDeleteDocElementCmd(true,  DocElement.type.band, initialData,
-                                    this.rb.getUniqueId(), this.getId(), -1, this.rb);
-                                this.rb.executeCommand(cmd);
-                            }
-                        }
                     }
                     let newItem = this.children[this.children.length - 1];
                     this.rb.selectObject(newItem.getId(), true);
@@ -188,7 +133,7 @@ export default class MainPanelItem {
                     } else if (panelName === DocElement.type.text || panelName === DocElement.type.image ||
                             panelName === DocElement.type.line || panelName === DocElement.type.table ||
                             panelName === DocElement.type.pageBreak ||
-                            panelName === DocElement.type.frame || panelName === DocElement.type.band) {
+                            panelName === DocElement.type.frame || panelName === DocElement.type.section) {
                         if (this.getData() instanceof DocElement) {
                             cmd = new CommandGroupCmd('Delete', this);
                             this.getData().addCommandsForDelete(cmd);
@@ -214,9 +159,9 @@ export default class MainPanelItem {
             }
         });
         if (this.properties.hasChildren) {
-            itemDiv.addClass('rbroMenuItemNoChildren rbroMenuItemOpen');
-            nameDiv.prepend(`<div id="rbro_menu_item_children_toggle${this.id}" class="rbroMenuArrow rbroIcon-arrow-right"></div>`);
-            this.element.append($(`<ul id="rbro_menu_item_children${this.id}"></ul>`));
+            itemDiv.addClass('rbroMenuItemNoChildren');
+            nameDiv.append(`<div id="rbro_menu_item_children_toggle${this.id}" class="rbroMenuArrow rbroIcon-arrow-right"></div>`);
+            this.element.append($(`<ul id="rbro_menu_item_children${this.id}" class="rbroHidden"></ul>`));
         }
         itemDiv.prepend(nameDiv);
         this.element.prepend(itemDiv);
@@ -262,6 +207,16 @@ export default class MainPanelItem {
         if (this.properties.hasDetails) {
             this.rb.setDetailPanel(this.panelName, this.data);
         }
+    }
+
+    getParentIds() {
+        let ids = [];
+        let parent = this.getParent();
+        while (parent !== null) {
+            ids.push(parent.id);
+            parent = parent.getParent();
+        }
+        return ids;
     }
 
     openParentItems() {
@@ -375,5 +330,63 @@ export default class MainPanelItem {
     clear() {
         $(`#rbro_menu_item_children${this.id}`).empty();
         this.children = [];
+    }
+
+    getDropObjectInfo() {
+        let rv = { allowDrop: false, panel: null, position: -1, container: null };
+        let draggedObj = this.rb.getDataObject(this.rb.getBrowserDragId());
+        if (draggedObj !== null) {
+            let dropIntoParent = false;
+            if (draggedObj instanceof DocElement) {
+                if (this.data instanceof DocElement && this.data.isDroppingAllowed()) {
+                    // get linked container if available (e.g. container of frame element),
+                    // otherwise use the parent container
+                    rv.container = this.data.getLinkedContainer();
+                    if (rv.container === null) {
+                        rv.container = this.data.getContainer();
+                        dropIntoParent = true;
+                    }
+                } else if (this.panelName === 'band') {
+                    rv.container = this.data;
+                }
+                if (rv.container !== null && rv.container.isElementAllowed(draggedObj.getElementType())) {
+                    rv.allowDrop = true;
+                }
+            } else if (draggedObj instanceof Parameter) {
+                if (this.data instanceof Parameter) {
+                    // do not allow dragging array/map into other array/map parameter
+                    if ((draggedObj.getValue('type') !== Parameter.type.array && draggedObj.getValue('type') !== Parameter.type.map) ||
+                            this === this.rb.getMainPanel().getParametersItem()) {
+                        rv.allowDrop = true;
+                        dropIntoParent = true;
+                    }
+                } else if (this.panelName === 'parameter') {
+                    rv.allowDrop = true;
+                }
+            } else if (draggedObj instanceof Style) {
+                if (this.data instanceof Style) {
+                    rv.allowDrop = true;
+                    dropIntoParent = true;
+                } else if (this.panelName === 'style') {
+                    rv.allowDrop = true;
+                }
+            }
+
+            if (rv.allowDrop) {
+                if (dropIntoParent) {
+                    rv.panel = this.getParent();
+                    rv.position = this.getSiblingPosition() + 1;
+                } else {
+                    rv.panel = this;
+                    rv.position = 0;
+                }
+                if (rv.panel === null || (rv.panel === draggedObj.getPanelItem().getParent() &&
+                        rv.position === draggedObj.getPanelItem().getSiblingPosition())) {
+                        // do not allow drop if object is not moved (same parent and position)
+                        rv.allowDrop = false;
+                    }
+            }
+        }
+        return rv;
     }
 }

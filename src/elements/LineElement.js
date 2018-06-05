@@ -11,8 +11,8 @@ export default class LineElement extends DocElement {
         this.setInitialData(initialData);
     }
 
-    setup() {
-        super.setup();
+    setup(openPanelItem) {
+        super.setup(openPanelItem);
         this.createElement();
         this.updateDisplay();
         this.updateStyle();

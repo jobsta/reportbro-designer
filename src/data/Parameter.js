@@ -47,9 +47,9 @@ export default class Parameter {
             for (let child of this.children) {
                 let parameter = new Parameter(child.id || this.rb.getUniqueId(), child, this.rb);
                 this.rb.addParameter(parameter);
-                let panelItem = new MainPanelItem('parameter', '',
-                    this.panelItem, parameter, { hasChildren: true, showAdd: this.editable, showDelete: this.editable, draggable: true },
-                    this.rb);
+                let panelItem = new MainPanelItem(
+                    'parameter', this.panelItem, parameter,
+                    { hasChildren: true, showAdd: this.editable, showDelete: this.editable, draggable: true }, this.rb);
                 parameter.setPanelItem(panelItem);
                 this.panelItem.appendChild(panelItem);
                 parameter.setup();
@@ -271,18 +271,27 @@ export default class Parameter {
                 parametersToAppend = this.getChildren();
             }
             if (parametersToAppend.length > 0) {
-                parameters.push({ separator: true, separatorClass: 'rbroParameterGroup', name: this.name });
+                parameters.push({
+                    separator: true, id: this.id,
+                    separatorClass: 'rbroParameterGroup', name: this.name });
             }
             for (let parameter of parametersToAppend) {
-                parameters.push({ name: this.name + '.' + parameter.getName(), description: '' });
+                let paramName = this.name + '.' + parameter.getName();
+                parameters.push({
+                    name: paramName, nameLowerCase: paramName.toLowerCase(),
+                    id: parameter.getId(), description: '' });
             }
         } else if (this.type !== Parameter.type.array) {
             if (!Array.isArray(allowedTypes) || allowedTypes.indexOf(this.type) !== -1) {
-                parameters.push({ name: this.name, description: '' });
+                parameters.push({
+                    name: this.name, nameLowerCase: this.name.toLowerCase(),
+                    id: this.id, description: '' });
             }
         } else if (Array.isArray(allowedTypes) && allowedTypes.indexOf(this.type) !== -1) {
             // add array parameter only if explicitly specified in allowedTypes
-            parameters.push({ name: this.name, description: '' });
+            parameters.push({
+                name: this.name, nameLowerCase: this.name.toLowerCase(),
+                id: this.id, description: '' });
         }
     }
 
@@ -365,6 +374,20 @@ export default class Parameter {
             }
         }
         return rows;
+    }
+
+    /**
+     * Removes ids of possible child elements.
+     * @param {Object} data - map containing parameter data.
+     */
+    static removeIds(data) {
+        if (data.children) {
+            for (let child of data.children) {
+                if ('id' in child) {
+                    delete child.id;
+                }
+            }
+        }
     }
 }
 

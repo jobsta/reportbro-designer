@@ -26,8 +26,8 @@ export default class ImageElement extends DocElement {
         this.setInitialData(initialData);
     }
 
-    setup() {
-        super.setup();
+    setup(openPanelItem) {
+        super.setup(openPanelItem);
         this.createElement();
         if (this.image !== '') {
             // setImage must be called after createElement so load event handler of image element is triggered

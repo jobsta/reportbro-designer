@@ -145,6 +145,10 @@ export default class TableTextElement extends TextElement {
         return false;
     }
 
+    isDroppingAllowed() {
+        return false;
+    }
+
     /**
      * Returns maximum allowed width of element.
      * This is needed when the element is resized by dragging so the resized element does not overflow its container.
@@ -187,10 +191,11 @@ export default class TableTextElement extends TextElement {
     createElement() {
         this.el = $(`<td id="rbro_el${this.id}" class="rbroTableTextElement"></td>`)
             .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`))
-            );
+                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`)
+                    .append($(`<span id="rbro_el_content_text_data${this.id}"></span>`))
+            ));
         $(`#rbro_el_table_band${this.parentId}`).append(this.el);
-        $(`#rbro_el_content_text${this.id}`).text(this.content);
+        $(`#rbro_el_content_text_data${this.id}`).text(this.content);
         this.registerEventHandlers();
     }
 

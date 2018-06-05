@@ -1,3 +1,5 @@
+import * as utils from "../utils";
+
 /**
  * Style data object. Contains all text styles (alignment, border, etc.):
  * @class
@@ -31,6 +33,9 @@ export default class Style {
         this.paddingTop = '';
         this.paddingRight = '';
         this.paddingBottom = '';
+
+        this.borderWidthVal = 0;
+
         this.setInitialData(initialData);
     }
 
@@ -40,6 +45,7 @@ export default class Style {
                 this[key] = initialData[key];
             }
         }
+        this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
     }
 
     /**

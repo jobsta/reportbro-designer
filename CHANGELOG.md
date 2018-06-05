@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.12.1] - 2018-06-06
+
+### Features
+* section elements to iterate lists
+* column range spreadsheet property
+* copy & paste of parameters and styles
+* search filter in parameter popup
+* allow decimal values for border width
+* selection of elements by dragging a rectangle in the layout editor
+* better design for nested menu panel items
+
+### Bug Fixes
+* fix drag & drop and resizing of multiple selected elements when an element is not aligned on the grid
+* allow undo of pasted elements
+* keep position of nested elements when pasting frames
+* test if dragging menu panel is allowed to new destination (e.g. element cannot be dragged into table band or table text element)
+* only show horizontal/vertical alignment buttons if appropriate (container of selected elements must have same x/y-offset)
+
 ## [0.11.2] - 2018-04-10
 
 ### Features

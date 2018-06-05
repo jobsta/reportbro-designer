@@ -93,7 +93,7 @@ export default class LineElementPanel {
 
         elDiv = $('<div id="rbro_line_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_line_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPrintIf = $(`<textarea id="rbro_line_element_print_if" rows="1"></textarea>`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -111,7 +111,7 @@ export default class LineElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_line_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_line_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);

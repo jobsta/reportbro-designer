@@ -1,7 +1,7 @@
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
-import PopupWindow from "../PopupWindow";
+import PopupWindow from '../PopupWindow';
 
 /**
  * Panel to edit all table band properties.
@@ -17,7 +17,7 @@ export default class TableBandElementPanel {
     render() {
         let panel = $('<div id="rbro_table_band_element_panel" class="rbroHidden"></div>');
         let elDiv = $('<div class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_table_band_element_width">${this.rb.getLabel('docElementHeight')}:</label>`);
+        elDiv.append(`<label for="rbro_table_band_element_height">${this.rb.getLabel('docElementHeight')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elHeight = $('<input id="rbro_table_band_element_height">')
             .on('input', event => {
@@ -102,7 +102,7 @@ export default class TableBandElementPanel {
 
         elDiv = $('<div id="rbro_table_band_element_group_expression_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_table_band_element_group_expression">${this.rb.getLabel('tableElementGroupExpression')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elGroupExpression = $(`<textarea id="rbro_table_band_element_group_expression" rows="1"></textarea>`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -123,7 +123,7 @@ export default class TableBandElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_table_band_element_group_expression', 'parameter', PopupWindow.type.parameterSet);
+                        'rbro_table_band_element_group_expression', 'groupExpression', PopupWindow.type.parameterSet);
                 }
             });
         elFormField.append(elParameterButton);
@@ -133,7 +133,7 @@ export default class TableBandElementPanel {
 
         elDiv = $('<div id="rbro_table_band_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_table_band_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPrintIf = $(`<textarea id="rbro_table_band_element_print_if" rows="1"></textarea>`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -154,7 +154,7 @@ export default class TableBandElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_table_band_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_table_band_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);

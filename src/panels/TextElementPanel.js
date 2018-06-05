@@ -24,7 +24,7 @@ export default class TextElementPanel {
         let panel = $('<div id="rbro_text_element_panel" class="rbroHidden"></div>');
         let elDiv = $('<div id="rbro_text_element_content_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_content">${this.rb.getLabel('textElementContent')}:</label>`);
-        let elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        let elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elContent = $(`<textarea id="rbro_text_element_content" rows="1"></textarea>`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -44,7 +44,7 @@ export default class TextElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_text_element_content', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_text_element_content', 'content', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);
@@ -189,7 +189,7 @@ export default class TextElementPanel {
         let elPrintSectionDiv = $('<div id="rbro_text_element_print_section" class="rbroHidden"></div>');
         elDiv = $('<div id="rbro_text_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPrintIf = $(`<textarea id="rbro_text_element_print_if" rows="1"></textarea>`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -210,7 +210,7 @@ export default class TextElementPanel {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
-                        'rbro_text_element_print_if', 'parameter', PopupWindow.type.parameterAppend);
+                        'rbro_text_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
                 }
             });
         elFormField.append(elParameterButton);
@@ -308,7 +308,7 @@ export default class TextElementPanel {
         let elCondStyleSectionDiv = $('<div id="rbro_text_element_cs_section" class="rbroHidden"></div>');
         elDiv = $('<div id="rbro_text_element_cs_condition_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_cs_condition">${this.rb.getLabel('docElementConditionalStyleCondition')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elCondStyleCondition = $(`<textarea id="rbro_text_element_cs_condition" rows="1"></textarea>`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
@@ -408,6 +408,24 @@ export default class TextElementPanel {
             elDiv.append(elFormField);
             elSpreadsheetSectionDiv.append(elDiv);
 
+            elDiv = $('<div id="rbro_text_element_spreadsheet_colspan_row" class="rbroFormRow"></div>');
+            elDiv.append(`<label for="rbro_text_element_spreadsheet_colspan">${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
+            elFormField = $('<div class="rbroFormField"></div>');
+            let elSpreadsheetColspan = $(`<input id="rbro_text_element_spreadsheet_colspan">`)
+                .on('input', event => {
+                    let obj = this.rb.getDataObject(this.selectedObjId);
+                    if (obj !== null && obj.getValue('spreadsheet_colspan') !== elSpreadsheetColspan.val()) {
+                        let cmd = new SetValueCmd(this.selectedObjId, 'rbro_text_element_spreadsheet_colspan', 'spreadsheet_colspan',
+                            elSpreadsheetColspan.val(), SetValueCmd.type.text, this.rb);
+                        this.rb.executeCommand(cmd);
+                    }
+                });
+            utils.setInputPositiveInteger(elSpreadsheetColspan);
+            elFormField.append(elSpreadsheetColspan);
+            elFormField.append('<div id="rbro_text_element_spreadsheet_colspan_error" class="rbroErrorMessage"></div>');
+            elDiv.append(elFormField);
+            elSpreadsheetSectionDiv.append(elDiv);
+
             elDiv = $('<div id="rbro_text_element_spreadsheet_add_empty_row_row" class="rbroFormRow"></div>');
             elDiv.append(`<label for="rbro_text_element_spreadsheet_add_empty_row">${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
@@ -478,6 +496,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_style_id').prop('disabled', false);
             $('#rbro_text_element_spreadsheet_hide').prop('disabled', false);
             $('#rbro_text_element_spreadsheet_column').prop('disabled', false);
+            $('#rbro_text_element_spreadsheet_colspan').prop('disabled', false);
             $('#rbro_text_element_spreadsheet_add_empty_row').prop('disabled', false);
 
             $('#rbro_text_element_content').val(data.getValue('content'));
@@ -493,12 +512,14 @@ export default class TextElementPanel {
                 $('#rbro_text_element_always_print_on_same_page').prop('checked', data.getValue('alwaysPrintOnSamePage'));
                 $('#rbro_text_element_spreadsheet_hide').prop('checked', data.getValue('spreadsheet_hide'));
                 $('#rbro_text_element_spreadsheet_column').val(data.getValue('spreadsheet_column'));
+                $('#rbro_text_element_spreadsheet_colspan').val(data.getValue('spreadsheet_colspan'));
                 $('#rbro_text_element_spreadsheet_add_empty_row').prop('checked', data.getValue('spreadsheet_addEmptyRow'));
                 $('#rbro_text_element_print_if_row').show();
                 $('#rbro_text_element_remove_empty_element_row').show();
                 $('#rbro_text_element_always_print_on_same_page_row').show();
                 $('#rbro_text_element_spreadsheet_hide').show();
                 $('#rbro_text_element_spreadsheet_column').show();
+                $('#rbro_text_element_spreadsheet_colspan').show();
                 $('#rbro_text_element_spreadsheet_header').show();
                 $('#rbro_text_element_spreadsheet_section').show();
             } else {
@@ -513,6 +534,7 @@ export default class TextElementPanel {
                 }
                 $('#rbro_text_element_spreadsheet_hide').hide();
                 $('#rbro_text_element_spreadsheet_column').hide();
+                $('#rbro_text_element_spreadsheet_colspan').hide();
                 $('#rbro_text_element_spreadsheet_header').hide();
                 $('#rbro_text_element_spreadsheet_section').hide();
             }
@@ -574,6 +596,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_style_id').prop('disabled', true);
             $('#rbro_text_element_spreadsheet_hide').prop('disabled', true);
             $('#rbro_text_element_spreadsheet_column').prop('disabled', true);
+            $('#rbro_text_element_spreadsheet_colspan').prop('disabled', true);
             $('#rbro_text_element_spreadsheet_add_empty_row').prop('disabled', true);
             this.selectedObjId = null;
         }
@@ -646,7 +669,7 @@ export default class TextElementPanel {
                     if (!$('#rbro_text_element_cs_header').hasClass('rbroPanelSectionHeaderOpen')) {
                         $('#rbro_text_element_cs_header').trigger('click');
                     }
-                } else if (error.field === 'spreadsheet_column') {
+                } else if (error.field === 'spreadsheet_column' || error.field === 'spreadsheet_colspan') {
                     $('#rbro_text_element_spreadsheet_header').addClass('rbroError');
                     if (!$('#rbro_text_element_spreadsheet_header').hasClass('rbroPanelSectionHeaderOpen')) {
                         $('#rbro_text_element_spreadsheet_header').trigger('click');

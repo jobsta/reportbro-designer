@@ -68,6 +68,15 @@ export default class Container {
         return this.parent;
     }
 
+    setParent(parent) {
+        this.parent = parent;
+        this.level = 0;
+        while (parent !== null) {
+            this.level++;
+            parent = parent.getParent();
+        }
+    }
+
     isSelected() {
         if (this.owner !== null && this.rb.isSelectedObject(this.owner.getId())) {
             return true;
@@ -124,8 +133,8 @@ export default class Container {
 
     /**
      * Returns true if given absolute position is inside container.
-     * @param {Number} x - absolute x coordinate.
-     * @param {Number} y - absolute y coordinate.
+     * @param {Number} posX - absolute x coordinate.
+     * @param {Number} posY - absolute y coordinate.
      */
     isInside(posX, posY) {
         let offset = this.getOffset();

@@ -21,21 +21,13 @@ export default class TableElementPanel {
         let panel = $('<div id="rbro_table_element_panel" class="rbroHidden"></div>');
         let elDiv = $('<div class="rbroFormRow" id="rbro_table_element_data_source_row"></div>');
         elDiv.append(`<label for="rbro_table_element_data_source">${this.rb.getLabel('docElementDataSource')}:</label>`);
-        let elFormField = $('<div class="rbroFormField"></div>');
+        let elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elDataSource = $(`<textarea id="rbro_table_element_data_source" rows="1"></textarea>`)
             .on('input', event => {
                 if (this.rb.getDataObject(this.selectedObjId) !== null) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_table_element_data_source', 'dataSource',
                         elDataSource.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
-                }
-            })
-            .focus(event => {
-                let selectedObj = this.rb.getDataObject(this.selectedObjId);
-                if (selectedObj !== null) {
-                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj, [Parameter.type.array]),
-                        this.selectedObjId, 'rbro_table_element_data_source', 'dataSource',
-                        PopupWindow.type.parameterSet);
                 }
             })
             .blur(event => {
@@ -47,6 +39,15 @@ export default class TableElementPanel {
             });
         autosize(elDataSource);
         elFormField.append(elDataSource);
+        let elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj, [Parameter.type.array]), this.selectedObjId,
+                        'rbro_table_element_data_source', 'dataSource', PopupWindow.type.parameterSet);
+                }
+            });
+        elFormField.append(elParameterButton);
         elFormField.append('<div id="rbro_table_element_data_source_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
@@ -254,6 +255,22 @@ export default class TableElementPanel {
         panel.append(elDiv);
         utils.initColorPicker(elBorderColor, this.rb);
 
+        elDiv = $('<div class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_table_element_border_width">${this.rb.getLabel('styleBorderWidth')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elBorderWidth = $(`<input id="rbro_table_element_border_width">`)
+            .on('input', event => {
+                if (this.rb.getDataObject(this.getSelectedObjId()) !== null) {
+                    let cmd = new SetValueCmd(this.getSelectedObjId(), 'rbro_table_element_border_width',
+                        'borderWidth', elBorderWidth.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elBorderWidth);
+        elDiv.append(elFormField);
+        utils.setInputDecimal(elBorderWidth);
+        panel.append(elDiv);
+
         if (this.rb.getProperty('enableSpreadsheet')) {
             let elSpreadsheetHeader = $('<div class="rbroPanelSectionHeader"></div>');
             let elSpreadsheetHeaderIcon = $('<span id="rbro_table_element_spreadsheet_header_icon" class="rbroIcon-plus"></span>');
@@ -362,6 +379,7 @@ export default class TableElementPanel {
             $('#rbro_table_element_border_row').prop('disabled', false);
             $('#rbro_table_element_border_none').prop('disabled', false);
             $('#rbro_table_element_border_color').spectrum('enable');
+            $('#rbro_table_element_border_width').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_hide').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_column').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('disabled', false);
@@ -377,6 +395,7 @@ export default class TableElementPanel {
             $('#rbro_table_element_border').find('button').removeClass('rbroButtonActive');
             $('#rbro_table_element_border').find(`button[value="${data.getValue('border')}"]`).addClass('rbroButtonActive');
             $('#rbro_table_element_border_color').spectrum('set', data.getValue('borderColor'));
+            $('#rbro_table_element_border_width').val(data.getValue('borderWidth'));
             $('#rbro_table_element_spreadsheet_hide').prop('checked', data.getValue('spreadsheet_hide'));
             $('#rbro_table_element_spreadsheet_column').val(data.getValue('spreadsheet_column'));
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('checked', data.getValue('spreadsheet_addEmptyRow'));
@@ -395,6 +414,7 @@ export default class TableElementPanel {
             $('#rbro_table_element_border_row').prop('disabled', true);
             $('#rbro_table_element_border_none').prop('disabled', true);
             $('#rbro_table_element_border_color').spectrum('disable');
+            $('#rbro_table_element_border_width').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_hide').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_column').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('disabled', true);

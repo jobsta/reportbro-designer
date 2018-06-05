@@ -44,7 +44,7 @@ export default class AddDeleteStyleCmd {
         let parent = this.rb.getDataObject(this.parentId);
         if (parent !== null) {
             let style = new Style(this.id, this.initialData, this.rb);
-            let panelItem = new MainPanelItem('style', '', parent.getPanelItem(), style, { draggable: true }, this.rb);
+            let panelItem = new MainPanelItem('style', parent.getPanelItem(), style, { draggable: true }, this.rb);
             panelItem.openParentItems();
             style.setPanelItem(panelItem);
             parent.getPanelItem().insertChild(this.position, panelItem);

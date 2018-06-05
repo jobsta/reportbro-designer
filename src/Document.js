@@ -1,4 +1,5 @@
 import AddDeleteDocElementCmd from './commands/AddDeleteDocElementCmd';
+import Band from './container/Band';
 import DocumentProperties from './data/DocumentProperties';
 import DocElement from './elements/DocElement';
 import * as utils from './utils';
@@ -16,6 +17,7 @@ export default class Document {
         this.elHeader = null;
         this.elContent = null;
         this.elFooter = null;
+        this.elSelectionArea = null;
         this.gridVisible = showGrid;
         this.gridSize = 10;
         this.pdfPreviewExists = false;
@@ -24,6 +26,7 @@ export default class Document {
         this.dragging = false;
         this.dragElementType = null;
         this.dragType = DocElement.dragType.none;
+        this.dragObjectId = null;
         this.dragContainerId = null;
         this.dragLinkedContainerId = null;
         this.dragCurrentContainerId = null;
@@ -33,14 +36,22 @@ export default class Document {
         this.dragCurrentY = 0;
         this.dragSnapToGrid = false;
         this.dragEnterCount = 0;
+
+        // drawing rectangle to select multiple elements
+        this.selectionAreaStarted = false;
+        this.selectionAreaStartX = 0;
+        this.selectionAreaStartY = 0;
     }
 
     render() {
         let panel = $('#rbro_document_panel')
             .mousedown(event => {
-                if (this.rb.isDocElementSelected()) {
+                if (this.rb.isDocElementSelected() && !event.shiftKey) {
                     this.rb.deselectAll();
                 }
+                let offset = this.elDocContent.offset();
+                this.startSelectionArea(
+                    event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
             });
 
         let elDocTabs = $('<div id="rbro_document_tabs" class="rbroDocumentTabs"></div>')
@@ -89,6 +100,9 @@ export default class Document {
         this.elFooter.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandFooter')}</div>`));
         this.elDocContent.append(this.elFooter);
         elDoc.append(this.elDocContent);
+
+        this.elSelectionArea = $('<div id="rbro_selection_area" class="rbroHidden rbroSelectionArea"></div>');
+        this.elDocContent.append(this.elSelectionArea);
 
         this.initializeEventHandlers();
 
@@ -139,9 +153,28 @@ export default class Document {
                 this.dragCurrentX = event.originalEvent.pageX;
                 this.dragCurrentY = event.originalEvent.pageY;
                 this.dragSnapToGrid = !event.ctrlKey;
-                this.rb.updateSelectionDrag(event.originalEvent.pageX - this.dragStartX,
-                    event.originalEvent.pageY - this.dragStartY,
-                    this.dragType, null, this.dragSnapToGrid, false);
+
+                let dragObject = this.rb.getDataObject(this.dragObjectId);
+                if (dragObject !== null) {
+                    let dragDiff = dragObject.getDragDiff(
+                        event.originalEvent.pageX - this.dragStartX,
+                        event.originalEvent.pageY - this.dragStartY, this.dragType,
+                        (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
+                    this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, null, false);
+                }
+            }
+            if (this.selectionAreaStarted) {
+                let offset = this.elDocContent.offset();
+                let area = this.getSelectionArea(
+                    event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
+                let props = {
+                    left: this.rb.toPixel(area.left), top: this.rb.toPixel(area.top),
+                    width: this.rb.toPixel(area.width), height: this.rb.toPixel(area.height)};
+                this.elSelectionArea.css(props);
+                if (this.elSelectionArea.hasClass('rbroHidden')) {
+                    // show element after css properties are set
+                    this.elSelectionArea.removeClass('rbroHidden');
+                }
             }
         });
         this.elDocContent.on('dragover', event => {
@@ -359,11 +392,11 @@ export default class Document {
     }
 
     getElement(band) {
-        if (band === Document.band.header) {
+        if (band === Band.bandType.header) {
             return this.elHeader;
-        } else if (band === Document.band.content) {
+        } else if (band === Band.bandType.content) {
             return this.elContent;
-        } else if (band === Document.band.footer) {
+        } else if (band === Band.bandType.footer) {
             return this.elFooter;
         }
         return null;
@@ -377,12 +410,13 @@ export default class Document {
         return this.dragging && ((this.dragStartX !== this.dragCurrentX) || (this.dragStartY !== this.dragCurrentY));
     }
 
-    startDrag(x, y, containerId, linkedContainerId, elementType, dragType) {
+    startDrag(x, y, objectId, containerId, linkedContainerId, elementType, dragType) {
         this.dragging = true;
         this.dragStartX = this.dragCurrentX = x;
         this.dragStartY = this.dragCurrentY = y;
         this.dragElementType = elementType;
         this.dragType = dragType;
+        this.dragObjectId = objectId;
         this.dragContainerId = containerId;
         this.dragLinkedContainerId = linkedContainerId;
         this.dragCurrentContainerId = null;
@@ -392,35 +426,108 @@ export default class Document {
     stopDrag() {
         let diffX = this.dragCurrentX - this.dragStartX;
         let diffY = this.dragCurrentY - this.dragStartY;
-        if (diffX !== 0 || diffY !== 0) {
+        let dragObject = this.rb.getDataObject(this.dragObjectId);
+        if (dragObject !== null && (diffX !== 0 || diffY !== 0)) {
             let container = null;
             if (this.dragType === DocElement.dragType.element) {
                 container = this.rb.getDataObject(this.dragCurrentContainerId);
             }
-            this.rb.updateSelectionDrag(diffX, diffY, this.dragType, container, this.dragSnapToGrid, true);
+            let dragDiff = dragObject.getDragDiff(
+                diffX, diffY, this.dragType, (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
+            this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, container, true);
         } else {
-            this.rb.updateSelectionDrag(0, 0, this.dragType, null, this.dragSnapToGrid, false);
+            this.rb.updateSelectionDrag(0, 0, this.dragType, null, false);
         }
         this.dragging = false;
         this.dragType = DocElement.dragType.none;
-        this.dragContainerId = this.dragCurrentContainerId = null;
+        this.dragObjectId = null;
+        this.dragContainerId = null;
+        this.dragCurrentContainerId = null;
         $('.rbroElementContainer').removeClass('rbroElementDragOver');
     }
 
     startBrowserDrag(dragElementType) {
         this.dragEnterCount = 0;
+        this.dragObjectId = null;
         this.dragContainerId = null;
         this.dragLinkedContainerId = null;
         this.dragElementType = dragElementType;
     }
-}
 
-Document.band = {
-    none: -1,
-    header: 1,
-    content: 2,
-    footer: 3
-};
+    startSelectionArea(x, y) {
+        this.selectionAreaStarted = true;
+        this.selectionAreaStartX = x;
+        this.selectionAreaStartY = y;
+    }
+
+    stopSelectionArea(x, y, clearSelection) {
+        let area = this.getSelectionArea(x, y);
+        if (area.width > 10 && area.height > 10) {
+            let docElements = this.rb.getDocElements(true);
+            for (let docElement of docElements) {
+                // do not select table text and table band elements
+                if (docElement.isDraggingAllowed()) {
+                    let pos = docElement.getAbsolutePosition();
+                    if (area.left < (pos.x + docElement.getValue('widthVal')) &&
+                        (area.left + area.width) >= pos.x &&
+                        area.top < (pos.y + docElement.getValue('heightVal')) &&
+                        (area.top + area.height) >= pos.y) {
+                        let allowSelect = true;
+                        // do not allow selection of element if its container is already selected,
+                        // e.g. text inside selected frame element
+                        if (docElement.getContainerId()) {
+                            let container = docElement.getContainer();
+                            if (container !== null && container.isSelected()) {
+                                allowSelect = false;
+                            }
+                        }
+                        if (allowSelect) {
+                            this.rb.selectObject(docElement.getId(), clearSelection);
+                            clearSelection = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        this.selectionAreaStarted = false;
+        this.selectionAreaStartX = 0;
+        this.selectionAreaStartY = 0;
+        this.elSelectionArea.addClass('rbroHidden');
+    }
+
+    getSelectionArea(x, y) {
+        let area = {};
+        if (x > this.selectionAreaStartX) {
+            area.left = this.selectionAreaStartX;
+            area.width = x - this.selectionAreaStartX;
+        } else {
+            area.left = x;
+            area.width = this.selectionAreaStartX - x;
+        }
+        if (y > this.selectionAreaStartY) {
+            area.top = this.selectionAreaStartY;
+            area.height = y - this.selectionAreaStartY;
+        } else {
+            area.top = y;
+            area.height = this.selectionAreaStartY - y;
+        }
+        return area;
+    }
+
+    mouseUp(event) {
+        if (this.isDragging()) {
+            this.stopDrag();
+        }
+        if (this.selectionAreaStarted) {
+            let offset = this.elDocContent.offset();
+            this.stopSelectionArea(
+                event.originalEvent.pageX - offset.left,
+                event.originalEvent.pageY - offset.top,
+                !event.shiftKey);
+        }
+    }
+}
 
 Document.tab = {
     pdfLayout: 'pdfLayout',

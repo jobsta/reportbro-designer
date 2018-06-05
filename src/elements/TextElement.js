@@ -65,13 +65,16 @@ export default class TextElement extends DocElement {
 
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
+        this.spreadsheet_colspan = '';
         this.spreadsheet_addEmptyRow = false;
 
         this.setInitialData(initialData);
+
+        this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
     }
 
-    setup() {
-        super.setup();
+    setup(openPanelItem) {
+        super.setup(openPanelItem);
         this.createElement();
         this.updateDisplay();
         this.updateStyle();
@@ -86,6 +89,9 @@ export default class TextElement extends DocElement {
             if (field.substr(0, 3) === 'cs_') {
                 Style.setBorderValue(this, field, 'cs_', value, elSelector, isShown);
             } else {
+                if (field === 'borderWidth') {
+                    this.borderWidthVal = utils.convertInputToNumber(value);
+                }
                 Style.setBorderValue(this, field, '', value, elSelector, isShown);
             }
         }
@@ -103,7 +109,7 @@ export default class TextElement extends DocElement {
                 $('#rbro_text_element_style_settings').show();
             }
         } else if (field === 'cs_styleId') {
-            if (value != '') {
+            if (value !== '') {
                 $('#rbro_text_element_cs_style_settings').hide();
             } else {
                 $('#rbro_text_element_cs_style_settings').show();
@@ -128,7 +134,7 @@ export default class TextElement extends DocElement {
             'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }
 
     getElementType() {
@@ -161,7 +167,7 @@ export default class TextElement extends DocElement {
     }
 
     getContentSize(width, height, style) {
-        let borderWidth = utils.convertInputToNumber(style.getValue('borderWidth'));
+        let borderWidth = style.getValue('borderWidthVal');
         width -= utils.convertInputToNumber(style.getValue('paddingLeft')) + utils.convertInputToNumber(style.getValue('paddingRight'));
         if (style.getValue('borderLeft')) {
             width -= borderWidth;
@@ -206,7 +212,7 @@ export default class TextElement extends DocElement {
             borderStyleProperties['border-style'] += style.getValue('borderRight') ? ' solid' : ' none';
             borderStyleProperties['border-style'] += style.getValue('borderBottom') ? ' solid' : ' none';
             borderStyleProperties['border-style'] += style.getValue('borderLeft') ? ' solid' : ' none';
-            borderStyleProperties['border-width'] = style.getValue('borderWidth') + 'px';
+            borderStyleProperties['border-width'] = style.getValue('borderWidthVal') + 'px';
             borderStyleProperties['border-color'] = style.getValue('borderColor');
         } else {
             borderStyleProperties['border-style'] = 'none';
@@ -249,12 +255,14 @@ export default class TextElement extends DocElement {
         this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroTextElement"></div>`);
         // rbroContentContainerHelper contains border styles and alignment classes
         // rbroDocElementContentText contains specific styles
+        // span is needed to preserve whitespaces and word-wrap of actual text content
         this.el
             .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`))
-            );
+                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`)
+                    .append($(`<span id="rbro_el_content_text_data${this.id}"></span>`))
+            ));
         this.appendToContainer();
-        $(`#rbro_el_content_text${this.id}`).text(this.content);
+        $(`#rbro_el_content_text_data${this.id}`).text(this.content);
         super.registerEventHandlers();
     }
 
@@ -266,7 +274,7 @@ export default class TextElement extends DocElement {
         }
         $(`#rbro_menu_item_name${this.id}`).text(this.name);
         $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
-        $(`#rbro_el_content_text${this.id}`).text(value);
+        $(`#rbro_el_content_text_data${this.id}`).text(value);
     }
 
     /**

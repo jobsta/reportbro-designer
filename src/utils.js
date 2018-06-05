@@ -2,15 +2,15 @@ String.prototype.reverse = function () { return this.split('').reverse().join(''
 
 export function setInputInteger(el) {
     el.on('keyup', function() {
-        var nvalue = this.value.reverse().replace(/[^0-9\-]|\-(?=.)/g,'').reverse();
-        if (this.value != nvalue) this.value = nvalue;
+        var nvalue = this.value.reverse().replace(/[^0-9\-]|\-(?=.)/g, '').reverse();
+        if (this.value !== nvalue) this.value = nvalue;
     });
 }
 
 export function setInputPositiveInteger(el) {
     el.on('keyup', function() {
-        var nvalue = this.value.replace(/[^0-9]/g,'');
-        if (this.value!=nvalue) this.value = nvalue;
+        var nvalue = this.value.replace(/[^0-9]/g, '');
+        if (this.value !== nvalue) this.value = nvalue;
     });
 }
 
@@ -19,26 +19,26 @@ export function setInputDecimal(el) {
         var nvalue = this.value.reverse().replace(/[^0-9\-\.,]|[\-](?=.)|[\.,](?=[0-9]*[\.,])/g, '').reverse();
         var className = this.className;
         var pos = className.indexOf('decimalPlaces');
-        if (pos != -1) {
+        if (pos !== -1) {
             pos += 13;
             var pos2 = className.indexOf(' ', pos);
             var places;
-            if (pos2 != -1) {
+            if (pos2 !== -1) {
                 places = parseInt(className.substring(pos, pos2), 10);
             } else {
                 places = parseInt(className.substr(pos), 10);
             }
             if (!isNaN(places)) {
                 pos = nvalue.indexOf('.');
-                if (pos == -1) {
+                if (pos === -1) {
                     pos = nvalue.indexOf(',');
                 }
-                if (pos != -1 && (nvalue.length - 1 - pos) > places) {
+                if (pos !== -1 && (nvalue.length - 1 - pos) > places) {
                     nvalue = nvalue.substring(0, pos + places + 1);
                 }
             }
         }
-        if(this.value!=nvalue) this.value = nvalue;
+        if(this.value !== nvalue) this.value = nvalue;
     });
 }
 
@@ -55,14 +55,16 @@ export function checkInputDecimal(val, min, max) {
 }
 
 export function convertInputToNumber(val) {
-    if (val === '') {
-        return 0;
+    if (typeof(val) === 'number') {
+        return val;
     }
-    let ret = parseInt(val, 10);
-    if (isNaN(ret)) {
-        return 0;
+    if (typeof(val) === 'string' && val !== '') {
+        let rv = parseFloat(val.replace(',', '.'));
+        if (!isNaN(rv)) {
+            return rv;
+        }
     }
-    return ret;
+    return 0;
 }
 
 export function roundValueToInterval(val, interval) {

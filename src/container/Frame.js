@@ -25,7 +25,7 @@ export default class Frame extends Container {
      */
     isElementAllowed(elementType) {
         return elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.frame &&
-            elementType !== DocElement.type.band;
+            elementType !== DocElement.type.section;
     }
 
     /**
