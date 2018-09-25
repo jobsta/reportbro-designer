@@ -4,23 +4,19 @@ var CopyWebpackPlugin = require("copy-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var banner = 
-`Copyright (C) 2017 jobsta
+`Copyright (C) 2018 jobsta
 
 This file is part of ReportBro, a library to generate PDF and Excel reports.
-Demos can be found at https://www.reportbro.com.
+Demos can be found at https://www.reportbro.com
 
-ReportBro is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-ReportBro is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
+Dual licensed under AGPLv3 and ReportBro commercial license:
+https://www.reportbro.com/license
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program. If not, see https://www.gnu.org/licenses/
+
+Details for ReportBro commercial license can be found at
+https://www.reportbro.com/license/agreement
 `;
 
 

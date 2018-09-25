@@ -124,29 +124,6 @@ export default class Parameter {
         return null;
     }
 
-    /**
-     * Returns the full parameter name.
-     * In case parameter is child of a map/array parameter the returned name is parentName.name, otherwise only name.
-     * @param {[String]} parentName - use this name for parent instead of current parent name. If null the
-     * current parent name is used.
-     * @param {[String]} name - use this name for the parameter instead of current name. If null the
-     * current parameter name is used.
-     * @returns {String}
-     */
-    getFullName(parentName, name) {
-        if (name === null) {
-            name = this.getName();
-        }
-        let parent = this.getParent();
-        if (parent !== null) {
-            if (parentName === null) {
-                parentName = parent.getName();
-            }
-            return parentName + '.' + name;
-        }
-        return name;
-    }
-
     addError(error) {
         this.errors.push(error);
     }
@@ -171,18 +148,46 @@ export default class Parameter {
     /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
-     * @param {String} oldParameterName
-     * @param {String} newParameterName
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
-    addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
-        if (this.expression.indexOf(oldParameterName) !== -1) {
-            let cmd = new SetValueCmd(this.id, 'rbro_parameter_expression', 'expression',
-                utils.replaceAll(this.expression, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
-        }
+    addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_parameter_expression', 'expression', cmdGroup);
         for (let child of this.getChildren()) {
-            child.addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup);
+            child.addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup);
+        }
+    }
+
+    /**
+     * Adds SetValue command to command group parameter in case the specified parameter is used in the
+     * specified object field.
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
+     * @param {String} tagId
+     * @param {String} field
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
+     */
+    addCommandForChangedParameterName(parameter, newParameterName, tagId, field, cmdGroup) {
+        let paramParent = parameter.getParent();
+        let paramRef = null;
+        let newParamRef = null;
+        if (paramParent !== null && paramParent.getValue('type') === Parameter.type.map) {
+            paramRef = '${' + paramParent.getName() + '.' + parameter.getName() + '}';
+            newParamRef = '${' + paramParent.getName() + '.' + newParameterName + '}';
+        } else if (parameter.getValue('type') === Parameter.type.map) {
+            paramRef = '${' + parameter.getName() + '.';
+            newParamRef = '${' + newParameterName + '.';
+        } else {
+            paramRef = '${' + parameter.getName() + '}';
+            newParamRef = '${' + newParameterName + '}';
+        }
+
+        if (paramRef !== null && newParamRef !== null && this.getValue(field).indexOf(paramRef) !== -1) {
+            let cmd = new SetValueCmd(
+                this.id, tagId, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
+                SetValueCmd.type.text, this.rb);
+            cmdGroup.addCommand(cmd);
         }
     }
 

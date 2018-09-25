@@ -1,6 +1,7 @@
 import StylePanel from './StylePanel';
 import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
+import Band from '../container/Band';
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import TableTextElement from '../elements/TableTextElement';
@@ -199,9 +200,6 @@ export default class TextElementPanel {
                         elPrintIf.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
             });
         autosize(elPrintIf);
         elFormField.append(elPrintIf);
@@ -254,7 +252,7 @@ export default class TextElementPanel {
 
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_pattern">${this.rb.getLabel('textElementPattern')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPattern = $(`<input id="rbro_text_element_pattern">`)
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
@@ -264,22 +262,17 @@ export default class TextElementPanel {
                         elPattern.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-            })
-            .focus(event => {
+            });
+        elFormField.append(elPattern);
+        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
                 let selectedObj = this.rb.getDataObject(this.selectedObjId);
                 if (selectedObj !== null) {
                     this.rb.getPopupWindow().show(this.rb.getPatterns(), this.selectedObjId,
                         'rbro_text_element_pattern', 'pattern', PopupWindow.type.pattern);
                 }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
-            })
-            .mouseup(event => {
-                event.preventDefault();
-                event.stopPropagation();
             });
-        elFormField.append(elPattern);
+        elFormField.append(elParameterButton);
         elFormField.append('<div id="rbro_text_element_pattern_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
@@ -527,7 +520,7 @@ export default class TextElementPanel {
                 $('#rbro_text_element_remove_empty_element_row').hide();
                 $('#rbro_text_element_always_print_on_same_page_row').hide();
                 let tableBandObj = this.rb.getDataObject(data.parentId);
-                if (tableBandObj !== null && tableBandObj.getValue('tableBand') === 'header') {
+                if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
                     $('#rbro_text_element_print_if_row').show();
                 } else {
                     $('#rbro_text_element_print_if_row').hide();

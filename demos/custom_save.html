@@ -29,6 +29,7 @@ function saveReport() {
         data: JSON.stringify(report),
         type: "PUT", contentType: "application/json",
         success: function(data) {
+            $('#reportbro').reportBro('setModified', false);
             alert('report saved');
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -38,16 +39,16 @@ function saveReport() {
 }
     
 $(document).ready(function() {
-    $('#reportbro').reportBro({
+    var rb = $('#reportbro').reportBro({
+        //remove reportServerUrl if you want to use the default report server for a quick start
+        reportServerUrl: 'http://localhost:8000/reportbro/report/run',
         saveCallback: saveReport
-        // uncomment if you have your own reportbro-lib installed
-        // reportServerUrl: 'http://localhost:8000/reportbro/report/run',
     });
 
     // load report saved in your application database
-    var report = null; // get report from server
+    var report = null; // TODO: get report from server
     if (report !== null) {
-        $('#reportbro').reportBro('load', report);
+        rb.reportBro('load', report);
     }
 });
     </script> 

@@ -1,5 +1,6 @@
 import DocElement from './DocElement';
 import TextElement from './TextElement';
+import Band from '../container/Band';
 import * as utils from '../utils';
 
 /**
@@ -80,7 +81,7 @@ export default class TableTextElement extends TextElement {
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom'];
         let tableBandObj = this.rb.getDataObject(this.parentId);
-        if (tableBandObj !== null && tableBandObj.getValue('tableBand') === 'header') {
+        if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
             fields.push('printIf');
         }
         return fields;

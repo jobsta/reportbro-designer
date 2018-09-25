@@ -7,6 +7,10 @@ ReportBro Designer can be easily integrated into your web application. Everyone 
 
 See the ReportBro project website on https://www.reportbro.com for full documentation and demos.
 
+<p align="center">
+  <img alt="ReportBro Designer in action" src="https://www.reportbro.com/static/images/reportbro_designer_screenshot.png">
+</p>
+
 ## Installation
 
 + Download ReportBro Designer from https://www.reportbro.com/download
@@ -33,7 +37,7 @@ Include the ReportBro, jQuery, Autosize, JsBarcode, Spectrum JavaScript files as
 <script src="reportbro/reportbro.js"></script>
 ```
 
-Place an empty div within the <body> of a web page:
+Place an empty div within the `<body>` of a web page:
 ```html
 <div id="reportbro"></div>
 ```
@@ -56,6 +60,10 @@ Install Node.js and npm.
 Troubleshooting for Ubuntu/Linux: If you get an error like "/usr/bin/env: node: No such file or directory" you can easily fix it with a symbolic link:
 
 `ln -s /usr/bin/nodejs /usr/bin/node`
+
+Go to reportbro-designer root directory and install node modules:
+
+`npm install`
 
 ### development:
 

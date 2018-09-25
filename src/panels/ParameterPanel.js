@@ -28,33 +28,20 @@ export default class ParameterPanel {
                     if (elParameterName.val().trim() !== '') {
                         let newParameterName = elParameterName.val();
                         let cmdGroup = new CommandGroupCmd('Rename parameter');
-                        let oldName = obj.getFullName(null, null);
-                        let newName = obj.getFullName(null, newParameterName);
                         let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_name', 'name',
                             newParameterName, SetValueCmd.type.text, this.rb);
                         cmdGroup.addCommand(cmd);
-
-                        let namesToConvert = [{ oldName: oldName, newName: newName }];
-                        for (let child of obj.getChildren()) {
-                            oldName = child.getFullName(null, null);
-                            newName = child.getFullName(newParameterName, null);
-                            namesToConvert.push({ oldName: oldName, newName: newName });
-                        }
                         let parent = obj.getParent();
                         if (parent !== null) {
                             parent.addUpdateTestDataCmdForChangedParameter(obj.getName(), newParameterName, cmdGroup);
                         }
                         // add commands to convert all values containing the currently changed parameter
-                        for (let nameToConvert of namesToConvert) {
-                            let docElements = this.rb.getDocElements(true);
-                            for (let docElement of docElements) {
-                                docElement.addCommandsForChangedParameter(
-                                        '${' + nameToConvert.oldName + '}', '${' + nameToConvert.newName + '}', cmdGroup);
-                            }
-                            for (let parameter of this.rb.getParameters()) {
-                                parameter.addCommandsForChangedParameter(
-                                        '${' + nameToConvert.oldName + '}', '${' + nameToConvert.newName + '}', cmdGroup);
-                            }
+                        let docElements = this.rb.getDocElements(true);
+                        for (let docElement of docElements) {
+                            docElement.addCommandsForChangedParameterName(obj, newParameterName, cmdGroup);
+                        }
+                        for (let parameter of this.rb.getParameters()) {
+                            parameter.addCommandsForChangedParameterName(obj, newParameterName, cmdGroup);
                         }
                         this.rb.executeCommand(cmdGroup);
                     } else {
@@ -160,13 +147,6 @@ export default class ParameterPanel {
                         elPattern.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
-            })
-            .mouseup(event => {
-                event.preventDefault();
-                event.stopPropagation();
             });
         elFormField.append(elPattern);
         let elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')

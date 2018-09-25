@@ -354,9 +354,24 @@ export default class MainPanelItem {
                 }
             } else if (draggedObj instanceof Parameter) {
                 if (this.data instanceof Parameter) {
-                    // do not allow dragging array/map into other array/map parameter
-                    if ((draggedObj.getValue('type') !== Parameter.type.array && draggedObj.getValue('type') !== Parameter.type.map) ||
-                            this === this.rb.getMainPanel().getParametersItem()) {
+                    let parent = this.data.getParent();
+                    if (parent !== null) {
+                        if (parent.getValue('type') === Parameter.type.array) {
+                            if (draggedObj.getValue('type') !== Parameter.type.array &&
+                                    draggedObj.getValue('type') !== Parameter.type.map &&
+                                    draggedObj.getValue('type') !== Parameter.type.sum &&
+                                    draggedObj.getValue('type') !== Parameter.type.average) {
+                                rv.allowDrop = true;
+                                dropIntoParent = true;
+                            }
+                        } else if (parent.getValue('type') === Parameter.type.map) {
+                            if (draggedObj.getValue('type') !== Parameter.type.array &&
+                                    draggedObj.getValue('type') !== Parameter.type.map) {
+                                rv.allowDrop = true;
+                                dropIntoParent = true;
+                            }
+                        }
+                    } else {
                         rv.allowDrop = true;
                         dropIntoParent = true;
                     }

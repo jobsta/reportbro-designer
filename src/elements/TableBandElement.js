@@ -1,5 +1,6 @@
 import DocElement from './DocElement';
 import TableTextElement from './TableTextElement';
+import Band from '../container/Band';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
@@ -8,10 +9,10 @@ import * as utils from '../utils';
  * @class
  */
 export default class TableBandElement extends DocElement {
-    constructor(id, initialData, tableBand, rb) {
-        let name = (tableBand === 'header') ? rb.getLabel('bandHeader') : ((tableBand === 'footer') ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
+    constructor(id, initialData, bandType, rb) {
+        let name = (bandType === 'header') ? rb.getLabel('bandHeader') : ((bandType === 'footer') ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
         super(name, id, 0, 20, rb);
-        this.tableBand = tableBand;
+        this.bandType = bandType;
         this.repeatHeader = false;
         this.alwaysPrintOnSamePage = true;
         this.backgroundColor = '';
@@ -85,9 +86,9 @@ export default class TableBandElement extends DocElement {
      */
     getFields() {
         let fields = ['id', 'height', 'backgroundColor'];
-        if (this.tableBand === 'header') {
+        if (this.bandType === Band.bandType.header) {
             fields.push('repeatHeader');
-        } else if (this.tableBand === 'content') {
+        } else if (this.bandType === Band.bandType.content) {
             fields.push('alternateBackgroundColor');
             fields.push('groupExpression');
             fields.push('printIf');
@@ -129,7 +130,7 @@ export default class TableBandElement extends DocElement {
 
     createElement() {
         this.el = $(`<tr id="rbro_el_table_band${this.id}" class="rbroTableBandElement"></tr>`);
-        $(`#rbro_el_table_${this.tableBand}${this.parentId}`).append(this.el);
+        $(`#rbro_el_table_${this.bandType}${this.parentId}`).append(this.el);
     }
 
     remove() {

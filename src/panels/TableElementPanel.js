@@ -29,13 +29,6 @@ export default class TableElementPanel {
                         elDataSource.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
-            })
-            .mouseup(event => {
-                event.preventDefault();
-                event.stopPropagation();
             });
         autosize(elDataSource);
         elFormField.append(elDataSource);

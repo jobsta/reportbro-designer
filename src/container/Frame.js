@@ -55,6 +55,21 @@ export default class Frame extends Container {
         if (this.owner !== null) {
             width = this.owner.getValue('widthVal');
             height = this.owner.getValue('heightVal');
+        }
+        return { width: width, height: height };
+    }
+    
+    /**
+     * Returns container content size.
+     * This is the container minus optional borders, thus the available area for
+     * elements inside the frame.
+     * @returns {Object} width and height of container content area.
+     */
+    getContentSize() {
+        let width = 0, height = 0;
+        if (this.owner !== null) {
+            width = this.owner.getValue('widthVal');
+            height = this.owner.getValue('heightVal');
             let borderWidth = this.owner.getValue('borderWidthVal');
             if (this.owner.getValue('borderLeft')) {
                 width -= borderWidth;

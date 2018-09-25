@@ -1,7 +1,8 @@
-import Document from '../Document';
 import MovePanelItemCmd from '../commands/MovePanelItemCmd';
 import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import SetValueCmd from '../commands/SetValueCmd';
+import Band from '../container/Band';
+import Parameter from '../data/Parameter';
 import * as utils from '../utils';
 
 /**
@@ -61,7 +62,7 @@ export default class DocElement {
         let container = this.getContainer();
         if (container !== null) {
             // adapt position if new element is outside container
-            let containerSize = container.getSize();
+            let containerSize = container.getContentSize();
             if (this.xVal + this.widthVal > containerSize.width) {
                 this.xVal = containerSize.width - this.widthVal;
             }
@@ -170,9 +171,9 @@ export default class DocElement {
         return null;
     }
 
-    getContainerSize() {
+    getContainerContentSize() {
         let container = this.getContainer();
-        return (container !== null) ? container.getSize() : { width: 0, height: 0 };
+        return (container !== null) ? container.getContentSize() : { width: 0, height: 0 };
     }
 
     appendToContainer() {
@@ -383,7 +384,7 @@ export default class DocElement {
             rv.x = dragX - posX1;
             rv.y = dragY - posY1;
         } else {
-            let containerSize = this.getContainerSize();
+            let containerSize = this.getContainerContentSize();
             if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN || dragType === DocElement.dragType.sizerNE) {
                 dragY = posY1 + diffY;
                 if (gridSize !== 0) {
@@ -458,7 +459,7 @@ export default class DocElement {
         let posX2 = posX1 + this.widthVal;
         let posY2 = posY1 + this.heightVal;
         let maxWidth = this.getMaxWidth();
-        let containerSize = this.getContainerSize();
+        let containerSize = this.getContainerContentSize();
         if (dragType === DocElement.dragType.element) {
             posX1 += diffX;
             posX2 = posX1 + this.widthVal;
@@ -508,14 +509,14 @@ export default class DocElement {
             let containerSize = { width: 0, height: 0};
             if (dragContainer !== null && dragContainer.getId() !== this.getContainerId()) {
                 containerChanged = true;
-                containerSize = dragContainer.getSize();
+                containerSize = dragContainer.getContentSize();
                 if (container !== null) {
                     let relativeOffset = dragContainer.getOffsetTo(container);
                     posX1 -= relativeOffset.x;
                     posY1 -= relativeOffset.y;
                 }
             } else {
-                containerSize = container.getSize();
+                containerSize = container.getContentSize();
             }
             if (!containerChanged || dragContainer.isElementAllowed(this.getElementType())) {
                 this.checkBounds(posX1, posY1, width, height, containerSize, cmdGroup);
@@ -633,7 +634,7 @@ export default class DocElement {
      * @returns {Number}.
      */
     getMaxWidth() {
-        let containerSize = this.getContainerSize();
+        let containerSize = this.getContainerContentSize();
         return containerSize.width;
     }
 
@@ -658,13 +659,102 @@ export default class DocElement {
     }
 
     /**
+     * Returns all parameters of the data source (which must be an array parameter).
+     * Must be overridden when the element has a data source.
+     * @returns {[Object]} contains the data source name and all parameters of the data source.
+     * Is null in case element does not have a data source.
+     */
+    getDataSource() {
+        return null;
+    }
+
+    /**
+     * Returns all data source parameters of this element and any possible parent elements.
+     * @param {Parameter[]} dataSources - array where the data sources will be appended to.
+     * @param {DocElement} child - optional child element where the method was called from.
+     */
+    getAllDataSources(dataSources, child) {
+        if (this.getElementType() === DocElement.type.table || this.getElementType() == DocElement.type.section) {
+            if (child && child.getValue('bandType') === Band.bandType.content) {
+                let dataSource = this.getDataSource();
+                if (dataSource !== null) {
+                    dataSources.push(dataSource);
+                }
+            }
+        }
+        let panelItem = this.getPanelItem();
+        if (panelItem !== null) {
+            let parentPanelItem = panelItem.getParent();
+            if (parentPanelItem !== null && parentPanelItem.getData() instanceof DocElement) {
+                parentPanelItem.getData().getAllDataSources(dataSources, this);
+            }
+        }
+    }
+
+    /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
-     * @param {String} oldParameterName
-     * @param {String} newParameterName
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
-    addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
+    addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
+    }
+
+    /**
+     * Adds SetValue command to command group parameter in case the specified parameter is used in the
+     * specified object field.
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
+     * @param {String} tagId
+     * @param {String} field
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
+     */
+    addCommandForChangedParameterName(parameter, newParameterName, tagId, field, cmdGroup) {
+        let paramParent = parameter.getParent();
+        let dataSources = [];
+        let paramRef = null;
+        let newParamRef = null;
+        
+        this.getAllDataSources(dataSources, null);
+
+        if (paramParent !== null && paramParent.getValue('type') === Parameter.type.array) {
+            if (dataSources.length > 0 && dataSources[0].parameters.indexOf(parameter) !== -1) {
+                paramRef = '${' + parameter.getName() + '}';
+                newParamRef = '${' + newParameterName + '}';
+            }
+        } else {
+            if (paramParent !== null && paramParent.getValue('type') === Parameter.type.map) {
+                paramRef = '${' + paramParent.getName() + '.' + parameter.getName() + '}';
+                newParamRef = '${' + paramParent.getName() + '.' + newParameterName + '}';
+            } else if (parameter.getValue('type') === Parameter.type.map) {
+                paramRef = '${' + parameter.getName() + '.';
+                newParamRef = '${' + newParameterName + '.';
+            } else {
+                let isDataSourceParam = false;
+                for (let dataSource of dataSources) {
+                    for (let dataSourceParam of dataSource.parameters) {
+                        if (dataSourceParam.getName() === parameter.getName()) {
+                            // the changed parameter has the same name as a used data source parameter, therefor
+                            // we are not going to change the parameter reference because it references the data source parameter
+                            isDataSourceParam = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isDataSourceParam) {
+                    paramRef = '${' + parameter.getName() + '}';
+                    newParamRef = '${' + newParameterName + '}';
+                }
+            }
+        }
+
+        if (paramRef !== null && newParamRef !== null && this.getValue(field).indexOf(paramRef) !== -1) {
+            let cmd = new SetValueCmd(
+                this.id, tagId, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
+                SetValueCmd.type.text, this.rb);
+            cmdGroup.addCommand(cmd);
+        }
     }
 
     /**

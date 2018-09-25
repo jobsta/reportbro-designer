@@ -46,7 +46,7 @@
 @media only screen {
   /* don't hide the input from screen-readers and keyboard access
  */
-  .switch-light input {
+  .switch-light input[type=checkbox] {
     position: absolute;
     opacity: 0;
     z-index: 3;

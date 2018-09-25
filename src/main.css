@@ -8,6 +8,7 @@
 #reportbro {
     font-family: 'Open Sans', sans-serif;
     text-rendering: optimizelegibility;
+    outline: none;
     color: #444444;
     font-weight: 400;
     font-size: 16px;
@@ -49,6 +50,7 @@
 }
 
 .rbroContainer input, .rbroContainer select, .rbroContainer textarea {
+    color: #444444;
     width: 100%;
     box-sizing: border-box;
     height: 28px;
@@ -57,8 +59,10 @@
     background-color: #f1f3f4;
     transition: all 0.2s linear;
     padding: 0 4px;
+    margin: 0;
     outline: none;
     font-size: 12px;
+    font-weight: inherit;
 }
 
 .rbroContainer select {
@@ -69,6 +73,9 @@
     height: auto;
     width: auto;
     margin: 0;
+    padding: 0;
+    display: inline-block;
+    opacity: inherit;
 }
 
 .rbroContainer input[type=file] {
@@ -203,7 +210,7 @@
 
 .rbroMenuPanelSidebar .rbroActionButtons > div button {
     display: block;
-    margin-bottom: 2px;
+    margin: 0px 0px 2px 0;
 }
 
 .rbroMenuPanelSidebar .rbroContainer {
@@ -273,14 +280,19 @@
     background-color: rgba(116, 116, 130, 0.2);
 }
 
+.rbroMenuItem.rbroMenuItemActive {
+    background-color: #ffffff;
+    color: #444444;
+}
+
 .rbroMenuItem.rbroError {
     background-color: #FF9999;
     color: #444444;
 }
 
-.rbroMenuItem.rbroMenuItemActive {
+.rbroMenuItem.rbroMenuItemActive.rbroError {
     background-color: #ffffff;
-    color: #444444;
+    color: #FF3B30;
 }
 
 .rbroMenuItem.rbroMenuItemDragOver {
@@ -657,13 +669,24 @@ ul ul .rbroMenuItemText {
     user-select: none;
 }
 
-.rbroTableElement table {
+.rbroTableElement table, .rbroTableElement table thead, .rbroTableElement table tbody, .rbroTableElement table tfoot, .rbroTableElement table tr,
+.rbroTableElement table th, .rbroTableElement table td {
     border-collapse: collapse;
+    border-spacing: 0;
     position: relative;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    min-height: 0;
+    font-weight: 400;
+    color: inherit;
+    box-sizing: border-box;
+    background-color: transparent;
+    text-align: left;
 }
 
 .rbroTableTextElement {
@@ -797,6 +820,7 @@ ul ul .rbroMenuItemText {
     vertical-align: top;
     box-sizing: border-box;
     border: inherit;
+    margin: 0;
 }
 
 .rbroMenuItem .rbroButton {
@@ -809,7 +833,7 @@ button.rbroActionButton {
     font-size: 16px;
     font-weight: 400;
     padding: 6px 11px;
-    margin-right: 2px;
+    margin: 0 2px 0 0;
     border: 2px solid transparent;
     border-radius: 4px;
 }
@@ -937,10 +961,11 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
 /* Popup Window */
 .rbroPopupWindow {
     font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
     font-weight: 400;
     position: absolute;
-    background-color: white;
-    color: inherit;
+    background-color: #ffffff;
+    color: #444444;
     box-sizing: border-box;
     border: 2px solid #004864;
     z-index: 999999;
@@ -1001,17 +1026,30 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     color: #666666;
 }
 
+.rbroPopupWindowContent table, .rbroPopupWindowContent table thead, .rbroPopupWindowContent table tbody,
+.rbroPopupWindowContent table tr, .rbroPopupWindowContent table th, .rbroPopupWindowContent table td {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    text-align: left;
+    font-weight: 400;
+    color: inherit;
+    box-sizing: border-box;
+}
+
 .rbroPopupWindowContent table {
     width: 98%;
-    border-collapse: collapse;
     margin: 10px auto 0;
 }
 
 .rbroPopupWindowContent table th:not(:first-child) {
     background-color: #D4E6F4;
     border: 1px solid #444444;
-    padding: 5px 0;
+    padding: 5px 2px;
     font-weight: 600;
+    text-align: center;
 }
 
 .rbroPopupWindowContent table th:first-child {
@@ -1022,9 +1060,23 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     margin-left: 5px;
 }
 
-.rbroPopupWindowContent table td {
+.rbroPopupWindowContent table td:not(:first-child) {
     border: 1px solid #444444;
-    padding: 0;
+}
+
+.rbroPopupWindowContent table input, .rbroPopupWindowContent table input:focus {
+    color: #444444;
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    padding: 4px;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 400;
+    display: inline-block;
+    opacity: 1;
 }
 
 .rbroPopupWindowContent table td.rbroHasFocus {
@@ -1036,23 +1088,17 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     padding: 2px;
 }
 
-
-.rbroPopupWindowContent table input, .rbroPopupWindowContent table input:focus {
-    width: 100%;
-    box-sizing: border-box;
-    height: 30px;
-    padding: 4px;
-    border: none;
-    font-size: 12px;
-}
-
 .rbroPopupWindowContent table .rbroButton {
     vertical-align: baseline;
 }
 
-.rbroPopupWindowButton.rBFullWidthButton {
-    width: 96%;
-    margin-left: 3%;
+.rbroFullWidthButton {
+    display: block;
+    margin: 0 12px 10px 38px;
+}
+
+.rbroFullWidthButton .rbroPopupWindowButton {
+    width: 100%;
 }
 
 .rbroPopupWindowButton {
@@ -1068,22 +1114,25 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     color: #004864;
 }
 
-.rbroPopupSearch {
+.rbroPopupSearch, .rbroPopupSearch:focus {
     width: 100%;
     position: relative;
     top: 0;
     left: 0;
     height: 28px;
     box-sizing: border-box;
-    border: 1px solid rgba(0,0,0,0.1);
+    border-style: none none solid none;
+    border-width: 1px;
+    border-color: rgba(0,0,0,0.1);
     transition: all 0.2s linear;
     padding: 0 4px;
     outline: none;
     font-size: 12px;
+    border-radius: 4px 4px 0 0 ;
 }
 
 .rbroPopupSearch:focus {
-    border: 1px solid #004864;
+    border-color: #004864;
 }
 /* ReportBro spectrum color picker */
 .rbroColorPickerContainer {

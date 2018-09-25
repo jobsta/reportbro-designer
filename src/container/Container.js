@@ -132,6 +132,14 @@ export default class Container {
     }
 
     /**
+     * Returns container content size.
+     * @returns {Object} width and height of container content area.
+     */
+    getContentSize() {
+        return { width: 0, height: 0 };
+    }
+
+    /**
      * Returns true if given absolute position is inside container.
      * @param {Number} posX - absolute x coordinate.
      * @param {Number} posY - absolute y coordinate.

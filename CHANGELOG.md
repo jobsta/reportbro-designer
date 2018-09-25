@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.0.0] - 2018-09-25
+
+### Bug Fixes
+* allow edit text element pattern field and add button to open pattern popup window
+* do not show search field in pattern popup
+* fix drag & drop of collection/list parameter in menu panel
+* fix updating parameter references when renaming a parameter
+* fix dragging element into frame with border
+
+### Changes
+* show separator for data source parameters in parameter popup window
+* make sure there is enough space for popup below input, otherwise just show it over input field
+* setModified method to change modified status (defines if save button is enabled)
+* return ReportBro instance when ReportBro is initialized
+
 ## [0.12.1] - 2018-06-06
 
 ### Features

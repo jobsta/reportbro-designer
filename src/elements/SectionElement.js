@@ -1,11 +1,8 @@
 import DocElement from './DocElement';
 import SectionBandElement from './SectionBandElement';
-import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
-import SetValueCmd from '../commands/SetValueCmd';
 import Band from '../container/Band';
+import Parameter from '../data/Parameter';
 import MainPanelItem from '../menu/MainPanelItem';
-import Document from '../Document';
-import * as utils from '../utils';
 
 /**
  * Section element. Sections can be added to the content band and contain a content band and optional
@@ -272,41 +269,34 @@ export default class SectionElement extends DocElement {
     }
 
     /**
-     * Returns all child parameters of the data source parameter (which must be an array parameter).
-     * @returns {Parameter[]}
+     * Returns all parameters of the data source (which must be an array parameter).
+     * @returns {[Object]} contains the data source name and all parameters of the data source.
      */
-    getDataParameters() {
+    getDataSource() {
         let parameters = [];
         let dataSource = this.dataSource.trim();
+        let dataSourceParameter = '';
         if (dataSource.length >= 3 && dataSource.substr(0, 2) === '${' &&
                 dataSource.charAt(dataSource.length - 1) === '}') {
-            let dataSourceParameter = dataSource.substring(2, dataSource.length - 1);
+            dataSourceParameter = dataSource.substring(2, dataSource.length - 1);
             let param = this.rb.getParameterByName(dataSourceParameter);
-            if (param !== null) {
+            if (param !== null && param.getValue('type') === Parameter.type.array) {
                 parameters = param.getChildren();
             }
         }
-        return parameters;
+        return { name: dataSourceParameter, parameters: parameters };
     }
 
     /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
-     * @param {String} oldParameterName
-     * @param {String} newParameterName
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
-    addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
-        if (this.dataSource.indexOf(oldParameterName) !== -1) {
-            let cmd = new SetValueCmd(this.id, 'rbro_section_element_data_source', 'dataSource',
-                utils.replaceAll(this.dataSource, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
-        }
-        if (this.printIf.indexOf(oldParameterName) !== -1) {
-            let cmd = new SetValueCmd(this.id, 'rbro_band_element_print_if', 'printIf',
-                utils.replaceAll(this.printIf, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
-        }
+    addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_section_element_data_source', 'dataSource', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_section_element_print_if', 'printIf', cmdGroup);
     }
 
     toJS() {

@@ -136,20 +136,12 @@ export default class BarCodeElement extends DocElement {
     /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
-     * @param {String} oldParameterName
-     * @param {String} newParameterName
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
-    addCommandsForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
-        if (this.content.indexOf(oldParameterName) !== -1) {
-            let cmd = new SetValueCmd(this.id, 'rbro_bar_code_element_content', 'content',
-                utils.replaceAll(this.source, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
-        }
-        if (this.printIf.indexOf(oldParameterName) !== -1) {
-            let cmd = new SetValueCmd(this.id, 'rbro_bar_code_element_print_if', 'printIf',
-                utils.replaceAll(this.printIf, oldParameterName, newParameterName), SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
-        }
+    addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_bar_code_element_content', 'content', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_bar_code_element_print_if', 'printIf', cmdGroup);
     }
 }

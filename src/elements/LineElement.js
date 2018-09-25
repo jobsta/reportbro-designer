@@ -72,4 +72,15 @@ export default class LineElement extends DocElement {
         this.appendToContainer();
         super.registerEventHandlers();
     }
+
+    /**
+     * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
+     * the object fields.
+     * @param {Parameter} parameter - parameter which will be renamed.
+     * @param {String} newParameterName - new name of the parameter.
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
+     */
+    addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_line_element_print_if', 'printIf', cmdGroup);
+    }
 }

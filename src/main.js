@@ -1,21 +1,17 @@
 //
-// Copyright (C) 2017 jobsta
+// Copyright (C) 2018 jobsta
 //
 // This file is part of ReportBro, a library to generate PDF and Excel reports.
-// Demos can be found at https://reportbro.com.
+// Demos can be found at https://www.reportbro.com
 //
-// ReportBro is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// ReportBro is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU Affero General Public License for more details.
+// Dual licensed under AGPLv3 and ReportBro commercial license:
+// https://www.reportbro.com/license
 //
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see https://www.gnu.org/licenses/
+//
+// Details for ReportBro commercial license can be found at
+// https://www.reportbro.com/license/agreement
 //
 
 
@@ -23,7 +19,7 @@ import ReportBro from './ReportBro';
 
 $.fn.reportBro = function(options) {
     var args = Array.prototype.slice.call(arguments, 1); // arguments for method call
-    var ret = this; // function return value (this jQuery obj by default)
+    var rv = null;
 
     this.each(function(i, _element) {
         var element = $(_element);
@@ -35,21 +31,24 @@ $.fn.reportBro = function(options) {
             if (reportBro && $.isFunction(reportBro[options])) {
                 currentResult = reportBro[options].apply(reportBro, args);
                 if (i === 0) {
-                    ret = currentResult;
+                    rv = currentResult;
                 }
                 if (options === 'destroy') {
                     element.removeData('reportBro');
                 }
             }
-        }
-        // new ReportBro instance
-        else if (!reportBro) {
-            reportBro = new ReportBro(element, options);
-            element.data('reportBro', reportBro);
-            reportBro.render();
-            reportBro.setup();
+        } else {
+            // new ReportBro instance
+            if (!reportBro) {
+                reportBro = new ReportBro(element, options);
+                element.data('reportBro', reportBro);
+                reportBro.render();
+                reportBro.setup();
+            }
+            // return ReportBro instance
+            rv = reportBro;
         }
     });
     
-    return ret;
+    return rv;
 };

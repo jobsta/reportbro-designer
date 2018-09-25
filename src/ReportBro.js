@@ -164,17 +164,16 @@ export default class ReportBro {
             pageMargins: 'Page margins',
             pageWidth: 'width',
             parameter: 'Parameter',
-            parameterExpression: 'Expression',
-            parameterListType: 'List type',
-            parameterName: 'Name',
-            parameterPattern: 'Pattern',
-            parameters: 'Parameters',
             parameterAddTestData: 'Add row',
             parameterArrayItemType: 'List item type',
             parameterEditTestData: 'Edit',
             parameterEditTestDataNoFields: 'No fields defined for this list',
             parameterEval: 'Evaluate',
+            parameterExpression: 'Expression',
+            parameterListType: 'List type',
+            parameterName: 'Name',
             parameterNullable: 'Nullable',
+            parameterPattern: 'Pattern',
             parameterSearchPlaceholder: 'Search parameters...',
             parameterTestData: 'Test data',
             parameterTestDataDatePattern: 'YYYY-MM-DD',
@@ -189,6 +188,8 @@ export default class ReportBro {
             parameterTypeSimpleArray: 'Simple List',
             parameterTypeString: 'Text',
             parameterTypeSum: 'Sum',
+            parameters: 'Parameters',
+            parametersDataSource: 'Data source parameters',
             patternCurrencySymbol: 'Pattern currency symbol',
             patternDate1: 'day.month.year, e.g. 1.6.1980',
             patternDate2: 'day.month.year (2-digit), hour(24h):minute, e.g. 1.6.80, 14:30',
@@ -523,12 +524,12 @@ export default class ReportBro {
                                                 val = obj.getValue('yVal') - 1;
                                             }
                                         } else if (event.which === 39) {
-                                            let containerSize = obj.getContainerSize();
+                                            let containerSize = obj.getContainerContentSize();
                                             if ((obj.getValue('xVal') + obj.getValue('widthVal')) < containerSize.width) {
                                                 val = obj.getValue('xVal') + 1;
                                             }
                                         } else if (event.which === 40) {
-                                            let containerSize = obj.getContainerSize();
+                                            let containerSize = obj.getContainerContentSize();
                                             if ((obj.getValue('yVal') + obj.getValue('heightVal')) < containerSize.height) {
                                                 val = obj.getValue('yVal') + 1;											
                                             }
@@ -686,33 +687,37 @@ export default class ReportBro {
     /**
      * Returns a list of parameter items.
      * Used for parameter popup window.
-     * @param {DocElement} docElement - adds all parameters available for this element, e.g. array field parameters
-     * of a table data source.
+     * @param {DocElement|Parameter} obj - adds all parameters available for this object (which is either a doc element or a parameter).
+     * For doc elements the parameters from the data source are included (e.g. array field parameters of a table data source).
      * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
      * parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
      * optional separator (Boolean).
      */
-    getParameterItems(docElement, allowedTypes) {
+    getParameterItems(obj, allowedTypes) {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
-        parameters.push({ separator: true, name: this.getLabel('parameters') });
-        let panelItem = docElement.getPanelItem();
-        while (panelItem !== null) {
-            if (panelItem !== null && panelItem.getData() instanceof TableBandElement &&
-                    panelItem.getData().getValue('tableBand') === 'content') {
-                if (panelItem.getParent() !== null && panelItem.getParent().getData() instanceof TableElement) {
-                    for (let dataParameter of panelItem.getParent().getData().getDataParameters()) {
-                        dataParameter.appendParameterItems(parameters, allowedTypes);
+        // dataSourceIndex is only needed for separator id which is used to hide the separator
+        // when there are no data source parameters available (due to search filter)
+        let dataSourceIndex = 0;
+        let dataSources = [];
+        if (obj instanceof DocElement) {
+            obj.getAllDataSources(dataSources, null);
+            for (let dataSource of dataSources) {
+                if (dataSource.parameters.length > 0) {
+                    parameters.push({
+                        separator: true, separatorClass: 'rbroParameterDataSourceGroup', id: 'ds' + dataSourceIndex,
+                        name: this.getLabel('parametersDataSource')
+                    });
+                    dataSourceIndex++;
+                    for (let dataSourceParameter of dataSource.parameters) {
+                        dataSourceParameter.appendParameterItems(parameters, allowedTypes);
                     }
                 }
-            } else if (panelItem !== null && panelItem.getData() instanceof SectionElement) {
-                for (let dataParameter of panelItem.getData().getDataParameters()) {
-                    dataParameter.appendParameterItems(parameters, allowedTypes);
-                }
             }
-            panelItem = panelItem.getParent();
         }
+
+        parameters.push({ separator: true, name: this.getLabel('parameters') });
         let mapParameters = []; // add all parameters of collections at end of list with a header containing the collection name
         for (let parameterItem of parameterItems) {
             let parameter = parameterItem.getData();
@@ -1429,7 +1434,17 @@ export default class ReportBro {
     ///////////////////////////////////////////////////////////////////////////
     // API functions
     ///////////////////////////////////////////////////////////////////////////
-    
+
+    /**
+     * Sets the internal modified flag.
+     * If true the save button is enabled, otherwise the save button is disabled.
+     * @param {Boolean} modified
+     */
+    setModified(modified) {
+        this.modified = modified;
+        this.updateMenuButtons();
+    }
+
     /**
      * Returns report object containing everything needed for the report.
      * @returns {Object}
@@ -1455,7 +1470,6 @@ export default class ReportBro {
     save() {
         if (this.properties.saveCallback) {
             this.properties.saveCallback();
-            this.modified = false;
         } else if (this.properties.localStorageReportKey) {
             if ('localStorage' in window && window['localStorage'] !== null) {
                 try {

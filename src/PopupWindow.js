@@ -67,11 +67,13 @@ export default class PopupWindow {
             $('body').append($('<div id="rbro_background_overlay" class="rbroBackgroundOverlay"></div>'));
             $('body').addClass('rbroFixedBackground'); // no scroll bars for background while popup is shown
         } else {
-            elSearch = $(`<input class="rbroPopupSearch" placeholder="${this.rb.getLabel('parameterSearchPlaceholder')}">`)
-                .on('input', event => {
-                    this.filterParameters(elSearch.val());
-                });
-            this.elContent.append(elSearch);
+            if (type === PopupWindow.type.parameterSet || type === PopupWindow.type.parameterAppend) {
+                elSearch = $(`<input class="rbroPopupSearch" placeholder="${this.rb.getLabel('parameterSearchPlaceholder')}">`)
+                    .on('input', event => {
+                        this.filterParameters(elSearch.val());
+                    });
+                this.elContent.append(elSearch);
+            }
             let ul = $('<ul></ul>')
                 .mousedown(event => {
                     // prevent default so blur event of input is not triggered,
@@ -128,7 +130,10 @@ export default class PopupWindow {
             let top = offset.top;
             // test if popup window should be shown above or below input field
             if (top < (winHeight / 2) || top < 300) {
-                top += this.input.height();
+                // make sure there is enough space for popup below input, otherwise just show it over input field
+                if ((top + this.input.height() + 300) < winHeight) {
+                    top += this.input.height();
+                }
             } else {
                 top -= 300;
             }
@@ -168,7 +173,7 @@ export default class PopupWindow {
 
     addTestDataRow(tableBody, parameters, testData) {
         let newRow = $('<tr></tr>');
-        newRow.append($('<th></th>').append($('<div class="rbroButton rbroDeleteButton rbroIcon-cancel"></div>')
+        newRow.append($('<td></td>').append($('<div class="rbroButton rbroDeleteButton rbroIcon-cancel"></div>')
             .click(event => {
                 $(event.target).parent().parent().remove();
             })
@@ -293,7 +298,7 @@ export default class PopupWindow {
         }
         table.append(tableBody);
         div.append(table);
-        div.append($(`<div class="rbroButton rbroPopupWindowButton rBFullWidthButton">${this.rb.getLabel('parameterAddTestData')}</div>`)
+        div.append($(`<div class="rbroFullWidthButton"><div class="rbroButton rbroPopupWindowButton">${this.rb.getLabel('parameterAddTestData')}</div></div>`)
             .click(event => {
                 this.addTestDataRow(tableBody, this.parameters, null);
             })
@@ -307,24 +312,22 @@ export default class PopupWindow {
      * @param {String} searchVal - search value.
      */
     filterParameters(searchVal) {
-        let currentGroupId = -1;
+        let currentGroupId = null;
         let groupCount = 0;
         if (this.items !== null) {
             searchVal = searchVal.toLowerCase();
             for (let item of this.items) {
                 if (item.separator) {
-                    if (item.id) {
-                        if (currentGroupId !== -1) {
-                            // hide groups (parameter maps) if they do not contain any visible items
-                            if (groupCount > 0) {
-                                $('#parameter_group_' + currentGroupId).show();
-                            } else {
-                                $('#parameter_group_' + currentGroupId).hide();
-                            }
+                    if (currentGroupId !== null) {
+                        // hide groups (data source parameters and parameter maps) if they do not contain any visible items
+                        if (groupCount > 0) {
+                            $('#parameter_group_' + currentGroupId).show();
+                        } else {
+                            $('#parameter_group_' + currentGroupId).hide();
                         }
-                        currentGroupId = item.id;
-                        groupCount = 0;
                     }
+                    currentGroupId = item.id ? item.id : null;
+                    groupCount = 0;
                 } else {
                     if (item.nameLowerCase.indexOf(searchVal) !== -1) {
                         $('#parameter_' + item.id).show();
@@ -336,7 +339,7 @@ export default class PopupWindow {
                     }
                 }
             }
-            if (currentGroupId !== -1) {
+            if (currentGroupId !== null) {
                 if (groupCount > 0) {
                     $('#parameter_group_' + currentGroupId).show();
                 } else {

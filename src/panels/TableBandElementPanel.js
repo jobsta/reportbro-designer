@@ -1,5 +1,5 @@
-import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
+import Band from '../container/Band';
 import * as utils from '../utils';
 import PopupWindow from '../PopupWindow';
 
@@ -143,9 +143,6 @@ export default class TableBandElementPanel {
                         elPrintIf.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
             });
         autosize(elPrintIf);
         elFormField.append(elPrintIf);
@@ -186,13 +183,13 @@ export default class TableBandElementPanel {
 
             $('#rbro_table_band_element_height').val(data.getValue('height'));
             $('#rbro_table_band_element_background_color').spectrum("set", data.getValue('backgroundColor'));
-            if (data.getValue('tableBand') === 'header') {
+            if (data.getValue('bandType') === Band.bandType.header) {
                 $('#rbro_table_band_element_repeat_header').prop('checked', data.getValue('repeatHeader'));
                 $('#rbro_table_band_element_repeat_header_row').show();
             } else {
                 $('#rbro_table_band_element_repeat_header_row').hide();
             }
-            if (data.getValue('tableBand') === 'content') {
+            if (data.getValue('bandType') === Band.bandType.content) {
                 $('#rbro_table_band_element_alternate_background_color').spectrum("set", data.getValue('alternateBackgroundColor'));
                 $('#rbro_table_band_element_always_print_on_same_page').prop('checked', data.getValue('alwaysPrintOnSamePage'));
                 $('#rbro_table_band_element_group_expression').val(data.getValue('groupExpression'));

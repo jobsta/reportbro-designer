@@ -99,6 +99,14 @@ export default class Band extends Container {
         return { width: width, height: height };
     }
     
+    /**
+     * Returns container content size. Same as container size.
+     * @returns {Object} width and height of container.
+     */
+    getContentSize() {
+        return this.getSize();
+    }
+    
     isInside(posX, posY) {
         if (this.section && this.owner !== null && this.owner && !this.owner.isVisible()) {
             return false;
