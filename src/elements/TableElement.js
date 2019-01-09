@@ -51,6 +51,7 @@ export default class TableElement extends DocElement {
         this.footerData = this.createBand('footer', -1, null);
         this.setupComplete = true;
         this.updateWidth();
+        this.updateHeight();
         this.updateStyle();
         this.updateName();
         if (openPanelItem) {
@@ -65,7 +66,7 @@ export default class TableElement extends DocElement {
         let panelItemProperties = { hasChildren: true, showDelete: false };
         if (dataValues) {
             data = dataValues;
-        } else if (this[dataKey] && (band !== 'content' || index < this[dataKey].length)) {
+        } else if (this[dataKey] && (band !== 'content' || (index !== -1 && index < this[dataKey].length))) {
             if (band === 'content') {
                 data = this[dataKey][index];
             } else {
@@ -89,7 +90,7 @@ export default class TableElement extends DocElement {
         this.panelItem.appendChild(panelItemBand);
         bandElement.setup();
         let columns = utils.convertInputToNumber(this.columns);
-        bandElement.createColumns(columns, false);
+        bandElement.createColumns(columns, false, -1, false);
         panelItemBand.open();
 
         if (band === 'header') {
@@ -147,6 +148,10 @@ export default class TableElement extends DocElement {
                 this.borderWidthVal = utils.convertInputToNumber(value);
             }
             this.updateStyle();
+        }
+
+        if (field === 'header' || field === 'footer' || field === 'contentRows') {
+            this.updateHeight();
         }
     }
 
@@ -213,6 +218,7 @@ export default class TableElement extends DocElement {
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
+            'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }
 
@@ -318,6 +324,26 @@ export default class TableElement extends DocElement {
     }
 
     /**
+     * Update table height based on height of available bands.
+     */
+    updateHeight() {
+        if (this.setupComplete) {
+            let height = 0;
+            if (this.header) {
+                height += this.headerData.getHeight();
+            }
+            for (let i=0; i < this.contentDataRows.length; i++) {
+                height += this.contentDataRows[i].getHeight();
+            }
+            if (this.footer) {
+                height += this.footerData.getHeight();
+            }
+            this.height = '' + height;
+            this.heightVal = height;
+        }
+    }
+
+    /**
      * Is called when column width of a cell was changed to update all DOM elements accordingly.
      * @param {TableBandElement} tableBand - band containing the changed cell.
      * @param {Number} columnIndex - column index of changed cell.
@@ -382,6 +408,20 @@ export default class TableElement extends DocElement {
         return { name: dataSourceParameter, parameters: parameters };
     }
 
+    /**
+     * Returns index of given content row.
+     * @param {DocElement} row - row element to get index for.
+     * @returns {Number} Index of row, -1 if row is not a content row in this table.
+     */
+    getContentRowIndex(row) {
+        for (let i=0; i < this.contentDataRows.length; i++) {
+            if (row === this.contentDataRows[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     addChildren(docElements) {
         let i;
         docElements.push(this.headerData);
@@ -408,6 +448,31 @@ export default class TableElement extends DocElement {
     }
 
     /**
+     * Reduce space of existing columns so there is enough space for new columns.
+     * @param {Number} columns - new column count.
+     * @param {Number} colIndex - columns left of this index will be shrinked (if necessary).
+     */
+    createSpaceForNewColumns(columns, colIndex) {
+        let columnMinWidth = TableElement.getColumnMinWidth();
+        let spaceNeeded = columns * columnMinWidth;
+        let i = colIndex - 1;
+        // reduce width of all existing columns until there is enough space
+        while (i >= 0) {
+            let column = this.headerData.getColumn(i);
+            let freeSpace = column.getValue('widthVal') - columnMinWidth;
+            let newWidth = columnMinWidth;
+            if (freeSpace > spaceNeeded) {
+                newWidth = column.getValue('widthVal') - spaceNeeded;
+            }
+            this.updateColumnWidth(i, newWidth, false);
+            spaceNeeded -= freeSpace;
+            if (spaceNeeded <= 0)
+                break;
+            i--;
+        }
+    }
+
+    /**
      * Adds commands to command group parameter to recreate table with new column count.
      * @param {Number} columns - requested new column count.
      * @param {CommandGroupCmd} cmdGroup - possible commands will be added to this command group.
@@ -415,9 +480,8 @@ export default class TableElement extends DocElement {
      * for all column.
      */
     addCommandsForChangedColumns(columns, cmdGroup) {
-        const COLUMN_MIN_WIDTH = 20;
         let existingColumns = utils.convertInputToNumber(this.columns);
-        let maxColumns = Math.floor(this.widthVal / COLUMN_MIN_WIDTH);
+        let maxColumns = Math.floor(this.widthVal / TableElement.getColumnMinWidth());
         if (columns > existingColumns && columns > maxColumns) {
             // not enough space for all columns
             return existingColumns;
@@ -429,23 +493,7 @@ export default class TableElement extends DocElement {
         cmdGroup.addCommand(cmd);
 
         if (columns > existingColumns) {
-            let newColumns = columns - existingColumns;
-            let spaceNeeded = newColumns * COLUMN_MIN_WIDTH;
-            // reduce width of all existing columns until there is enough space
-            let i = existingColumns - 1;
-            while (i >= 0) {
-                let column = this.headerData.getColumn(i);
-                let freeSpace = column.getValue('widthVal') - COLUMN_MIN_WIDTH;
-                let newWidth = COLUMN_MIN_WIDTH;
-                if (freeSpace > spaceNeeded) {
-                    newWidth = column.getValue('widthVal') - spaceNeeded;
-                }
-                this.updateColumnWidth(i, newWidth, false);
-                spaceNeeded -= freeSpace;
-                if (spaceNeeded <= 0)
-                    break;
-                i--;
-            }
+            this.createSpaceForNewColumns(columns - existingColumns, existingColumns);
         } else if (columns < existingColumns) {
             let usedWidth = 0;
             for (let i=0; i < columns; i++) {
@@ -459,11 +507,11 @@ export default class TableElement extends DocElement {
         }
 
         this.columns = columns;
-        this.headerData.createColumns(columns, true);
+        this.headerData.createColumns(columns, true, -1, false);
         for (let i=0; i < this.contentDataRows.length; i++) {
-            this.contentDataRows[i].createColumns(columns, true);
+            this.contentDataRows[i].createColumns(columns, true, -1, false);
         }
-        this.footerData.createColumns(columns, true);
+        this.footerData.createColumns(columns, true, -1, false);
 
         // restore table with new column count and updated settings
         cmd = new AddDeleteDocElementCmd(true, this.getPanelItem().getPanelName(),
@@ -497,7 +545,7 @@ export default class TableElement extends DocElement {
         } else {
             let data;
             if (this.contentDataRows.length > 0) {
-                data = { height: this.contentDataRows[0].height, columnData: [] };
+                data = { height: this.contentDataRows[this.contentDataRows.length - 1].height, columnData: [] };
                 for (let columnData of this.contentDataRows[0].columnData) {
                     data.columnData.push({ width: columnData.width });
                 }
@@ -541,6 +589,10 @@ export default class TableElement extends DocElement {
         for (let column of columns) {
             delete column.id;
         }
+    }
+
+    static getColumnMinWidth() {
+        return 20;
     }
 }
 

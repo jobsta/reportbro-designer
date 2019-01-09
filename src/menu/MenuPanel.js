@@ -1,5 +1,6 @@
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
+import TableTextElement from '../elements/TableTextElement';
 
 /**
  * The menu panel contains all menu buttons.
@@ -186,6 +187,72 @@ export default class MenuPanel {
             });
         elVAlignDiv.append(elAlignBottom);
         elActionsDiv.append(elVAlignDiv);
+
+        let elColumnActionsDiv = $('<div id="rbro_menu_column_actions" style="display: none;"></div>');
+        let elColumnAddLeft = $(`<button id="rbro_menu_column_add_left"
+                class="rbroButton rbroActionButton rbroIcon-column-add-left" type="button"
+                title="${this.rb.getLabel('menuColumnAddLeft')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement) {
+                    obj.insertColumn(true);
+                }
+            });
+        elColumnActionsDiv.append(elColumnAddLeft);
+        let elColumnAddRight = $(`<button id="rbro_menu_column_add_right"
+                class="rbroButton rbroActionButton rbroIcon-column-add-right" type="button"
+                title="${this.rb.getLabel('menuColumnAddRight')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement) {
+                    obj.insertColumn(false);
+                }
+            });
+        elColumnActionsDiv.append(elColumnAddRight);
+        let elColumnDelete = $(`<button id="rbro_menu_column_delete"
+                class="rbroButton rbroActionButton rbroIcon-column-delete" type="button"
+                title="${this.rb.getLabel('menuColumnDelete')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement) {
+                    obj.deleteColumn();
+                }
+            });
+        elColumnActionsDiv.append(elColumnDelete);
+        elActionsDiv.append(elColumnActionsDiv);
+
+        let elRowActionsDiv = $('<div id="rbro_menu_row_actions" style="display: none;"></div>');
+        let elRowAddAbove = $(`<button id="rbro_menu_row_add_above"
+                class="rbroButton rbroActionButton rbroIcon-row-add-above" type="button"
+                title="${this.rb.getLabel('menuRowAddAbove')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement && obj.getParent() !== null) {
+                    obj.getParent().insertRow(true);
+                }
+            });
+        elRowActionsDiv.append(elRowAddAbove);
+        let elRowAddBelow = $(`<button id="rbro_menu_row_add_below"
+                class="rbroButton rbroActionButton rbroIcon-row-add-below" type="button"
+                title="${this.rb.getLabel('menuRowAddBelow')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement && obj.getParent() !== null) {
+                    obj.getParent().insertRow(false);
+                }
+            });
+        elRowActionsDiv.append(elRowAddBelow);
+        let elRowDelete = $(`<button id="rbro_menu_row_delete"
+                class="rbroButton rbroActionButton rbroIcon-row-delete" type="button"
+                title="${this.rb.getLabel('menuRowDelete')}"></button>`)
+            .click(event => {
+                let obj = this.rb.getSelectedObject();
+                if (obj instanceof TableTextElement && obj.getParent() !== null) {
+                    obj.getParent().deleteRow();
+                }
+            });
+        elRowActionsDiv.append(elRowDelete);
+        elActionsDiv.append(elRowActionsDiv);
 
         let elMenuToggleGrid = $(`<button id="rbro_menu_toggle_grid"
                 class="rbroButton rbroGridButton rbroActionButton rbroIcon-grid ${this.rb.getProperty('showGrid') ? 'rbroButtonActive' : ''}" type="button"

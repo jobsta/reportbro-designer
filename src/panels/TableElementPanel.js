@@ -75,11 +75,11 @@ export default class TableElementPanel {
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_table_element_columns">${this.rb.getLabel('tableElementColumns')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elColumns = $(`<input id="rbro_table_element_columns">`)
+        let elColumns = $(`<input id="rbro_table_element_columns" maxlength="2">`)
             .change(event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null) {
-                    let val = utils.checkInputDecimal(elColumns.val(), 1, 20);
+                    let val = utils.checkInputDecimal(elColumns.val(), 1, 99);
                     if (val !== elColumns.val()) {
                         elColumns.val(val);
                     }
@@ -124,11 +124,11 @@ export default class TableElementPanel {
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_table_element_content_rows">${this.rb.getLabel('tableElementContentRows')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elContentRows = $(`<input id="rbro_table_element_content_rows" maxlength="1">`)
+        let elContentRows = $(`<input id="rbro_table_element_content_rows" maxlength="2">`)
             .change(event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null) {
-                    let val = utils.checkInputDecimal(elContentRows.val(), 1, 9);
+                    let val = utils.checkInputDecimal(elContentRows.val(), 1, 99);
                     if (val !== elContentRows.val()) {
                         elContentRows.val(val);
                     }
@@ -264,6 +264,69 @@ export default class TableElementPanel {
         utils.setInputDecimal(elBorderWidth);
         panel.append(elDiv);
 
+        let elPrintHeader = $('<div class="rbroPanelSectionHeader"></div>');
+        let elPrintHeaderIcon = $('<span id="rbro_table_element_print_header_icon" class="rbroIcon-plus"></span>');
+        elDiv = $('<div id="rbro_table_element_print_header" class="rbroFormRow rbroPanelSection"></div>')
+                .click(event => {
+                    $('#rbro_table_element_print_header').toggleClass('rbroPanelSectionHeaderOpen');
+                    $('#rbro_table_element_print_section').toggleClass('rbroHidden');
+                    elPrintHeaderIcon.toggleClass('rbroIcon-plus');
+                    elPrintHeaderIcon.toggleClass('rbroIcon-minus');
+                    if (elPrintHeaderIcon.hasClass('rbroIcon-minus')) {
+                        $('#rbro_detail_panel').scrollTop(elPrintHeader.position().top);
+                    }
+                    autosize.update($('#rbro_table_element_print_if'));
+                });
+        elPrintHeader.append(elPrintHeaderIcon);
+        elPrintHeader.append(`<span>${this.rb.getLabel('docElementPrintSettings')}</span>`);
+        elDiv.append(elPrintHeader);
+        panel.append(elDiv);
+
+        let elPrintSectionDiv = $('<div id="rbro_table_element_print_section" class="rbroHidden"></div>');
+        elDiv = $('<div id="rbro_table_element_print_if_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_table_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
+        let elPrintIf = $(`<textarea id="rbro_table_element_print_if" rows="1"></textarea>`)
+            .on('input', event => {
+                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                    let cmd = new SetValueCmd(this.selectedObjId,
+                        'rbro_table_element_print_if', 'printIf',
+                        elPrintIf.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        autosize(elPrintIf);
+        elFormField.append(elPrintIf);
+        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                        'rbro_table_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
+                }
+            });
+        elFormField.append(elParameterButton);
+        elFormField.append('<div id="rbro_table_element_print_if_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_table_element_remove_empty_element">${this.rb.getLabel('docElementRemoveEmptyElement')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elRemoveEmptyElement = $(`<input id="rbro_table_element_remove_empty_element" type="checkbox">`)
+            .change(event => {
+                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                    let cmd = new SetValueCmd(this.selectedObjId,
+                        'rbro_table_element_remove_empty_element', 'removeEmptyElement',
+                        elRemoveEmptyElement.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elRemoveEmptyElement);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+        panel.append(elPrintSectionDiv);
+
         if (this.rb.getProperty('enableSpreadsheet')) {
             let elSpreadsheetHeader = $('<div class="rbroPanelSectionHeader"></div>');
             let elSpreadsheetHeaderIcon = $('<span id="rbro_table_element_spreadsheet_header_icon" class="rbroIcon-plus"></span>');
@@ -341,6 +404,7 @@ export default class TableElementPanel {
 
     updateAutosizeInputs() {
         autosize.update($('#rbro_table_element_data_source'));
+        autosize.update($('#rbro_line_element_print_if'));
     }
 
     show(data) {
@@ -373,6 +437,8 @@ export default class TableElementPanel {
             $('#rbro_table_element_border_none').prop('disabled', false);
             $('#rbro_table_element_border_color').spectrum('enable');
             $('#rbro_table_element_border_width').prop('disabled', false);
+            $('#rbro_table_element_print_if').prop('disabled', false);
+            $('#rbro_table_element_remove_empty_element').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_hide').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_column').prop('disabled', false);
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('disabled', false);
@@ -389,6 +455,8 @@ export default class TableElementPanel {
             $('#rbro_table_element_border').find(`button[value="${data.getValue('border')}"]`).addClass('rbroButtonActive');
             $('#rbro_table_element_border_color').spectrum('set', data.getValue('borderColor'));
             $('#rbro_table_element_border_width').val(data.getValue('borderWidth'));
+            $('#rbro_table_element_print_if').val(data.getValue('printIf'));
+            $('#rbro_table_element_remove_empty_element').prop('checked', data.getValue('removeEmptyElement'));
             $('#rbro_table_element_spreadsheet_hide').prop('checked', data.getValue('spreadsheet_hide'));
             $('#rbro_table_element_spreadsheet_column').val(data.getValue('spreadsheet_column'));
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('checked', data.getValue('spreadsheet_addEmptyRow'));
@@ -408,6 +476,8 @@ export default class TableElementPanel {
             $('#rbro_table_element_border_none').prop('disabled', true);
             $('#rbro_table_element_border_color').spectrum('disable');
             $('#rbro_table_element_border_width').prop('disabled', true);
+            $('#rbro_table_element_print_if').prop('disabled', true);
+            $('#rbro_table_element_remove_empty_element').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_hide').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_column').prop('disabled', true);
             $('#rbro_table_element_spreadsheet_add_empty_row').prop('disabled', true);

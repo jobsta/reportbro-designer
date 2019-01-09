@@ -15,10 +15,8 @@ import DocElement from './elements/DocElement';
 import FrameElement from './elements/FrameElement';
 import PageBreakElement from './elements/PageBreakElement';
 import SectionElement from './elements/SectionElement';
-import TableBandElement from './elements/TableBandElement';
 import TableElement from './elements/TableElement';
 import TableTextElement from './elements/TableTextElement';
-import TextElement from './elements/TextElement';
 import BarCodeElementPanel from './panels/BarCodeElementPanel';
 import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
 import EmptyDetailPanel from './panels/EmptyDetailPanel';
@@ -36,6 +34,7 @@ import StylePanel from './panels/StylePanel';
 import TableElementPanel from './panels/TableElementPanel';
 import TableBandElementPanel from './panels/TableBandElementPanel';
 import TextElementPanel from './panels/TextElementPanel';
+import * as utils from './utils';
 
 /**
  * Used for the main ReportBro instance.
@@ -74,6 +73,7 @@ export default class ReportBro {
             docElementRemoveEmptyElement: 'Remove when empty',
             docElementRoot: 'Document',
             docElementSection: 'Section',
+            docElementLink: 'Link',
             docElementSize: 'Size (width, height)',
             docElementSpreadsheet: 'Spreadsheet',
             docElementSpreadsheetAddEmptyRow: 'Add empty row below',
@@ -91,6 +91,7 @@ export default class ReportBro {
             documentTabXlsxDownload: 'XLSX Download',
             emptyPanel: 'Empty panel',
             errorMsgDuplicateParameterField: 'Field already exists',
+            errorMsgLoadingImageFailed: 'Loading image failed',
             errorMsgInvalidArray: 'Invalid list',
             errorMsgInvalidAvgSumExpression: 'Expression must contain number field of a list parameter',
             errorMsgInvalidBarCode: 'Invalid bar code content',
@@ -133,6 +134,9 @@ export default class ReportBro {
             headerFooterDisplayAlways: 'Always',
             headerFooterDisplayNotOnFirstPage: 'Do not show on first page',
             headerSize: 'Header size',
+            menuColumnAddLeft: 'Add column to the left',
+            menuColumnAddRight: 'Add column to the right',
+            menuColumnDelete: 'Delete column',
             menuAlignBottom: 'Align bottom',
             menuAlignCenter: 'Align center',
             menuAlignLeft: 'Align left',
@@ -143,6 +147,9 @@ export default class ReportBro {
             menuPreviewTip: 'Preview report',
             menuRedo: 'REDO',
             menuRedoTip: 'Repeat last undone command',
+            menuRowAddAbove: 'Add row above',
+            menuRowAddBelow: 'Add row below',
+            menuRowDelete: 'Delete row',
             menuSave: 'SAVE',
             menuSaveTip: 'Save report',
             menuToggleGrid: 'Show/Hide grid',
@@ -223,6 +230,7 @@ export default class ReportBro {
             styleName: 'Name',
             styleNone: 'None',
             stylePadding: 'Padding',
+            styleStrikethrough: 'Strikethrough',
             styleTextColor: 'Text color',
             styleTextStyle: 'Text style',
             styleUnderline: 'Underline',
@@ -430,8 +438,21 @@ export default class ReportBro {
                                         clipboardElement.containerId = mappedContainerIds[clipboardElement.containerId];
                                         // since element is inside pasted container we can keep x/y coordinates
                                     } else {
-                                        // paste new element at top/left of container
-                                        clipboardElement.x = clipboardElement.y = 0;
+                                        let pasteToY = 0;
+                                        let container = this.getDataObject(clipboardElement.containerId);
+                                        if (container !== null) {
+                                            // determine new y-coord so pasted element is in
+                                            // visible area of scrollable document
+                                            let containerOffset = container.getOffset();
+                                            let containerSize = container.getContentSize();
+                                            let contentScrollY = this.getDocument().getContentScrollPosY();
+                                            if (contentScrollY > containerOffset.y &&
+                                                (contentScrollY + clipboardElement.height) < (containerOffset.y + containerSize.height)) {
+                                                pasteToY = contentScrollY - containerOffset.y;
+                                            }
+                                        }
+                                        clipboardElement.x = 0;
+                                        clipboardElement.y = pasteToY;
                                     }
                                     cmd = new AddDeleteDocElementCmd(
                                         true, clipboardElement.elementType, clipboardElement,
@@ -843,10 +864,11 @@ export default class ReportBro {
                 $(`#rbro_menu_item_children_toggle${obj.getId()}`).hide();
             }
         } else if (obj instanceof Style) {
-            for (let docElement of this.docElements) {
-                docElement.updateChangedStyle(obj.getId());
+            if (operation === Command.operation.change) {
+                for (let docElement of this.docElements) {
+                    docElement.updateChangedStyle(obj.getId());
+                }
             }
-            
         }
         for (let panelName in this.detailPanels) {
             this.detailPanels[panelName].notifyEvent(obj, operation);
@@ -959,7 +981,7 @@ export default class ReportBro {
         $('#rbro_menu_redo').prop('disabled', (this.lastCommandIndex >= (this.commandStack.length - 1)));
     }
 
-    updateMenuAlignButtons() {
+    updateMenuActionButtons() {
         let elementCount = 0;
         let previousContainerOffset = { x: 0, y: 0 };
         let elementSameContainerOffsetX = true;
@@ -995,10 +1017,40 @@ export default class ReportBro {
                 $('#rbro_menu_valign').hide();
             }
             $('#rbo_menu_elements .rbroMenuButton').hide();
+            $('#rbro_menu_column_actions').hide();
+            $('#rbro_menu_row_actions').hide();
         } else {
+            let obj = null;
+            if (this.selections.length === 1) {
+                obj = this.getDataObject(this.selections[0]);
+            }
             $('#rbro_menu_align').hide();
             $('#rbro_menu_valign').hide();
-            $('#rbo_menu_elements .rbroMenuButton').show();
+            if (obj instanceof TableTextElement) {
+                $('#rbo_menu_elements .rbroMenuButton').hide();
+                let table = obj.getTable();
+                let parent = obj.getParent();
+                if (table !== null && utils.convertInputToNumber(table.getValue('columns')) !== 1) {
+                    $('#rbro_menu_column_delete').show();
+                } else {
+                    $('#rbro_menu_column_delete').hide();
+                }
+                $('#rbro_menu_column_actions').show();
+                if (table !== null && parent !== null && parent.getValue('bandType') === Band.bandType.content) {
+                    if (utils.convertInputToNumber(table.getValue('contentRows')) !== 1) {
+                        $('#rbro_menu_row_delete').show();
+                    } else {
+                        $('#rbro_menu_row_delete').hide();
+                    }
+                    $('#rbro_menu_row_actions').show();
+                } else {
+                    $('#rbro_menu_row_actions').hide();
+                }
+            } else {
+                $('#rbo_menu_elements .rbroMenuButton').show();
+                $('#rbro_menu_column_actions').hide();
+                $('#rbro_menu_row_actions').hide();
+            }
         }
     }
 
@@ -1030,6 +1082,13 @@ export default class ReportBro {
     getDataObject(id) {
         if (id !== null && id in this.objectMap) {
             return this.objectMap[id];
+        }
+        return null;
+    }
+
+    getSelectedObject() {
+        if (this.selections.length === 1) {
+            return this.getDataObject(this.selections[0]);
         }
         return null;
     }
@@ -1074,12 +1133,12 @@ export default class ReportBro {
             }
         }
         this.selectionSinceLastCommand = true;
-        this.updateMenuAlignButtons();
+        this.updateMenuActionButtons();
     }
 
     deselectObject(id) {
         this.deselectObjectInternal(id, true);
-        this.updateMenuAlignButtons();
+        this.updateMenuActionButtons();
     }
 
     deselectObjectInternal(id, updateSelections) {
@@ -1104,7 +1163,7 @@ export default class ReportBro {
             this.deselectObjectInternal(selectionId, false);
         }
         this.selections = [];
-        this.updateMenuAlignButtons();
+        this.updateMenuActionButtons();
     }
 
     getContainer(posX, posY, elementType) {
@@ -1354,7 +1413,8 @@ export default class ReportBro {
                         }
                     }
                     ret[parameter.getName()] = testDataRows;
-                } else if (type === Parameter.type.string || type === Parameter.type.number || type === Parameter.type.date) {
+                } else if (type === Parameter.type.string || type === Parameter.type.number ||
+                           type === Parameter.type.boolean || type === Parameter.type.date) {
                     ret[parameter.getName()] = parameter.getValue('testData');
                 }
             }

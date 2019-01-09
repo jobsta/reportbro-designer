@@ -312,7 +312,8 @@ export default class DocElement {
                     linkedContainer.setParent(this.getContainer());
                 }
             }
-        } else if (['styleId', 'bold', 'italic', 'underline', 'horizontalAlignment', 'verticalAlignment',
+        } else if (['styleId', 'bold', 'italic', 'underline', 'strikethrough',
+                'horizontalAlignment', 'verticalAlignment',
                 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
                 'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
                 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'].indexOf(field) !== -1) {
@@ -358,7 +359,7 @@ export default class DocElement {
     }
 
     updateChangedStyle(styleId) {
-        if (this.styleId === styleId) {
+        if (utils.convertInputToNumber(this.styleId) === styleId) {
             this.updateStyle();
         }
     }
@@ -719,9 +720,12 @@ export default class DocElement {
         this.getAllDataSources(dataSources, null);
 
         if (paramParent !== null && paramParent.getValue('type') === Parameter.type.array) {
-            if (dataSources.length > 0 && dataSources[0].parameters.indexOf(parameter) !== -1) {
-                paramRef = '${' + parameter.getName() + '}';
-                newParamRef = '${' + newParameterName + '}';
+            for (let dataSource of dataSources) {
+                if (dataSource.parameters.indexOf(parameter) !== -1) {
+                    paramRef = '${' + parameter.getName() + '}';
+                    newParamRef = '${' + newParameterName + '}';
+                    break;
+                }
             }
         } else {
             if (paramParent !== null && paramParent.getValue('type') === Parameter.type.map) {

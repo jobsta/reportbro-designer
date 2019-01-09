@@ -1,5 +1,4 @@
 import DocElement from './DocElement';
-import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
 import * as utils from '../utils';
 
@@ -17,6 +16,7 @@ export default class TextElement extends DocElement {
         this.bold = false;
         this.italic = false;
         this.underline = false;
+        this.strikethrough = false;
         this.horizontalAlignment = Style.alignment.left;
         this.verticalAlignment = Style.alignment.top;
         this.textColor = '#000000';
@@ -41,6 +41,7 @@ export default class TextElement extends DocElement {
         this.cs_bold = false;
         this.cs_italic = false;
         this.cs_underline = false;
+        this.cs_strikethrough = false;
         this.cs_horizontalAlignment = Style.alignment.left;
         this.cs_verticalAlignment = Style.alignment.top;
         this.cs_textColor = '#000000';
@@ -62,6 +63,7 @@ export default class TextElement extends DocElement {
         
         this.alwaysPrintOnSamePage = true;
         this.pattern = '';
+        this.link = '';
 
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
@@ -123,13 +125,13 @@ export default class TextElement extends DocElement {
      */
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'width', 'height', 'content', 'eval',
-            'styleId', 'bold', 'italic', 'underline',
+            'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
-            'printIf', 'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern',
-            'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline',
+            'printIf', 'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern', 'link',
+            'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor', 'cs_font', 'cs_fontSize',
             'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
@@ -201,7 +203,15 @@ export default class TextElement extends DocElement {
         styleProperties['background-color'] = style.getValue('backgroundColor');
         styleProperties['font-weight'] = style.getValue('bold') ? 'bold' : '';
         styleProperties['font-style'] = style.getValue('italic') ? 'italic' : 'normal';
-        styleProperties['text-decoration'] = style.getValue('underline') ? 'underline' : 'none';
+        if (style.getValue('underline') && style.getValue('strikethrough')) {
+            styleProperties['text-decoration'] = 'underline line-through';
+        } else if (style.getValue('underline')) {
+            styleProperties['text-decoration'] = 'underline';
+        } else if (style.getValue('strikethrough')) {
+            styleProperties['text-decoration'] = 'line-through';
+        } else {
+            styleProperties['text-decoration'] = 'none';
+        }
         styleProperties['color'] = style.getValue('textColor');
         styleProperties['font-family'] = style.getValue('font');
         styleProperties['font-size'] = style.getValue('fontSize') + 'px';

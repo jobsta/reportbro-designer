@@ -250,6 +250,33 @@ export default class ImageElementPanel {
         elFormField.append(elRemoveEmptyElement);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_image_element_link">${this.rb.getLabel('docElementLink')}:</label>`);
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
+        let elLink = $(`<input id="rbro_image_element_link">`)
+            .on('input', event => {
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null && obj.getValue('link') !== elLink.val()) {
+                    let cmd = new SetValueCmd(this.selectedObjId,
+                        'rbro_image_element_link', 'link',
+                        elLink.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elLink);
+        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                        'rbro_image_element_link', 'link', PopupWindow.type.parameterSet);
+                }
+            });
+        elFormField.append(elParameterButton);
+        elFormField.append('<div id="rbro_image_element_link_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
         panel.append(elPrintSectionDiv);
 
         if (this.rb.getProperty('enableSpreadsheet')) {
@@ -356,6 +383,7 @@ export default class ImageElementPanel {
             $('#rbro_image_element_height').prop('disabled', false);
             $('#rbro_image_element_print_if').prop('disabled', false);
             $('#rbro_image_element_remove_empty_element').prop('disabled', false);
+            $('#rbro_image_element_link').prop('disabled', false);
             $('#rbro_image_element_spreadsheet_hide').prop('disabled', false);
             $('#rbro_image_element_spreadsheet_column').prop('disabled', false);
             $('#rbro_image_element_spreadsheet_add_empty_row').prop('disabled', false);
@@ -373,6 +401,7 @@ export default class ImageElementPanel {
             $('#rbro_image_element_height').val(data.getValue('height'));
             $('#rbro_image_element_print_if').val(data.getValue('printIf'));
             $('#rbro_image_element_remove_empty_element').prop('checked', data.getValue('removeEmptyElement'));
+            $('#rbro_image_element_link').val(data.getValue('link'));
             $('#rbro_image_element_spreadsheet_hide').prop('checked', data.getValue('spreadsheet_hide'));
             $('#rbro_image_element_spreadsheet_column').val(data.getValue('spreadsheet_column'));
             $('#rbro_image_element_spreadsheet_add_empty_row').prop('checked', data.getValue('spreadsheet_addEmptyRow'));
@@ -388,6 +417,7 @@ export default class ImageElementPanel {
             $('#rbro_image_element_height').prop('disabled', true);
             $('#rbro_image_element_print_if').prop('disabled', true);
             $('#rbro_image_element_remove_empty_element').prop('disabled', true);
+            $('#rbro_image_element_link').prop('disabled', true);
             $('#rbro_image_element_spreadsheet_hide').prop('disabled', true);
             $('#rbro_image_element_spreadsheet_column').prop('disabled', true);
             $('#rbro_image_element_spreadsheet_add_empty_row').prop('disabled', true);
@@ -425,7 +455,7 @@ export default class ImageElementPanel {
                 }
                 $('#' + rowId).addClass('rbroError');
                 $('#' + errorId).html(errorMsg);
-                if (error.field === 'print_if') {
+                if (error.field === 'print_if' || error.field === 'link') {
                     $('#rbro_image_element_print_header').addClass('rbroError');
                     if (!$('#rbro_image_element_print_header').hasClass('rbroPanelSectionHeaderOpen')) {
                         $('#rbro_image_element_print_header').trigger('click');

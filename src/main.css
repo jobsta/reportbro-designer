@@ -202,15 +202,22 @@
     border-bottom: 1px solid #E4E7EA;
     margin-top: 5px;
     margin-bottom: 10px;
+    height: auto;
 }
 
 .rbroMenuPanelSidebar .rbroMenuButton {
     border: none;
 }
 
-.rbroMenuPanelSidebar .rbroActionButtons > div button {
+.rbroMenuPanelSidebar .rbroActionButtons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.rbroMenuPanelSidebar .rbroActionButtons button {
     display: block;
-    margin: 0px 0px 2px 0;
+    margin: 4px;
 }
 
 .rbroMenuPanelSidebar .rbroContainer {

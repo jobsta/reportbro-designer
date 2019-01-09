@@ -370,6 +370,16 @@ export default class Document {
         return this.rb.getContainer(absPosX - offset.left, absPosY - offset.top, elementType);
     }
 
+    /**
+     * Returns scroll y position of document content.
+     * @returns {Number} scroll y position.
+     */
+    getContentScrollPosY() {
+        let contentOffset = this.elDocContent.offset();
+        let panelOffset = $('#rbro_document_panel').offset();
+        return panelOffset.top - contentOffset.top;
+    }
+
     isGridVisible() {
         return this.gridVisible;
     }

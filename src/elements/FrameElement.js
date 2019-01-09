@@ -59,6 +59,34 @@ export default class FrameElement extends DocElement {
     }
 
     /**
+     * Register event handler for mouse down so element can be dragged but and
+     * only allow selection if double clicked.
+     */
+    registerEventHandlers() {
+        this.el
+            .dblclick(event => {
+                if (!this.rb.isSelectedObject(this.id)) {
+                    this.rb.selectObject(this.id, true);
+                    event.stopPropagation();
+                }
+            })
+            .mousedown(event => {
+                if (event.shiftKey) {
+                    this.rb.deselectObject(this.id);
+                } else {
+                    if (this.rb.isSelectedObject(this.id)) {
+                        this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
+                            this.id, this.containerId, this.linkedContainerId,
+                            this.getElementType(), DocElement.dragType.element);
+                    } else {
+                        this.rb.deselectAll();
+                    }
+                }
+                event.stopPropagation();
+            });
+    }
+
+    /**
      * Returns highest id of this component, this is the id of the linked container because it is
      * created after the frame element.
      * @returns {Number}

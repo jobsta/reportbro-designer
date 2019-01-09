@@ -13,6 +13,7 @@ export default class SectionBandElement extends DocElement {
         let name = (bandType === Band.bandType.header) ?
             rb.getLabel('bandHeader') : ((bandType === Band.bandType.footer) ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
         super(name, id, 0, 100, rb);
+        this.setupComplete = false;
         this.band = null;
         this.bandType = bandType;
         this.repeatHeader = false;
@@ -37,6 +38,7 @@ export default class SectionBandElement extends DocElement {
         this.band = new Band(this.bandType, true, this.linkedContainerId, 'section_' + this.bandType + '_' + this.linkedContainerId, this.rb);
         this.band.init(this);
         this.rb.addContainer(this.band);
+        this.setupComplete = true;
     }
 
     /**
@@ -60,7 +62,7 @@ export default class SectionBandElement extends DocElement {
      */
     getAbsolutePosition() {
         let pos = { x: 0, y: 0 };
-        let parent = this.rb.getDataObject(this.parentId);
+        let parent = this.getParent();
         if (parent !== null) {
             pos = parent.getAbsolutePosition();
         }
@@ -73,7 +75,7 @@ export default class SectionBandElement extends DocElement {
 
         if (field === 'height') {
             this[field + 'Val'] = utils.convertInputToNumber(value);
-            let parent = this.rb.getDataObject(this.parentId);
+            let parent = this.getParent();
             if (parent !== null) {
                 parent.updateBands(this);
             }
@@ -96,6 +98,13 @@ export default class SectionBandElement extends DocElement {
         if (this.el !== null) {
             let props = { top: this.rb.toPixel(y), width: '100%', height: this.rb.toPixel(height) };
             this.el.css(props);
+            if (this.setupComplete) {
+                // update section element because section band dividers are contained in section
+                let parent = this.getParent();
+                if (parent !== null) {
+                    parent.updateHeight(this, height);
+                }
+            }
         }
     }
 
@@ -104,7 +113,7 @@ export default class SectionBandElement extends DocElement {
      * @returns {String[]}
      */
     getSizers() {
-        return [];
+        return ['S'];
     }
 
     getHeightTagId() {

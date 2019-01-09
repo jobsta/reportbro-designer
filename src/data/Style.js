@@ -1,3 +1,6 @@
+import AddDeleteStyleCmd from "../commands/AddDeleteStyleCmd";
+import SetValueCmd from "../commands/SetValueCmd";
+import DocElement from "../elements/DocElement";
 import * as utils from "../utils";
 
 /**
@@ -15,6 +18,7 @@ export default class Style {
         this.bold = false;
         this.italic = false;
         this.underline = false;
+        this.strikethrough = false;
         this.horizontalAlignment = Style.alignment.left;
         this.verticalAlignment = Style.alignment.top;
         this.textColor = '#000000';
@@ -53,7 +57,8 @@ export default class Style {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'name', 'bold', 'italic', 'underline', 'horizontalAlignment', 'verticalAlignment',
+        return ['id', 'name', 'bold', 'italic', 'underline', 'strikethrough',
+            'horizontalAlignment', 'verticalAlignment',
             'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'];
@@ -88,6 +93,28 @@ export default class Style {
 
     setBorderAll(fieldPrefix, value) {
         this[fieldPrefix + 'borderAll'] = value;
+    }
+
+    /**
+     * Adds commands to command group parameter to delete this style and reset any references to it.
+     * @param {CommandGroupCmd} cmdGroup - commands for deletion of style will be added to this command group.
+     */
+    addCommandsForDelete(cmdGroup) {
+        let cmd;
+        let elements = this.rb.getDocElements(true);
+        for (let element of elements) {
+            if ((element.getElementType() === DocElement.type.text ||
+                    element.getElementType() === DocElement.type.tableText) && element.getValue('styleId') &&
+                    utils.convertInputToNumber(element.getValue('styleId')) === this.id) {
+                cmd = new SetValueCmd(
+                    element.getId(), 'rbro_text_element_style_id', 'styleId', '', SetValueCmd.type.text, this.rb);
+                cmdGroup.addCommand(cmd);
+            }
+        }
+        cmd = new AddDeleteStyleCmd(
+            false, this.toJS(), this.getId(), this.getPanelItem().getParent().getId(),
+            this.getPanelItem().getSiblingPosition(), this.rb);
+        cmdGroup.addCommand(cmd);
     }
 
     addError(error) {

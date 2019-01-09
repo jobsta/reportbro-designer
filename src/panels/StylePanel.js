@@ -125,17 +125,28 @@ export default class StylePanel {
                     }
                 });
             elTextStyle.append(elItalic);
-            let elunderline = $(`<button id="rbro_${idPrefix}underline"
+            let elUnderline = $(`<button id="rbro_${idPrefix}underline"
                     class="rbroButton rbroActionButton rbroIcon-underline" type="button"
-                    title="${rb.getLabel('styleunderline')}"></button>`)
+                    title="${rb.getLabel('styleUnderline')}"></button>`)
                 .click(event => {
                     if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
                         let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}underline`,
-                            `${fieldPrefix}underline`, !elunderline.hasClass('rbroButtonActive'), SetValueCmd.type.button, rb);
+                            `${fieldPrefix}underline`, !elUnderline.hasClass('rbroButtonActive'), SetValueCmd.type.button, rb);
                         rb.executeCommand(cmd);
                     }
                 });
-            elTextStyle.append(elunderline);
+            elTextStyle.append(elUnderline);
+            let elStrikethrough = $(`<button id="rbro_${idPrefix}strikethrough"
+                    class="rbroButton rbroActionButton rbroIcon-strikethrough" type="button"
+                    title="${rb.getLabel('styleStrikethrough')}"></button>`)
+                .click(event => {
+                    if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
+                        let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}strikethrough`,
+                            `${fieldPrefix}strikethrough`, !elStrikethrough.hasClass('rbroButtonActive'), SetValueCmd.type.button, rb);
+                        rb.executeCommand(cmd);
+                    }
+                });
+            elTextStyle.append(elStrikethrough);
             elFormField.append(elTextStyle);
             elDiv.append(elFormField);
             elPanel.append(elDiv);
@@ -310,7 +321,15 @@ export default class StylePanel {
             elFormField = $('<div class="rbroFormField"></div>');
             let elLineSpacing = $(`<select id="rbro_${idPrefix}line_spacing">
                     <option value="1">1</option>
+                    <option value="1.1">1.1</option>
+                    <option value="1.2">1.2</option>
+                    <option value="1.3">1.3</option>
+                    <option value="1.4">1.4</option>
                     <option value="1.5">1.5</option>
+                    <option value="1.6">1.6</option>
+                    <option value="1.7">1.7</option>
+                    <option value="1.8">1.8</option>
+                    <option value="1.9">1.9</option>
                     <option value="2">2</option>
                 </select>`)
                 .change(event => {
@@ -480,6 +499,7 @@ export default class StylePanel {
                 $(`#rbro_${idPrefix}bold`).prop('disabled', false);
                 $(`#rbro_${idPrefix}italic`).prop('disabled', false);
                 $(`#rbro_${idPrefix}underline`).prop('disabled', false);
+                $(`#rbro_${idPrefix}strikethrough`).prop('disabled', false);
                 $(`#rbro_${idPrefix}halignment_justify`).prop('disabled', false);
                 $(`#rbro_${idPrefix}text_color`).spectrum('enable');
                 $(`#rbro_${idPrefix}font`).prop('disabled', false);
@@ -567,6 +587,11 @@ export default class StylePanel {
                 } else {
                     $(`#rbro_${idPrefix}underline`).removeClass('rbroButtonActive');
                 }
+                if (data.getValue(`${fieldPrefix}strikethrough`)) {
+                    $(`#rbro_${idPrefix}strikethrough`).addClass('rbroButtonActive');
+                } else {
+                    $(`#rbro_${idPrefix}strikethrough`).removeClass('rbroButtonActive');
+                }
                 $(`#rbro_${idPrefix}text_color`).spectrum("set", data.getValue(`${fieldPrefix}textColor`));
                 $(`#rbro_${idPrefix}font`).val(data.getValue(`${fieldPrefix}font`));
                 $(`#rbro_${idPrefix}font_size`).val(data.getValue(`${fieldPrefix}fontSize`));
@@ -600,6 +625,7 @@ export default class StylePanel {
                 $(`#rbro_${idPrefix}bold`).prop('disabled', true);
                 $(`#rbro_${idPrefix}italic`).prop('disabled', true);
                 $(`#rbro_${idPrefix}underline`).prop('disabled', true);
+                $(`#rbro_${idPrefix}strikethrough`).prop('disabled', true);
                 $(`#rbro_${idPrefix}halignment_justify`).prop('disabled', true);
                 $(`#rbro_${idPrefix}text_color`).spectrum('disable');
                 $(`#rbro_${idPrefix}font`).prop('disabled', true);

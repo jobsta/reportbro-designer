@@ -231,7 +231,6 @@ export default class TextElementPanel {
         elFormField.append(elRemoveEmptyElement);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
-        panel.append(elPrintSectionDiv);
 
         elDiv = $('<div id="rbro_text_element_always_print_on_same_page_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_always_print_on_same_page">${this.rb.getLabel('docElementAlwaysPrintOnSamePage')}:</label>`);
@@ -248,7 +247,6 @@ export default class TextElementPanel {
         elFormField.append(elAlwaysPrintOnSamePage);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
-        panel.append(elPrintSectionDiv);
 
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_text_element_pattern">${this.rb.getLabel('textElementPattern')}:</label>`);
@@ -274,6 +272,33 @@ export default class TextElementPanel {
             });
         elFormField.append(elParameterButton);
         elFormField.append('<div id="rbro_text_element_pattern_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_text_element_link">${this.rb.getLabel('docElementLink')}:</label>`);
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
+        let elLink = $(`<input id="rbro_text_element_link">`)
+            .on('input', event => {
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null && obj.getValue('link') !== elLink.val()) {
+                    let cmd = new SetValueCmd(this.selectedObjId,
+                        'rbro_text_element_link', 'link',
+                        elLink.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        elFormField.append(elLink);
+        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    this.rb.getPopupWindow().show(this.rb.getParameterItems(selectedObj), this.selectedObjId,
+                        'rbro_text_element_link', 'link', PopupWindow.type.parameterSet);
+                }
+            });
+        elFormField.append(elParameterButton);
+        elFormField.append('<div id="rbro_text_element_link_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
         panel.append(elPrintSectionDiv);
@@ -485,6 +510,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_remove_empty_element').prop('disabled', false);
             $('#rbro_text_element_always_print_on_same_page').prop('disabled', false);
             $('#rbro_text_element_pattern').prop('disabled', false);
+            $('#rbro_text_element_link').prop('disabled', false);
             $('#rbro_text_element_cs_condition').prop('disabled', false);
             $('#rbro_text_element_style_id').prop('disabled', false);
             $('#rbro_text_element_spreadsheet_hide').prop('disabled', false);
@@ -498,6 +524,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_height').val(data.getValue('height'));
             $('#rbro_text_element_print_if').val(data.getValue('printIf'));
             $('#rbro_text_element_pattern').val(data.getValue('pattern'));
+            $('#rbro_text_element_link').val(data.getValue('link'));
             if (!(data instanceof TableTextElement)) {
                 $('#rbro_text_element_position_x').val(data.getValue('x'));
                 $('#rbro_text_element_position_y').val(data.getValue('y'));
@@ -584,7 +611,8 @@ export default class TextElementPanel {
             $('#rbro_text_element_print_if').prop('disabled', true);
             $('#rbro_text_element_remove_empty_element').prop('disabled', true);
             $('#rbro_text_element_always_print_on_same_page').prop('disabled', true);
-            $('#rbro_text_element_pattern').prop('disabled', false);
+            $('#rbro_text_element_pattern').prop('disabled', true);
+            $('#rbro_text_element_link').prop('disabled', true);
             $('#rbro_text_element_cs_condition').prop('disabled', true);
             $('#rbro_text_element_style_id').prop('disabled', true);
             $('#rbro_text_element_spreadsheet_hide').prop('disabled', true);
@@ -652,7 +680,7 @@ export default class TextElementPanel {
                 }
                 $('#' + rowId).addClass('rbroError');
                 $('#' + errorId).html(errorMsg);
-                if (error.field === 'print_if' || error.field === 'pattern') {
+                if (error.field === 'print_if' || error.field === 'pattern' || error.field === 'link') {
                     $('#rbro_text_element_print_header').addClass('rbroError');
                     if (!$('#rbro_text_element_print_header').hasClass('rbroPanelSectionHeaderOpen')) {
                         $('#rbro_text_element_print_header').trigger('click');

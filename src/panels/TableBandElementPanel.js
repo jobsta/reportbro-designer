@@ -155,11 +155,16 @@ export default class TableBandElementPanel {
                 }
             });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_text_element_print_if_error" class="rbroErrorMessage"></div>');
+        elFormField.append('<div id="rbro_table_band_element_print_if_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
         $('#rbro_detail_panel').append(panel);
+    }
+
+    updateAutosizeInputs() {
+        autosize.update($('#rbro_table_band_element_group_expression'));
+        autosize.update($('#rbro_table_band_element_print_if'));
     }
 
     show(data) {
@@ -209,6 +214,7 @@ export default class TableBandElementPanel {
             $('#rbro_table_band_element_height').prop('disabled', true);
             $('#rbro_table_band_element_repeat_header').prop('disabled', true);
         }
+        this.updateAutosizeInputs();
         this.updateErrors();
     }
 
@@ -229,6 +235,14 @@ export default class TableBandElementPanel {
         let selectedObj = this.rb.getDataObject(this.selectedObjId);
         if (selectedObj !== null) {
             for (let error of selectedObj.getErrors()) {
+                let rowId = 'rbro_table_band_element_' + error.field + '_row';
+                let errorId = 'rbro_table_band_element_' + error.field + '_error';
+                let errorMsg = this.rb.getLabel(error.msg_key);
+                if (error.info) {
+                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' + error.info + '</span>');
+                }
+                $('#' + rowId).addClass('rbroError');
+                $('#' + errorId).html(errorMsg);
             }
         }
     }

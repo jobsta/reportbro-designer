@@ -1,5 +1,7 @@
 import DocElement from './DocElement';
 import TableTextElement from './TableTextElement';
+import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
+import CommandGroupCmd from '../commands/CommandGroupCmd';
 import Band from '../container/Band';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
@@ -70,10 +72,13 @@ export default class TableBandElement extends DocElement {
         if (field === 'height') {
             let height = utils.convertInputToNumber(value);
             this[field + 'Val'] = height;
-            // set td height to height - 1 because border consumes 1 pixel
-            this.getElement().find('td').css({ height: this.rb.toPixel(height - 1) });
+            this.getElement().find('td').css({ height: this.rb.toPixel(height) });
             for (let col of this.columnData) {
                 col.setValue(field, value, elSelector, isShown);
+            }
+            let table = this.getParent();
+            if (table !== null) {
+                table.updateHeight();
             }
         } else if (field === 'backgroundColor') {
             this.updateStyle();
@@ -144,7 +149,16 @@ export default class TableBandElement extends DocElement {
         return this.rb.getDataObject(this.parentId);
     }
 
-    createColumns(columns, isUpdate) {
+    /**
+     * Create given number of columns for this band.
+     * @param {Number} columns - column count, this can be more or less than current number of columns.
+     * @param {Boolean} isUpdate - true if this is triggered by a changed value, false if called during initalization.
+     * @param {Number} insertColIndex - column index where a new column will be inserted, either left or right to this index.
+     * If -1 then no column is inserted at a certain index.
+     * @param {Boolean} insertLeft - if true then the new column is inserted left to param insertColIndex, otherwise it is inserted right to it.
+     * Only used if param insertColIndex is not -1.
+     */
+    createColumns(columns, isUpdate, insertColIndex, insertLeft) {
         if (this.panelItem === null) {
             return;
         }
@@ -161,8 +175,27 @@ export default class TableBandElement extends DocElement {
         for (let i=0; i < columns; i++) {
             let data;
             let dataId;
-            if (i < this.columnData.length) {
-                data = this.columnData[i];
+            let colWidth = isUpdate ? 20 : 100;
+            let useColDataIndex = i;
+            if (insertColIndex !== -1) {
+                if (insertLeft) {
+                    if (i === insertColIndex) {
+                        colWidth = this.columnData[insertColIndex].getValue('widthVal');
+                        useColDataIndex = -1;
+                    } else if (i >= insertColIndex) {
+                        useColDataIndex--;
+                    }
+                } else {
+                    if (i === (insertColIndex + 1)) {
+                        colWidth = this.columnData[insertColIndex].getValue('widthVal');
+                        useColDataIndex = -1;
+                    } else if (i > insertColIndex) {
+                        useColDataIndex--;
+                    }
+                }
+            }
+            if (useColDataIndex !== -1 && useColDataIndex < this.columnData.length) {
+                data = this.columnData[useColDataIndex];
                 dataId = data.id;
                 if (!isUpdate) {
                     data.band = this.band;
@@ -172,7 +205,7 @@ export default class TableBandElement extends DocElement {
                 }
             } else {
                 data = { band: this.band, columnIndex: i, parentId: this.id, tableId: this.parentId,
-                        width: isUpdate ? 20 : 100, height: this.height };
+                        width: colWidth, height: this.height };
             }
             if (!dataId) {
                 dataId = this.rb.getUniqueId();
@@ -187,7 +220,15 @@ export default class TableBandElement extends DocElement {
             textElement.setup(true);
         }
         this.columnData = newColumnData;
-        this.getElement().find('td').css({ height: this.rb.toPixel(this.heightVal - 1) });
+        this.getElement().find('td').css({ height: this.rb.toPixel(this.heightVal) });
+    }
+
+    deleteColumn(colIndex) {
+        if (colIndex < this.columnData.length) {
+            this.columnData[colIndex].remove();
+            this.rb.deleteDataObject(this.columnData[colIndex]);
+            this.columnData.splice(colIndex, 1);
+        }
     }
 
     show(visible) {
@@ -212,6 +253,20 @@ export default class TableBandElement extends DocElement {
         return null;
     }
 
+    /**
+     * Returns index of given column.
+     * @param {DocElement} column - column element to get index for.
+     * @returns {Number} Index of column, -1 if column is not contained in this band.
+     */
+    getColumnIndex(column) {
+        for (let i=0; i < this.columnData.length; i++) {
+            if (column === this.columnData[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     getWidth() {
         let width = 0;
         for (let col of this.columnData) {
@@ -226,6 +281,76 @@ export default class TableBandElement extends DocElement {
             widths.push(col.getValue('widthVal'));
         }
         return widths;
+    }
+
+    /**
+     * Adds a table content row above or below this row.
+     * @param {Boolean} above - if true then row will be added above, otherwise below.
+     */
+    insertRow(above) {
+        let table = this.getParent();
+        if (table !== null) {
+            let rowIndex = table.getContentRowIndex(this);
+            if (rowIndex !== -1) {
+                let cmdGroup = new CommandGroupCmd('Insert row');
+                // delete table with current settings and restore below with new columns, necessary for undo/redo
+                let cmd = new AddDeleteDocElementCmd(false, table.getPanelItem().getPanelName(),
+                    table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
+                cmdGroup.addCommand(cmd);
+
+                // increase content row count of table
+                let contentRows = utils.convertInputToNumber(table.getValue('contentRows')) + 1;
+                table.setValue('contentRows', contentRows, 'rbro_table_element_content_rows', false);
+
+                let contentRow = table.getValue('contentDataRows')[rowIndex];
+                let data = { height: contentRow.height, columnData: [] };
+                for (let columnData of contentRow.columnData) {
+                    data.columnData.push({ width: columnData.width });
+                }
+                let band = table.createBand('content', -1, data);
+                table.getValue('contentDataRows').splice(above ? rowIndex : (rowIndex + 1), 0, band);
+
+                // restore table with new content row count and updated settings
+                cmd = new AddDeleteDocElementCmd(true, table.getPanelItem().getPanelName(),
+                    table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
+                cmdGroup.addCommand(cmd);
+
+                this.rb.executeCommand(cmdGroup);
+                // select first cell of new band
+                this.rb.selectObject(band.getValue('columnData')[0].getId(), true);
+            }
+        }
+    }
+
+    /**
+     * Delete content row of this band.
+     */
+    deleteRow() {
+        let table = this.getParent();
+        if (table !== null) {
+            let rowIndex = table.getContentRowIndex(this);
+            let contentRows = utils.convertInputToNumber(table.getValue('contentRows'));
+            if (rowIndex !== -1 && contentRows > 1) {
+                let cmdGroup = new CommandGroupCmd('Delete row');
+                // delete table with current settings and restore below with new rows, necessary for undo/redo
+                let cmd = new AddDeleteDocElementCmd(false, table.getPanelItem().getPanelName(),
+                    table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
+                cmdGroup.addCommand(cmd);
+
+                // decrease content row count of table
+                table.setValue('contentRows', contentRows - 1, 'rbro_table_element_content_rows', false);
+
+                // remove content row
+                table.getValue('contentDataRows').splice(rowIndex, 1);
+
+                // restore table with new content row count and updated settings
+                cmd = new AddDeleteDocElementCmd(true, table.getPanelItem().getPanelName(),
+                    table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
+                cmdGroup.addCommand(cmd);
+
+                this.rb.executeCommand(cmdGroup);
+            }
+        }
     }
 
     addChildren(docElements) {

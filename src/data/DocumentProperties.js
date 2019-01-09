@@ -1,3 +1,4 @@
+import SectionElement from '../elements/SectionElement';
 import * as utils from '../utils';
 
 /**
@@ -134,6 +135,14 @@ export default class DocumentProperties {
         this.width = size.width;
         this.height = size.height;
         this.rb.getDocument().updatePageSize(size.width, size.height);
+
+        // update width of all elements which cover full width
+        let docElements = this.rb.getDocElements(true);
+        for (let docElement of docElements) {
+            if (docElement instanceof SectionElement) {
+                docElement.setWidth(size.width);
+            }
+        }
     }
 
     updateHeader() {

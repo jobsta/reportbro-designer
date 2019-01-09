@@ -32,7 +32,9 @@ export default class SectionElement extends DocElement {
         this.headerData = this.createBand(Band.bandType.header, null);
         this.contentData = this.createBand(Band.bandType.content, null);
         this.footerData = this.createBand(Band.bandType.footer, null);
-        this.updateHeight();
+        this.updateHeight(null, -1);
+
+        this.setWidth(this.getContainerContentSize().width);
 
         this.setupComplete = true;
         this.updateName();
@@ -95,9 +97,31 @@ export default class SectionElement extends DocElement {
     }
 
     /**
-     * Do not register any event handlers so element cannot be selected.
+     * Register event handler for mouse down so element can be dragged but and
+     * only allow selection if double clicked.
      */
     registerEventHandlers() {
+        this.el
+            .dblclick(event => {
+                if (!this.rb.isSelectedObject(this.id)) {
+                    this.rb.selectObject(this.id, true);
+                    event.stopPropagation();
+                }
+            })
+            .mousedown(event => {
+                if (event.shiftKey) {
+                    this.rb.deselectObject(this.id);
+                } else {
+                    if (this.rb.isSelectedObject(this.id)) {
+                        this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
+                            this.id, this.containerId, this.linkedContainerId,
+                            this.getElementType(), DocElement.dragType.element);
+                    } else {
+                        this.rb.deselectAll();
+                    }
+                }
+                event.stopPropagation();
+            });
     }
     
     /**
@@ -111,6 +135,19 @@ export default class SectionElement extends DocElement {
         }
         return id;
     }
+
+    appendContainerChildren(elements) {
+        if (this.headerData !== null) {
+            this.headerData.appendContainerChildren(elements);
+        }
+        if (this.contentData !== null) {
+            this.contentData.appendContainerChildren(elements);
+        }
+        if (this.footerData !== null) {
+            this.footerData.appendContainerChildren(elements);
+        }
+    }
+
 
     setValue(field, value, elSelector, isShown) {
         super.setValue(field, value, elSelector, isShown);
@@ -181,12 +218,27 @@ export default class SectionElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroSectionElement"></div>`);
+        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroSectionElement"></div>`);
         this.el.append($(`<div id="rbro_divider_section_top${this.id}" class="rbroDivider rbroDividerSection" style="top: 0px"></div>`));
         this.el.append($(`<div id="rbro_divider_section_header${this.id}" class="rbroDivider rbroDividerSectionBand rbroHidden"></div>`));
         this.el.append($(`<div id="rbro_divider_section_footer${this.id}" class="rbroDivider rbroDividerSectionBand rbroHidden"></div>`));
         this.el.append($(`<div id="rbro_divider_section_bottom${this.id}" class="rbroDivider rbroDividerSection"></div>`));
         this.appendToContainer();
+        this.registerEventHandlers();
+    }
+
+    remove() {
+        super.remove();
+        // delete containers of section bands
+        if (this.headerData !== null) {
+            this.rb.deleteContainer(this.headerData.getLinkedContainer());
+        }
+        if (this.contentData !== null) {
+            this.rb.deleteContainer(this.contentData.getLinkedContainer());
+        }
+        if (this.footerData !== null) {
+            this.rb.deleteContainer(this.footerData.getLinkedContainer());
+        }
     }
 
     updateName() {
@@ -202,22 +254,59 @@ export default class SectionElement extends DocElement {
     }
 
     /**
+     * Set internal width and width of all bands. Should be called whenever the document size changes.
+     * @param {Number} width - total band width.
+     */
+    setWidth(width) {
+        this.widthVal = width;
+        this.width = '' + width;
+        if (this.headerData !== null) {
+            this.headerData.widthVal = width;
+            this.headerData.width = '' + width;
+        }
+        if (this.contentData !== null) {
+            this.contentData.widthVal = width;
+            this.contentData.width = '' + width;
+        }
+        if (this.footerData !== null) {
+            this.footerData.widthVal = width;
+            this.footerData.width = '' + width;
+        }
+    }
+
+    /**
      * Update section element height and position, visibility of dividers for header/footer bands.
+     * @param {SectionBandElement} band - if not null the bandHeight parameter will be used for band height
+     * instead of the actual stored height value. This is needed to update the divider display during drag
+     * of section band height.
+     * @param {Number} bandHeight - used band height for given band parameter instead of stored height value.
     */
-    updateHeight() {
+    updateHeight(band, bandHeight) {
         let height = 0;
         if (this.header && this.headerData !== null) {
-            height += this.headerData.getValue('heightVal');
+            if (band === this.headerData) {
+                height += bandHeight;
+            } else {
+                height += this.headerData.getValue('heightVal');
+            }
             $(`#rbro_divider_section_header${this.id}`).css({ top: this.rb.toPixel(height) }).removeClass('rbroHidden');
         } else {
             $(`#rbro_divider_section_header${this.id}`).addClass('rbroHidden');
         }
         if (this.contentData !== null) {
-            height += this.contentData.getValue('heightVal');
+            if (band === this.contentData) {
+                height += bandHeight;
+            } else {
+                height += this.contentData.getValue('heightVal');
+            }
         }
         if (this.footer && this.footerData !== null) {
             $(`#rbro_divider_section_footer${this.id}`).css({ top: this.rb.toPixel(height) }).removeClass('rbroHidden');
-            height += this.footerData.getValue('heightVal');
+            if (band === this.footerData) {
+                height += bandHeight;
+            } else {
+                height += this.footerData.getValue('heightVal');
+            }
         } else {
             $(`#rbro_divider_section_footer${this.id}`).addClass('rbroHidden');
         }
@@ -247,7 +336,7 @@ export default class SectionElement extends DocElement {
                 this.footerData.setValue('y', '' + y, null, true);
             }
         }
-        this.updateHeight();
+        this.updateHeight(null, -1);
     }
 
     /**

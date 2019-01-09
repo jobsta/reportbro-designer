@@ -1,10 +1,8 @@
-import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import AddDeleteStyleCmd from '../commands/AddDeleteStyleCmd';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import MovePanelItemCmd from '../commands/MovePanelItemCmd';
 import SetValueCmd from '../commands/SetValueCmd';
-import Container from '../container/Container';
 import Parameter from '../data/Parameter';
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
@@ -123,13 +121,14 @@ export default class MainPanelItem {
         if (this.properties.showDelete) {
             itemDiv.append($('<div class="rbroButton rbroDeleteButton rbroIcon-cancel"></div>')
                 .click(event => {
-                    let initialData = this.getData().toJS();
-                    let pos = this.getSiblingPosition();
                     let cmd = null;
                     if (panelName === 'parameter') {
-                        cmd = new AddDeleteParameterCmd(false, initialData, this.getId(), this.parent.getId(), pos, this.rb);
+                        cmd = new AddDeleteParameterCmd(
+                            false, this.getData().toJS(), this.getId(), this.parent.getId(),
+                            this.getSiblingPosition(), this.rb);
                     } else if (panelName === 'style') {
-                        cmd = new AddDeleteStyleCmd(false, initialData, this.getId(), this.parent.getId(), pos, this.rb);
+                        cmd = new CommandGroupCmd('Delete', this);
+                        this.getData().addCommandsForDelete(cmd);
                     } else if (panelName === DocElement.type.text || panelName === DocElement.type.image ||
                             panelName === DocElement.type.line || panelName === DocElement.type.table ||
                             panelName === DocElement.type.pageBreak ||

@@ -20,6 +20,7 @@ export default class ImageElement extends DocElement {
         this.horizontalAlignment = Style.alignment.left;
         this.verticalAlignment = Style.alignment.top;
         this.backgroundColor = '';
+        this.link = '';
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_addEmptyRow = false;
@@ -54,7 +55,7 @@ export default class ImageElement extends DocElement {
     getFields() {
         return ['id', 'containerId', 'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
             'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
-            'printIf', 'removeEmptyElement',
+            'printIf', 'removeEmptyElement', 'link',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
     }
 

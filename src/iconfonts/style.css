@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'reportbro';
   src:
-    url('reportbro.woff2?7obw4r') format('woff2'),
-    url('reportbro.ttf?7obw4r') format('truetype'),
-    url('reportbro.woff?7obw4r') format('woff'),
-    url('reportbro.svg?7obw4r#reportbro') format('svg');
+    url('reportbro.woff2?dmx1ph') format('woff2'),
+    url('reportbro.ttf?dmx1ph') format('truetype'),
+    url('reportbro.woff?dmx1ph') format('woff'),
+    url('reportbro.svg?dmx1ph#reportbro') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,6 +24,24 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.rbroIcon-row-delete:before {
+  content: "\e92f";
+}
+.rbroIcon-column-delete:before {
+  content: "\e930";
+}
+.rbroIcon-row-add-below:before {
+  content: "\e931";
+}
+.rbroIcon-row-add-above:before {
+  content: "\e932";
+}
+.rbroIcon-column-add-left:before {
+  content: "\e933";
+}
+.rbroIcon-column-add-right:before {
+  content: "\e934";
+}
 .rbroIcon-section:before {
   content: "\e92e";
 }
@@ -150,6 +168,9 @@
 .rbroIcon-underline:before {
   content: "\e908";
 }
+.rbroIcon-strikethrough:before {
+  content: "\e900";
+}
 .rbroIcon-text-align-left:before {
   content: "\e909";
 }
@@ -166,7 +187,7 @@
   content: "\e805";
 }
 .rbroIcon-arrow-right:before {
-  content: "\e900";
+  content: "\e935";
 }
 .rbroIcon-arrow-down:before {
   content: "\e60c";
