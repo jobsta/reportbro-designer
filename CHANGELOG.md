@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.1.0] - 2019-01-10
+
+### Features
+* menu action buttons to add columns to the left/right of selected table column,
+and buttons to add content rows above/below of selected table column
+* allow dragging of selected section and of section band height
+* link property for text and image element to create an external link
+* strikethrough text style
+
+### Bug Fixes
+* fix updating parameter references when renaming a parameter which is used inside a table in a section
+* remove references when a style is deleted
+* update element using style when style is changed
+* fix menu item display in sidebar menu
+* fix deletion of section: internal containers for section bands were not deleted,
+undo delete action did not work properly (elements inside section bands were not restored)
+* fix display of error messages for table band print-if field
+* do not ignore test data for boolean parameter in report preview
+
+### Changes
+* allow up to 99 table content rows
+* add printIf and removeEmptyElement fields for table
+* section and frame can be selected with double click
+* more options for text line spacing
+* copy pasted element to current scroll position instead of upper left corner
+
 ## [1.0.0] - 2018-09-25
 
 ### Bug Fixes
