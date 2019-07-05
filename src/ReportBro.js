@@ -90,6 +90,7 @@ export default class ReportBro {
             documentTabPdfPreview: 'PDF Preview',
             documentTabXlsxDownload: 'XLSX Download',
             emptyPanel: 'Empty panel',
+            errorMsgDuplicateParameter: 'Parameter already exists',
             errorMsgDuplicateParameterField: 'Field already exists',
             errorMsgLoadingImageFailed: 'Loading image failed',
             errorMsgInvalidArray: 'Invalid list',
@@ -101,6 +102,7 @@ export default class ReportBro {
             errorMsgInvalidExpression: 'Invalid expression: ${info}',
             errorMsgInvalidExpressionFuncNotDefined: 'Function ${info} not defined',
             errorMsgInvalidExpressionNameNotDefined: 'Name ${info} not defined',
+            errorMsgInvalidLink: 'Link must start with http:// or https://',
             errorMsgInvalidImage: 'Invalid image data, image must be base64 encoded',
             errorMsgInvalidImageSource: 'Invalid source, expected url starting with http:// or https://',
             errorMsgInvalidImageSourceParameter: 'Parameter must be an image or string (containing a url)',
@@ -256,6 +258,7 @@ export default class ReportBro {
         this.properties = {
             additionalFonts: [],
             adminMode: true,
+            cmdExecutedCallback: null,
             enableSpreadsheet: true,
             fonts: [
                 { name: 'Courier', value: 'courier' },
@@ -660,14 +663,6 @@ export default class ReportBro {
         return this.properties[key];
     }
 
-    /**
-     * Returns a new unique id which can be used for any data object.
-     * @returns {Number}
-     */
-    getUniqueId() {
-        return this.nextId++;
-    }
-
     getMainPanel() {
         return this.mainPanel;
     }
@@ -772,16 +767,6 @@ export default class ReportBro {
         return parameters;
     }
 
-    getParameterByName(parameterName) {
-        let parameters = this.getParameters();
-        for (let parameter of parameters) {
-            if (parameter.getValue('name') === parameterName) {
-                return parameter;
-            }
-        }
-        return null;
-    }
-
     /**
      * Append document elements of given container.
      * @param {Container} container
@@ -879,18 +864,9 @@ export default class ReportBro {
         this.addDataObject(parameter);
     }
 
-    deleteParameter(parameter) {
-        this.deleteDataObject(parameter);
-    }
-
     addStyle(style) {
         this.addDataObject(style);
         this.notifyEvent(style, Command.operation.add);
-    }
-
-    deleteStyle(style) {
-        this.deleteDataObject(style);
-        this.notifyEvent(style, Command.operation.remove);
     }
 
     getStyles() {
@@ -914,17 +890,11 @@ export default class ReportBro {
         this.addDataObject(element);
     }
 
-    deleteDocElement(element) {
+    deleteDocElements() {
         for (let i=0; i < this.docElements.length; i++) {
-            if (this.docElements[i].getId() === element.getId()) {
-                if (this.detailData === this.docElements[i]) {
-                    this.setDetailPanel('none', null);
-                }
-                this.docElements.splice(i, 1);
-                this.deleteDataObject(element);
-                break;
-            }
+            this.deleteDataObject(this.docElements[i]);
         }
+        this.docElements = [];
     }
 
     getDetailData() {
@@ -955,23 +925,34 @@ export default class ReportBro {
         this.modified = true;
         this.selectionSinceLastCommand = false;
         this.updateMenuButtons();
+        if (this.properties.cmdExecutedCallback) {
+            this.properties.cmdExecutedCallback(cmd);
+        }
     }
 
     undoCommand() {
         if (this.lastCommandIndex >= 0) {
-            this.commandStack[this.lastCommandIndex].undo();
+            let cmd = this.commandStack[this.lastCommandIndex];
+            cmd.undo();
             this.lastCommandIndex--;
             this.modified = true;
             this.updateMenuButtons();
+            if (this.properties.cmdExecutedCallback) {
+                this.properties.cmdExecutedCallback(cmd);
+            }
         }
     }
 
     redoCommand() {
         if (this.lastCommandIndex < (this.commandStack.length - 1)) {
             this.lastCommandIndex++;
-            this.commandStack[this.lastCommandIndex].do();
+            let cmd = this.commandStack[this.lastCommandIndex];
+            cmd.do();
             this.modified = true;
             this.updateMenuButtons();
+            if (this.properties.cmdExecutedCallback) {
+                this.properties.cmdExecutedCallback(cmd);
+            }
         }
     }
 
@@ -1332,49 +1313,6 @@ export default class ReportBro {
         return val + 'px';
     }
 
-    createDocElement(docElementData) {
-        let element = AddDeleteDocElementCmd.createElement(
-            docElementData.id, docElementData, docElementData.elementType, -1, false, this);
-        let maxId = element.getMaxId();
-        if (maxId >= this.nextId) {
-            this.nextId = maxId + 1;
-        }
-        return element;
-    }
-
-    createParameter(parameterData) {
-        let parameter = new Parameter(parameterData.id, parameterData, this);
-        let parentPanel = this.mainPanel.getParametersItem();
-        let panelItem = new MainPanelItem(
-            'parameter', parentPanel, parameter,
-            { hasChildren: true, showAdd: parameter.getValue('editable'), showDelete: parameter.getValue('editable'), draggable: true }, this);
-        parameter.setPanelItem(panelItem);
-        parentPanel.appendChild(panelItem);
-        parameter.setup();
-        if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
-            $(`#rbro_menu_item_add${parameter.getId()}`).hide();
-            $(`#rbro_menu_item_children${parameter.getId()}`).hide();
-            $(`#rbro_menu_item_children_toggle${parameter.getId()}`).hide();
-        }
-        this.addParameter(parameter);
-        let maxId = parameter.getMaxId();
-        if (maxId >= this.nextId) {
-            this.nextId = maxId + 1;
-        }
-    }
-
-    createStyle(styleData) {
-        let style = new Style(styleData.id, styleData, this);
-        let parentPanel = this.mainPanel.getStylesItem();
-        let panelItem = new MainPanelItem('style', parentPanel, style, { draggable: true }, this);
-        style.setPanelItem(panelItem);
-        parentPanel.appendChild(panelItem);
-        this.addStyle(style);
-        if (styleData.id >= this.nextId) {
-            this.nextId = styleData.id + 1;
-        }
-    }
-
     /**
      * Shows a global loading image which disables all controls.
      */
@@ -1550,12 +1488,13 @@ export default class ReportBro {
      */
     load(report) {
         for (let parameter of this.getParameters()) {
-            this.deleteParameter(parameter);
+            this.deleteDataObject(parameter);
         }
         for (let style of this.getStyles()) {
-            this.deleteStyle(style);
+            this.deleteDataObject(style);
         }
-        
+        this.deleteDocElements();
+
         this.nextId = 1;
         this.setDetailPanel('none', null);
         this.docElements = [];
@@ -1633,5 +1572,171 @@ export default class ReportBro {
         if (this.reportKey !== null) {
             window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
         }
+    }
+
+    /**
+     * Returns a new unique id which can be used for any data object.
+     * @returns {Number}
+     */
+    getUniqueId() {
+        return this.nextId++;
+    }
+
+    /**
+     * Returns document element for the given id, or null if document element does not exist.
+     * @param {Number} id - Id of document element to search for.
+     * @returns {[DocElement]}
+     */
+    getDocElementById(id) {
+        let obj = this.getDataObject(id);
+        if (obj instanceof DocElement) {
+            return obj;
+        }
+        return null;
+    }
+
+    /**
+     * Returns parameter for the given id, or null if parameter does not exist.
+     * @param {Number} id - Id of parameter to search for.
+     * @returns {[Parameter]}
+     */
+    getParameterById(id) {
+        let obj = this.getDataObject(id);
+        if (obj instanceof Parameter) {
+            return obj;
+        }
+        return null;
+    }
+
+    /**
+     * Returns parameter for the given name, or null if parameter does not exist.
+     * @param {String} parameterName - Name of parameter to search for.
+     * @returns {[Parameter]}
+     */
+    getParameterByName(parameterName) {
+        let parameters = this.getParameters();
+        for (let parameter of parameters) {
+            if (parameter.getValue('name') === parameterName) {
+                return parameter;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns style for the given id, or null if style does not exist.
+     * @param {Number} id - Id of style to search for.
+     * @returns {[Style]}
+     */
+    getStyleById(id) {
+        let obj = this.getDataObject(id);
+        if (obj instanceof Style) {
+            return obj;
+        }
+        return null;
+    }
+
+    /**
+     * Creates a doc element with given data.
+     * @param {Object} docElementData - Map containing all data for new doc element, must
+     * also contain a unique id.
+     * @returns {DocElement} the created doc element.
+     */
+    createDocElement(docElementData) {
+        let element = AddDeleteDocElementCmd.createElement(
+            docElementData.id, docElementData, docElementData.elementType, -1, false, this);
+        let maxId = element.getMaxId();
+        if (maxId >= this.nextId) {
+            this.nextId = maxId + 1;
+        }
+        return element;
+    }
+
+    /**
+     * Creates a parameter with given data.
+     * @param {Object} parameterData - Map containing all data for new parameter, must
+     * also contain an unique id.
+     * @returns {Parameter} the created parameter.
+     */
+    createParameter(parameterData) {
+        let parameter = new Parameter(parameterData.id, parameterData, this);
+        let parentPanel = this.mainPanel.getParametersItem();
+        let panelItem = new MainPanelItem(
+            'parameter', parentPanel, parameter,
+            { hasChildren: true, showAdd: parameter.getValue('editable'), showDelete: parameter.getValue('editable'), draggable: true }, this);
+        parameter.setPanelItem(panelItem);
+        parentPanel.appendChild(panelItem);
+        parameter.setup();
+        if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
+            $(`#rbro_menu_item_add${parameter.getId()}`).hide();
+            $(`#rbro_menu_item_children${parameter.getId()}`).hide();
+            $(`#rbro_menu_item_children_toggle${parameter.getId()}`).hide();
+        }
+        this.addParameter(parameter);
+        let maxId = parameter.getMaxId();
+        if (maxId >= this.nextId) {
+            this.nextId = maxId + 1;
+        }
+        return parameter;
+    }
+
+    /**
+     * Creates a style with given data.
+     * @param {Object} styleData - Map containing all data for new style, must
+     * also contain an unique id.
+     * @returns {Style} the created style.
+     */
+    createStyle(styleData) {
+        let style = new Style(styleData.id, styleData, this);
+        let parentPanel = this.mainPanel.getStylesItem();
+        let panelItem = new MainPanelItem('style', parentPanel, style, { draggable: true }, this);
+        style.setPanelItem(panelItem);
+        parentPanel.appendChild(panelItem);
+        this.addStyle(style);
+        if (styleData.id >= this.nextId) {
+            this.nextId = styleData.id + 1;
+        }
+        return style;
+    }
+
+    /**
+     * Deletes given doc element. Deletes internal object and all
+     * related GUI elements (panel item, layout element).
+     * @param {DocElement} element - doc element to delete.
+     */
+    deleteDocElement(element) {
+        for (let i=0; i < this.docElements.length; i++) {
+            if (this.docElements[i].getId() === element.getId()) {
+                this.notifyEvent(element, Command.operation.remove);
+                if (this.detailData === this.docElements[i]) {
+                    this.setDetailPanel('none', null);
+                }
+                this.docElements.splice(i, 1);
+                this.deleteDataObject(element);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Deletes given parameter. Deletes internal object and all
+     * related GUI elements (panel item, layout element).
+     * @param {Parameter} parameter - parameter to delete.
+     */
+    deleteParameter(parameter) {
+        this.notifyEvent(parameter, Command.operation.remove);
+        this.deleteDataObject(parameter);
+        parameter.getPanelItem().getParent().removeChild(parameter.getPanelItem());
+    }
+
+    /**
+     * Deletes given style. Deletes internal object and all
+     * related GUI elements (panel item, layout element).
+     * @param {Style} style - style to delete.
+     */
+    deleteStyle(style) {
+        this.notifyEvent(style, Command.operation.remove);
+        this.deleteDataObject(style);
+        style.getPanelItem().getParent().removeChild(style.getPanelItem());
     }
 }

@@ -70,7 +70,6 @@ export default class AddDeleteDocElementCmd {
     deleteElement() {
         let element = this.rb.getDataObject(this.id);
         if (element !== null) {
-            this.rb.notifyEvent(element, Command.operation.remove);
             this.rb.deleteDocElement(element);
         }
     }

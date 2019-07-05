@@ -57,7 +57,6 @@ export default class AddDeleteStyleCmd {
         if (style !== null) {
             this.initialData = style.toJS();
             this.rb.deleteStyle(style);
-            style.getPanelItem().getParent().removeChild(style.getPanelItem());
         }
     }
 }

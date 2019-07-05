@@ -59,9 +59,7 @@ export default class AddDeleteParameterCmd {
         let parameter = this.rb.getDataObject(this.id);
         if (parameter !== null) {
             this.initialData = parameter.toJS();
-            this.rb.notifyEvent(parameter, Command.operation.remove);
             this.rb.deleteParameter(parameter);
-            parameter.getPanelItem().getParent().removeChild(parameter.getPanelItem());
         }
     }
 }
