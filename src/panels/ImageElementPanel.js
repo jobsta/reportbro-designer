@@ -138,13 +138,10 @@ export default class ImageElementPanel {
         elFormField = $('<div class="rbroFormField rbroSplit"></div>');
         let elWidth = $(`<input id="rbro_image_element_width">`)
             .on('input', event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let val = utils.checkInputDecimal(elWidth.val(), 10, 1000);
-                    if (val !== elWidth.val()) {
-                        elWidth.val(val);
-                    }
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null && obj.getValue('width') !== elWidth.val()) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_image_element_width', 'width',
-                        val, SetValueCmd.type.text, this.rb);
+                        elWidth.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -152,13 +149,10 @@ export default class ImageElementPanel {
         elFormField.append(elWidth);
         let elHeight = $(`<input id="rbro_image_element_height">`)
             .on('input', event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let val = utils.checkInputDecimal(elHeight.val(), 10, 1000);
-                    if (val !== elHeight.val()) {
-                        elHeight.val(val);
-                    }
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null && obj.getValue('height') !== elHeight.val()) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_image_element_height', 'height',
-                        val, SetValueCmd.type.text, this.rb);
+                        elHeight.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
