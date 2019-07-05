@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0] - 2019-07-05
+
+### Features
+* basic touch support to drag & drop and resize document elements
+* public API methods to get, add and delete objects:
+getUniqueId, getDocElementById, getStyleById, getParameterById, getParameterByName,
+createDocElement, createParameter, createStyle, deleteDocElement, deleteParameter, deleteStyle
+
+### Changes
+* add cmdExecutedCallback which is called when a command is exuected
+
+### Bug Fixes
+* delete existing document elements when loading report
+* fix issue when editing image size
+
 ## [1.1.0] - 2019-01-10
 
 ### Features
