@@ -1,6 +1,7 @@
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import TableTextElement from '../elements/TableTextElement';
+import {getEventAbsPos} from "../utils";
 
 /**
  * The menu panel contains all menu buttons.
@@ -47,6 +48,7 @@ export default class MenuPanel {
 
         let panelRight = $('<div class="rbroElementButtonContainer"></div>');
         let elElementsDiv = $('<div id="rbo_menu_elements" class="rbroElementButtons"></div>');
+
         elElementsDiv.append($(`<div id="rbro_menu_element_text" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementText')}">
                     <span class="rbroIcon-text"></span>
@@ -60,7 +62,21 @@ export default class MenuPanel {
                 // avoid calling dragstart handler for main div which disables dragging for all other elements
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.text, '');
+
+                // keep the browser from continuing to process the touch event
+                // (this also prevents a mouse event from being delivered).
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_line" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementLine')}">
                     <span class="rbroIcon-line"></span>
@@ -71,7 +87,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.line, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.line, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_image" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementImage')}">
                     <span class="rbroIcon-image"></span>
@@ -82,7 +109,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.image, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.image, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_bar_code" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementBarCode')}">
                     <span class="rbroIcon-barcode"></span>
@@ -92,6 +130,16 @@ export default class MenuPanel {
                 event.originalEvent.dataTransfer.effectAllowed = 'copy';
                 this.rb.startBrowserDrag('docElement', DocElement.type.barCode, '');
                 event.stopPropagation();
+            })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.barCode, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
             })
         );
         elElementsDiv.append($(`<div id="rbro_menu_element_table" class="rbroButton rbroMenuButton" draggable="true"
@@ -104,7 +152,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.table, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.table, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_frame" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementFrame')}">
                     <span class="rbroIcon-frame"></span>
@@ -115,7 +174,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.frame, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.frame, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_section" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementSection')}">
                     <span class="rbroIcon-section"></span>
@@ -126,7 +196,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.section, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.section, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         elElementsDiv.append($(`<div id="rbro_menu_element_page_break" class="rbroButton rbroMenuButton" draggable="true"
                 title="${this.rb.getLabel('docElementPageBreak')}">
                     <span class="rbroIcon-page-break"></span>
@@ -137,7 +218,18 @@ export default class MenuPanel {
                 this.rb.startBrowserDrag('docElement', DocElement.type.pageBreak, '');
                 event.stopPropagation();
             })
+            .on('touchstart', event => {
+                this.rb.startBrowserDrag('docElement', DocElement.type.pageBreak, '');
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDragover(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().processDrop(event);
+            })
         );
+
         panelRight.append(elElementsDiv);
         
         let elActionsDiv = $('<div class="rbroActionButtons"></div>');

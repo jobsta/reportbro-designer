@@ -4,6 +4,7 @@ import SetValueCmd from '../commands/SetValueCmd';
 import Band from '../container/Band';
 import Parameter from '../data/Parameter';
 import * as utils from '../utils';
+import {getEventAbsPos} from "../utils";
 
 /**
  * Base class for all doc elements.
@@ -81,6 +82,49 @@ export default class DocElement {
     }
 
     /**
+     * Register event handler for a container element so it can be dragged and
+     * allow selection on double click.
+     */
+    registerContainerEventHandlers() {
+        this.el
+            .dblclick(event => {
+                if (!this.rb.isSelectedObject(this.id)) {
+                    this.rb.selectObject(this.id, true);
+                    event.stopPropagation();
+                }
+            })
+            .mousedown(event => {
+                if (event.shiftKey) {
+                    this.rb.deselectObject(this.id);
+                } else {
+                    if (this.rb.isSelectedObject(this.id)) {
+                        this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
+                            this.id, this.containerId, this.linkedContainerId,
+                            this.getElementType(), DocElement.dragType.element);
+                    } else {
+                        this.rb.deselectAll();
+                    }
+                }
+                event.stopPropagation();
+            })
+            .on('touchstart', event => {
+                if (this.rb.isSelectedObject(this.id)) {
+                    let absPos = getEventAbsPos(event);
+                    this.rb.getDocument().startDrag(absPos.x, absPos.y,
+                        this.id, this.containerId, this.linkedContainerId,
+                        this.getElementType(), DocElement.dragType.element);
+                }
+                event.preventDefault();
+            })
+            .on('touchmove', event => {
+                this.rb.getDocument().processDrag(event);
+            })
+            .on('touchend', event => {
+                this.rb.getDocument().stopDrag();
+            });
+    }
+
+    /**
      * Register event handlers so element can be selected, dragged and resized.
      */
     registerEventHandlers() {
@@ -90,6 +134,27 @@ export default class DocElement {
             })
             .mousedown(event => {
                 this.handleClick(event, false);
+            })
+            .on('touchstart', event => {
+                if (!this.rb.isSelectedObject(this.id)) {
+                    this.handleClick(event, true);
+                } else {
+                    let absPos = getEventAbsPos(event);
+                    this.rb.getDocument().startDrag(absPos.x, absPos.y,
+                        this.id, this.containerId, this.linkedContainerId,
+                        this.getElementType(), DocElement.dragType.element);
+                    event.preventDefault();
+                }
+            })
+            .on('touchmove', event => {
+                if (this.rb.isSelectedObject(this.id)) {
+                    this.rb.getDocument().processDrag(event);
+                }
+            })
+            .on('touchend', event => {
+                if (this.rb.isSelectedObject(this.id)) {
+                    this.rb.getDocument().stopDrag();
+                }
             });
     }
 
@@ -555,7 +620,24 @@ export default class DocElement {
                             this.id, this.containerId, this.linkedContainerId,
                             this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
                         event.stopPropagation();
+                    })
+                    .on('touchstart', event => {
+                        if (this.rb.isSelectedObject(this.id)) {
+                            let absPos = getEventAbsPos(event);
+                            this.rb.getDocument().startDrag(absPos.x, absPos.y,
+                                this.id, this.containerId, this.linkedContainerId,
+                                this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
+                        }
+                        event.preventDefault();
+                        event.stopPropagation();
+                    })
+                    .on('touchmove', event => {
+                        this.rb.getDocument().processDrag(event);
+                    })
+                    .on('touchend', event => {
+                        this.rb.getDocument().stopDrag();
                     });
+
                 elSizerContainer.append(elSizer);
             }
             this.el.addClass('rbroSelected');

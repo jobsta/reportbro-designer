@@ -15,6 +15,7 @@ export default class TableTextElement extends TextElement {
         this.columnIndex = initialData.columnIndex;
         this.parentId = initialData.parentId;
         this.tableId = initialData.tableId;
+        this.lastTouchStartTime = 0;
     }
 
     registerEventHandlers() {
@@ -39,6 +40,26 @@ export default class TableTextElement extends TextElement {
                     }
                     event.stopPropagation();
                 }
+            })
+            .on('touchstart', event => {
+                if (!this.rb.isSelectedObject(this.id)) {
+                    let timeSinceLastTouch = new Date().getTime() - this.lastTouchStartTime;
+                    // if last touch event was just recently ("double click") we allow
+                    // selection of this table text element. Otherwise element can only be
+                    // selected if another table text is already selected.
+                    if (timeSinceLastTouch < 1000) {
+                        if (this.rb.isSelectedObject(this.tableId)) {
+                            this.rb.selectObject(this.id, true);
+                            event.stopPropagation();
+                        }
+                    } else {
+                        if (this.rb.isTableElementSelected(this.tableId)) {
+                            this.rb.selectObject(this.id, true);
+                            event.stopPropagation();
+                        }
+                    }
+                }
+                this.lastTouchStartTime = new Date().getTime();
             });
     }
 

@@ -3,6 +3,7 @@ import Band from './container/Band';
 import DocumentProperties from './data/DocumentProperties';
 import DocElement from './elements/DocElement';
 import * as utils from './utils';
+import {getEventAbsPos} from "./utils";
 
 /**
  * Area to display all bands and its doc elements.
@@ -129,39 +130,7 @@ export default class Document {
     initializeEventHandlers() {
         $('#rbro_document_panel').mousemove(event => {
             if (this.dragging) {
-                if (this.dragType === DocElement.dragType.element) {
-                    let container = this.getContainer(
-                        event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
-                    let containerId = null;
-                    if (container !== null) {
-                        containerId = container.getId();
-                        if (containerId === this.dragLinkedContainerId) {
-                            // container is the same as the linked container of dragged element, this is
-                            // the case when dragging container elements like frames
-                            container = container.getParent();
-                            containerId = (container !== null) ? container.getId() : null;
-                        }
-                    }
-                    if (containerId !== this.dragCurrentContainerId) {
-                        $('.rbroElementContainer').removeClass('rbroElementDragOver');
-                        if (container !== null && containerId !== this.dragContainerId) {
-                            container.dragOver();
-                        }
-                    }
-                    this.dragCurrentContainerId = containerId;
-                }
-                this.dragCurrentX = event.originalEvent.pageX;
-                this.dragCurrentY = event.originalEvent.pageY;
-                this.dragSnapToGrid = !event.ctrlKey;
-
-                let dragObject = this.rb.getDataObject(this.dragObjectId);
-                if (dragObject !== null) {
-                    let dragDiff = dragObject.getDragDiff(
-                        event.originalEvent.pageX - this.dragStartX,
-                        event.originalEvent.pageY - this.dragStartY, this.dragType,
-                        (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
-                    this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, null, false);
-                }
+                this.processDrag(event);
             }
             if (this.selectionAreaStarted) {
                 let offset = this.elDocContent.offset();
@@ -178,21 +147,7 @@ export default class Document {
             }
         });
         this.elDocContent.on('dragover', event => {
-            if (this.rb.isBrowserDragActive('docElement')) {
-                let container = this.getContainer(
-                    event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
-                let containerId = (container !== null) ? container.getId() : null;
-                if (containerId !== this.dragContainerId) {
-                    $('.rbroElementContainer').removeClass('rbroElementDragOver');
-                    if (container !== null) {
-                        container.dragOver();
-                    }
-                    this.dragContainerId = containerId;
-                }
-                // without preventDefault for dragover event, the drop event is not fired
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            this.processDragover(event);
         })
         .on('dragenter', event => {
             if (this.rb.isBrowserDragActive('docElement')) {
@@ -210,35 +165,105 @@ export default class Document {
             }
         })
         .on('drop', event => {
-            if (this.rb.isBrowserDragActive('docElement')) {
-                $('.rbroElementContainer').removeClass('rbroElementDragOver');
-                let docProperties = this.rb.getDocumentProperties();
-                let container = this.getContainer(
-                    event.originalEvent.pageX, event.originalEvent.pageY, this.dragElementType);
-                while (container !== null && !container.isElementAllowed(this.dragElementType)) {
-                    container = container.getParent();
-                }
-                if (container !== null && container.isElementAllowed(this.dragElementType)) {
-                    let offset = this.elDocContent.offset();
-                    let x = event.originalEvent.pageX - offset.left;
-                    let y = event.originalEvent.pageY - offset.top;
-                    let containerOffset = container.getOffset();
-                    x -= containerOffset.x;
-                    y -= containerOffset.y;
-                    if (!event.ctrlKey && this.rb.getDocument().isGridVisible()) {
-                        let gridSize = this.rb.getDocument().getGridSize();
-                        x = utils.roundValueToInterval(x, gridSize);
-                        y = utils.roundValueToInterval(y, gridSize);
-                    }
-                    let initialData = { x: '' + x, y: '' + y, containerId: container.getId() };
-                    let cmd = new AddDeleteDocElementCmd(true, this.dragElementType, initialData,
-                        this.rb.getUniqueId(), container.getId(), -1, this.rb);
-                    this.rb.executeCommand(cmd);
-                }
-                event.preventDefault();
-                return false;
-            }
+            this.processDrop(event);
+            return false;
         });
+    }
+
+    processDragover(event) {
+        if (this.rb.isBrowserDragActive('docElement')) {
+            let absPos = getEventAbsPos(event);
+            let container = null;
+            if (absPos !== null) {
+                container = this.getContainer(absPos.x, absPos.y, this.dragElementType);
+                this.dragCurrentX = absPos.x;
+                this.dragCurrentY = absPos.y;
+            }
+            let containerId = (container !== null) ? container.getId() : null;
+            if (containerId !== this.dragContainerId) {
+                $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                if (container !== null) {
+                    container.dragOver();
+                }
+                this.dragContainerId = containerId;
+            }
+            // without preventDefault for dragover event, the drop event is not fired
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
+    processDrop(event) {
+        if (this.rb.isBrowserDragActive('docElement')) {
+            let absPos = getEventAbsPos(event);
+            if (absPos !== null) {
+                this.dragCurrentX = absPos.x;
+                this.dragCurrentY = absPos.y;
+            }
+            $('.rbroElementContainer').removeClass('rbroElementDragOver');
+            let docProperties = this.rb.getDocumentProperties();
+            let container = this.getContainer(
+                this.dragCurrentX, this.dragCurrentY, this.dragElementType);
+            while (container !== null && !container.isElementAllowed(this.dragElementType)) {
+                container = container.getParent();
+            }
+            if (container !== null && container.isElementAllowed(this.dragElementType)) {
+                let offset = this.elDocContent.offset();
+                let x = this.dragCurrentX - offset.left;
+                let y = this.dragCurrentY - offset.top;
+                let containerOffset = container.getOffset();
+                x -= containerOffset.x;
+                y -= containerOffset.y;
+                if (!event.ctrlKey && this.rb.getDocument().isGridVisible()) {
+                    let gridSize = this.rb.getDocument().getGridSize();
+                    x = utils.roundValueToInterval(x, gridSize);
+                    y = utils.roundValueToInterval(y, gridSize);
+                }
+                let initialData = { x: '' + x, y: '' + y, containerId: container.getId() };
+                let cmd = new AddDeleteDocElementCmd(true, this.dragElementType, initialData,
+                    this.rb.getUniqueId(), container.getId(), -1, this.rb);
+                this.rb.executeCommand(cmd);
+            }
+            event.preventDefault();
+            $('#rbro_menu_element_drag_item').addClass('rbroHidden');
+        }
+    }
+    
+    processDrag(event) {
+        let absPos = getEventAbsPos(event);
+        if (this.dragType === DocElement.dragType.element) {
+            let container = this.getContainer(
+                absPos.x, absPos.y, this.dragElementType);
+            let containerId = null;
+            if (container !== null) {
+                containerId = container.getId();
+                if (containerId === this.dragLinkedContainerId) {
+                    // container is the same as the linked container of dragged element, this is
+                    // the case when dragging container elements like frames
+                    container = container.getParent();
+                    containerId = (container !== null) ? container.getId() : null;
+                }
+            }
+            if (containerId !== this.dragCurrentContainerId) {
+                $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                if (container !== null && containerId !== this.dragContainerId) {
+                    container.dragOver();
+                }
+            }
+            this.dragCurrentContainerId = containerId;
+        }
+        this.dragCurrentX = absPos.x;
+        this.dragCurrentY = absPos.y;
+        this.dragSnapToGrid = !event.ctrlKey;
+
+        let dragObject = this.rb.getDataObject(this.dragObjectId);
+        if (dragObject !== null) {
+            let dragDiff = dragObject.getDragDiff(
+                absPos.x - this.dragStartX,
+                absPos.y - this.dragStartY, this.dragType,
+                (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
+            this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, null, false);
+        }
     }
 
     updatePageSize(width, height) {
@@ -462,6 +487,10 @@ export default class Document {
         this.dragContainerId = null;
         this.dragLinkedContainerId = null;
         this.dragElementType = dragElementType;
+        this.dragStartX = 0;
+        this.dragStartY = 0;
+        this.dragCurrentX = 0;
+        this.dragCurrentY = 0;
     }
 
     startSelectionArea(x, y) {

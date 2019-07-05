@@ -154,8 +154,21 @@ export function insertAtCaret(element, text) {
 
 export function getDataTransferType(transferType, prefix) {
     let parts = transferType.split('/');
-    if (parts.length >= 2 && parts[0] == prefix) {
+    if (parts.length >= 2 && parts[0] === prefix) {
         return parts[1];
+    }
+    return null;
+}
+
+export function getEventAbsPos(event) {
+    let absPosX = 0, absPosY = 0;
+    if (event.originalEvent instanceof TouchEvent) {
+        if (event.touches.length > 0) {
+            let lastTouch = event.touches[event.touches.length - 1];
+            return { x: lastTouch.pageX, y: lastTouch.pageY };
+        }
+    } else {
+        return { x: event.originalEvent.pageX, y: event.originalEvent.pageY };
     }
     return null;
 }
