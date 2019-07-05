@@ -198,7 +198,7 @@ export default class Parameter {
      * @param {String} newParameterName
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
-    addUpdateTestDataCmdForChangedParameter(oldParameter, newParameter, cmdGroup) {
+    addUpdateTestDataCmdForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
         if (this.type === Parameter.type.array) {
             let rows = [];
             try {
@@ -208,8 +208,8 @@ export default class Parameter {
                         let itemRow = {};
                         for (let val in row) {
                             if (row.hasOwnProperty(val)) {
-                                if (val === oldParameter) {
-                                    itemRow[newParameter] = row[val];
+                                if (val === oldParameterName) {
+                                    itemRow[newParameterName] = row[val];
                                 } else {
                                     itemRow[val] = row[val];
                                 }
