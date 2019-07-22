@@ -1,6 +1,6 @@
 {
   "name": "reportbro-designer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Designer to create pdf and excel report layouts. The reports can be generated with reportbro-lib (a Python package) on the server.",
   "keywords": [
     "report",
@@ -23,8 +23,8 @@
     "url": "http://github.com/jobsta/reportbro-designer"
   },
   "files": [
-    "dist/*.js",
-    "dist/*.css"
+    "dist",
+    "src"
   ],
   "main": "dist/reportbro.js",
   "scripts": {
