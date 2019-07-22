@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1] - 2019-07-22
+
+### Bug Fixes
+* fix drag & drop and resize of document elements in Firefox
+* fix npm package
+
 ## [1.2.0] - 2019-07-05
 
 ### Features
