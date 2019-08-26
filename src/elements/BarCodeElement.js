@@ -1,7 +1,4 @@
 import DocElement from './DocElement';
-import SetValueCmd from '../commands/SetValueCmd';
-import Style from '../data/Style';
-import * as utils from '../utils';
 
 /**
  * Barcode doc element. Currently only Code-128 is supported.
