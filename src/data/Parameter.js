@@ -1,3 +1,4 @@
+import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
@@ -225,6 +226,36 @@ export default class Parameter {
                     cmdGroup.addCommand(cmd);
                 }
             } catch (e) {
+            }
+        }
+    }
+
+    /**
+     * Adds AddDeleteParameterCmd to command group parameter in case the
+     * parameter type was changed from/to array. The command will add/delete the internal
+     * 'row_number' parameter which is available for array parameters.
+     * @param {String} newParameterType - new type of the parameter.
+     * @param {CommandGroupCmd} cmdGroup - possible AddDeleteParameterCmd command will
+     * be added to this command group.
+     */
+    addCommandsForChangedParameterType(newParameterType, cmdGroup) {
+        if (this.type !== Parameter.type.array && newParameterType === Parameter.type.array) {
+            let initialData = {
+                name: 'row_number', type: Parameter.type.number, eval: false, editable: false,
+                showOnlyNameType: true
+            };
+            let cmd = new AddDeleteParameterCmd(true, initialData, this.rb.getUniqueId(), this.getId(), -1, this.rb);
+            cmdGroup.addCommand(cmd);
+        } else if (this.type === Parameter.type.array && newParameterType !== Parameter.type.array) {
+            let children = this.getChildren();
+            for (let child of children) {
+                if (child.getValue('name') === 'row_number' && !child.getValue('editable')) {
+                    let cmd = new AddDeleteParameterCmd(
+                        false, child.toJS(), child.getId(), this.getId(),
+                        child.getPanelItem().getSiblingPosition(), this.rb);
+                    cmdGroup.addCommand(cmd);
+                    break;
+                }
             }
         }
     }

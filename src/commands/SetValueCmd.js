@@ -1,4 +1,5 @@
 import Command from './Command';
+import DocElement from '../elements/DocElement';
 
 /**
  * Command to set a single value of a data object.
@@ -44,6 +45,10 @@ export default class SetValueCmd {
         let isShown = (detailData !== null && detailData.getId() === this.objId);
         let elSelector = `#${this.tagId}`;
         obj.setValue(this.field, value, elSelector, isShown);
+
+        if (obj instanceof DocElement) {
+            value = obj.getUpdateValue(this.field, value);
+        }
 
         if (this.field === 'name') {
             $(`#rbro_menu_item_name${this.objId}`).text(value);

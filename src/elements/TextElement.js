@@ -83,6 +83,16 @@ export default class TextElement extends DocElement {
         this.updateContent(this.content);
     }
 
+    handleDoubleClick(event) {
+        super.handleDoubleClick(event);
+        // focus text content input element and set caret at end of content
+        let el = $('#rbro_text_element_content').get(0);
+        el.focus();
+        if (typeof el.selectionStart === 'number') {
+            el.selectionStart = el.selectionEnd = el.value.length;
+        }
+    }
+
     setValue(field, value, elSelector, isShown) {
         if (field.indexOf('border') !== -1) {
             // Style.setBorderValue needs to be called before super.setValue because it calls updateStyle() which expects
@@ -191,7 +201,7 @@ export default class TextElement extends DocElement {
         let styleProperties = {};
         let borderStyleProperties = {};
         let style = this.getStyle();
-        let contentSize = this.getContentSize(this.widthVal, this.heightVal, style);
+        let contentSize = this.getContentSize(this.getDisplayWidth(), this.getDisplayHeight(), style);
         let horizontalAlignment = style.getValue('horizontalAlignment');
         let verticalAlignment = style.getValue('verticalAlignment');
         let alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() + horizontalAlignment.slice(1);

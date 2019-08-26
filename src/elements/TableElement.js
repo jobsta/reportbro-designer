@@ -293,21 +293,31 @@ export default class TableElement extends DocElement {
     }
 
     /**
-     * Is called when column width of a single column was changed to update the column width of all table bands.
+     * Is called when number of columns was changed to update the column width of all table bands.
      * @param {Number} columnIndex - index of changed column.
      * @param {Number} width - new column width.
-     * @param {Boolean} updateTableWidth - if true the table width will be updated as well.
      */
-    updateColumnWidth(columnIndex, width, updateTableWidth) {
+    updateColumnWidth(columnIndex, width) {
         if (this.setupComplete) {
             this.headerData.updateColumnWidth(columnIndex, width);
             for (let i=0; i < this.contentDataRows.length; i++) {
                 this.contentDataRows[i].updateColumnWidth(columnIndex, width);
             }
             this.footerData.updateColumnWidth(columnIndex, width);
-            if (updateTableWidth) {
-                this.updateWidth();
+        }
+    }
+
+    /**
+     * Update display of columns of all bands depending on column span value of preceding columns.
+     * e.g. if a column has column span value of 3 then the next two columns will be hidden.
+     */
+    updateColumnDisplay() {
+        if (this.setupComplete) {
+            this.headerData.updateColumnDisplay();
+            for (let i=0; i < this.contentDataRows.length; i++) {
+                this.contentDataRows[i].updateColumnDisplay();
             }
+            this.footerData.updateColumnDisplay();
         }
     }
 
@@ -348,37 +358,24 @@ export default class TableElement extends DocElement {
      * @param {TableBandElement} tableBand - band containing the changed cell.
      * @param {Number} columnIndex - column index of changed cell.
      * @param {Number} newColumnWidth
+     * @param {Number} newTableWidth
      */
-    notifyColumnWidthResized(tableBand, columnIndex, newColumnWidth) {
+    notifyColumnWidthResized(tableBand, columnIndex, newColumnWidth, newTableWidth) {
         if (!this.setupComplete)
             return;
 
         if (tableBand !== this.headerData) {
-            let column = this.headerData.getColumn(columnIndex);
-            if (column !== null) {
-                column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
-            }
+            this.headerData.notifyColumnWidthResized(columnIndex, newColumnWidth);
         }
         for (let i=0; i < this.contentDataRows.length; i++) {
             if (tableBand !== this.contentDataRows[i]) {
-                let column = this.contentDataRows[i].getColumn(columnIndex);
-                if (column !== null) {
-                    column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
-                }
+                this.contentDataRows[i].notifyColumnWidthResized(columnIndex, newColumnWidth);
             }
         }
         if (tableBand !== this.footerData) {
-            let column = this.footerData.getColumn(columnIndex);
-            if (column !== null) {
-                column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
-            }
+            this.footerData.notifyColumnWidthResized(columnIndex, newColumnWidth);
         }
-        let width = this.headerData.getWidth();
-        let column = this.headerData.getColumn(columnIndex);
-        if (column !== null) {
-            width -= column.getValue('widthVal') - newColumnWidth;
-        }
-        $(`#rbro_el_table${this.id}`).css('width', (width + 1) + 'px');
+        $(`#rbro_el_table${this.id}`).css('width', (newTableWidth + 1) + 'px');
     }
 
     updateName() {
@@ -464,7 +461,7 @@ export default class TableElement extends DocElement {
             if (freeSpace > spaceNeeded) {
                 newWidth = column.getValue('widthVal') - spaceNeeded;
             }
-            this.updateColumnWidth(i, newWidth, false);
+            this.updateColumnWidth(i, newWidth);
             spaceNeeded -= freeSpace;
             if (spaceNeeded <= 0)
                 break;
@@ -502,7 +499,7 @@ export default class TableElement extends DocElement {
             // add remaining space to last column
             let column = this.headerData.getColumn(columns - 1);
             if (this.widthVal - usedWidth > 0) {
-                this.updateColumnWidth(columns - 1, column.getValue('widthVal') + (this.widthVal - usedWidth), false);
+                this.updateColumnWidth(columns - 1, column.getValue('widthVal') + (this.widthVal - usedWidth));
             }
         }
 

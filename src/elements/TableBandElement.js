@@ -2,6 +2,7 @@ import DocElement from './DocElement';
 import TableTextElement from './TableTextElement';
 import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
+import SetValueCmd from '../commands/SetValueCmd';
 import Band from '../container/Band';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
@@ -217,9 +218,13 @@ export default class TableBandElement extends DocElement {
             let panelItemText = new MainPanelItem(DocElement.type.text, this.panelItem, textElement, { showDelete: false }, this.rb);
             textElement.setPanelItem(panelItemText);
             this.panelItem.appendChild(panelItemText);
-            textElement.setup(true);
         }
         this.columnData = newColumnData;
+        // call setup of table text elements after columnData of table band has been set
+        for (let col of newColumnData) {
+            col.setup(true);
+        }
+        this.updateColumnDisplay();
         this.getElement().find('td').css({ height: this.rb.toPixel(this.heightVal) });
     }
 
@@ -240,9 +245,37 @@ export default class TableBandElement extends DocElement {
     }
 
     updateColumnWidth(columnIndex, width) {
+        let i = 0;
         if (columnIndex < this.columnData.length) {
-            let colData = this.columnData[columnIndex];
-            colData.updateColumnWidth(width);
+            this.columnData[columnIndex].setWidth(width);
+        }
+    }
+
+    /**
+     * Update display of columns depending on column span value of preceding columns.
+     * e.g. if a column has column span value of 3 then the next two columns will be hidden.
+     */
+    updateColumnDisplay() {
+        let i = 0;
+        while (i < this.columnData.length) {
+            let colData = this.columnData[i];
+            let colWidth = colData.getValue('widthVal');
+            let colSpan = colData.getValue('colspanVal');
+            colData.getElement().show();
+            if (colSpan > 1) {
+                let colspanEndIndex = ((i + colSpan) < this.columnData.length) ? (i + colSpan) : this.columnData.length;
+                i++;
+                // hide columns within colspan
+                while (i < colspanEndIndex) {
+                    colWidth += this.columnData[i].getValue('widthVal');
+                    this.columnData[i].getElement().hide();
+                    i++;
+                }
+            } else {
+                i++;
+            }
+            colData.setDisplayWidth(colWidth);
+            colData.updateDisplay();
         }
     }
 
@@ -251,6 +284,31 @@ export default class TableBandElement extends DocElement {
             return this.columnData[columnIndex];
         }
         return null;
+    }
+
+    /**
+     * Is called when column width of a cell was changed to update all DOM elements accordingly.
+     * @param {Number} columnIndex - column index of changed cell.
+     * @param {Number} newColumnWidth
+     */
+    notifyColumnWidthResized(columnIndex, newColumnWidth) {
+        let i = 0;
+        while (i < this.columnData.length) {
+            let column = this.columnData[i];
+            let nextCellIndex = column.getNextCellIndex();
+            if (nextCellIndex > columnIndex) {
+                if (nextCellIndex > i + 1) {
+                    for (let j = i; j < nextCellIndex; j++) {
+                        if (j !== columnIndex) {
+                            newColumnWidth += this.columnData[j].getValue('widthVal');
+                        }
+                    }
+                }
+                column.updateDisplayInternalNotify(0, 0, newColumnWidth, column.getValue('heightVal'), false);
+                break;
+            }
+            i = nextCellIndex;
+        }
     }
 
     /**
@@ -269,13 +327,25 @@ export default class TableBandElement extends DocElement {
 
     getWidth() {
         let width = 0;
-        for (let col of this.columnData) {
-            width += col.getValue('widthVal');
+        let i = 0;
+        while (i < this.columnData.length) {
+            let col = this.columnData[i];
+            width += col.getDisplayWidth();
+            let colspan = col.getValue('colspanVal');
+            if (colspan > 1) {
+                i += colspan;
+            } else {
+                i++;
+            }
         }
         return width;
     }
 
-    getColumnWidths() {
+    /**
+     * Returns array of all cell widths of this row.
+     * @returns {Number[]} array of cell widths.
+     */
+    getSingleCellWidths() {
         let widths = [];
         for (let col of this.columnData) {
             widths.push(col.getValue('widthVal'));

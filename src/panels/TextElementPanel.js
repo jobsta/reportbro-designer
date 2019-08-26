@@ -1,5 +1,6 @@
 import StylePanel from './StylePanel';
 import Command from '../commands/Command';
+import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Band from '../container/Band';
 import Style from '../data/Style';
@@ -105,9 +106,9 @@ export default class TextElementPanel {
             .on('input', event => {
                 let obj = this.rb.getDataObject(this.selectedObjId);
                 if (obj !== null && obj.getValue('width') !== elWidth.val()) {
-                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_text_element_width', 'width',
-                        elWidth.val(), SetValueCmd.type.text, this.rb);
-                    this.rb.executeCommand(cmd);
+                    let cmdGroup = new CommandGroupCmd('Set width');
+                    obj.addCommandsForChangedWidth(elWidth.val(), false, cmdGroup);
+                    this.rb.executeCommand(cmdGroup);
                 }
             });
         utils.setInputDecimal(elWidth);
@@ -124,6 +125,31 @@ export default class TextElementPanel {
         utils.setInputDecimal(elHeight);
         elFormField.append(elHeight);
         elFormField.append('<div id="rbro_text_element_size_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = $('<div id="rbro_text_element_colspan_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_text_element_colspan">${this.rb.getLabel('tableElementColspan')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elColspan = $(`<input id="rbro_text_element_colspan" maxlength="1">`)
+            .change(event => {
+                let obj = this.rb.getDataObject(this.selectedObjId);
+                if (obj !== null) {
+                    let val = elColspan.val().trim();
+                    if (val !== '') {
+                        val = utils.checkInputDecimal(val, 1, 9);
+                    }
+                    if (val !== elColspan.val()) {
+                        elColspan.val(val);
+                    }
+                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_text_element_colspan', 'colspan',
+                        elColspan.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
+            });
+        utils.setInputPositiveInteger(elColspan);
+        elFormField.append(elColspan);
+        elFormField.append('<div id="rbro_text_element_colspan_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -506,6 +532,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_position_y').prop('disabled', false);
             $('#rbro_text_element_width').prop('disabled', false);
             $('#rbro_text_element_height').prop('disabled', false);
+            $('#rbro_text_element_colspan').prop('disabled', false);
             $('#rbro_text_element_print_if').prop('disabled', false);
             $('#rbro_text_element_remove_empty_element').prop('disabled', false);
             $('#rbro_text_element_always_print_on_same_page').prop('disabled', false);
@@ -520,14 +547,15 @@ export default class TextElementPanel {
 
             $('#rbro_text_element_content').val(data.getValue('content'));
             $('#rbro_text_element_eval').prop('checked', data.getValue('eval'));
-            $('#rbro_text_element_width').val(data.getValue('width'));
-            $('#rbro_text_element_height').val(data.getValue('height'));
+            $('#rbro_text_element_width').val(data.getDisplayWidth());
+            $('#rbro_text_element_height').val(data.getDisplayHeight());
             $('#rbro_text_element_print_if').val(data.getValue('printIf'));
             $('#rbro_text_element_pattern').val(data.getValue('pattern'));
             $('#rbro_text_element_link').val(data.getValue('link'));
             if (!(data instanceof TableTextElement)) {
                 $('#rbro_text_element_position_x').val(data.getValue('x'));
                 $('#rbro_text_element_position_y').val(data.getValue('y'));
+                $('#rbro_text_element_colspan_row').hide();
                 $('#rbro_text_element_remove_empty_element').prop('checked', data.getValue('removeEmptyElement'));
                 $('#rbro_text_element_always_print_on_same_page').prop('checked', data.getValue('alwaysPrintOnSamePage'));
                 $('#rbro_text_element_spreadsheet_hide').prop('checked', data.getValue('spreadsheet_hide'));
@@ -544,6 +572,8 @@ export default class TextElementPanel {
                 $('#rbro_text_element_spreadsheet_section').show();
             } else {
                 $('#rbro_text_element_position_x').val(data.getOffsetX());
+                $('#rbro_text_element_colspan').val(data.getValue('colspan'));
+                $('#rbro_text_element_colspan_row').show();
                 $('#rbro_text_element_remove_empty_element_row').hide();
                 $('#rbro_text_element_always_print_on_same_page_row').hide();
                 let tableBandObj = this.rb.getDataObject(data.parentId);
@@ -608,6 +638,7 @@ export default class TextElementPanel {
             $('#rbro_text_element_position_y').prop('disabled', true);
             $('#rbro_text_element_width').prop('disabled', true);
             $('#rbro_text_element_height').prop('disabled', true);
+            $('#rbro_text_element_colspan').prop('disabled', true);
             $('#rbro_text_element_print_if').prop('disabled', true);
             $('#rbro_text_element_remove_empty_element').prop('disabled', true);
             $('#rbro_text_element_always_print_on_same_page').prop('disabled', true);

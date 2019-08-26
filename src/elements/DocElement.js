@@ -130,7 +130,7 @@ export default class DocElement {
     registerEventHandlers() {
         this.el
             .dblclick(event => {
-                this.handleClick(event, true);
+                this.handleDoubleClick(event);
             })
             .mousedown(event => {
                 this.handleClick(event, false);
@@ -156,6 +156,10 @@ export default class DocElement {
                     this.rb.getDocument().stopDrag();
                 }
             });
+    }
+
+    handleDoubleClick(event) {
+        this.handleClick(event, true);
     }
 
     /**
@@ -188,7 +192,7 @@ export default class DocElement {
         } else {
             if (event.shiftKey) {
                 this.rb.deselectObject(this.id);
-            } else {
+            } else if (!ignoreSelectedContainer) {
                 this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
                     this.id, this.containerId, this.linkedContainerId,
                     this.getElementType(), DocElement.dragType.element);
@@ -329,13 +333,10 @@ export default class DocElement {
             cmd.disableSelect();
             cmdGroup.addCommand(cmd);
         }
-        if (width !== this.widthVal && this.getWidthTagId() !== '') {
-            let cmd = new SetValueCmd(this.id, this.getWidthTagId(), 'width',
-                '' + width, SetValueCmd.type.text, this.rb);
-            cmd.disableSelect();
-            cmdGroup.addCommand(cmd);
+        if (width !== this.getDisplayWidth() && this.getWidthTagId() !== '') {
+            this.addCommandsForChangedWidth(width, true, cmdGroup);
         }
-        if (height !== this.heightVal && this.getHeightTagId() !== '') {
+        if (height !== this.getDisplayHeight() && this.getHeightTagId() !== '') {
             let cmd = new SetValueCmd(this.id, this.getHeightTagId(), 'height',
                 '' + height, SetValueCmd.type.text, this.rb);
             cmd.disableSelect();
@@ -349,7 +350,7 @@ export default class DocElement {
                 if (child.getData() instanceof DocElement) {
                     let docElement = child.getData();
                     docElement.checkBounds(docElement.getValue('xVal'), docElement.getValue('yVal'),
-                        docElement.getValue('widthVal'), docElement.getValue('heightVal'),
+                        docElement.getDisplayWidth(), docElement.getDisplayHeight(),
                         linkedContainerSize, cmdGroup);
                 }
             }
@@ -390,6 +391,25 @@ export default class DocElement {
                 this.updateDisplay();
             }
         }
+    }
+
+    /**
+     * Returns value to use for updating input control.
+     * Can be overridden in case update value can be different from internal value, e.g.
+     * width for table cells with colspan > 1.
+     * @param {Number} field - field name.
+     * @param {Number} value - value for update.
+     */
+    getUpdateValue(field, value) {
+        return value;
+    }
+
+    getDisplayWidth() {
+        return this.widthVal;
+    }
+
+    getDisplayHeight() {
+        return this.heightVal;
     }
 
     /**
@@ -434,10 +454,11 @@ export default class DocElement {
         let dragX, dragY;
         let posX1 = this.xVal;
         let posY1 = this.yVal;
-        let posX2 = posX1 + this.widthVal;
-        let posY2 = posY1 + this.heightVal;
+        let posX2 = posX1 + this.getDisplayWidth();
+        let posY2 = posY1 + this.getDisplayHeight();
+        let minWidth = this.getMinWidth();
         let maxWidth = this.getMaxWidth();
-        const MIN_DRAG_SIZE = 20;
+        let minHeight = this.getMinHeight();
         if (dragType === DocElement.dragType.element) {
             dragX = posX1 + diffX;
             if (gridSize !== 0) {
@@ -456,11 +477,11 @@ export default class DocElement {
                 if (gridSize !== 0) {
                     dragY = utils.roundValueToInterval(dragY, gridSize);
                 }
-                if (dragY > posY2 - MIN_DRAG_SIZE) {
+                if (dragY > posY2 - minHeight) {
                     if (gridSize !== 0) {
-                        dragY = utils.roundValueToLowerInterval(posY2 - MIN_DRAG_SIZE, gridSize);
+                        dragY = utils.roundValueToLowerInterval(posY2 - minHeight, gridSize);
                     } else {
-                        dragY = posY2 - MIN_DRAG_SIZE;
+                        dragY = posY2 - minHeight;
                     }
                 } else if (dragY < 0) {
                     dragY = 0;
@@ -472,11 +493,11 @@ export default class DocElement {
                 if (gridSize !== 0) {
                     dragX = utils.roundValueToInterval(dragX, gridSize);
                 }
-                if (dragX < posX1 + MIN_DRAG_SIZE) {
+                if (dragX < posX1 + minWidth) {
                     if (gridSize !== 0) {
-                        dragX = utils.roundValueToUpperInterval(posX1 + MIN_DRAG_SIZE, gridSize);
+                        dragX = utils.roundValueToUpperInterval(posX1 + minWidth, gridSize);
                     } else {
-                        dragX = posX1 + MIN_DRAG_SIZE;
+                        dragX = posX1 + minWidth;
                     }
                 } else if (dragX > maxWidth) {
                     dragX = maxWidth;
@@ -488,11 +509,11 @@ export default class DocElement {
                 if (gridSize !== 0) {
                     dragY = utils.roundValueToInterval(dragY, gridSize);
                 }
-                if (dragY < posY1 + MIN_DRAG_SIZE) {
+                if (dragY < posY1 + minHeight) {
                     if (gridSize !== 0) {
-                        dragY = utils.roundValueToUpperInterval(posY1 + MIN_DRAG_SIZE, gridSize);
+                        dragY = utils.roundValueToUpperInterval(posY1 + minHeight, gridSize);
                     } else {
-                        dragY = posY1 + MIN_DRAG_SIZE;
+                        dragY = posY1 + minHeight;
                     }
                 } else if (dragY > containerSize.height) {
                     dragY = containerSize.height;
@@ -504,11 +525,11 @@ export default class DocElement {
                 if (gridSize !== 0) {
                     dragX = utils.roundValueToInterval(dragX, gridSize);
                 }
-                if (dragX > posX2 - MIN_DRAG_SIZE) {
+                if (dragX > posX2 - minWidth) {
                     if (gridSize !== 0) {
-                        dragX = utils.roundValueToLowerInterval(posX2 - MIN_DRAG_SIZE, gridSize);
+                        dragX = utils.roundValueToLowerInterval(posX2 - minWidth, gridSize);
                     } else {
-                        dragX = posX2 - MIN_DRAG_SIZE;
+                        dragX = posX2 - minWidth;
                     }
                 } else if (dragX < 0) {
                     dragX = 0;
@@ -522,15 +543,15 @@ export default class DocElement {
     updateDrag(diffX, diffY, dragType, dragContainer, cmdGroup) {
         let posX1 = this.xVal;
         let posY1 = this.yVal;
-        let posX2 = posX1 + this.widthVal;
-        let posY2 = posY1 + this.heightVal;
+        let posX2 = posX1 + this.getDisplayWidth();
+        let posY2 = posY1 + this.getDisplayHeight();
         let maxWidth = this.getMaxWidth();
         let containerSize = this.getContainerContentSize();
         if (dragType === DocElement.dragType.element) {
             posX1 += diffX;
-            posX2 = posX1 + this.widthVal;
+            posX2 = posX1 + this.getDisplayWidth();
             posY1 += diffY;
-            posY2 = posY1 + this.heightVal;
+            posY2 = posY1 + this.getDisplayHeight();
         } else {
             if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN ||
                 dragType === DocElement.dragType.sizerNE) {
@@ -601,7 +622,7 @@ export default class DocElement {
                     this.updateDisplay();
                 }
             } else {
-                this.updateDisplayInternal(this.xVal, this.yVal, this.widthVal, this.heightVal);
+                this.updateDisplay();
             }
         } else {
             this.updateDisplayInternal(posX1, posY1, width, height);
@@ -712,6 +733,14 @@ export default class DocElement {
     }
 
     /**
+     * Returns minimum allowed width of element.
+     * @returns {Number}.
+     */
+    getMinWidth() {
+        return 20;
+    }
+
+    /**
      * Returns maximum allowed width of element.
      * This is needed when the element is resized by dragging so the resized element does not overflow its container.
      * @returns {Number}.
@@ -719,6 +748,14 @@ export default class DocElement {
     getMaxWidth() {
         let containerSize = this.getContainerContentSize();
         return containerSize.width;
+    }
+
+    /**
+     * Returns minimum allowed height of element.
+     * @returns {Number}.
+     */
+    getMinHeight() {
+        return 20;
     }
 
     createElement() {
@@ -859,6 +896,15 @@ export default class DocElement {
                 element.getPanelItem().getSiblingPosition(), this.rb);
             cmdGroup.addCommand(cmd);
         }
+    }
+
+    addCommandsForChangedWidth(newWidth, disableSelect, cmdGroup) {
+        let cmd = new SetValueCmd(this.id, this.getWidthTagId(), 'width',
+            '' + newWidth, SetValueCmd.type.text, this.rb);
+        if (disableSelect) {
+            cmd.disableSelect();
+        }
+        cmdGroup.addCommand(cmd);
     }
 
     addChildren(docElements) {
