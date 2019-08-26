@@ -70,10 +70,15 @@ export default class ParameterPanel {
                 <option value="average">${this.rb.getLabel('parameterTypeAverage')}</option>
             </select>`)
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let parameter = this.rb.getDataObject(this.selectedObjId);
+                if (parameter !== null) {
+                    let cmdGroup = new CommandGroupCmd('Set parameter type');
+                    let parameterType = elType.val();
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_type',
-                        'type', elType.val(), SetValueCmd.type.select, this.rb);
-                    this.rb.executeCommand(cmd);
+                        'type', parameterType, SetValueCmd.type.select, this.rb);
+                    cmdGroup.addCommand(cmd);
+                    parameter.addCommandsForChangedParameterType(parameterType, cmdGroup);
+                    this.rb.executeCommand(cmdGroup);
                 }
             });
         elFormField.append(elType);
