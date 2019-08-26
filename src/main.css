@@ -23,6 +23,8 @@
     height: 100%;
     top: auto;
     left: auto;
+    -webkit-user-select: none;
+    -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
@@ -331,7 +333,7 @@ ul ul ul ul ul ul .rbroMenuItem {
 }
 
 ul ul .rbroMenuItemText {
-    width: 170px;
+    width: calc(100% - 56px);
 }
 
 .rbroMenuArrow {
@@ -349,14 +351,25 @@ ul ul .rbroMenuItemText {
     display: none;
 }
 
+.rbroMainPanelSizer {
+    width: 3px;
+    cursor: ew-resize;
+    background: #cccccc;
+    transition: background 0.2s linear;
+}
+
+.rbroMainPanelSizer:hover {
+    background: #468FED;
+}
+
 /* Detail Panel */
 
 .rbroDetailPanel {
-    left: 230px;
     width: 390px;
     background-color: #ffffff;
     font-size: 13px;
     margin-top: 2px;
+    border-right: 2px solid #E4E7EA;
 }
 
 .rbroEmptyDetailPanel {
@@ -395,6 +408,7 @@ ul ul .rbroMenuItemText {
 
 .rbroFormRow label {
     width: 35%;
+    cursor: pointer;
 }
 
 .rbroFormRow label.rbroDisabled {
@@ -479,8 +493,7 @@ ul ul .rbroMenuItemText {
 /* Document Panel - Template layouting and PDF preview */
 
 .rbroDocumentPanel {
-    right: 5px;
-    width: calc(100% - 630px);
+    right: 0;
 }
 
 .rbroDocument {
@@ -516,8 +529,6 @@ ul ul .rbroMenuItemText {
 
 .rbroDocumentBandDescription {
     display: none;
-    -ms-user-select: none;	
-    user-select: none;
     pointer-events: none;
 }
 
@@ -670,10 +681,6 @@ ul ul .rbroMenuItemText {
 
 .rbroTextElement, .rbroImageElement, .rbroFrameElement {
     border: 1px dotted #B0B0B0;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 .rbroTableElement table, .rbroTableElement table thead, .rbroTableElement table tbody, .rbroTableElement table tfoot, .rbroTableElement table tr,
@@ -681,10 +688,6 @@ ul ul .rbroMenuItemText {
     border-collapse: collapse;
     border-spacing: 0;
     position: relative;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     margin: 0;
     padding: 0;
     min-width: 0;
@@ -832,6 +835,7 @@ ul ul .rbroMenuItemText {
 
 .rbroMenuItem .rbroButton {
     margin-left: 5px;
+    min-width: 18px;
 }
 
 button.rbroActionButton {
