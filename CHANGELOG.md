@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0] - 2019-08-26
+
+### Features
+* sizer to change main panel width
+* column span field for table text element
+* add internal parameter row_number for list parameters
+* add locales for separate language files (English and German available)
+
+### Changes
+* focus text input when text element is double clicked
+
+### Bug Fixes
+* disable save button depending on modified flag
+* do not allow setting invalid color value
+
 ## [1.2.1] - 2019-07-22
 
 ### Bug Fixes
