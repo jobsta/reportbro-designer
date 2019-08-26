@@ -249,9 +249,10 @@ export default class StylePanel {
             let elTextColorContainer = $('<div class="rbroColorPickerContainer"></div>');
             let elTextColor = $(`<input id="rbro_${idPrefix}text_color">`)
                 .change(event => {
-                    if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
+                    let val = elTextColor.val();
+                    if (rb.getDataObject(panel.getSelectedObjId()) !== null && utils.isValidColor(val)) {
                         let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}text_color`,
-                            `${fieldPrefix}textColor`, elTextColor.val(), SetValueCmd.type.color, rb);
+                            `${fieldPrefix}textColor`, val, SetValueCmd.type.color, rb);
                         rb.executeCommand(cmd);
                     }
                 });
@@ -268,9 +269,10 @@ export default class StylePanel {
         let elBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elBgColor = $(`<input id="rbro_${idPrefix}background_color">`)
             .change(event => {
-                if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
+                let val = elBgColor.val();
+                if (rb.getDataObject(panel.getSelectedObjId()) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}background_color`,
-                        `${fieldPrefix}backgroundColor`, elBgColor.val(), SetValueCmd.type.color, rb);
+                        `${fieldPrefix}backgroundColor`, val, SetValueCmd.type.color, rb);
                     rb.executeCommand(cmd);
                 }
             });
@@ -418,9 +420,10 @@ export default class StylePanel {
             let elBorderColorContainer = $('<div class="rbroColorPickerContainer"></div>');
             let elBorderColor = $(`<input id="rbro_${idPrefix}border_color">`)
                 .change(event => {
-                    if (rb.getDataObject(panel.getSelectedObjId()) !== null) {
+                    let val = elBorderColor.val();
+                    if (rb.getDataObject(panel.getSelectedObjId()) !== null && utils.isValidColor(val)) {
                         let cmd = new SetValueCmd(panel.getSelectedObjId(), `rbro_${idPrefix}border_color`,
-                            `${fieldPrefix}borderColor`, elBorderColor.val(), SetValueCmd.type.color, rb);
+                            `${fieldPrefix}borderColor`, val, SetValueCmd.type.color, rb);
                         rb.executeCommand(cmd);
                     }
                 });

@@ -54,9 +54,10 @@ export default class TableBandElementPanel {
         let elBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elBgColor = $('<input id="rbro_table_band_element_background_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elBgColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_table_band_element_background_color',
-                        'backgroundColor', elBgColor.val(), SetValueCmd.type.color, this.rb);
+                        'backgroundColor', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -72,9 +73,10 @@ export default class TableBandElementPanel {
         let elAltBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elAltBgColor = $('<input id="rbro_table_band_element_alternate_background_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elAltBgColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_table_band_element_alternate_background_color',
-                        'alternateBackgroundColor', elAltBgColor.val(), SetValueCmd.type.color, this.rb);
+                        'alternateBackgroundColor', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });

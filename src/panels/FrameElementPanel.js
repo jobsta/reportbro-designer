@@ -95,9 +95,10 @@ export default class FrameElementPanel {
         let elBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elBgColor = $('<input id="rbro_frame_element_background_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elBgColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_frame_element_background_color',
-                        'backgroundColor', elBgColor.val(), SetValueCmd.type.color, this.rb);
+                        'backgroundColor', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -187,9 +188,10 @@ export default class FrameElementPanel {
         let elBorderColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elBorderColor = $('<input id="rbro_frame_element_border_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elBorderColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_frame_element_border_color',
-                        'borderColor', elBorderColor.val(), SetValueCmd.type.color, this.rb);
+                        'borderColor', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });

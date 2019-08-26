@@ -236,9 +236,10 @@ export default class TableElementPanel {
         let elBorderColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elBorderColor = $('<input id="rbro_table_element_border_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elBorderColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_table_element_border_color',
-                        'borderColor', elBorderColor.val(), SetValueCmd.type.color, this.rb);
+                        'borderColor', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });

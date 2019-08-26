@@ -131,6 +131,10 @@ export function initColorPicker(el, rb, options) {
         });
 }
 
+export function isValidColor(color) {
+    return /^#[0-9A-F]{6}$/i.test(color);
+}
+
 export function insertAtCaret(element, text) {
     if (document.selection) {
         element.focus();

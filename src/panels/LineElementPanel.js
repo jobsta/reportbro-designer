@@ -79,9 +79,10 @@ export default class LineElementPanel {
         let elColorContainer = $('<div class="rbroColorPickerContainer"></div>');
         let elColor = $('<input id="rbro_line_element_color">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let val = elColor.val();
+                if (this.rb.getDataObject(this.selectedObjId) !== null && utils.isValidColor(val)) {
                     let cmd = new SetValueCmd(this.selectedObjId, 'rbro_line_element_color',
-                        'color', elColor.val(), SetValueCmd.type.color, this.rb);
+                        'color', val, SetValueCmd.type.color, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
