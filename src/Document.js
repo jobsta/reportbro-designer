@@ -128,24 +128,6 @@ export default class Document {
     }
 
     initializeEventHandlers() {
-        $('#rbro_document_panel').mousemove(event => {
-            if (this.dragging) {
-                this.processDrag(event);
-            }
-            if (this.selectionAreaStarted) {
-                let offset = this.elDocContent.offset();
-                let area = this.getSelectionArea(
-                    event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
-                let props = {
-                    left: this.rb.toPixel(area.left), top: this.rb.toPixel(area.top),
-                    width: this.rb.toPixel(area.width), height: this.rb.toPixel(area.height)};
-                this.elSelectionArea.css(props);
-                if (this.elSelectionArea.hasClass('rbroHidden')) {
-                    // show element after css properties are set
-                    this.elSelectionArea.removeClass('rbroHidden');
-                }
-            }
-        });
         this.elDocContent.on('dragover', event => {
             this.processDragover(event);
         })
@@ -168,6 +150,24 @@ export default class Document {
             this.processDrop(event);
             return false;
         });
+    }
+    
+    processMouseMove(event) {
+        if (this.dragging) {
+            this.processDrag(event);
+        } else if (this.selectionAreaStarted) {
+            let offset = this.elDocContent.offset();
+            let area = this.getSelectionArea(
+                event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
+            let props = {
+                left: this.rb.toPixel(area.left), top: this.rb.toPixel(area.top),
+                width: this.rb.toPixel(area.width), height: this.rb.toPixel(area.height)};
+            this.elSelectionArea.css(props);
+            if (this.elSelectionArea.hasClass('rbroHidden')) {
+                // show element after css properties are set
+                this.elSelectionArea.removeClass('rbroHidden');
+            }
+        }
     }
 
     processDragover(event) {

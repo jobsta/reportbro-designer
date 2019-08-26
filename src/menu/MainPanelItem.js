@@ -103,7 +103,7 @@ export default class MainPanelItem {
         
         let nameDiv = $(`<div class="rbroMenuItemText"><span id="rbro_menu_item_name${this.id}">${name}</span></div>`);
         if (this.properties.showAdd) {
-            itemDiv.append($(`<span id="rbro_menu_item_add${this.id}" class="rbroButton rbroRoundButton rbroIcon-plus"></span>`)
+            itemDiv.append($(`<div id="rbro_menu_item_add${this.id}" class="rbroButton rbroRoundButton rbroIcon-plus"></div>`)
                 .click(event => {
                     if (panelName === 'parameter') {
                         let cmd = new AddDeleteParameterCmd(true, {}, this.rb.getUniqueId(), this.getId(), -1, this.rb);

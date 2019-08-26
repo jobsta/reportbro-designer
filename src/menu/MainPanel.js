@@ -43,6 +43,11 @@ export default class MainPanel {
             this.documentPropertiesItem
         ];
 
+        this.dragMainPanelSizer = false;
+        this.dragMainPanelSizerStartX = 0;
+        this.mainPanelWidth = 230;
+        this.mainPanelSizerWidth = 3;
+
         headerBand.setPanelItem(this.headerItem);
         contentBand.setPanelItem(this.documentItem);
         footerBand.setPanelItem(this.footerItem);
@@ -87,6 +92,13 @@ export default class MainPanel {
     render() {
         let panel = $('#rbro_main_panel_list');
         this.appendChildren(panel, this.items);
+
+        $('#rbro_main_panel_sizer').mousedown(event => {
+            this.dragMainPanelSizer =  true;
+            this.dragMainPanelSizerStartX = event.pageX;
+        });
+
+        this.updateMainPanelWidth(this.mainPanelWidth);
     }
 
     appendChildren(el, items) {
@@ -98,6 +110,42 @@ export default class MainPanel {
                 this.appendChildren(el, children);
             }
         }
+    }
+
+    processMouseMove(event) {
+        if (this.dragMainPanelSizer) {
+            let mainPanelWidth = this.mainPanelWidth + (event.pageX - this.dragMainPanelSizerStartX);
+            mainPanelWidth = this.checkMainPanelWidth(mainPanelWidth);
+            this.updateMainPanelWidth(mainPanelWidth);
+            return true;
+        }
+        return false;
+    }
+
+    mouseUp(event) {
+        if (this.dragMainPanelSizer) {
+            this.dragMainPanelSizer = false;
+            this.mainPanelWidth = this.mainPanelWidth + (event.pageX - this.dragMainPanelSizerStartX);
+            this.mainPanelWidth = this.checkMainPanelWidth(this.mainPanelWidth);
+            this.updateMainPanelWidth(this.mainPanelWidth);
+        }
+    }
+
+    updateMainPanelWidth(mainPanelWidth) {
+        $('#rbro_main_panel').css({ width: mainPanelWidth });
+        $('#rbro_main_panel_sizer').css({ left: mainPanelWidth });
+        $('#rbro_detail_panel').css({ left: mainPanelWidth + this.mainPanelSizerWidth });
+        let docPanelLeft = mainPanelWidth + this.mainPanelSizerWidth + 390;
+        $('#rbro_document_panel').css({ width: `calc(100% - ${docPanelLeft}px)` });
+    }
+
+    checkMainPanelWidth(mainPanelWidth) {
+        if (mainPanelWidth < 150) {
+            return 150;
+        } else if (mainPanelWidth > 500) {
+            return 500;
+        }
+        return mainPanelWidth;
     }
 
     showHeader() {
