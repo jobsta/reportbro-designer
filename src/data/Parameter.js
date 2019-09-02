@@ -50,7 +50,7 @@ export default class Parameter {
                 this.rb.addParameter(parameter);
                 let panelItem = new MainPanelItem(
                     'parameter', this.panelItem, parameter,
-                    { hasChildren: true, showAdd: this.editable, showDelete: this.editable, draggable: true }, this.rb);
+                    { hasChildren: true, showAdd: parameter.editable, showDelete: parameter.editable, draggable: true }, this.rb);
                 parameter.setPanelItem(panelItem);
                 this.panelItem.appendChild(panelItem);
                 parameter.setup();
@@ -244,7 +244,8 @@ export default class Parameter {
                 name: 'row_number', type: Parameter.type.number, eval: false, editable: false,
                 showOnlyNameType: true
             };
-            let cmd = new AddDeleteParameterCmd(true, initialData, this.rb.getUniqueId(), this.getId(), -1, this.rb);
+            let cmd = new AddDeleteParameterCmd(true, initialData, this.rb.getUniqueId(), this.getId(), 0, this.rb);
+            cmd.setShowDelete(false);
             cmdGroup.addCommand(cmd);
         } else if (this.type === Parameter.type.array && newParameterType !== Parameter.type.array) {
             let children = this.getChildren();
@@ -365,16 +366,18 @@ export default class Parameter {
             fields.push(fieldInfo);
         } else {
             for (let child of this.getChildren()) {
-                let fieldInfo = { name: child.getName() };
-                if (child.getValue('type') === Parameter.type.simpleArray) {
-                    fieldInfo.type = child.getValue('arrayItemType');
-                    fieldInfo.allowMultiple = true;
-                    fieldInfo.arraySize = 1;
-                } else {
-                    fieldInfo.type = child.getValue('type');
-                    fieldInfo.allowMultiple = false;
+                if (!child.showOnlyNameType) {
+                    let fieldInfo = { name: child.getName() };
+                    if (child.getValue('type') === Parameter.type.simpleArray) {
+                        fieldInfo.type = child.getValue('arrayItemType');
+                        fieldInfo.allowMultiple = true;
+                        fieldInfo.arraySize = 1;
+                    } else {
+                        fieldInfo.type = child.getValue('type');
+                        fieldInfo.allowMultiple = false;
+                    }
+                    fields.push(fieldInfo);
                 }
-                fields.push(fieldInfo);
             }
         }
         let rows = [];
