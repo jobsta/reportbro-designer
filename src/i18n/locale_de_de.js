@@ -46,7 +46,7 @@ var locale_de = {
     emptyPanel: 'Leer',
     errorMsgDuplicateParameter: 'Parameter existiert bereits',
     errorMsgDuplicateParameterField: 'Feld existiert bereits',
-    errorMsgLoadingImageFailed: 'Bild laden fehlgeschlagen',
+    errorMsgLoadingImageFailed: 'Bild laden fehlgeschlagen: ${info}',
     errorMsgInvalidArray: 'Ungültige Liste',
     errorMsgInvalidAvgSumExpression: 'Summe nur für Zahlen-Parameter einer Liste möglich',
     errorMsgInvalidBarCode: 'Ungültiger Barcode Inhalt',

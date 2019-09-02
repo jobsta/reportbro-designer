@@ -430,7 +430,8 @@ export default class ParameterPanel {
                 let errorId = 'rbro_parameter_' + error.field + '_error';
                 let errorMsg = this.rb.getLabel(error.msg_key);
                 if (error.info) {
-                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' + error.info + '</span>');
+                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
+                        error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
                 }
                 $('#' + rowId).addClass('rbroError');
                 $('#' + errorId).html(errorMsg);

@@ -46,7 +46,7 @@ var locale_en = {
     emptyPanel: 'Empty panel',
     errorMsgDuplicateParameter: 'Parameter already exists',
     errorMsgDuplicateParameterField: 'Field already exists',
-    errorMsgLoadingImageFailed: 'Loading image failed',
+    errorMsgLoadingImageFailed: 'Loading image failed: ${info}',
     errorMsgInvalidArray: 'Invalid list',
     errorMsgInvalidAvgSumExpression: 'Expression must contain number field of a list parameter',
     errorMsgInvalidBarCode: 'Invalid bar code content',
