@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.1] - 2019-09-02
+
+### Changes
+* do not allow deletion of internal row_number parameter
+* insert internal row_number parameter at top
+
+### Bug Fixes
+* do not show internal row_number parameter in "Edit test data" popup
+
 ## [1.3.0] - 2019-08-26
 
 ### Features
