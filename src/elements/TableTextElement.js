@@ -109,7 +109,7 @@ export default class TableTextElement extends TextElement {
      */
     getUpdateValue(field, value) {
         if (field === 'width') {
-            value = utils.convertInputToNumber(value);
+            let updateValue = utils.convertInputToNumber(value);
             if (this.colspanVal > 1) {
                 let tableBandObj = this.rb.getDataObject(this.parentId);
                 if (tableBandObj !== null) {
@@ -119,12 +119,17 @@ export default class TableTextElement extends TextElement {
                         nextCellIndex = cellWidths.length;
                     }
                     for (let i = this.columnIndex + 1; i < nextCellIndex; i++) {
-                        value += cellWidths[i];
+                        updateValue += cellWidths[i];
                     }
                 }
             }
+            if (value === '' && updateValue === 0) {
+                // empty input value
+                return '';
+            }
+            return '' + updateValue;
         }
-        return '' + value;
+        return value;
     }
 
     setWidth(width) {
