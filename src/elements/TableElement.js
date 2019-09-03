@@ -375,6 +375,8 @@ export default class TableElement extends DocElement {
         if (tableBand !== this.footerData) {
             this.footerData.notifyColumnWidthResized(columnIndex, newColumnWidth);
         }
+        this.width = '' + newTableWidth;
+        this.widthVal = newTableWidth;
         $(`#rbro_el_table${this.id}`).css('width', (newTableWidth + 1) + 'px');
     }
 
