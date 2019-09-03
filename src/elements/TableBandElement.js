@@ -197,10 +197,10 @@ export default class TableBandElement extends DocElement {
             }
             if (useColDataIndex !== -1 && useColDataIndex < this.columnData.length) {
                 data = this.columnData[useColDataIndex];
+                data.columnIndex = i;
                 dataId = data.id;
                 if (!isUpdate) {
                     data.band = this.band;
-                    data.columnIndex = i;
                     data.parentId = this.id;
                     data.tableId = this.parentId;
                 }
