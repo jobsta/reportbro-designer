@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.3.2] - 2019-09-03
+
+### Bug Fixes
+* fix freeze when inserting table columns left or right to selected table cell
+* fix checking bounds when table is dragged over right border
+
 ## [1.3.1] - 2019-09-02
 
 ### Changes
