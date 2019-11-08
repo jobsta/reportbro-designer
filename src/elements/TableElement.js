@@ -230,7 +230,7 @@ export default class TableElement extends DocElement {
         super.select();
         let elSizerContainer = this.getSizerContainerElement();
         for (let sizer of ['NE', 'SE', 'SW', 'NW']) {
-            elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerInactive"></div>`));
+            elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerMove"></div>`));
         }
     }
 

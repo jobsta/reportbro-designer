@@ -171,8 +171,7 @@
 }
 
 .rbroMenuPanelSidebar .rbroDocumentPanel {
-    right: 114px;
-    width: calc(100% - 744px);
+    right: 104px;
 }
 
 .rbroMenuPanelSidebar .rbroMenuPanel {
@@ -771,6 +770,10 @@ ul ul .rbroMenuItemText {
     position: absolute;
     border: 1px solid #606060;
     background-color: #F0F0F0;
+}
+
+.rbroSizer.rbroSizerMove {
+    cursor: move;
 }
 
 .rbroSizerN {
