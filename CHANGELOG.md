@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.3] - 2019-11-08
+
+### Bug Fixes
+* do not show resize mouse cursor in corners when table is selected
+* fix setting transparent color
+* fix parameter type drop down options in Safari
+* fix content area and ReportBro logo alignment when sidebar is active
+
 ## [1.3.2] - 2019-09-03
 
 ### Bug Fixes
