@@ -132,7 +132,8 @@ export function initColorPicker(el, rb, options) {
 }
 
 export function isValidColor(color) {
-    return /^#[0-9A-F]{6}$/i.test(color);
+    // test for empty value (transparent) or # and 6 hex digits
+    return !color || /^#[0-9A-F]{6}$/i.test(color);
 }
 
 export function insertAtCaret(element, text) {
