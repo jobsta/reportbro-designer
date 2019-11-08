@@ -14,6 +14,7 @@ export default class ParameterPanel {
         this.rootElement = rootElement;
         this.rb = rb;
         this.selectedObjId = null;
+        this.parameterTypeOptions = [];
     }
 
     render(data) {
@@ -57,18 +58,7 @@ export default class ParameterPanel {
         elDiv = $('<div id="rbro_parameter_type_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_parameter_type">${this.rb.getLabel('parameterType')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elType = $(`<select id="rbro_parameter_type">
-                <option value="string">${this.rb.getLabel('parameterTypeString')}</option>
-                <option value="number">${this.rb.getLabel('parameterTypeNumber')}</option>
-                <option value="boolean">${this.rb.getLabel('parameterTypeBoolean')}</option>
-                <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
-                <option value="image">${this.rb.getLabel('parameterTypeImage')}</option>
-                <option value="array">${this.rb.getLabel('parameterTypeArray')}</option>
-                <option value="simple_array">${this.rb.getLabel('parameterTypeSimpleArray')}</option>
-                <option value="map">${this.rb.getLabel('parameterTypeMap')}</option>
-                <option value="sum">${this.rb.getLabel('parameterTypeSum')}</option>
-                <option value="average">${this.rb.getLabel('parameterTypeAverage')}</option>
-            </select>`)
+        let elType = $('<select id="rbro_parameter_type"></select>')
             .change(event => {
                 let parameter = this.rb.getDataObject(this.selectedObjId);
                 if (parameter !== null) {
@@ -397,23 +387,55 @@ export default class ParameterPanel {
         } else {
             $('#rbro_parameter_expression_row').hide();
         }
-        // do not allow nested array/map
-        if (obj.getPanelItem() !== null && obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem()) {
-            $('#rbro_parameter_type option[value="array"]').removeClass('rbroHidden');
-            $('#rbro_parameter_type option[value="map"]').removeClass('rbroHidden');
-        } else {
-            $('#rbro_parameter_type option[value="array"]').addClass('rbroHidden');
-            $('#rbro_parameter_type option[value="map"]').addClass('rbroHidden');
-        }
+
+        let parameterTypeOptions = [];
+        // do not allow nested array/map (only for top-level parameters)
+        let topLevelParameter = (obj.getPanelItem() !== null &&
+            obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem());
         // do not allow image and sum/average parameter in list
-        if (parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) {
-            $('#rbro_parameter_type option[value="image"]').addClass('rbroHidden');
-            $('#rbro_parameter_type option[value="sum"]').addClass('rbroHidden');
-            $('#rbro_parameter_type option[value="average"]').addClass('rbroHidden');
+        let listFieldParameter = (parentParameter !== null &&
+            parentParameter.getValue('type') === Parameter.type.array);
+
+        parameterTypeOptions.push({ value: 'string', label: this.rb.getLabel('parameterTypeString') });
+        parameterTypeOptions.push({ value: 'number', label: this.rb.getLabel('parameterTypeNumber') });
+        parameterTypeOptions.push({ value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean') });
+        parameterTypeOptions.push({ value: 'date', label: this.rb.getLabel('parameterTypeDate') });
+        if (!listFieldParameter) {
+            parameterTypeOptions.push({ value: 'image', label: this.rb.getLabel('parameterTypeImage') });
+        }
+        if (topLevelParameter) {
+            parameterTypeOptions.push({ value: 'array', label: this.rb.getLabel('parameterTypeArray') });
+        }
+        parameterTypeOptions.push({ value: 'simple_array', label: this.rb.getLabel('parameterTypeSimpleArray') });
+        if (topLevelParameter) {
+            parameterTypeOptions.push({ value: 'map', label: this.rb.getLabel('parameterTypeMap') });
+        }
+        if (!listFieldParameter) {
+            parameterTypeOptions.push({ value: 'sum', label: this.rb.getLabel('parameterTypeSum') });
+            parameterTypeOptions.push({ value: 'average', label: this.rb.getLabel('parameterTypeAverage') });
+        }
+
+        let parameterTypeOptionsChanged = false;
+        if (parameterTypeOptions.length !== this.parameterTypeOptions.length) {
+            parameterTypeOptionsChanged = true;
         } else {
-            $('#rbro_parameter_type option[value="image"]').removeClass('rbroHidden');
-            $('#rbro_parameter_type option[value="sum"]').removeClass('rbroHidden');
-            $('#rbro_parameter_type option[value="average"]').removeClass('rbroHidden');
+            for (let i=0; i < parameterTypeOptions.length; i++) {
+                if (parameterTypeOptions[i].value !== this.parameterTypeOptions[i].value) {
+                    parameterTypeOptionsChanged = true;
+                    break;
+                }
+            }
+        }
+        if (parameterTypeOptionsChanged) {
+            // add dom elements for changed options
+            let elParameterType = $('#rbro_parameter_type');
+            elParameterType.empty();
+            for (let i=0; i < parameterTypeOptions.length; i++) {
+                let parameterTypeOption = parameterTypeOptions[i];
+                elParameterType.append(
+                    `<option value="${parameterTypeOption.value}">${parameterTypeOption.label}</option>`);
+            }
+            this.parameterTypeOptions = parameterTypeOptions;
         }
     }
 
