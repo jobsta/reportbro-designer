@@ -135,8 +135,13 @@ export default class MainPanel {
         $('#rbro_main_panel').css({ width: mainPanelWidth });
         $('#rbro_main_panel_sizer').css({ left: mainPanelWidth });
         $('#rbro_detail_panel').css({ left: mainPanelWidth + this.mainPanelSizerWidth });
-        let docPanelLeft = mainPanelWidth + this.mainPanelSizerWidth + 390;
-        $('#rbro_document_panel').css({ width: `calc(100% - ${docPanelLeft}px)` });
+        // calculate width of main panel, detail panel and sidebar (if available)
+        let totalPanelWidth = mainPanelWidth + this.mainPanelSizerWidth + 390;
+        if (this.rb.getProperty('menuSidebar')) {
+            totalPanelWidth += 104;
+            $('#reportbro .rbroLogo').css({ width: mainPanelWidth });
+        }
+        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)` });
     }
 
     checkMainPanelWidth(mainPanelWidth) {
