@@ -26,6 +26,34 @@ export default class MenuPanel {
                 })
             );
         }
+        if (this.rb.getProperty('menuShowDebug')) {
+            panelLeft.append($(`<button id="rbro_menu_log_report" class="rbroButton rbroMenuButton" title="${this.rb.getLabel('menuLogReportTip')}">
+                    <span class="rbroIcon-console"></span><span class="rbroHidden">${this.rb.getLabel('menuLogReport')}</span></button>`)
+                .click(event => {
+                    console.log(JSON.stringify(this.rb.getReport()));
+                })
+            );
+            panelLeft.append($(`<button id="rbro_menu_insert_report" class="rbroButton rbroMenuButton" title="${this.rb.getLabel('menuInsertReportTip')}">
+                    <span class="rbroIcon-insert-report"></span><span class="rbroHidden">${this.rb.getLabel('menuInsertReport')}</span></button>`)
+                .click(event => {
+                    let strReport = prompt('Paste report template here to load report');
+                    if (strReport) {
+                        try {
+                            let report = JSON.parse(strReport);
+                            if (typeof report.docElements === "object" && typeof report.parameters === "object" &&
+                                    typeof report.styles === "object" && typeof report.documentProperties === "object") {
+                                this.rb.load(report);
+                            } else {
+                                alert('Invalid report template data');
+                            }
+                        } catch (e) {
+                            alert('Invalid report template data');
+                        }
+
+                    }
+                })
+            );
+        }
         panelLeft.append($(`<button id="rbro_menu_undo" class="rbroButton rbroMenuButton" title="${this.rb.getLabel('menuUndoTip')}">
                 <span class="rbroIcon-undo"></span><span class="${menuButtonClass}">${this.rb.getLabel('menuUndo')}</span></button>`)
             .click(event => {
