@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.4] - 2019-12-23
+
+### Changes
+* option to show menu buttons to log report template to console and load report template from text
+
+### Bug Fixes
+* fix changing table columns when table contains cells with colspan
+* fix loading report with small table (< 200px) with table positioned near right border
+
 ## [1.3.3] - 2019-11-08
 
 ### Bug Fixes
