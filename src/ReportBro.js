@@ -59,6 +59,7 @@ export default class ReportBro {
             ],
             localStorageReportKey: null,
             menuShowButtonLabels: false,
+            menuShowDebug: false,
             menuSidebar: false,
             saveCallback: null,
             showGrid: true,
@@ -1248,7 +1249,7 @@ export default class ReportBro {
      * @returns {Object}
      */
     getReport() {
-        let ret = { docElements: [], parameters: [], styles: [], version: 2 };
+        let ret = { docElements: [], parameters: [], styles: [], version: 3 };
         let i;
         ret.docElements = this.getDocElements(false);
         for (let parameter of this.getParameters()) {
@@ -1313,6 +1314,17 @@ export default class ReportBro {
                 if (docElementData.elementType === DocElement.type.table) {
                     docElementData.contentDataRows = [docElementData.contentData];
                     docElementData.contentRows = '1';
+                }
+            }
+        }
+        if (report.version < 3) {
+            for (let docElementData of report.docElements) {
+                if (docElementData.elementType === DocElement.type.table) {
+                    let width = 0;
+                    for (let i=0; i < docElementData.headerData.columnData.length; i++) {
+                        width += docElementData.headerData.columnData[i].width;
+                    }
+                    docElementData.width = width;
                 }
             }
         }

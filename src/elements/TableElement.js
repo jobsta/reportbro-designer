@@ -50,7 +50,6 @@ export default class TableElement extends DocElement {
         this.contentDataRows = contentDataRows;
         this.footerData = this.createBand('footer', -1, null);
         this.setupComplete = true;
-        this.updateWidth();
         this.updateHeight();
         this.updateStyle();
         this.updateName();
@@ -216,7 +215,8 @@ export default class TableElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
+        return ['id', 'containerId', 'x', 'y', 'width',
+            'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
@@ -275,6 +275,7 @@ export default class TableElement extends DocElement {
             </div>`);
         this.appendToContainer();
         this.registerEventHandlers();
+        $(`#rbro_el_table${this.id}`).css('width', (this.widthVal + 1) + 'px');
     }
 
     remove() {
@@ -318,18 +319,6 @@ export default class TableElement extends DocElement {
                 this.contentDataRows[i].updateColumnDisplay();
             }
             this.footerData.updateColumnDisplay();
-        }
-    }
-
-    /**
-     * Update table width based on width of all cells of content band.
-     */
-    updateWidth() {
-        if (this.setupComplete) {
-            let width = this.headerData.getWidth();
-            this.width = '' + width;
-            this.widthVal = width;
-            $(`#rbro_el_table${this.id}`).css('width', (this.widthVal + 1) + 'px');
         }
     }
 
