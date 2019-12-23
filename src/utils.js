@@ -124,11 +124,11 @@ export function initColorPicker(el, rb, options) {
     el.spectrum(allOptions);
     el.show();  // show original text input
     el.focus(event => {
-            el.parent().addClass('rbroActive');
-        });
+        el.parent().addClass('rbroActive');
+    });
     el.blur(event => {
-            el.parent().removeClass('rbroActive');
-        });
+        el.parent().removeClass('rbroActive');
+    });
 }
 
 export function isValidColor(color) {
