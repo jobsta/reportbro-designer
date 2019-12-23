@@ -298,7 +298,7 @@ export default class TableBandElement extends DocElement {
             let nextCellIndex = column.getNextCellIndex();
             if (nextCellIndex > columnIndex) {
                 if (nextCellIndex > i + 1) {
-                    for (let j = i; j < nextCellIndex; j++) {
+                    for (let j = i; j < nextCellIndex && j < this.columnData.length; j++) {
                         if (j !== columnIndex) {
                             newColumnWidth += this.columnData[j].getValue('widthVal');
                         }
