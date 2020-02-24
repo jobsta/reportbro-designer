@@ -62,6 +62,7 @@ export default class ReportBro {
             menuShowDebug: false,
             menuSidebar: false,
             saveCallback: null,
+            selectCallback: null,
             showGrid: true,
             patternAdditionalDates: [],
             patternAdditionalNumbers: [],
@@ -913,6 +914,9 @@ export default class ReportBro {
                 obj.getPanelItem().openParentItems();
                 obj.getPanelItem().setActive();
             }
+            if (this.properties.selectCallback) {
+                this.properties.selectCallback(obj, true);
+            }
         }
         this.selectionSinceLastCommand = true;
         this.updateMenuActionButtons();
@@ -931,7 +935,11 @@ export default class ReportBro {
                 this.setDetailPanel('none', null);
                 $('.rbroMenuItem').removeClass('rbroMenuItemActive');
             }
+            if (this.properties.selectCallback) {
+                this.properties.selectCallback(obj, false);
+            }
         }
+
         if (updateSelections) {
             let selectionIndex = this.selections.indexOf(id);
             if (selectionIndex !== -1) {
