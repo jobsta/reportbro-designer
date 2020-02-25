@@ -125,7 +125,7 @@ export default class DocumentPropertiesPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elPatternCurrencySymbol = $('<input id="rbro_document_properties_pattern_currency_symbol">')
             .change(event => {
-                let cmd = new SetValueCmd(this.rb.getDetailData().getId(),
+                let cmd = new SetValueCmd(this.documentProperties.getId(),
                     'rbro_document_properties_pattern_currency_symbol', 'patternCurrencySymbol',
                     elPatternCurrencySymbol.val(), SetValueCmd.type.text, this.rb);
                 this.rb.executeCommand(cmd);
@@ -341,12 +341,13 @@ export default class DocumentPropertiesPanel {
      * @param {String} operation - operation which caused the notification.
      */
     notifyEvent(obj, operation) {
-        if (obj instanceof DocumentProperties && obj === this.rb.getDetailData() && operation === Command.operation.change) {
+        if (obj instanceof DocumentProperties && this.rb.isSelectedObject(obj.id) &&
+                operation === Command.operation.change) {
             this.updateVisibility(obj);
         }
     }
 
-    updateVisibility(obj) {
+    static updateVisibility(obj) {
         if (obj.getValue('pageFormat') === DocumentProperties.pageFormat.userDefined) {
             $('#rbro_document_properties_page_size_row').show();
         } else {

@@ -201,11 +201,15 @@ export default class MainPanelItem {
     }
 
     setActive() {
-        $('.rbroMenuItem').removeClass('rbroMenuItemActive');
+        //$('.rbroMenuItem').removeClass('rbroMenuItemActive');
         $(`#rbro_menu_item${this.id}`).addClass('rbroMenuItemActive');
-        if (this.properties.hasDetails) {
-            this.rb.setDetailPanel(this.panelName, this.data);
-        }
+        // if (this.properties.hasDetails) {
+        //     this.rb.setDetailPanel(this.panelName, this.data);
+        // }
+    }
+
+    setInactive() {
+        $(`#rbro_menu_item${this.id}`).removeClass('rbroMenuItemActive');
     }
 
     getParentIds() {

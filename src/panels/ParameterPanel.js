@@ -313,7 +313,7 @@ export default class ParameterPanel {
      * @param {String} operation - operation which caused the notification.
      */
     notifyEvent(obj, operation) {
-        if (obj instanceof Parameter && obj === this.rb.getDetailData() && operation === Command.operation.change) {
+        if (obj instanceof Parameter && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
             this.updateVisibility(obj);
         }
     }

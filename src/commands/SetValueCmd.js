@@ -41,8 +41,7 @@ export default class SetValueCmd {
 
     setValue(value) {
         let obj = this.rb.getDataObject(this.objId);
-        let detailData = this.rb.getDetailData();
-        let isShown = (detailData !== null && detailData.getId() === this.objId);
+        let isShown = this.rb.isSelectedObject(this.objId);
         let elSelector = `#${this.tagId}`;
         obj.setValue(this.field, value, elSelector, isShown);
 

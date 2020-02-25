@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.4.0] - 2020
+
+### Changes
+* add selectCallback which is called when an object is selected/deselected
+
+
 ## [1.3.4] - 2019-12-23
 
 ### Changes
