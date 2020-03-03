@@ -143,8 +143,17 @@ export default class FrameElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'containerId', 'linkedContainerId', 'label',
-            'x', 'y', 'width', 'height', 'backgroundColor',
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id', 'containerId', 'linkedContainerId');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
+        return ['label', 'x', 'y', 'width', 'height', 'backgroundColor',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement', 'shrinkToContentHeight',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];

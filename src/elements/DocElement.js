@@ -417,6 +417,16 @@ export default class DocElement {
      * @returns {String[]}
      */
     getFields() {
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id', 'containerId');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
         return [];
     }
 

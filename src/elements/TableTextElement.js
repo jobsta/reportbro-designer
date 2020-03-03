@@ -203,9 +203,20 @@ export default class TableTextElement extends TextElement {
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'width', 'height', 'content', 'eval', 'colspan',
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
+        let fields = ['width', 'height', 'content', 'eval', 'colspan',
             'styleId', 'bold', 'italic', 'underline',
-            'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing',
+            'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
+            'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
             'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern', 'link',
             'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline',

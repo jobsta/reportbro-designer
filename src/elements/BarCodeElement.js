@@ -39,11 +39,11 @@ export default class BarCodeElement extends DocElement {
     }
 
     /**
-     * Returns all data fields of this object. The fields are used when serializing the object.
+     * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
-    getFields() {
-        return ['id', 'containerId', 'x', 'y', 'height', 'content', 'format', 'displayValue',
+    getProperties() {
+        return ['x', 'y', 'height', 'content', 'format', 'displayValue',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }

@@ -130,11 +130,11 @@ export default class TextElement extends DocElement {
     }
 
     /**
-     * Returns all data fields of this object. The fields are used when serializing the object.
+     * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
-    getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'content', 'eval',
+    getProperties() {
+        return ['x', 'y', 'width', 'height', 'content', 'eval',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',
@@ -142,7 +142,8 @@ export default class TextElement extends DocElement {
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
             'printIf', 'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern', 'link',
             'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
-            'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor', 'cs_font', 'cs_fontSize',
+            'cs_horizontalAlignment', 'cs_verticalAlignment',
+            'cs_textColor', 'cs_backgroundColor', 'cs_font', 'cs_fontSize',
             'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',

@@ -49,11 +49,11 @@ export default class ImageElement extends DocElement {
     }
 
     /**
-     * Returns all data fields of this object. The fields are used when serializing the object.
+     * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
-    getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
+    getProperties() {
+        return ['x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
             'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
             'printIf', 'removeEmptyElement', 'link',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];

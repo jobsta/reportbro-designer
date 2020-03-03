@@ -166,11 +166,11 @@ export default class SectionElement extends DocElement {
     }
 
     /**
-     * Returns all data fields of this object. The fields are used when serializing the object.
+     * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
-    getFields() {
-        return ['id', 'containerId', 'y', 'label', 'dataSource', 'header', 'footer', 'printIf'];
+    getProperties() {
+        return ['y', 'label', 'dataSource', 'header', 'footer', 'printIf'];
     }
 
     getElementType() {

@@ -87,7 +87,17 @@ export default class SectionBandElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'containerId', 'linkedContainerId', 'height', 'alwaysPrintOnSamePage', 'shrinkToContentHeight'];
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id', 'containerId', 'linkedContainerId');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
+        let fields = ['height', 'alwaysPrintOnSamePage', 'shrinkToContentHeight'];
         if (this.bandType === Band.bandType.header) {
             fields.push('repeatHeader');
         }

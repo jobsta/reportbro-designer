@@ -211,11 +211,11 @@ export default class TableElement extends DocElement {
     }
 
     /**
-     * Returns all data fields of this object. The fields are used when serializing the object.
+     * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
-    getFields() {
-        return ['id', 'containerId', 'x', 'y', 'width',
+    getProperties() {
+        return ['x', 'y', 'width',
             'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',

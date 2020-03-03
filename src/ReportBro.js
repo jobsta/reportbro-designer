@@ -119,23 +119,6 @@ export default class ReportBro {
         this.mainPanel = new MainPanel(element, this.headerBand, this.contentBand, this.footerBand,
                 this.parameterContainer, this.styleContainer, this);
         this.menuPanel = new MenuPanel(element, this);
-        // this.activeDetailPanel = 'none';
-        // this.detailPanels = {
-        //     'none': new EmptyDetailPanel(element, this),
-        //     'bar_code': new BarCodeElementPanel(element, this),
-        //     'frame': new FrameElementPanel(element, this),
-        //     'text': new TextElementPanel(element, this),
-        //     'line': new LineElementPanel(element, this),
-        //     'image': new ImageElementPanel(element, this),
-        //     'page_break': new PageBreakElementPanel(element, this),
-        //     'table': new TableElementPanel(element, this),
-        //     'table_band': new TableBandElementPanel(element, this),
-        //     'parameter': new ParameterPanel(element, this),
-        //     'section': new SectionElementPanel(element, this),
-        //     'section_band': new SectionBandElementPanel(element, this),
-        //     'style': new StylePanel(element, this),
-        //     'documentProperties': new DocumentPropertiesPanel(this.documentProperties, element, this)
-        // };
         this.docElementPanel = new DocElementPanel(element, this);
 
         this.commandStack = [];
@@ -1203,8 +1186,7 @@ export default class ReportBro {
             }
         }
         if (errors.length > 0) {
-            //this.detailPanels[this.activeDetailPanel].updateErrors();
-            this.docElementPanel.updateErrors();
+            this.docElementPanel.updateErrors(errors, errors[0].object_id);
             this.selectObject(errors[0].object_id, true);
         }
     }

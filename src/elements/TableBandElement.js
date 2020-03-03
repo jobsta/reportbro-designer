@@ -91,7 +91,17 @@ export default class TableBandElement extends DocElement {
      * @returns {String[]}
      */
     getFields() {
-        let fields = ['id', 'height', 'backgroundColor'];
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
+        let fields = ['height', 'backgroundColor'];
         if (this.bandType === Band.bandType.header) {
             fields.push('repeatHeader');
         } else if (this.bandType === Band.bandType.content) {
