@@ -19,23 +19,9 @@ import TableElement from './elements/TableElement';
 import TableTextElement from './elements/TableTextElement';
 import locales from './i18n/locales';
 import DocElementPanel from './panels/DocElementPanel';
-import BarCodeElementPanel from './panels/BarCodeElementPanel';
-import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
-import EmptyDetailPanel from './panels/EmptyDetailPanel';
-import FrameElementPanel from './panels/FrameElementPanel';
-import ImageElementPanel from './panels/ImageElementPanel';
-import LineElementPanel from './panels/LineElementPanel';
-import SectionBandElementPanel from './panels/SectionBandElementPanel';
-import SectionElementPanel from './panels/SectionElementPanel';
 import MainPanel from './menu/MainPanel';
 import MainPanelItem from './menu/MainPanelItem';
 import MenuPanel from './menu/MenuPanel';
-import PageBreakElementPanel from './panels/PageBreakElementPanel';
-import ParameterPanel from './panels/ParameterPanel';
-import StylePanel from './panels/StylePanel';
-import TableElementPanel from './panels/TableElementPanel';
-import TableBandElementPanel from './panels/TableBandElementPanel';
-import TextElementPanel from './panels/TextElementPanel';
 import * as utils from './utils';
 
 /**
@@ -392,10 +378,7 @@ export default class ReportBro {
             </div>`);
         this.mainPanel.render();
         this.menuPanel.render();
-        // for (let panelName in this.detailPanels) {
-        //     this.detailPanels[panelName].render();
-        // }
-        // this.detailPanels[this.activeDetailPanel].show(this.detailData);
+        this.docElementPanel.render();
         this.document.render();
         this.popupWindow.render();
         this.updateMenuButtons();
@@ -490,8 +473,10 @@ export default class ReportBro {
     /**
      * Returns a list of parameter items.
      * Used for parameter popup window.
-     * @param {DocElement|Parameter} obj - adds all parameters available for this object (which is either a doc element or a parameter).
-     * For doc elements the parameters from the data source are included (e.g. array field parameters of a table data source).
+     * @param {DocElement|Parameter} obj - adds all parameters available for
+     * this object (which is either a doc element or a parameter).
+     * For doc elements the parameters from the data source
+     * are included (e.g. array field parameters of a table data source).
      * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
      * parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
@@ -521,7 +506,8 @@ export default class ReportBro {
         }
 
         parameters.push({ separator: true, name: this.getLabel('parameters') });
-        let mapParameters = []; // add all parameters of collections at end of list with a header containing the collection name
+        // add all parameters of collections at end of list with a header containing the collection name
+        let mapParameters = [];
         for (let parameterItem of parameterItems) {
             let parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.map) {

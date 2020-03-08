@@ -40,7 +40,8 @@ export default class PopupWindow {
      * Shows a popup window for the given items.
      * @param {Object[]} items - items to display in the popup window. Each item must contain a name (String), and
      * optional a description (String) and separator (Boolean). If separator is true the item is not selectable.
-     * @param {String} objId - id of data object where the field belongs to.
+     * @param {String} objId - id of data object where the field belongs to, used to set the test data value
+     * when popup is closed. If this is no testData popup then the objId is not used.
      * @param {String} tagId - id of DOM element in the panel for the given field. In case of empty string there is no
      * input element available.
      * @param {String} field - field of data object where selected item will be written into.
