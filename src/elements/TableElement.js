@@ -211,12 +211,21 @@ export default class TableElement extends DocElement {
     }
 
     /**
+     * Returns all data fields of this object. The fields are used when serializing the object.
+     * @returns {String[]}
+     */
+    getFields() {
+        let fields = this.getProperties();
+        fields.splice(0, 0, 'id', 'containerId', 'width');
+        return fields;
+    }
+
+    /**
      * Returns all fields of this object that can be modified in the properties panel.
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'width',
-            'dataSource', 'columns', 'header', 'contentRows', 'footer',
+        return ['x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
@@ -519,7 +528,8 @@ export default class TableElement extends DocElement {
             return;
         }
         // delete table with current settings and restore below with new columns, necessary for undo/redo
-        let cmd = new AddDeleteDocElementCmd(false, this.getPanelItem().getPanelName(),
+        let cmd = new AddDeleteDocElementCmd(
+            false, this.getPanelItem().getPanelName(),
             this.toJS(), this.id, this.getContainerId(), -1, this.rb);
         cmdGroup.addCommand(cmd);
 
@@ -545,7 +555,8 @@ export default class TableElement extends DocElement {
 
         this.contentRows = '' + contentRows;
         // restore table with new content rows and updated settings
-        cmd = new AddDeleteDocElementCmd(true, this.getPanelItem().getPanelName(),
+        cmd = new AddDeleteDocElementCmd(
+            true, this.getPanelItem().getPanelName(),
             this.toJS(), this.id, this.getContainerId(), -1, this.rb);
         cmdGroup.addCommand(cmd);
     }
