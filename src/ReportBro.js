@@ -1244,6 +1244,14 @@ export default class ReportBro {
         this.updateMenuButtons();
     }
 
+	/**
+	 * Returns the value of the modified flag.
+	 * @returns {Boolean}
+	 */
+	isModified() {
+	    return this.modified;
+	}
+
     /**
      * Returns report object containing everything needed for the report.
      * @returns {Object}
