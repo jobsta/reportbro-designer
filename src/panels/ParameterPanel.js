@@ -1,3 +1,4 @@
+import PanelBase from './PanelBase';
 import Command from '../commands/Command';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
@@ -9,11 +10,44 @@ import * as utils from '../utils';
  * Panel to edit all parameter properties.
  * @class
  */
-export default class ParameterPanel {
+export default class ParameterPanel extends PanelBase {
     constructor(rootElement, rb) {
-        this.rootElement = rootElement;
-        this.rb = rb;
-        this.selectedObjId = null;
+        super('rbro_parameter', Parameter, rootElement, rb);
+
+        this.propertyDescriptors = {
+            'name': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'name'
+            },
+            'type': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'type'
+            },
+            'arrayItemType': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'arrayItemType'
+            },
+            'eval': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'eval'
+            },
+            'nullable': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'nullable'
+            },
+            'pattern': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'pattern'
+            },
+            'expression': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'expression'
+            },
+            'testData': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'test_data'
+            },
+        };
         this.parameterTypeOptions = [];
     }
 
@@ -24,25 +58,29 @@ export default class ParameterPanel {
         let elFormField = $('<div class="rbroFormField"></div>');
         let elParameterName = $('<input id="rbro_parameter_name">')
             .change(event => {
-                let obj = this.rb.getDataObject(this.selectedObjId);
-                if (obj !== null) {
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
                     if (elParameterName.val().trim() !== '') {
                         let newParameterName = elParameterName.val();
                         let cmdGroup = new CommandGroupCmd('Rename parameter');
-                        let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_name', 'name',
+                        let cmd = new SetValueCmd(
+                            selectedObject.getId(), 'rbro_parameter_name', 'name',
                             newParameterName, SetValueCmd.type.text, this.rb);
                         cmdGroup.addCommand(cmd);
-                        let parent = obj.getParent();
+                        let parent = selectedObject.getParent();
                         if (parent !== null) {
-                            parent.addUpdateTestDataCmdForChangedParameter(obj.getName(), newParameterName, cmdGroup);
+                            parent.addUpdateTestDataCmdForChangedParameter(
+                                selectedObject.getName(), newParameterName, cmdGroup);
                         }
                         // add commands to convert all values containing the currently changed parameter
                         let docElements = this.rb.getDocElements(true);
                         for (let docElement of docElements) {
-                            docElement.addCommandsForChangedParameterName(obj, newParameterName, cmdGroup);
+                            docElement.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
                         }
                         for (let parameter of this.rb.getParameters()) {
-                            parameter.addCommandsForChangedParameterName(obj, newParameterName, cmdGroup);
+                            parameter.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
                         }
                         this.rb.executeCommand(cmdGroup);
                     } else {
@@ -60,14 +98,15 @@ export default class ParameterPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elType = $('<select id="rbro_parameter_type"></select>')
             .change(event => {
-                let parameter = this.rb.getDataObject(this.selectedObjId);
-                if (parameter !== null) {
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
                     let cmdGroup = new CommandGroupCmd('Set parameter type');
                     let parameterType = elType.val();
-                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_type',
-                        'type', parameterType, SetValueCmd.type.select, this.rb);
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_type', 'type',
+                        parameterType, SetValueCmd.type.select, this.rb);
                     cmdGroup.addCommand(cmd);
-                    parameter.addCommandsForChangedParameterType(parameterType, cmdGroup);
+                    selectedObject.addCommandsForChangedParameterType(parameterType, cmdGroup);
                     this.rb.executeCommand(cmdGroup);
                 }
             });
@@ -86,8 +125,10 @@ export default class ParameterPanel {
                 <option value="date">${this.rb.getLabel('parameterTypeDate')}</option>
             </select>`)
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_array_item_type',
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_array_item_type',
                         'arrayItemType', elArrayItemType.val(), SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -103,9 +144,10 @@ export default class ParameterPanel {
             elFormField = $('<div class="rbroFormField"></div>');
             let elEval = $('<input id="rbro_parameter_eval" type="checkbox">')
                 .change(event => {
-                    if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                        let cmd = new SetValueCmd(this.selectedObjId,
-                            'rbro_parameter_eval', 'eval',
+                    let selectedObject = this.rb.getSelectedObject();
+                    if (selectedObject !== null) {
+                        let cmd = new SetValueCmd(
+                            selectedObject.getId(), 'rbro_parameter_eval', 'eval',
                             elEval.is(":checked"), SetValueCmd.type.checkbox, this.rb);
                         this.rb.executeCommand(cmd);
                     }
@@ -120,9 +162,10 @@ export default class ParameterPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elNullable = $('<input id="rbro_parameter_nullable" type="checkbox">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let cmd = new SetValueCmd(this.selectedObjId,
-                        'rbro_parameter_nullable', 'nullable',
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_nullable', 'nullable',
                         elNullable.is(":checked"), SetValueCmd.type.checkbox, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -136,9 +179,10 @@ export default class ParameterPanel {
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPattern = $('<input id="rbro_parameter_pattern">')
             .on('input', event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let cmd = new SetValueCmd(this.selectedObjId,
-                        'rbro_parameter_pattern', 'pattern',
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_pattern', 'pattern',
                         elPattern.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -146,17 +190,18 @@ export default class ParameterPanel {
         elFormField.append(elPattern);
         let elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
             .click(event => {
-                let selectedObj = this.rb.getDataObject(this.selectedObjId);
-                if (selectedObj !== null) {
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
                     let patterns;
-                    let type = selectedObj.getValue('type');
-                    let valueType = (type === Parameter.type.simpleArray) ? selectedObj.getValue('arrayItemType') : type;
+                    let type = selectedObject.getValue('type');
+                    let valueType = (type === Parameter.type.simpleArray) ?
+                        selectedObject.getValue('arrayItemType') : type;
                     if (valueType === Parameter.type.date) {
                         patterns = this.rb.getProperty('patternDates');
                     } else {
                         patterns = this.rb.getProperty('patternNumbers');
                     }
-                    this.rb.getPopupWindow().show(patterns, this.selectedObjId,
+                    this.rb.getPopupWindow().show(patterns, selectedObject.getId(),
                         'rbro_parameter_pattern', 'pattern', PopupWindow.type.pattern);
                 }
             });
@@ -170,8 +215,10 @@ export default class ParameterPanel {
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elExpression = $('<textarea id="rbro_parameter_expression" rows="1"></textarea>')
             .on('input', event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_expression', 'expression',
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_expression', 'expression',
                         elExpression.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -181,20 +228,19 @@ export default class ParameterPanel {
         elParameterButton = $(`<div id="rbro_parameter_expression_param_button"
         class="rbroButton rbroRoundButton rbroIcon-select"></div>`)
             .click(event => {
-                let selectedObj = this.rb.getDataObject(this.selectedObjId);
-                if (selectedObj !== null) {
-                    let items;
-                    let popupType;
-                    if (selectedObj.getValue('type') === Parameter.type.sum ||
-                            selectedObj.getValue('type') === Parameter.type.average) {
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let items, popupType;
+                    if (selectedObject.getValue('type') === Parameter.type.sum ||
+                            selectedObject.getValue('type') === Parameter.type.average) {
                         items = this.rb.getArrayFieldParameterItems(Parameter.type.number);
                         popupType = PopupWindow.type.parameterSet;
                     } else {
-                        items = this.rb.getParameterItems(selectedObj);
+                        items = this.rb.getParameterItems(selectedObject);
                         popupType = PopupWindow.type.parameterAppend;
                     }
-                    this.rb.getPopupWindow().show(items, this.selectedObjId,
-                        'rbro_parameter_expression', 'expression', popupType);
+                    this.rb.getPopupWindow().show(
+                        items, selectedObject.getId(), 'rbro_parameter_expression', 'expression', popupType);
                 }
             });
         elFormField.append(elParameterButton);
@@ -207,8 +253,10 @@ export default class ParameterPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elTestData = $('<input id="rbro_parameter_test_data">')
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
-                    let cmd = new SetValueCmd(this.selectedObjId, 'rbro_parameter_test_data', 'testData',
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_parameter_test_data', 'testData',
                         elTestData.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -220,12 +268,12 @@ export default class ParameterPanel {
                     <span class="rbroIcon-edit"></span>
                 </button>`)
             .click(event => {
-                let selectedObj = this.rb.getDataObject(this.selectedObjId);
-                if (selectedObj !== null) {
-                    let rows = selectedObj.getTestDataRows(true);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let rows = selectedObject.getTestDataRows(true);
                     if (rows.length > 0) {
                         this.rb.getPopupWindow().show(
-                            rows, this.selectedObjId, '', 'testData', PopupWindow.type.testData);
+                            rows, selectedObject.getId(), '', 'testData', PopupWindow.type.testData);
                     } else {
                         alert(this.rb.getLabel('parameterEditTestDataNoFields'));
                     }
@@ -239,94 +287,7 @@ export default class ParameterPanel {
         $('#rbro_detail_panel').append(panel);
     }
 
-    updateAutosizeInputs() {
-        autosize.update($('#rbro_parameter_expression'));
-    }
-
-    show(data) {
-        $('#rbro_parameter_panel').removeClass('rbroHidden');
-        this.updateData(data);
-    }
-
-    hide() {
-        $('#rbro_parameter_panel').addClass('rbroHidden');
-    }
-
-    /**
-     * Is called when the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
-     * @param {Parameter} data
-     */
-    updateData(data) {
-        if (data !== null) {
-            let editable = data.getValue('editable');
-            $('#rbro_parameter_name').prop('disabled', !editable);
-            $('#rbro_parameter_type').prop('disabled', !editable);
-            $('#rbro_parameter_eval').prop('disabled', !editable);
-            $('#rbro_parameter_nullable').prop('disabled', !editable);
-            $('#rbro_parameter_pattern').prop('disabled', !editable);
-            $('#rbro_parameter_expression').prop('disabled', !editable);
-            if (editable) {
-                $('#rbro_parameter_name_row label').removeClass('rbroDisabled');
-                $('#rbro_parameter_type_row label').removeClass('rbroDisabled');
-                $('#rbro_parameter_eval_row label').removeClass('rbroDisabled');
-                $('#rbro_parameter_nullable_row label').removeClass('rbroDisabled');
-                $('#rbro_parameter_pattern_row label').removeClass('rbroDisabled');
-                $('#rbro_parameter_expression_row label').removeClass('rbroDisabled');
-            } else {
-                $('#rbro_parameter_name_row label').addClass('rbroDisabled');
-                $('#rbro_parameter_type_row label').addClass('rbroDisabled');
-                $('#rbro_parameter_eval_row label').addClass('rbroDisabled');
-                $('#rbro_parameter_nullable_row label').addClass('rbroDisabled');
-                $('#rbro_parameter_pattern_row label').addClass('rbroDisabled');
-                $('#rbro_parameter_expression_row label').addClass('rbroDisabled');
-            }
-            $('#rbro_parameter_test_data').prop('disabled', false);
-
-            $('#rbro_parameter_name').val(data.getName());
-            $('#rbro_parameter_type').val(data.getValue('type'));
-            $('#rbro_parameter_eval').prop('checked', data.getValue('eval'));
-            $('#rbro_parameter_nullable').prop('checked', data.getValue('nullable'));
-            $('#rbro_parameter_pattern').val(data.getValue('pattern'));
-            $('#rbro_parameter_expression').val(data.getValue('expression'));
-            $('#rbro_parameter_test_data').val(data.getValue('testData'));
-            this.updatePatternPlaceholder(data);
-            this.updateVisibility(data);
-            this.selectedObjId = data.getId();
-        } else {
-            $('#rbro_parameter_name').prop('disabled', true);
-            $('#rbro_parameter_type').prop('disabled', true);
-            $('#rbro_parameter_eval').prop('disabled', true);
-            $('#rbro_parameter_nullable').prop('disabled', true);
-            $('#rbro_parameter_pattern').prop('disabled', true);
-            $('#rbro_parameter_expression').prop('disabled', true);
-            $('#rbro_parameter_test_data').prop('disabled', true);
-        }
-        
-        this.updateAutosizeInputs();
-        this.updateErrors();
-    }
-
-    /**
-     * Is called when a data object was modified (including new and deleted data objects).
-     * @param {*} obj - new/deleted/modified data object.
-     * @param {String} operation - operation which caused the notification.
-     */
-    notifyEvent(obj, operation) {
-        if (obj instanceof Parameter && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
-            this.updateVisibility(obj);
-        }
-    }
-
-    updatePatternPlaceholder(obj) {
-        if (obj !== null && obj.getValue('type') === Parameter.type.date) {
-            $('#rbro_parameter_test_data').attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
-        } else {
-            $('#rbro_parameter_test_data').attr('placeholder', '');
-        }
-    }
-
-    updateVisibility(obj) {
+    updateVisibileRows(obj, field) {
         let type = obj.getValue('type');
         let valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
         let showOnlyNameType = obj.getValue('showOnlyNameType');
@@ -335,133 +296,170 @@ export default class ParameterPanel {
             parentParameter = obj.getPanelItem().getParent().getData();
         }
 
-        if (type === Parameter.type.simpleArray) {
-            $('#rbro_parameter_array_item_type_row').show();
-        } else {
-            $('#rbro_parameter_array_item_type_row').hide();
-        }
-        if (type === Parameter.type.string || type === Parameter.type.number || type === Parameter.type.boolean || type === Parameter.type.date ||
-                type === Parameter.type.array || type === Parameter.type.simpleArray || type === Parameter.type.map) {
-            $('#rbro_parameter_nullable_row').show();
-        } else {
-            $('#rbro_parameter_nullable_row').hide();
-        }
-        if ((valueType === Parameter.type.number || valueType === Parameter.type.date ||
-                valueType === Parameter.type.sum || valueType === Parameter.type.average) && !showOnlyNameType) {
-            $('#rbro_parameter_pattern_row').show();
-        } else {
-            $('#rbro_parameter_pattern_row').hide();
-        }
-        if (type === Parameter.type.image || type === Parameter.type.sum || type === Parameter.type.average ||
-                showOnlyNameType) {
-            $('#rbro_parameter_eval_row').hide();
-            $('#rbro_parameter_test_data_row').hide();
-        } else {
-            if (type === Parameter.type.image || type === Parameter.type.array || type === Parameter.type.simpleArray || type === Parameter.type.map) {
-                $('#rbro_parameter_eval_row').hide();
+        if (field === null || field === 'type') {
+            if (type === Parameter.type.simpleArray) {
+                $('#rbro_parameter_array_item_type_row').show();
             } else {
-                $('#rbro_parameter_eval_row').show();
+                $('#rbro_parameter_array_item_type_row').hide();
             }
-            if ((parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) ||
-                    type === Parameter.type.map) {
+            if (type === Parameter.type.string || type === Parameter.type.number ||
+                    type === Parameter.type.boolean || type === Parameter.type.date ||
+                    type === Parameter.type.array || type === Parameter.type.simpleArray || type === Parameter.type.map) {
+                $('#rbro_parameter_nullable_row').show();
+            } else {
+                $('#rbro_parameter_nullable_row').hide();
+            }
+        }
+        if (field === null || field === 'type' || field === 'arrayItemType') {
+            if ((valueType === Parameter.type.number || valueType === Parameter.type.date ||
+                    valueType === Parameter.type.sum || valueType === Parameter.type.average) && !showOnlyNameType) {
+                $('#rbro_parameter_pattern_row').show();
+            } else {
+                $('#rbro_parameter_pattern_row').hide();
+            }
+        }
+        if (field === null || field === 'type' || field === 'eval') {
+            if (type === Parameter.type.image || type === Parameter.type.sum || type === Parameter.type.average ||
+                showOnlyNameType) {
+                $('#rbro_parameter_eval_row').hide();
                 $('#rbro_parameter_test_data_row').hide();
             } else {
-                if (type === Parameter.type.array || type === Parameter.type.simpleArray || !obj.getValue('eval')) {
-                    $('#rbro_parameter_test_data_row').show();
+                if (type === Parameter.type.image || type === Parameter.type.array ||
+                    type === Parameter.type.simpleArray || type === Parameter.type.map) {
+                    $('#rbro_parameter_eval_row').hide();
                 } else {
+                    $('#rbro_parameter_eval_row').show();
+                }
+                if ((parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) ||
+                    type === Parameter.type.map) {
                     $('#rbro_parameter_test_data_row').hide();
+                } else {
+                    if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
+                            !obj.getValue('eval')) {
+                        $('#rbro_parameter_test_data_row').show();
+                    } else {
+                        $('#rbro_parameter_test_data_row').hide();
+                    }
+                }
+                if (type === Parameter.type.array || type === Parameter.type.simpleArray) {
+                    $('#rbro_parameter_test_data').hide();
+                    $('#rbro_parameter_edit_test_data').show();
+                } else {
+                    $('#rbro_parameter_test_data').show();
+                    $('#rbro_parameter_edit_test_data').hide();
                 }
             }
-            if (type === Parameter.type.array || type === Parameter.type.simpleArray) {
-                $('#rbro_parameter_test_data').hide();
-                $('#rbro_parameter_edit_test_data').show();
+            if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||
+                  type === Parameter.type.boolean || type === Parameter.type.date)) ||
+                    (type === Parameter.type.sum || type === Parameter.type.average)) && !showOnlyNameType) {
+                $('#rbro_parameter_expression_row').show();
             } else {
-                $('#rbro_parameter_test_data').show();
-                $('#rbro_parameter_edit_test_data').hide();
+                $('#rbro_parameter_expression_row').hide();
             }
         }
-        if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||
-              type === Parameter.type.boolean || type === Parameter.type.date)) ||
-                (type === Parameter.type.sum || type === Parameter.type.average)) && !showOnlyNameType) {
-            $('#rbro_parameter_expression_row').show();
-        } else {
-            $('#rbro_parameter_expression_row').hide();
-        }
 
-        let parameterTypeOptions = [];
-        // do not allow nested array/map (only for top-level parameters)
-        let topLevelParameter = (obj.getPanelItem() !== null &&
-            obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem());
-        // do not allow image and sum/average parameter in list
-        let listFieldParameter = (parentParameter !== null &&
-            parentParameter.getValue('type') === Parameter.type.array);
+        if (field === null) {
+            let parameterTypeOptions = [];
+            // do not allow nested array/map (only for top-level parameters)
+            let topLevelParameter = (obj.getPanelItem() !== null &&
+                obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem());
+            // do not allow image and sum/average parameter in list
+            let listFieldParameter = (parentParameter !== null &&
+                parentParameter.getValue('type') === Parameter.type.array);
 
-        parameterTypeOptions.push({ value: 'string', label: this.rb.getLabel('parameterTypeString') });
-        parameterTypeOptions.push({ value: 'number', label: this.rb.getLabel('parameterTypeNumber') });
-        parameterTypeOptions.push({ value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean') });
-        parameterTypeOptions.push({ value: 'date', label: this.rb.getLabel('parameterTypeDate') });
-        if (!listFieldParameter) {
-            parameterTypeOptions.push({ value: 'image', label: this.rb.getLabel('parameterTypeImage') });
-        }
-        if (topLevelParameter) {
-            parameterTypeOptions.push({ value: 'array', label: this.rb.getLabel('parameterTypeArray') });
-        }
-        parameterTypeOptions.push({ value: 'simple_array', label: this.rb.getLabel('parameterTypeSimpleArray') });
-        if (topLevelParameter) {
-            parameterTypeOptions.push({ value: 'map', label: this.rb.getLabel('parameterTypeMap') });
-        }
-        if (!listFieldParameter) {
-            parameterTypeOptions.push({ value: 'sum', label: this.rb.getLabel('parameterTypeSum') });
-            parameterTypeOptions.push({ value: 'average', label: this.rb.getLabel('parameterTypeAverage') });
-        }
+            parameterTypeOptions.push({value: 'string', label: this.rb.getLabel('parameterTypeString')});
+            parameterTypeOptions.push({value: 'number', label: this.rb.getLabel('parameterTypeNumber')});
+            parameterTypeOptions.push({value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean')});
+            parameterTypeOptions.push({value: 'date', label: this.rb.getLabel('parameterTypeDate')});
+            if (!listFieldParameter) {
+                parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
+            }
+            if (topLevelParameter) {
+                parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
+            }
+            parameterTypeOptions.push({value: 'simple_array', label: this.rb.getLabel('parameterTypeSimpleArray')});
+            if (topLevelParameter) {
+                parameterTypeOptions.push({value: 'map', label: this.rb.getLabel('parameterTypeMap')});
+            }
+            if (!listFieldParameter) {
+                parameterTypeOptions.push({value: 'sum', label: this.rb.getLabel('parameterTypeSum')});
+                parameterTypeOptions.push({value: 'average', label: this.rb.getLabel('parameterTypeAverage')});
+            }
 
-        let parameterTypeOptionsChanged = false;
-        if (parameterTypeOptions.length !== this.parameterTypeOptions.length) {
-            parameterTypeOptionsChanged = true;
-        } else {
-            for (let i=0; i < parameterTypeOptions.length; i++) {
-                if (parameterTypeOptions[i].value !== this.parameterTypeOptions[i].value) {
-                    parameterTypeOptionsChanged = true;
-                    break;
+            let parameterTypeOptionsChanged = false;
+            if (parameterTypeOptions.length !== this.parameterTypeOptions.length) {
+                parameterTypeOptionsChanged = true;
+            } else {
+                for (let i = 0; i < parameterTypeOptions.length; i++) {
+                    if (parameterTypeOptions[i].value !== this.parameterTypeOptions[i].value) {
+                        parameterTypeOptionsChanged = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (parameterTypeOptionsChanged) {
-            // add dom elements for changed options
-            let elParameterType = $('#rbro_parameter_type');
-            elParameterType.empty();
-            for (let i=0; i < parameterTypeOptions.length; i++) {
-                let parameterTypeOption = parameterTypeOptions[i];
-                elParameterType.append(
-                    `<option value="${parameterTypeOption.value}">${parameterTypeOption.label}</option>`);
+            if (parameterTypeOptionsChanged) {
+                // add dom elements for changed options
+                let elParameterType = $('#rbro_parameter_type');
+                elParameterType.empty();
+                for (let i = 0; i < parameterTypeOptions.length; i++) {
+                    let parameterTypeOption = parameterTypeOptions[i];
+                    elParameterType.append(
+                        `<option value="${parameterTypeOption.value}">${parameterTypeOption.label}</option>`);
+                }
+                this.parameterTypeOptions = parameterTypeOptions;
             }
-            this.parameterTypeOptions = parameterTypeOptions;
         }
     }
 
     /**
-     * Updates displayed errors of currently selected data object.
+     * Is called when the selection is changed or the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {[String]} field - affected field in case of change operation.
      */
-    updateErrors() {
-        $('#rbro_parameter_panel .rbroFormRow').removeClass('rbroError');
-        $('#rbro_parameter_panel .rbroErrorMessage').text('');
-        let selectedObj = this.rb.getDataObject(this.selectedObjId);
-        if (selectedObj !== null) {
-            for (let error of selectedObj.getErrors()) {
-                let rowId = 'rbro_parameter_' + error.field + '_row';
-                let errorId = 'rbro_parameter_' + error.field + '_error';
-                let errorMsg = this.rb.getLabel(error.msg_key);
-                if (error.info) {
-                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
-                        error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+    updateDisplay(field) {
+        let selectedObject = this.rb.getSelectedObject();
+
+        if (selectedObject !== null && selectedObject instanceof Parameter) {
+            for (let property in this.propertyDescriptors) {
+                if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+                    let propertyDescriptor = this.propertyDescriptors[property];
+                    let value = selectedObject.getValue(property);
+                    super.setValue(propertyDescriptor, value, false);
                 }
-                $('#' + rowId).addClass('rbroError');
-                $('#' + errorId).html(errorMsg);
             }
+
+            if (field === null || field === 'type') {
+                if (selectedObject.getValue('type') === Parameter.type.date) {
+                    $('#rbro_parameter_test_data').attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+                } else {
+                    $('#rbro_parameter_test_data').attr('placeholder', '');
+                }
+            }
+
+            ParameterPanel.updateVisibileRows(selectedObject, field);
+            ParameterPanel.updateAutosizeInputs(field);
         }
     }
 
-    getSelectedObjId() {
-        return this.selectedObjId;
+    /**
+     * Is called when the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {[String]} field - affected field in case of change operation.
+     */
+    static updateAutosizeInputs(field) {
+        if (field === null || field === 'expression') {
+            autosize.update($('#rbro_parameter_expression'));
+        }
     }
+
+    // /**
+    //  * Is called when a data object was modified (including new and deleted data objects).
+    //  * @param {*} obj - new/deleted/modified data object.
+    //  * @param {String} operation - operation which caused the notification.
+    //  */
+    // notifyEvent(obj, operation) {
+    //     if (obj instanceof Parameter && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
+    //         this.updateDisplay();
+    //     }
+    // }
 }

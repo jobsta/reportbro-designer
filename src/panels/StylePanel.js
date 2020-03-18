@@ -1,3 +1,4 @@
+import PanelBase from './PanelBase';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
@@ -7,23 +8,151 @@ import * as utils from '../utils';
  * Panel to edit all style properties.
  * @class
  */
-export default class StylePanel {
+export default class StylePanel extends PanelBase {
     constructor(rootElement, rb) {
-        this.rootElement = rootElement;
-        this.rb = rb;
-        this.selectedObjId = null;
+        super('rbro_style', Style, rootElement, rb);
+
+        this.propertyDescriptors = {
+            'name': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'name'
+            },
+            'bold': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'bold',
+                'rowId': 'rbro_style_textstyle_row',
+                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough']
+            },
+            'italic': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'italic',
+                'rowId': 'rbro_style_textstyle_row',
+                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough']
+            },
+            'underline': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'underline',
+                'rowId': 'rbro_style_textstyle_row',
+                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough']
+            },
+            'strikethrough': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'strikethrough',
+                'rowId': 'rbro_style_textstyle_row',
+                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough']
+            },
+            'horizontalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'halignment',
+                'rowId': 'rbro_style_alignment_row',
+                'rowProperties': ['horizontalAlignment', 'verticalAlignment']
+            },
+            'verticalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'valignment',
+                'rowId': 'rbro_style_alignment_row'
+            },
+            'textColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'text_color'
+            },
+            'backgroundColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': true,
+                'fieldId': 'background_color'
+            },
+            'alternateBackgroundColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': true,
+                'fieldId': 'alternate_background_color'
+            },
+            'font': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'font',
+                'rowId': 'rbro_style_font_row',
+                'rowProperties': ['font', 'fontSize']
+            },
+            'fontSize': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'font_size',
+                'rowId': 'rbro_style_font_row'
+            },
+            'lineSpacing': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'line_spacing'
+            },
+            'borderAll': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_all',
+                'rowId': 'rbro_style_border_row',
+                'rowProperties': ['borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom']
+            },
+            'borderLeft': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_left',
+                'rowId': 'rbro_style_border_row'
+            },
+            'borderTop': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_top',
+                'rowId': 'rbro_style_border_row'
+            },
+            'borderRight': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_right',
+                'rowId': 'rbro_style_border_row'
+            },
+            'borderBottom': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_bottom',
+                'rowId': 'rbro_style_border_row'
+            },
+            'borderColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'border_color'
+            },
+            'borderWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'border_width'
+            },
+            'paddingLeft': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_left',
+                'rowId': 'rbro_style_padding_row',
+                'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom']
+            },
+            'paddingTop': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_top',
+                'rowId': 'rbro_style_padding_row'
+            },
+            'paddingRight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_right',
+                'rowId': 'rbro_style_padding_row'
+            },
+            'paddingBottom': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_bottom',
+                'rowId': 'rbro_style_padding_row'
+            }
+        };
     }
 
-    render(data) {
+    render() {
         let panel = $('<div id="rbro_style_panel" class="rbroHidden"></div>');
         let elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_style_name">${this.rb.getLabel('styleName')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elStyleName = $(`<input id="rbro_style_name">`)
             .change(event => {
-                if (this.rb.getDataObject(this.selectedObjId) !== null) {
+                let obj = this.rb.getSelectedObject();
+                if (obj !== null) {
                     if (elStyleName.val().trim() !== '') {
-                        let cmd = new SetValueCmd(this.selectedObjId, 'rbro_style_name', 'name',
+                        let cmd = new SetValueCmd(
+                            obj.getId(), 'rbro_style_name', 'name',
                             elStyleName.val(), SetValueCmd.type.text, this.rb);
                     } else {
                         elStyleName.val(style.getName());
@@ -696,4 +825,34 @@ export default class StylePanel {
         elDiv.append(elFormField);
         elPanel.append(elDiv);
     }
+
+    /**
+     * Is called when the selection is changed or the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {[String]} field - affected field in case of change operation.
+     */
+    updateDisplay(field) {
+        let selectedObject = this.rb.getSelectedObject();
+
+        if (selectedObject !== null && selectedObject instanceof Style) {
+            for (let property in this.propertyDescriptors) {
+                if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+                    let propertyDescriptor = this.propertyDescriptors[property];
+                    let value = selectedObject.getValue(property);
+                    super.setValue(propertyDescriptor, value, false);
+                }
+            }
+        }
+    }
+
+    // /**
+    //  * Is called when a data object was modified (including new and deleted data objects).
+    //  * @param {*} obj - new/deleted/modified data object.
+    //  * @param {String} operation - operation which caused the notification.
+    //  */
+    // notifyEvent(obj, operation) {
+    //     if (obj instanceof Style && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
+    //         this.updateDisplay();
+    //     }
+    // }
 }

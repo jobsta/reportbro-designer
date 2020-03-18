@@ -102,7 +102,7 @@ export default class DocElement {
                             this.id, this.containerId, this.linkedContainerId,
                             this.getElementType(), DocElement.dragType.element);
                     } else {
-                        this.rb.deselectAll();
+                        this.rb.deselectAll(true);
                     }
                 }
                 event.stopPropagation();

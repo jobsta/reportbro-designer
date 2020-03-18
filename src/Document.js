@@ -48,7 +48,7 @@ export default class Document {
         let panel = $('#rbro_document_panel')
             .mousedown(event => {
                 if (this.rb.isDocElementSelected() && !event.shiftKey) {
-                    this.rb.deselectAll();
+                    this.rb.deselectAll(true);
                 }
                 let offset = this.elDocContent.offset();
                 this.startSelectionArea(

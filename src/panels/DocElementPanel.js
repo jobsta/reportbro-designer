@@ -1,7 +1,9 @@
+import PanelBase from './PanelBase';
 import StylePanel from './StylePanel';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Parameter from '../data/Parameter';
+import DocElement from '../elements/DocElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 
@@ -9,10 +11,465 @@ import * as utils from '../utils';
  * Generic panel to edit all shared properties of selected document elements.
  * @class
  */
-export default class DocElementPanel {
+export default class DocElementPanel extends PanelBase {
     constructor(rootElement, rb) {
-        this.rootElement = rootElement;
-        this.rb = rb;
+        super('rbro_doc_element', DocElement, rootElement, rb);
+
+        this.propertyDescriptors = {
+            'label': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'label'
+            },
+            'content': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'content'
+            },
+            'eval': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'eval'
+            },
+            'dataSource': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'data_source'
+            },
+            'x': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'x',
+                'rowId': 'rbro_doc_element_position_row',
+                'rowProperties': ['x', 'y'],
+                'labelId': 'rbro_doc_element_position_label',
+                'defaultLabel': 'docElementPosition',
+                'singlePropertyLabel': 'docElementPositionX'
+            },
+            'y': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'y',
+                'rowId': 'rbro_doc_element_position_row',
+                'labelId': 'rbro_doc_element_position_label',
+                'defaultLabel': 'docElementPosition',
+                'singlePropertyLabel': 'docElementPositionY'
+            },
+            'width': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'width',
+                'rowId': 'rbro_doc_element_size_row',
+                'rowProperties': ['width', 'height'],
+                'labelId': 'rbro_doc_element_size_label',
+                'defaultLabel': 'docElementSize',
+                'singlePropertyLabel': 'docElementWidth'
+            },
+            'height': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'height',
+                'rowId': 'rbro_doc_element_size_row',
+                'labelId': 'rbro_doc_element_size_label',
+                'defaultLabel': 'docElementSize',
+                'singlePropertyLabel': 'docElementHeight'
+            },
+            'colspan': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'colspan'
+            },
+            'format': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'format'
+            },
+            'displayValue': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'display_value'
+            },
+            'source': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'source'
+            },
+            'image': {
+                'type': SetValueCmd.type.file,
+                'fieldId': 'image',
+                'rowId': 'rbro_doc_element_image_row',
+                'rowProperties': ['image', 'imageFilename']
+            },
+            'imageFilename': {
+                'type': SetValueCmd.type.filename,
+                'fieldId': 'image_filename',
+                'rowId': 'rbro_doc_element_image_row',
+            },
+            'columns': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'columns'
+            },
+            'header': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'header',
+            },
+            'contentRows': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'content_rows'
+            },
+            'footer': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'footer'
+            },
+            'color': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'color',
+                'section': 'style'
+            },
+            'styleId': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'style_id',
+                'section': 'style',
+                'showIfEmptyId': 'rbro_doc_element_style_settings'
+            },
+            'bold': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'bold',
+                'rowId': 'rbro_doc_element_textstyle_row',
+                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough'],
+                'section': 'style'
+            },
+            'italic': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'italic',
+                'rowId': 'rbro_doc_element_textstyle_row',
+                'section': 'style'
+            },
+            'underline': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'underline',
+                'rowId': 'rbro_doc_element_textstyle_row',
+                'section': 'style'
+            },
+            'strikethrough': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'strikethrough',
+                'rowId': 'rbro_doc_element_textstyle_row',
+                'section': 'style'
+            },
+            'horizontalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'halignment',
+                'rowId': 'rbro_doc_element_alignment_row',
+                'rowProperties': ['horizontalAlignment', 'verticalAlignment'],
+                'section': 'style'
+            },
+            'verticalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'valignment',
+                'rowId': 'rbro_doc_element_alignment_row',
+                'section': 'style'
+            },
+            'textColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'text_color',
+                'section': 'style'
+            },
+            'backgroundColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': true,
+                'fieldId': 'background_color',
+                'section': 'style'
+            },
+            'alternateBackgroundColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': true,
+                'fieldId': 'alternate_background_color',
+                'section': 'style'
+            },
+            'font': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'font',
+                'rowId': 'rbro_doc_element_font_row',
+                'rowProperties': ['font', 'fontSize'],
+                'section': 'style'
+            },
+            'fontSize': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'font_size',
+                'rowId': 'rbro_doc_element_font_row',
+                'section': 'style'
+            },
+            'lineSpacing': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'line_spacing',
+                'section': 'style'
+            },
+            'borderAll': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_all',
+                'rowId': 'rbro_doc_element_border_row',
+                'rowProperties': ['borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom'],
+                'section': 'style'
+            },
+            'borderLeft': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_left',
+                'rowId': 'rbro_doc_element_border_row',
+                'section': 'style'
+            },
+            'borderTop': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_top',
+                'rowId': 'rbro_doc_element_border_row',
+                'section': 'style'
+            },
+            'borderRight': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_right',
+                'rowId': 'rbro_doc_element_border_row',
+                'section': 'style'
+            },
+            'borderBottom': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'border_bottom',
+                'rowId': 'rbro_doc_element_border_row',
+                'section': 'style'
+            },
+            'borderColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'border_color',
+                'section': 'style'
+            },
+            'borderWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'border_width',
+                'section': 'style'
+            },
+            'paddingLeft': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_left',
+                'rowId': 'rbro_doc_element_padding_row',
+                'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
+                'section': 'style'
+            },
+            'paddingTop': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_top',
+                'rowId': 'rbro_doc_element_padding_row',
+                'section': 'style'
+            },
+            'paddingRight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_right',
+                'rowId': 'rbro_doc_element_padding_row',
+                'section': 'style'
+            },
+            'paddingBottom': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'padding_bottom',
+                'rowId': 'rbro_doc_element_padding_row',
+                'section': 'style'
+            },
+            'groupExpression': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'group_expression',
+                'section': 'print'
+            },
+            'printIf': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'print_if',
+                'section': 'print'
+            },
+            'repeatHeader': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'repeat_header',
+                'section': 'print'
+            },
+            'removeEmptyElement': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'remove_empty_element',
+                'section': 'print'
+            },
+            'alwaysPrintOnSamePage': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'always_print_on_same_page',
+                'section': 'print'
+            },
+            'shrinkToContentHeight': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'shrink_to_content_height',
+                'section': 'print'
+            },
+            'pattern': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'pattern',
+                'section': 'print'
+            },
+            'link': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'link',
+                'section': 'print'
+            },
+            'cs_condition': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_condition',
+                'section': 'cs_style'
+            },
+            'cs_styleId': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'cs_style_id',
+                'section': 'cs_style'
+            },
+            'cs_bold': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_bold',
+                'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'rowProperties': ['cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough'],
+                'section': 'cs_style'
+            },
+            'cs_italic': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_italic',
+                'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'section': 'cs_style'
+            },
+            'cs_underline': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_underline',
+                'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'section': 'cs_style'
+            },
+            'cs_strikethrough': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_strikethrough',
+                'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'section': 'cs_style'
+            },
+            'cs_horizontalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'cs_horizontal_alignment',
+                'rowId': 'rbro_doc_element_cs_alignment_row',
+                'rowProperties': ['cs_horizontalAlignment', 'cs_verticalAlignment'],
+                'section': 'cs_style'
+            },
+            'cs_verticalAlignment': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'cs_vertical_alignment',
+                'rowId': 'rbro_doc_element_cs_alignment_row',
+                'section': 'cs_style'
+            },
+            'cs_textColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'cs_text_color',
+                'section': 'cs_style'
+            },
+            'cs_backgroundColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': true,
+                'fieldId': 'cs_background_color',
+                'section': 'cs_style'
+            },
+            'cs_font': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'cs_font',
+                'rowId': 'rbro_doc_element_cs_font_row',
+                'rowProperties': ['cs_font', 'cs_fontSize'],
+                'section': 'cs_style'
+            },
+            'cs_fontSize': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'cs_font_size',
+                'rowId': 'rbro_doc_element_cs_font_row',
+                'section': 'cs_style'
+            },
+            'cs_lineSpacing': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'cs_line_spacing',
+                'section': 'cs_style'
+            },
+            'cs_borderAll': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_border_all',
+                'rowId': 'rbro_doc_element_cs_border_row',
+                'rowProperties': [
+                    'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom'
+                ],
+                'section': 'cs_style'
+            },
+            'cs_borderLeft': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_border_left',
+                'rowId': 'rbro_doc_element_cs_border_row',
+                'section': 'cs_style'
+            },
+            'cs_borderTop': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_border_top',
+                'rowId': 'rbro_doc_element_cs_border_row',
+                'section': 'cs_style'
+            },
+            'cs_borderRight': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_border_right',
+                'rowId': 'rbro_doc_element_cs_border_row',
+                'section': 'cs_style'
+            },
+            'cs_borderBottom': {
+                'type': SetValueCmd.type.button,
+                'fieldId': 'cs_border_bottom',
+                'rowId': 'rbro_doc_element_cs_border_row',
+                'section': 'cs_style'
+            },
+            'cs_borderColor': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'cs_border_color',
+                'section': 'cs_style'
+            },
+            'cs_borderWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_border_width',
+                'section': 'cs_style'
+            },
+            'cs_paddingLeft': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_padding_left',
+                'rowId': 'rbro_doc_element_cs_padding_row',
+                'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
+                'section': 'cs_style'
+            },
+            'cs_paddingTop': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_padding_top',
+                'rowId': 'rbro_doc_element_cs_padding_row',
+                'section': 'cs_style'
+            },
+            'cs_paddingRight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_padding_right',
+                'rowId': 'rbro_doc_element_cs_padding_row',
+                'section': 'cs_style'
+            },
+            'cs_paddingBottom': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_padding_bottom',
+                'rowId': 'rbro_doc_element_cs_padding_row',
+                'section': 'cs_style'
+            },
+            'spreadsheet_hide': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'spreadsheet_hide',
+                'section': 'spreadsheet'
+            },
+            'spreadsheet_column': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'spreadsheet_column',
+                'section': 'spreadsheet'
+            },
+            'spreadsheet_colspan': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'spreadsheet_colspan',
+                'section': 'spreadsheet'
+            },
+            'spreadsheet_addEmptyRow': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'spreadsheet_add_empty_row',
+                'section': 'spreadsheet'
+            }
+        };
     }
 
     render() {
@@ -565,22 +1022,22 @@ export default class DocElementPanel {
         elDiv = $('<div id="rbro_doc_element_style_id_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elStyle = $('<select id="rbro_doc_element_style_id"></select>')
+        this.elStyle = $('<select id="rbro_doc_element_style_id"></select>')
             .change(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
-                    if (obj.getValue('styleId') !== elStyle.val()) {
+                    if (obj.getValue('styleId') !== this.elStyle.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'rbro_doc_element_style_id', 'styleId',
-                            elStyle.val(), SetValueCmd.type.select, this.rb));
+                            this.elStyle.val(), SetValueCmd.type.select, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
                 }
             });
-        elFormField.append(elStyle);
+        elFormField.append(this.elStyle);
         elDiv.append(elFormField);
         elStyleSectionDiv.append(elDiv);
 
@@ -885,22 +1342,22 @@ export default class DocElementPanel {
         elDiv = $('<div id="rbro_doc_element_cs_style_id_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_cs_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elCsStyle = $('<select id="rbro_doc_element_cs_style_id"></select>')
+        this.elCsStyle = $('<select id="rbro_doc_element_cs_style_id"></select>')
             .change(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
-                    if (obj.getValue('cs_styleId') !== elCsStyle.val()) {
+                    if (obj.getValue('cs_styleId') !== this.elCsStyle.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'rbro_doc_element_cs_style_id', 'cs_styleId',
-                            elCsStyle.val(), SetValueCmd.type.select, this.rb));
+                            this.elCsStyle.val(), SetValueCmd.type.select, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
                 }
             });
-        elFormField.append(elCsStyle);
+        elFormField.append(this.elCsStyle);
         elDiv.append(elFormField);
         elCsStyleSectionDiv.append(elDiv);
 
@@ -1043,462 +1500,25 @@ export default class DocElementPanel {
         $('#rbro_detail_panel').append(panel);
     }
 
-    updateDisplay() {
+    renderStyleSelect() {
+        this.elStyle.empty();
+        this.elCsStyle.empty();
+        this.elStyle.append(`<option value="">${this.rb.getLabel('styleNone')}</option>`);
+        this.elCsStyle.append(`<option value="">${this.rb.getLabel('styleNone')}</option>`);
+        let styles = this.rb.getStyles();
+        for (let style of styles) {
+            this.elStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
+            this.elCsStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
+        }
+    }
+
+    /**
+     * Is called when the selection is changed or the selected element was changed.
+     * The panel is updated to show the values of the selected data objects.
+     * @param {[String]} field - affected field in case of change operation.
+     */
+    updateDisplay(field) {
         let selectedObjects = this.rb.getSelectedObjects();
-        let propertyDescriptors = {
-            'label': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'label'
-            },
-            'content': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'content'
-            },
-            'eval': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'eval'
-            },
-            'dataSource': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'data_source'
-            },
-            'x': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'x',
-                'rowId': 'rbro_doc_element_position_row',
-                'rowProperties': ['x', 'y'],
-                'labelId': 'rbro_doc_element_position_label',
-                'defaultLabel': 'docElementPosition',
-                'singlePropertyLabel': 'docElementPositionX'
-            },
-            'y': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'y',
-                'rowId': 'rbro_doc_element_position_row',
-                'labelId': 'rbro_doc_element_position_label',
-                'defaultLabel': 'docElementPosition',
-                'singlePropertyLabel': 'docElementPositionY'
-            },
-            'width': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'width',
-                'rowId': 'rbro_doc_element_size_row',
-                'rowProperties': ['width', 'height'],
-                'labelId': 'rbro_doc_element_size_label',
-                'defaultLabel': 'docElementSize',
-                'singlePropertyLabel': 'docElementWidth'
-            },
-            'height': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'height',
-                'rowId': 'rbro_doc_element_size_row',
-                'labelId': 'rbro_doc_element_size_label',
-                'defaultLabel': 'docElementSize',
-                'singlePropertyLabel': 'docElementHeight'
-            },
-            'colspan': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'colspan'
-            },
-            'format': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'format'
-            },
-            'displayValue': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'display_value'
-            },
-            'source': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'source'
-            },
-            'image': {
-                'type': SetValueCmd.type.file,
-                'fieldId': 'image',
-                'rowId': 'rbro_doc_element_image_row',
-                'rowProperties': ['image', 'imageFilename']
-            },
-            'imageFilename': {
-                'type': SetValueCmd.type.filename,
-                'fieldId': 'image_filename',
-                'rowId': 'rbro_doc_element_image_row',
-            },
-            'columns': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'columns'
-            },
-            'header': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'header',
-            },
-            'contentRows': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'content_rows'
-            },
-            'footer': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'footer'
-            },
-            'color': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'color',
-                'section': 'style'
-            },
-            'styleId': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'style_id',
-                'section': 'style'
-            },
-            'bold': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'bold',
-                'rowId': 'rbro_doc_element_textstyle_row',
-                'rowProperties': ['bold', 'italic', 'underline', 'strikethrough'],
-                'section': 'style'
-            },
-            'italic': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'italic',
-                'rowId': 'rbro_doc_element_textstyle_row',
-                'section': 'style'
-            },
-            'underline': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'underline',
-                'rowId': 'rbro_doc_element_textstyle_row',
-                'section': 'style'
-            },
-            'strikethrough': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'strikethrough',
-                'rowId': 'rbro_doc_element_textstyle_row',
-                'section': 'style'
-            },
-            'horizontalAlignment': {
-                'type': SetValueCmd.type.buttonGroup,
-                'fieldId': 'halignment',
-                'rowId': 'rbro_doc_element_alignment_row',
-                'rowProperties': ['horizontalAlignment', 'verticalAlignment'],
-                'section': 'style'
-            },
-            'verticalAlignment': {
-                'type': SetValueCmd.type.buttonGroup,
-                'fieldId': 'valignment',
-                'rowId': 'rbro_doc_element_alignment_row',
-                'section': 'style'
-            },
-            'textColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'text_color',
-                'section': 'style'
-            },
-            'backgroundColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': true,
-                'fieldId': 'background_color',
-                'section': 'style'
-            },
-            'alternateBackgroundColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': true,
-                'fieldId': 'alternate_background_color',
-                'section': 'style'
-            },
-            'font': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'font',
-                'rowId': 'rbro_doc_element_font_row',
-                'rowProperties': ['font', 'fontSize'],
-                'section': 'style'
-            },
-            'fontSize': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'font_size',
-                'rowId': 'rbro_doc_element_font_row',
-                'section': 'style'
-            },
-            'lineSpacing': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'line_spacing',
-                'section': 'style'
-            },
-            'borderAll': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'border_all',
-                'rowId': 'rbro_doc_element_border_row',
-                'rowProperties': ['borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom'],
-                'section': 'style'
-            },
-            'borderLeft': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'border_left',
-                'rowId': 'rbro_doc_element_border_row',
-                'section': 'style'
-            },
-            'borderTop': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'border_top',
-                'rowId': 'rbro_doc_element_border_row',
-                'section': 'style'
-            },
-            'borderRight': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'border_right',
-                'rowId': 'rbro_doc_element_border_row',
-                'section': 'style'
-            },
-            'borderBottom': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'border_bottom',
-                'rowId': 'rbro_doc_element_border_row',
-                'section': 'style'
-            },
-            'borderColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'border_color',
-                'section': 'style'
-            },
-            'borderWidth': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'border_width',
-                'section': 'style'
-            },
-            'paddingLeft': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'padding_left',
-                'rowId': 'rbro_doc_element_padding_row',
-                'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
-                'section': 'style'
-            },
-            'paddingTop': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'padding_top',
-                'rowId': 'rbro_doc_element_padding_row',
-                'section': 'style'
-            },
-            'paddingRight': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'padding_right',
-                'rowId': 'rbro_doc_element_padding_row',
-                'section': 'style'
-            },
-            'paddingBottom': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'padding_bottom',
-                'rowId': 'rbro_doc_element_padding_row',
-                'section': 'style'
-            },
-            'groupExpression': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'group_expression',
-                'section': 'print'
-            },
-            'printIf': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'print_if',
-                'section': 'print'
-            },
-            'repeatHeader': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'repeat_header',
-                'section': 'print'
-            },
-            'removeEmptyElement': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'remove_empty_element',
-                'section': 'print'
-            },
-            'alwaysPrintOnSamePage': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'always_print_on_same_page',
-                'section': 'print'
-            },
-            'shrinkToContentHeight': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'shrink_to_content_height',
-                'section': 'print'
-            },
-            'pattern': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'pattern',
-                'section': 'print'
-            },
-            'link': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'link',
-                'section': 'print'
-            },
-            'cs_condition': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_condition',
-                'section': 'cs_style'
-            },
-            'cs_styleId': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'cs_style_id',
-                'section': 'cs_style'
-            },
-            'cs_bold': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_bold',
-                'rowId': 'rbro_doc_element_cs_textstyle_row',
-                'rowProperties': ['cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough'],
-                'section': 'cs_style'
-            },
-            'cs_italic': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_italic',
-                'rowId': 'rbro_doc_element_cs_textstyle_row',
-                'section': 'cs_style'
-            },
-            'cs_underline': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_underline',
-                'rowId': 'rbro_doc_element_cs_textstyle_row',
-                'section': 'cs_style'
-            },
-            'cs_strikethrough': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_strikethrough',
-                'rowId': 'rbro_doc_element_cs_textstyle_row',
-                'section': 'cs_style'
-            },
-            'cs_horizontalAlignment': {
-                'type': SetValueCmd.type.buttonGroup,
-                'fieldId': 'cs_horizontal_alignment',
-                'rowId': 'rbro_doc_element_cs_alignment_row',
-                'rowProperties': ['cs_horizontalAlignment', 'cs_verticalAlignment'],
-                'section': 'cs_style'
-            },
-            'cs_verticalAlignment': {
-                'type': SetValueCmd.type.buttonGroup,
-                'fieldId': 'cs_vertical_alignment',
-                'rowId': 'rbro_doc_element_cs_alignment_row',
-                'section': 'cs_style'
-            },
-            'cs_textColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'cs_text_color',
-                'section': 'cs_style'
-            },
-            'cs_backgroundColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': true,
-                'fieldId': 'cs_background_color',
-                'section': 'cs_style'
-            },
-            'cs_font': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'cs_font',
-                'rowId': 'rbro_doc_element_cs_font_row',
-                'rowProperties': ['cs_font', 'cs_fontSize'],
-                'section': 'cs_style'
-            },
-            'cs_fontSize': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'cs_font_size',
-                'rowId': 'rbro_doc_element_cs_font_row',
-                'section': 'cs_style'
-            },
-            'cs_lineSpacing': {
-                'type': SetValueCmd.type.select,
-                'fieldId': 'cs_line_spacing',
-                'section': 'cs_style'
-            },
-            'cs_borderAll': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_border_all',
-                'rowId': 'rbro_doc_element_cs_border_row',
-                'rowProperties': [
-                    'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom'
-                ],
-                'section': 'cs_style'
-            },
-            'cs_borderLeft': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_border_left',
-                'rowId': 'rbro_doc_element_cs_border_row',
-                'section': 'cs_style'
-            },
-            'cs_borderTop': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_border_top',
-                'rowId': 'rbro_doc_element_cs_border_row',
-                'section': 'cs_style'
-            },
-            'cs_borderRight': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_border_right',
-                'rowId': 'rbro_doc_element_cs_border_row',
-                'section': 'cs_style'
-            },
-            'cs_borderBottom': {
-                'type': SetValueCmd.type.button,
-                'fieldId': 'cs_border_bottom',
-                'rowId': 'rbro_doc_element_cs_border_row',
-                'section': 'cs_style'
-            },
-            'cs_borderColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'cs_border_color',
-                'section': 'cs_style'
-            },
-            'cs_borderWidth': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_border_width',
-                'section': 'cs_style'
-            },
-            'cs_paddingLeft': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_padding_left',
-                'rowId': 'rbro_doc_element_cs_padding_row',
-                'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
-                'section': 'cs_style'
-            },
-            'cs_paddingTop': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_padding_top',
-                'rowId': 'rbro_doc_element_cs_padding_row',
-                'section': 'cs_style'
-            },
-            'cs_paddingRight': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_padding_right',
-                'rowId': 'rbro_doc_element_cs_padding_row',
-                'section': 'cs_style'
-            },
-            'cs_paddingBottom': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'cs_padding_bottom',
-                'rowId': 'rbro_doc_element_cs_padding_row',
-                'section': 'cs_style'
-            },
-            'spreadsheet_hide': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'spreadsheet_hide',
-                'section': 'spreadsheet'
-            },
-            'spreadsheet_column': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'spreadsheet_column',
-                'section': 'spreadsheet'
-            },
-            'spreadsheet_colspan': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'spreadsheet_colspan',
-                'section': 'spreadsheet'
-            },
-            'spreadsheet_addEmptyRow': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'spreadsheet_add_empty_row',
-                'section': 'spreadsheet'
-            }
-        };
 
         let sectionPropertyCount = {};
         let sharedProperties = {};
@@ -1514,17 +1534,16 @@ export default class DocElementPanel {
         }
 
         // show/hide property depending if it is available in all selected objects
-        for (let property in propertyDescriptors) {
-            if (propertyDescriptors.hasOwnProperty(property)) {
-                let propertyDescriptor = propertyDescriptors[property];
+        for (let property in this.propertyDescriptors) {
+            if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+                let propertyDescriptor = this.propertyDescriptors[property];
                 let show = false;
-                let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
                 if (property in sharedProperties) {
                     if (sharedProperties[property] === selectedObjects.length) {
                         let value = null;
                         let differentValues = false;
                         for (let obj of selectedObjects) {
-                            let objValue = obj.getValue(property);
+                            let objValue = obj.getUpdateValue(property, obj.getValue(property));
                             if (value === null) {
                                 value = objValue;
                             } else if (objValue !== value) {
@@ -1533,63 +1552,13 @@ export default class DocElementPanel {
                             }
                         }
 
-                        if (differentValues) {
-                            $(propertyId).addClass('rbroDifferentValues');
-                        } else {
-                            $(propertyId).removeClass('rbroDifferentValues');
-                        }
+                        super.setValue(propertyDescriptor, value, differentValues);
 
-                        // set value for current property
-                        if (propertyDescriptor['type'] === SetValueCmd.type.text) {
-                            if (differentValues) {
-                                $(propertyId).val('');
-                                $(propertyId).attr('placeholder', 'different values ...');
+                        if ('showIfEmptyId' in propertyDescriptor) {
+                            if (value) {
+                                $('#' + propertyDescriptor['showIfEmptyId']).hide();
                             } else {
-                                $(propertyId).val(value);
-                                $(propertyId).attr('placeholder', '');
-                            }
-                        } else if (propertyDescriptor['type'] === SetValueCmd.type.checkbox) {
-                            if (differentValues) {
-                                $(propertyId).prop('checked', false);
-                            } else {
-                                $(propertyId).prop('checked', value);
-                            }
-                        } else if (propertyDescriptor['type'] === SetValueCmd.type.button) {
-                            if (differentValues) {
-                                $(propertyId).removeClass('rbroButtonActive');
-                            } else {
-                                if (value) {
-                                    $(propertyId).addClass('rbroButtonActive');
-                                } else {
-                                    $(propertyId).removeClass('rbroButtonActive');
-                                }
-                            }
-                        } else if (propertyDescriptor['type'] === SetValueCmd.type.buttonGroup) {
-                            $(propertyId).find('button').removeClass('rbroButtonActive');
-                            if (!differentValues) {
-                                $(propertyId).find(`button[value="${value}"]`).addClass('rbroButtonActive');
-                            }
-                        } else if (propertyDescriptor['type'] === SetValueCmd.type.color) {
-                            if (differentValues) {
-                                if (propertyDescriptor['allowEmpty']) {
-                                    $(propertyId).spectrum("set", '');
-                                } else {
-                                    $(propertyId).spectrum("set", '#000000');
-                                }
-                            } else {
-                                $(propertyId).spectrum("set", value);
-                            }
-                        } else if (propertyDescriptor['type'] === SetValueCmd.type.filename) {
-                            if (differentValues) {
-                                $(propertyId).text('different files ...');
-                                $(propertyId + '_container').removeClass('rbroHidden');
-                            } else {
-                                $(propertyId).text(value);
-                                if (value === '') {
-                                    $(propertyId + '_container').addClass('rbroHidden');
-                                } else {
-                                    $(propertyId + '_container').removeClass('rbroHidden');
-                                }
+                                $('#' + propertyDescriptor['showIfEmptyId']).show();
                             }
                         }
 
@@ -1609,6 +1578,7 @@ export default class DocElementPanel {
 
                 // only handle row visibility if rowId is not set, otherwise row visibility will be handled
                 // below, e.g. for button groups
+                let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
                 if (!('rowId' in propertyDescriptor)) {
                     let propertyRowId = propertyId + '_row';
                     if (show) {
@@ -1627,97 +1597,116 @@ export default class DocElementPanel {
             }
         }
 
-        // sharedProperties now only contains properties shared by all objects
+        if (field === null) {
+            // only update labels, visible rows and sections if selection was changed (no specific field update)
 
-        for (let property in propertyDescriptors) {
-            if (propertyDescriptors.hasOwnProperty(property)) {
-                let propertyDescriptor = propertyDescriptors[property];
-                if ('rowId' in propertyDescriptor && 'rowProperties' in propertyDescriptor) {
-                    let shownPropertyCount = 0;
-                    for (let rowProperty of propertyDescriptor['rowProperties']) {
-                        if (rowProperty in sharedProperties) {
-                            shownPropertyCount++;
-                        }
-                    }
-                    if ('labelId' in propertyDescriptor) {
-                        let label = propertyDescriptor['defaultLabel'];
-                        if (shownPropertyCount === 1) {
-                            // get label of single property shown in this property group, e.g. label
-                            // is changed to "Width" instead of "Size (Width, Height)" if only width property
-                            // is shown and not both width and height.
-                            for (let rowProperty of propertyDescriptor['rowProperties']) {
-                                if (rowProperty in sharedProperties) {
-                                    label = propertyDescriptors[rowProperty]['singlePropertyLabel'];
-                                    break;
-                                }
+            // sharedProperties now only contains properties shared by all objects
+
+            for (let property in this.propertyDescriptors) {
+                if (this.propertyDescriptors.hasOwnProperty(property)) {
+                    let propertyDescriptor = this.propertyDescriptors[property];
+                    if ('rowId' in propertyDescriptor && 'rowProperties' in propertyDescriptor) {
+                        let shownPropertyCount = 0;
+                        for (let rowProperty of propertyDescriptor['rowProperties']) {
+                            if (rowProperty in sharedProperties) {
+                                shownPropertyCount++;
                             }
                         }
-                        $('#' + propertyDescriptor['labelId']).text(this.rb.getLabel(label) + ':');
+                        if ('labelId' in propertyDescriptor) {
+                            let label = propertyDescriptor['defaultLabel'];
+                            if (shownPropertyCount === 1) {
+                                // get label of single property shown in this property group, e.g. label
+                                // is changed to "Width" instead of "Size (Width, Height)" if only width property
+                                // is shown and not both width and height.
+                                for (let rowProperty of propertyDescriptor['rowProperties']) {
+                                    if (rowProperty in sharedProperties) {
+                                        label = this.propertyDescriptors[rowProperty]['singlePropertyLabel'];
+                                        break;
+                                    }
+                                }
+                            }
+                            $('#' + propertyDescriptor['labelId']).text(this.rb.getLabel(label) + ':');
+                        }
+                        if (shownPropertyCount > 0) {
+                            $('#' + propertyDescriptor['rowId']).removeClass('rbroHidden');
+                        } else {
+                            $('#' + propertyDescriptor['rowId']).addClass('rbroHidden');
+                        }
                     }
-                    if (shownPropertyCount > 0) {
-                        $('#' + propertyDescriptor['rowId']).removeClass('rbroHidden');
-                    } else {
-                        $('#' + propertyDescriptor['rowId']).addClass('rbroHidden');
-                    }
+                }
+            }
+
+            // show section if there is at least one property shown in section
+            for (let section of ['style', 'print', 'cs_style', 'spreadsheet']) {
+                if (section in sectionPropertyCount) {
+                    $(`#rbro_doc_element_${section}_section_container`).removeClass('rbroHidden');
+                } else {
+                    $(`#rbro_doc_element_${section}_section_container`).addClass('rbroHidden');
                 }
             }
         }
 
-        // show section if there is at least one shown property of section
-        for (let section of ['style', 'print', 'cs_style', 'spreadsheet']) {
-            if (section in sectionPropertyCount) {
-                $(`#rbro_doc_element_${section}_section_container`).removeClass('rbroHidden');
-            } else {
-                $(`#rbro_doc_element_${section}_section_container`).addClass('rbroHidden');
-            }
-        }
-
-        DocElementPanel.updateAutosizeInputs();
+        DocElementPanel.updateAutosizeInputs(field);
     }
 
-    static updateAutosizeInputs() {
-        autosize.update($('#rbro_doc_element_data_source'));
-        autosize.update($('#rbro_doc_element_content'));
-        autosize.update($('#rbro_doc_element_source'));
-        autosize.update($('#rbro_doc_element_group_expression'));
-        autosize.update($('#rbro_doc_element_print_if'));
+    static updateAutosizeInputs(field) {
+        if (field === null || field === 'dataSource') {
+            autosize.update($('#rbro_doc_element_data_source'));
+        }
+        if (field === null || field === 'content') {
+            autosize.update($('#rbro_doc_element_content'));
+        }
+        if (field === null || field === 'source') {
+            autosize.update($('#rbro_doc_element_source'));
+        }
+        if (field === null || field === 'expression') {
+            autosize.update($('#rbro_doc_element_group_expression'));
+        }
+        if (field === null || field === 'printIf') {
+            autosize.update($('#rbro_doc_element_print_if'));
+        }
+    }
+
+    show() {
+        this.renderStyleSelect();
+        super.show();
     }
 
     /**
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.
+     * @param {[String]} field - affected field in case of change operation.
      */
-    notifyEvent(obj, operation) {
-    }
-
-    /**
-     * Updates displayed errors of currently selected data object.
-     */
-    updateErrors(errors, displayedObjectId) {
-        $('#rbro_doc_element_panel .rbroFormRow').removeClass('rbroError');
-        $('#rbro_doc_element_panel .rbroPanelSection').removeClass('rbroError');
-        $('#rbro_doc_element_panel .rbroErrorMessage').text('');
-
-        for (let error of errors) {
-            if (error.object_id === displayedObjectId) {
-                let rowId = 'rbro_line_element_' + error.field + '_row';
-                let errorId = 'rbro_line_element_' + error.field + '_error';
-                let errorMsg = this.rb.getLabel(error.msg_key);
-                if (error.info) {
-                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
-                        error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+    notifyEvent(obj, operation, field) {
+        if (obj instanceof DocElement && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
+            this.updateDisplay(field);
+        }
+        if (obj instanceof Style) {
+            if (operation === Command.operation.add || operation === Command.operation.move) {
+                this.renderStyleSelect();
+                let selectedObj = this.rb.getDataObject(this.selectedObjId);
+                if (selectedObj !== null) {
+                    $('#rbro_text_element_style_id').val(selectedObj.getValue('styleId'));
+                    $('#rbro_text_element_cs_style_id').val(selectedObj.getValue('cs_styleId'));
                 }
-                $('#' + rowId).addClass('rbroError');
-                $('#' + errorId).html(errorMsg);
+            } else if (operation === Command.operation.remove) {
+                this.elStyle.find(`option[value='${obj.getId()}']`).remove();
+                this.cs_elStyle.find(`option[value='${obj.getId()}']`).remove();
+            } else if (operation === Command.operation.rename) {
+                this.elStyle.find(`option[value='${obj.getId()}']`).text(obj.getName());
+                this.cs_elStyle.find(`option[value='${obj.getId()}']`).text(obj.getName());
+            }
+            if ($('#rbro_text_element_style_id').val() === '') {
+                $('#rbro_text_element_style_settings').show();
+            } else {
+                $('#rbro_text_element_style_settings').hide();
+            }
+            if ($('#rbro_text_element_cs_style_id').val() === '') {
+                $('#rbro_text_element_cs_style_settings').show();
+            } else {
+                $('#rbro_text_element_cs_style_settings').hide();
             }
         }
-    }
-
-    /**
-     * Is called when the selected element was changed.
-     */
-    selectionChanged() {
-        this.updateDisplay();
     }
 }

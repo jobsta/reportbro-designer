@@ -86,6 +86,13 @@ export default class Style {
 
     setValue(field, value, elSelector, isShown) {
         this[field] = value;
+
+        if (field !== 'name') {
+            for (let docElement of this.getDocElements(true)) {
+                docElement.updateChangedStyle(this.getId());
+            }
+        }
+
         if (field.indexOf('border') !== -1) {
             Style.setBorderValue(this, field, '', value, elSelector, isShown);
         }

@@ -19,6 +19,10 @@ import TableElement from './elements/TableElement';
 import TableTextElement from './elements/TableTextElement';
 import locales from './i18n/locales';
 import DocElementPanel from './panels/DocElementPanel';
+import DocumentPropertiesPanel from './panels/DocumentPropertiesPanel';
+import EmptyDetailPanel from './panels/EmptyDetailPanel';
+import ParameterPanel from './panels/ParameterPanel';
+import StylePanel from './panels/StylePanel';
 import MainPanel from './menu/MainPanel';
 import MainPanelItem from './menu/MainPanelItem';
 import MenuPanel from './menu/MenuPanel';
@@ -106,6 +110,14 @@ export default class ReportBro {
                 this.parameterContainer, this.styleContainer, this);
         this.menuPanel = new MenuPanel(element, this);
         this.docElementPanel = new DocElementPanel(element, this);
+        this.activeDetailPanel = 'none';
+        this.detailPanels = {
+            'none': new EmptyDetailPanel(element, this),
+            'docElement': new DocElementPanel(element, this),
+            'parameter': new ParameterPanel(element, this),
+            'style': new StylePanel(element, this),
+            'documentProperties': new DocumentPropertiesPanel(element, this)
+        };
 
         this.commandStack = [];
         this.lastCommandIndex = -1;
@@ -378,7 +390,10 @@ export default class ReportBro {
             </div>`);
         this.mainPanel.render();
         this.menuPanel.render();
-        this.docElementPanel.render();
+        for (let panelName in this.detailPanels) {
+            this.detailPanels[panelName].render();
+        }
+        this.detailPanels[this.activeDetailPanel].show(this.detailData);
         this.document.render();
         this.popupWindow.render();
         this.updateMenuButtons();
@@ -593,15 +608,12 @@ export default class ReportBro {
         return docElements;
     }
 
-    // setDetailPanel(panelName, data) {
-    //     this.detailPanels[this.activeDetailPanel].hide();
-    //     this.activeDetailPanel = panelName;
-    //     this.detailData = data;
-    //     this.detailPanels[panelName].show(data);
-    // }
-
-    updateDetailPanel() {
-        //this.detailPanels[this.activeDetailPanel].updateData(this.detailData);
+    setDetailPanel(panelName) {
+        if (panelName !== this.activeDetailPanel) {
+            this.detailPanels[this.activeDetailPanel].hide();
+            this.activeDetailPanel = panelName;
+            this.detailPanels[panelName].show();
+        }
     }
 
     /**
@@ -611,28 +623,8 @@ export default class ReportBro {
      * @param {[String]} field - affected field in case of change operation.
      */
     notifyEvent(obj, operation, field) {
-        if (obj instanceof Parameter) {
-            if (obj.getValue('type') === Parameter.type.array || obj.getValue('type') === Parameter.type.map) {
-                $(`#rbro_menu_item_add${obj.getId()}`).show();
-                $(`#rbro_menu_item_children${obj.getId()}`).show();
-                $(`#rbro_menu_item_children_toggle${obj.getId()}`).show();
-            } else {
-                $(`#rbro_menu_item_add${obj.getId()}`).hide();
-                $(`#rbro_menu_item_children${obj.getId()}`).hide();
-                $(`#rbro_menu_item_children_toggle${obj.getId()}`).hide();
-            }
-        } else if (obj instanceof Style) {
-            if (operation === Command.operation.change) {
-                for (let docElement of this.docElements) {
-                    docElement.updateChangedStyle(obj.getId());
-                }
-            }
-        }
-        // for (let panelName in this.detailPanels) {
-        //     this.detailPanels[panelName].notifyEvent(obj, operation);
-        // }
-        this.docElementPanel.notifyEvent(obj, operation);
-    }	
+        this.detailPanels[this.activeDetailPanel].notifyEvent(obj, operation, field);
+    }
 
     addParameter(parameter) {
         this.addDataObject(parameter);
@@ -670,10 +662,6 @@ export default class ReportBro {
         }
         this.docElements = [];
     }
-
-    // getDetailData() {
-    //     return this.detailData;
-    // }
 
     getDocumentProperties() {
         return this.documentProperties;
@@ -886,25 +874,38 @@ export default class ReportBro {
     }
 
     selectObject(id, clearSelection) {
-        if (clearSelection) {
-            this.deselectAll();
-        }
+        let detailPanel = 'none';
         let obj = this.getDataObject(id);
+        if (clearSelection) {
+            this.deselectAll(obj !== null);
+        }
         if (obj !== null) {
+            if (obj instanceof DocElement) {
+                detailPanel = 'docElement';
+            } else if (obj instanceof Parameter) {
+                detailPanel = 'parameter';
+            } else if (obj instanceof Style) {
+                detailPanel = 'style';
+            } else if (obj instanceof DocumentProperties) {
+                detailPanel = 'documentProperties';
+            }
+
             this.selections.push(id);
             obj.select();
             if (obj.getPanelItem() !== null) {
                 obj.getPanelItem().openParentItems();
                 obj.getPanelItem().setActive();
             }
-            if (this.isDocElementSelected()) {
-                this.docElementPanel.selectionChanged();
+            if (detailPanel !== this.activeDetailPanel) {
+                this.setDetailPanel(detailPanel);
             }
+            this.detailPanels[this.activeDetailPanel].selectionChanged();
 
             if (this.properties.selectCallback) {
                 this.properties.selectCallback(obj, true);
             }
         }
+
         this.selectionSinceLastCommand = true;
         this.updateMenuActionButtons();
     }
@@ -921,9 +922,6 @@ export default class ReportBro {
             if (obj.getPanelItem() !== null) {
                 obj.getPanelItem().setInactive();
             }
-            // if (this.isSelectedObject(obj.id)) {
-            //     this.setDetailPanel('none', null);
-            // }
         }
 
         if (updateSelections) {
@@ -931,7 +929,11 @@ export default class ReportBro {
             if (selectionIndex !== -1) {
                 this.selections.splice(selectionIndex, 1);
             }
-            this.docElementPanel.selectionChanged();
+            if (this.selections.length > 0) {
+                this.detailPanels[this.activeDetailPanel].selectionChanged();
+            } else {
+                this.setDetailPanel('none');
+            }
         }
 
         if (obj !== null && this.properties.selectCallback) {
@@ -939,12 +941,14 @@ export default class ReportBro {
         }
     }
 
-    deselectAll() {
+    deselectAll(notifyPanel) {
         for (let selectionId of this.selections) {
             this.deselectObjectInternal(selectionId, false);
         }
         this.selections = [];
-        this.docElementPanel.selectionChanged();
+        if (notifyPanel) {
+            this.setDetailPanel('none');
+        }
         this.updateMenuActionButtons();
     }
 
@@ -1298,7 +1302,6 @@ export default class ReportBro {
         this.deleteDocElements();
 
         this.nextId = 1;
-        //this.setDetailPanel('none', null);
         this.docElements = [];
         this.objectMap = {};
         this.initObjectMap();
@@ -1521,9 +1524,6 @@ export default class ReportBro {
         for (let i=0; i < this.docElements.length; i++) {
             if (this.docElements[i].getId() === element.getId()) {
                 this.notifyEvent(element, Command.operation.remove);
-                // if (this.detailData === this.docElements[i]) {
-                //     this.setDetailPanel('none', null);
-                // }
                 this.docElements.splice(i, 1);
                 this.deleteDataObject(element);
                 break;

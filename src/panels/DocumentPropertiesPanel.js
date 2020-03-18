@@ -1,4 +1,4 @@
-import Command from '../commands/Command';
+import PanelBase from './PanelBase';
 import SetValueCmd from '../commands/SetValueCmd';
 import DocumentProperties from '../data/DocumentProperties';
 import * as utils from '../utils';
@@ -7,11 +7,84 @@ import * as utils from '../utils';
  * Panel to edit all document properties.
  * @class
  */
-export default class DocumentPropertiesPanel {
-    constructor(documentProperties, rootElement, rb) {
-        this.documentProperties = documentProperties;
-        this.rootElement = rootElement;
-        this.rb = rb;
+export default class DocumentPropertiesPanel extends PanelBase {
+    constructor(rootElement, rb) {
+        super('rbro_document_properties', DocumentProperties, rootElement, rb);
+
+        this.propertyDescriptors = {
+            'pageFormat': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_format'
+            },
+            'pageWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_width'
+            },
+            'pageHeight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_height'
+            },
+            'unit': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'unit'
+            },
+            'orientation': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'orientation'
+            },
+            'contentHeight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'content_height'
+            },
+            'marginLeft': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_margin_left'
+            },
+            'marginTop': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_margin_top'
+            },
+            'marginRight': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_margin_right'
+            },
+            'marginBottom': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'page_margin_bottom'
+            },
+            'header': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'header'
+            },
+            'headerSize': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'header_size'
+            },
+            'headerDisplay': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'header_display'
+            },
+            'footer': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'footer'
+            },
+            'footerSize': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'footer_size'
+            },
+            'footerDisplay': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'footer_display'
+            },
+            'patternLocale': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'pattern_locale'
+            },
+            'patternCurrencySymbol': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'pattern_currency_symbol'
+            }
+        };
     }
 
     render(data) {
@@ -26,26 +99,38 @@ export default class DocumentPropertiesPanel {
                 <option value="user_defined">${this.rb.getLabel('pageFormatUserDefined')}</option>
             </select>`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_format', 'pageFormat',
-                    elPageFormat.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_format', 'pageFormat',
+                        elPageFormat.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elPageFormat);
 
         let elPageSizeDiv = $('<div id="rbro_document_properties_page_size_row" class="rbroTripleSplit"></div>');
         let elPageWidth = $('<input id="rbro_document_properties_page_width" maxlength="5">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_width', 'pageWidth',
-                    elPageWidth.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_width', 'pageWidth',
+                        elPageWidth.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elPageWidth);
         elPageSizeDiv.append(elPageWidth);
         let elPageHeight = $('<input id="rbro_document_properties_page_height" maxlength="5">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_height', 'pageHeight',
-                    elPageHeight.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_height', 'pageHeight',
+                        elPageHeight.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elPageHeight);
         elPageSizeDiv.append(elPageHeight);
@@ -53,19 +138,20 @@ export default class DocumentPropertiesPanel {
             <option value="mm">mm</option>
             <option value="inch">inch</option>
         </select>`)
-        .change(event => {
-            let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_unit', 'unit',
-                elUnit.val(), SetValueCmd.type.select, this.rb);
-            this.rb.executeCommand(cmd);
+            .change(event => {
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_unit', 'unit',
+                        elUnit.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
         });
         elPageSizeDiv.append(elUnit);
         elFormField.append(elPageSizeDiv);
         elFormField.append('<div id="rbro_document_properties_page_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
-        if (this.documentProperties.getValue('pageFormat') !== DocumentProperties.pageFormat.userDefined) {
-            elPageSizeDiv.hide();
-        }
 
         elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_document_properties_orientation">${this.rb.getLabel('orientation')}:</label>`);
@@ -75,9 +161,13 @@ export default class DocumentPropertiesPanel {
                 <option value="landscape">${this.rb.getLabel('orientationLandscape')}</option>
             </select>`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_orientation', 'orientation',
-                    elOrientation.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_orientation', 'orientation',
+                        elOrientation.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elOrientation);
         elDiv.append(elFormField);
@@ -88,9 +178,13 @@ export default class DocumentPropertiesPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elContentHeight = $('<input id="rbro_document_properties_content_height">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_content_height', 'contentHeight',
-                    elContentHeight.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_content_height', 'contentHeight',
+                        elContentHeight.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elContentHeight);
         elFormField.append(elContentHeight);
@@ -112,9 +206,13 @@ export default class DocumentPropertiesPanel {
                 <option value="it">it</option>
             </select>`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_pattern_locale', 'patternLocale',
-                    elPatternLocale.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_pattern_locale', 'patternLocale',
+                        elPatternLocale.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elPatternLocale);
         elDiv.append(elFormField);
@@ -125,18 +223,20 @@ export default class DocumentPropertiesPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elPatternCurrencySymbol = $('<input id="rbro_document_properties_pattern_currency_symbol">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(),
-                    'rbro_document_properties_pattern_currency_symbol', 'patternCurrencySymbol',
-                    elPatternCurrencySymbol.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(),
+                        'rbro_document_properties_pattern_currency_symbol', 'patternCurrencySymbol',
+                        elPatternCurrencySymbol.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elPatternCurrencySymbol);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
         $('#rbro_detail_panel').append(panel);
-
-        this.updateData(this.documentProperties);
     }
 
     renderMarginControls(panel) {
@@ -147,9 +247,13 @@ export default class DocumentPropertiesPanel {
         let elMarginTopDiv = $('<div class="rbroColumnCenter"></div>');
         let elMarginTop = $(`<input id="rbro_document_properties_page_margin_top" placeholder="${this.rb.getLabel('orientationTop')}">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_margin_top', 'marginTop',
-                    elMarginTop.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_margin_top', 'marginTop',
+                        elMarginTop.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elMarginTop);
         elMarginTopDiv.append(elMarginTop);
@@ -158,17 +262,25 @@ export default class DocumentPropertiesPanel {
         let elDiv2 = $('<div class="rbroSplit"></div>');
         let elMarginLeft = $(`<input id="rbro_document_properties_page_margin_left" placeholder="${this.rb.getLabel('orientationLeft')}">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_margin_left', 'marginLeft',
-                    elMarginLeft.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_margin_left', 'marginLeft',
+                        elMarginLeft.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elMarginLeft);
         elDiv2.append(elMarginLeft);
         let elMarginRight = $(`<input id="rbro_document_properties_page_margin_right" placeholder="${this.rb.getLabel('orientationRight')}">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_margin_right', 'marginRight',
-                    elMarginRight.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_margin_right', 'marginRight',
+                        elMarginRight.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elMarginRight);
         elDiv2.append(elMarginRight);
@@ -177,9 +289,13 @@ export default class DocumentPropertiesPanel {
         let elMarginBottomDiv = $('<div class="rbroColumnCenter"></div>');
         let elMarginBottom = $(`<input id="rbro_document_properties_page_margin_bottom" placeholder="${this.rb.getLabel('orientationBottom')}">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_page_margin_bottom', 'marginBottom',
-                    elMarginBottom.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_page_margin_bottom', 'marginBottom',
+                        elMarginBottom.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elMarginBottom);
         elMarginBottomDiv.append(elMarginBottom);
@@ -196,9 +312,13 @@ export default class DocumentPropertiesPanel {
         let elHeaderLabel = $(`<label class="switch-light switch-material"></label>`);
         let elHeader = $(`<input id="rbro_document_properties_header" type="checkbox">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_header', 'header',
-                    elHeader.is(":checked"), SetValueCmd.type.checkbox, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_header', 'header',
+                        elHeader.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elHeaderLabel.append(elHeader);
         let elHeaderSpan = $('<span></span>');
@@ -215,9 +335,13 @@ export default class DocumentPropertiesPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elHeaderSize = $('<input id="rbro_document_properties_header_size">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_header_size', 'headerSize',
-                    elHeaderSize.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_header_size', 'headerSize',
+                        elHeaderSize.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elHeaderSize);
         elFormField.append(elHeaderSize);
@@ -232,9 +356,13 @@ export default class DocumentPropertiesPanel {
                 <option value="not_on_first_page">${this.rb.getLabel('headerFooterDisplayNotOnFirstPage')}</option>
             </select>`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_header_display', 'headerDisplay',
-                    elHeaderDisplay.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_header_display', 'headerDisplay',
+                        elHeaderDisplay.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elHeaderDisplay);
         elDiv.append(elFormField);
@@ -249,9 +377,13 @@ export default class DocumentPropertiesPanel {
         let elFooterLabel = $(`<label class="switch-light switch-material"></label>`);
         let elFooter = $(`<input id="rbro_document_properties_footer" type="checkbox">`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_footer', 'footer',
-                    elFooter.is(":checked"), SetValueCmd.type.checkbox, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_footer', 'footer',
+                        elFooter.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFooterLabel.append(elFooter);
         let elFooterSpan = $('<span></span>');
@@ -268,9 +400,13 @@ export default class DocumentPropertiesPanel {
         elFormField = $('<div class="rbroFormField"></div>');
         let elFooterSize = $('<input id="rbro_document_properties_footer_size">')
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_footer_size', 'footerSize',
-                    elFooterSize.val(), SetValueCmd.type.text, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_footer_size', 'footerSize',
+                        elFooterSize.val(), SetValueCmd.type.text, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         utils.setInputPositiveInteger(elFooterSize);
         elFormField.append(elFooterSize);
@@ -285,9 +421,13 @@ export default class DocumentPropertiesPanel {
                 <option value="not_on_first_page">${this.rb.getLabel('headerFooterDisplayNotOnFirstPage')}</option>
             </select>`)
             .change(event => {
-                let cmd = new SetValueCmd(this.documentProperties.getId(), 'rbro_document_properties_footer_display', 'footerDisplay',
-                    elFooterDisplay.val(), SetValueCmd.type.select, this.rb);
-                this.rb.executeCommand(cmd);
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'rbro_document_properties_footer_display', 'footerDisplay',
+                        elFooterDisplay.val(), SetValueCmd.type.select, this.rb);
+                    this.rb.executeCommand(cmd);
+                }
             });
         elFormField.append(elFooterDisplay);
         elDiv.append(elFormField);
@@ -296,91 +436,68 @@ export default class DocumentPropertiesPanel {
         panel.append(elFooterDiv);
     }
 
-    show(data) {
-        $('#rbro_document_properties_panel').removeClass('rbroHidden');
-        this.updateData(data);
-    }
-
-    hide() {
-        $('#rbro_document_properties_panel').addClass('rbroHidden');
-    }
-
     /**
      * Is called when the selected element was changed.
      * The panel is updated to show the values of the selected data object.
-     * @param {DocumentProperties} data
+     * @param {DocumentProperties} obj - currently selected object.
+     * @param {[String]} field - affected field in case of change operation.
      */
-    updateData(data) {
-        if (data !== null) {
-            $('#rbro_document_properties_page_format').val(data.getValue('pageFormat'));
-            $('#rbro_document_properties_page_width').val(data.getValue('pageWidth'));
-            $('#rbro_document_properties_page_height').val(data.getValue('pageHeight'));
-            $('#rbro_document_properties_unit').val(data.getValue('unit'));
-            $('#rbro_document_properties_orientation').val(data.getValue('orientation'));
-            $('#rbro_document_properties_content_height').val(data.getValue('contentHeight'));
-            $('#rbro_document_properties_page_margin_top').val(data.getValue('marginTop'));
-            $('#rbro_document_properties_page_margin_left').val(data.getValue('marginLeft'));
-            $('#rbro_document_properties_page_margin_right').val(data.getValue('marginRight'));
-            $('#rbro_document_properties_page_margin_bottom').val(data.getValue('marginBottom'));
-            $('#rbro_document_properties_header').prop('checked', data.getValue('header'));
-            $('#rbro_document_properties_header_size').val(data.getValue('headerSize'));
-            $('#rbro_document_properties_header_display').val(data.getValue('headerDisplay'));
-            $('#rbro_document_properties_footer').prop('checked', data.getValue('footer'));
-            $('#rbro_document_properties_footer_size').val(data.getValue('footerSize'));
-            $('#rbro_document_properties_footer_display').val(data.getValue('footerDisplay'));
-            $('#rbro_document_properties_pattern_locale').val(data.getValue('patternLocale'));
-            $('#rbro_document_properties_pattern_currency_symbol').val(data.getValue('patternCurrencySymbol'));
-            this.updateVisibility(data);
-        }
-        this.updateErrors();
-    }
-
-    /**
-     * Is called when a data object was modified (including new and deleted data objects).
-     * @param {*} obj - new/deleted/modified data object.
-     * @param {String} operation - operation which caused the notification.
-     */
-    notifyEvent(obj, operation) {
-        if (obj instanceof DocumentProperties && this.rb.isSelectedObject(obj.id) &&
-                operation === Command.operation.change) {
-            this.updateVisibility(obj);
-        }
-    }
-
-    static updateVisibility(obj) {
-        if (obj.getValue('pageFormat') === DocumentProperties.pageFormat.userDefined) {
-            $('#rbro_document_properties_page_size_row').show();
-        } else {
-            $('#rbro_document_properties_page_size_row').hide();
-        }
-        if (obj.getValue('header')) {
-            $('#rbro_document_properties_header_settings').show();
-        } else {
-            $('#rbro_document_properties_header_settings').hide();
-        }
-        if (obj.getValue('footer')) {
-            $('#rbro_document_properties_footer_settings').show();
-        } else {
-            $('#rbro_document_properties_footer_settings').hide();
-        }
-    }
-
-    /**
-     * Updates displayed errors of currently selected data object.
-     */
-    updateErrors() {
-        $('#rbro_document_properties_panel .rbroFormRow').removeClass('rbroError');
-        $('#rbro_document_properties_panel .rbroErrorMessage').text('');
-        for (let error of this.documentProperties.getErrors()) {
-            let rowId = 'rbro_document_properties_' + error.field + '_row';
-            let errorId = 'rbro_document_properties_' + error.field + '_error';
-            let errorMsg = this.rb.getLabel(error.msg_key);
-            if (error.info) {
-                errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
-                    error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+    static updateVisibileRows(obj, field) {
+        if (field === null || field === 'pageFormat') {
+            if (obj.getValue('pageFormat') === DocumentProperties.pageFormat.userDefined) {
+                $('#rbro_document_properties_page_size_row').show();
+            } else {
+                $('#rbro_document_properties_page_size_row').hide();
             }
-            $('#' + rowId).addClass('rbroError');
-            $('#' + errorId).html(errorMsg);
+        }
+        if (field === null || field === 'header') {
+            if (obj.getValue('header')) {
+                $('#rbro_document_properties_header_settings').show();
+            } else {
+                $('#rbro_document_properties_header_settings').hide();
+            }
+        }
+        if (field === null || field === 'footer') {
+            if (obj.getValue('footer')) {
+                $('#rbro_document_properties_footer_settings').show();
+            } else {
+                $('#rbro_document_properties_footer_settings').hide();
+            }
         }
     }
+
+    /**
+     * Is called when the selection is changed or the selected element was changed.
+     * The panel is updated to show the values of the selected data object.
+     * @param {[String]} field - affected field in case of change operation.
+     */
+    updateDisplay(field) {
+        let selectedObject = this.rb.getSelectedObject();
+
+        if (selectedObject !== null && selectedObject instanceof DocumentProperties) {
+            for (let property in this.propertyDescriptors) {
+                if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+                    let propertyDescriptor = this.propertyDescriptors[property];
+                    let value = selectedObject.getValue(property);
+                    super.setValue(propertyDescriptor, value, false);
+                }
+            }
+
+            DocumentPropertiesPanel.updateVisibileRows(selectedObject, field);
+        }
+    }
+
+    // /**
+    //  * Is called when a data object was modified (including new and deleted data objects).
+    //  * @param {*} obj - new/deleted/modified data object.
+    //  * @param {String} operation - operation which caused the notification.
+    //  * @param {[String]} field - affected field in case of change operation.
+    //  */
+    // notifyEvent(obj, operation, field) {
+    //     if (obj instanceof DocumentProperties && this.rb.isSelectedObject(obj.id) &&
+    //             operation === Command.operation.change) {
+    //         this.updateDisplay(field);
+    //     }
+    // }
+    //
 }
