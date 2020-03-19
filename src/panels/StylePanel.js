@@ -62,11 +62,6 @@ export default class StylePanel extends PanelBase {
                 'allowEmpty': true,
                 'fieldId': 'background_color'
             },
-            'alternateBackgroundColor': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': true,
-                'fieldId': 'alternate_background_color'
-            },
             'font': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'font',
@@ -147,13 +142,13 @@ export default class StylePanel extends PanelBase {
         elDiv.append(`<label for="rbro_style_name">${this.rb.getLabel('styleName')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elStyleName = $(`<input id="rbro_style_name">`)
-            .change(event => {
+            .on('input', event => {
                 let obj = this.rb.getSelectedObject();
                 if (obj !== null) {
                     if (elStyleName.val().trim() !== '') {
-                        let cmd = new SetValueCmd(
+                        this.rb.executeCommand(new SetValueCmd(
                             obj.getId(), 'rbro_style_name', 'name',
-                            elStyleName.val(), SetValueCmd.type.text, this.rb);
+                            elStyleName.val(), SetValueCmd.type.text, this.rb));
                     } else {
                         elStyleName.val(style.getName());
                     }
@@ -163,12 +158,12 @@ export default class StylePanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        StylePanel.renderStyle(panel, 'style_', '', this.rb);
+        StylePanel.renderStyle(panel, 'style_', '', false, this.rb);
 
         $('#rbro_detail_panel').append(panel);
     }
 
-    static renderStyle(elPanel, idPrefix, fieldPrefix, rb) {
+    static renderStyle(elPanel, idPrefix, fieldPrefix, renderAlternateBgColor, rb) {
         let elDiv, elFormField;
         elDiv = $(`<div id="rbro_${idPrefix}textstyle_row" class="rbroFormRow"></div>`);
         elDiv.append(`<label>${rb.getLabel('styleTextStyle')}:</label>`);
@@ -181,6 +176,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBold.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}bold`) !== val) {
@@ -201,6 +197,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elItalic.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}italic`) !== val) {
@@ -221,6 +218,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elUnderline.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}underline`) !== val) {
@@ -241,6 +239,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elStrikethrough.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}strikethrough`) !== val) {
@@ -268,6 +267,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleHAlignmentLeft')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -286,6 +286,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleHAlignmentCenter')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -304,6 +305,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleHAlignmentRight')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -322,6 +324,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleHAlignmentJustify')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(obj.getId(), `rbro_${idPrefix}halignment`,
@@ -342,6 +345,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleVAlignmentTop')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -360,6 +364,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleVAlignmentMiddle')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -378,6 +383,7 @@ export default class StylePanel extends PanelBase {
              title="${rb.getLabel('styleVAlignmentBottom')}"></button>`)
             .click(event => {
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
@@ -403,6 +409,7 @@ export default class StylePanel extends PanelBase {
                 let val = elTextColor.val();
                 if (utils.isValidColor(val)) {
                     let cmdGroup = new CommandGroupCmd('Set value', rb);
+                    cmdGroup.handleSelection();
                     let selectedObjects = rb.getSelectedObjects();
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}textColor`) !== val) {
@@ -432,6 +439,7 @@ export default class StylePanel extends PanelBase {
                 let val = elBgColor.val();
                 if (utils.isValidColor(val)) {
                     let cmdGroup = new CommandGroupCmd('Set value', rb);
+                    cmdGroup.handleSelection();
                     let selectedObjects = rb.getSelectedObjects();
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}backgroundColor`) !== val) {
@@ -451,34 +459,37 @@ export default class StylePanel extends PanelBase {
         elPanel.append(elDiv);
         utils.initColorPicker(elBgColor, rb, { allowEmpty: true });
 
-        elDiv = $(`<div id="rbro_${idPrefix}alternate_background_color_row" class="rbroFormRow"></div>`);
-        elDiv.append(`<label for="rbro_${idPrefix}alternate_background_color">
-                      ${rb.getLabel('tableElementAlternateBackgroundColor')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elAlternateBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
-        let elAlternateBgColor = $(`<input id="rbro_${idPrefix}alternate_background_color">`)
-            .change(event => {
-                let val = elAlternateBgColor.val();
-                if (utils.isValidColor(val)) {
-                    let cmdGroup = new CommandGroupCmd('Set value', rb);
-                    let selectedObjects = rb.getSelectedObjects();
-                    for (let obj of selectedObjects) {
-                        if (obj.getValue(`${fieldPrefix}alternateBackgroundColor`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `rbro_${idPrefix}alternate_background_color`,
-                                `${fieldPrefix}alternateBackgroundColor`, val, SetValueCmd.type.color, rb));
+        if (renderAlternateBgColor) {
+            elDiv = $(`<div id="rbro_${idPrefix}alternate_background_color_row" class="rbroFormRow"></div>`);
+            elDiv.append(`<label for="rbro_${idPrefix}alternate_background_color">
+                          ${rb.getLabel('tableElementAlternateBackgroundColor')}:</label>`);
+            elFormField = $('<div class="rbroFormField"></div>');
+            let elAlternateBgColorContainer = $('<div class="rbroColorPickerContainer"></div>');
+            let elAlternateBgColor = $(`<input id="rbro_${idPrefix}alternate_background_color">`)
+                .change(event => {
+                    let val = elAlternateBgColor.val();
+                    if (utils.isValidColor(val)) {
+                        let cmdGroup = new CommandGroupCmd('Set value', rb);
+                        cmdGroup.handleSelection();
+                        let selectedObjects = rb.getSelectedObjects();
+                        for (let obj of selectedObjects) {
+                            if (obj.getValue(`${fieldPrefix}alternateBackgroundColor`) !== val) {
+                                cmdGroup.addCommand(new SetValueCmd(
+                                    obj.getId(), `rbro_${idPrefix}alternate_background_color`,
+                                    `${fieldPrefix}alternateBackgroundColor`, val, SetValueCmd.type.color, rb));
+                            }
+                        }
+                        if (!cmdGroup.isEmpty()) {
+                            rb.executeCommand(cmdGroup);
                         }
                     }
-                    if (!cmdGroup.isEmpty()) {
-                        rb.executeCommand(cmdGroup);
-                    }
-                }
-            });
-        elAlternateBgColorContainer.append(elAlternateBgColor);
-        elFormField.append(elAlternateBgColorContainer);
-        elDiv.append(elFormField);
-        elPanel.append(elDiv);
-        utils.initColorPicker(elAlternateBgColor, rb, { allowEmpty: true });
+                });
+            elAlternateBgColorContainer.append(elAlternateBgColor);
+            elFormField.append(elAlternateBgColorContainer);
+            elDiv.append(elFormField);
+            elPanel.append(elDiv);
+            utils.initColorPicker(elAlternateBgColor, rb, { allowEmpty: true });
+        }
 
         elDiv = $(`<div id="rbro_${idPrefix}font_row" class="rbroFormRow"></div>`);
         elDiv.append(`<label for="rbro_${idPrefix}font">${rb.getLabel('styleFont')}:</label>`);
@@ -492,6 +503,7 @@ export default class StylePanel extends PanelBase {
             .change(event => {
                 let val = elFont.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}font`) !== val) {
@@ -514,6 +526,7 @@ export default class StylePanel extends PanelBase {
             .change(event => {
                 let val = elFontSize.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}fontSize`) !== val) {
@@ -551,6 +564,7 @@ export default class StylePanel extends PanelBase {
             .change(event => {
                 let val = elLineSpacing.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}lineSpacing`) !== val) {
@@ -579,6 +593,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBorderAll.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderAll`) !== val) {
@@ -599,6 +614,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBorderLeft.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderLeft`) !== val) {
@@ -619,6 +635,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBorderTop.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderTop`) !== val) {
@@ -639,6 +656,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBorderRight.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderRight`) !== val) {
@@ -660,6 +678,7 @@ export default class StylePanel extends PanelBase {
             .click(event => {
                 let val = !elBorderBottom.hasClass('rbroButtonActive');
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderBottom`) !== val) {
@@ -688,6 +707,7 @@ export default class StylePanel extends PanelBase {
                 let val = elBorderColor.val();
                 if (utils.isValidColor(val)) {
                     let cmdGroup = new CommandGroupCmd('Set value', rb);
+                    cmdGroup.handleSelection();
                     let selectedObjects = rb.getSelectedObjects();
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}borderColor`) !== val) {
@@ -715,6 +735,7 @@ export default class StylePanel extends PanelBase {
             .on('input', event => {
                 let val = elBorderWidth.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderWidth`) !== val) {
@@ -744,6 +765,7 @@ export default class StylePanel extends PanelBase {
             .on('input', event => {
                 let val = elPaddingTop.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingTop`) !== val) {
@@ -766,6 +788,7 @@ export default class StylePanel extends PanelBase {
             .on('input', event => {
                 let val = elPaddingLeft.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingLeft`) !== val) {
@@ -785,6 +808,7 @@ export default class StylePanel extends PanelBase {
             .on('input', event => {
                 let val = elPaddingRight.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingRight`) !== val) {
@@ -807,6 +831,7 @@ export default class StylePanel extends PanelBase {
             .on('input', event => {
                 let val = elPaddingBottom.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
+                cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingBottom`) !== val) {
@@ -844,15 +869,4 @@ export default class StylePanel extends PanelBase {
             }
         }
     }
-
-    // /**
-    //  * Is called when a data object was modified (including new and deleted data objects).
-    //  * @param {*} obj - new/deleted/modified data object.
-    //  * @param {String} operation - operation which caused the notification.
-    //  */
-    // notifyEvent(obj, operation) {
-    //     if (obj instanceof Style && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
-    //         this.updateDisplay();
-    //     }
-    // }
 }

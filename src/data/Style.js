@@ -88,7 +88,7 @@ export default class Style {
         this[field] = value;
 
         if (field !== 'name') {
-            for (let docElement of this.getDocElements(true)) {
+            for (let docElement of this.rb.getDocElements(true)) {
                 docElement.updateChangedStyle(this.getId());
             }
         }

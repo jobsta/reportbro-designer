@@ -436,7 +436,7 @@ export default class ParameterPanel extends PanelBase {
                 }
             }
 
-            ParameterPanel.updateVisibileRows(selectedObject, field);
+            this.updateVisibileRows(selectedObject, field);
             ParameterPanel.updateAutosizeInputs(field);
         }
     }

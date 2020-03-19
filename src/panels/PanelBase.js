@@ -1,3 +1,4 @@
+import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
 
 /**
@@ -35,6 +36,12 @@ export default class PanelBase {
             } else {
                 $(propertyId).val(value);
                 $(propertyId).attr('placeholder', '');
+            }
+        } else if (propertyDescriptor['type'] === SetValueCmd.type.select) {
+            if (differentValues) {
+                $(propertyId).val('');
+            } else {
+                $(propertyId).val(value);
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.checkbox) {
             if (differentValues) {

@@ -672,12 +672,12 @@ export default class ReportBro {
         if (this.lastCommandIndex < (this.commandStack.length - 1)) {
             this.commandStack = this.commandStack.slice(0, this.lastCommandIndex + 1);
         }
-        if (!this.selectionSinceLastCommand && cmd instanceof SetValueCmd && this.commandStack.length > 0) {
-            // if previous and current command are both SetValueCmds and target the same text field,
+        if (!this.selectionSinceLastCommand && this.commandStack.length > 0) {
+            // if previous command can be replaced by current command
             // we can discard the previous command and only keep the latest update
             let prevCmd = this.commandStack[this.commandStack.length - 1];
-            if (prevCmd instanceof SetValueCmd && prevCmd.allowReplace(cmd)) {
-                cmd.oldValue = prevCmd.oldValue;
+            if (cmd.allowReplace(prevCmd)) {
+                cmd.replace(prevCmd);
                 this.commandStack = this.commandStack.slice(0, this.commandStack.length - 1);
                 this.lastCommandIndex--;
             }
@@ -877,7 +877,11 @@ export default class ReportBro {
         let detailPanel = 'none';
         let obj = this.getDataObject(id);
         if (clearSelection) {
-            this.deselectAll(obj !== null);
+            if (obj !== null && this.selections.length === 1 && this.selections[0] === id) {
+                // nothing to do, selection did not change
+                return;
+            }
+            this.deselectAll(true);
         }
         if (obj !== null) {
             if (obj instanceof DocElement) {
