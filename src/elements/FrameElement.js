@@ -75,18 +75,18 @@ export default class FrameElement extends DocElement {
         return this.linkedContainerId;
     }
     
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         if (field.indexOf('border') !== -1) {
-            // Style.setBorderValue needs to be called before super.setValue because it calls updateStyle() which expects
-            // the correct border settings
+            // Style.setBorderValue needs to be called before super.setValue
+            // because it calls updateStyle() which expects the correct border settings
             this[field] = value;
             if (field === 'borderWidth') {
                 this.borderWidthVal = utils.convertInputToNumber(value);
             }
-            Style.setBorderValue(this, field, '', value, elSelector, isShown);
+            Style.setBorderValue(this, field, '', value, this.rb);
         }
 
-        super.setValue(field, value, elSelector, isShown);
+        super.setValue(field, value);
 
         if (field === 'label') {
             this.updateName();
@@ -163,22 +163,6 @@ export default class FrameElement extends DocElement {
         return DocElement.type.frame;
     }
 
-    getXTagId() {
-        return 'rbro_frame_element_position_x';
-    }
-
-    getYTagId() {
-        return 'rbro_frame_element_position_y';
-    }
-
-    getWidthTagId() {
-        return 'rbro_frame_element_width';
-    }
-
-    getHeightTagId() {
-        return 'rbro_frame_element_height';
-    }
-
     createElement() {
         this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroFrameElement rbroElementContainer"></div>`);
         // rbroContentContainerHelper contains border styles
@@ -217,6 +201,6 @@ export default class FrameElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_frame_element_print_if', 'printIf', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
 }

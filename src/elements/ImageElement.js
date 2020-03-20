@@ -39,8 +39,8 @@ export default class ImageElement extends DocElement {
         this.updateName();
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
         if (field === 'source' || field === 'imageFilename') {
             this.updateName();
         } else if (field === 'image') {
@@ -98,22 +98,6 @@ export default class ImageElement extends DocElement {
         styleProperties['background-color'] = this.getValue('backgroundColor');
         $(`#rbro_el_content${this.id}`).css(styleProperties);
         $(`#rbro_el_content${this.id}`).removeClass().addClass('rbroContentContainerHelper').addClass(alignClass).addClass(valignClass);
-    }
-
-    getXTagId() {
-        return 'rbro_image_element_position_x';
-    }
-
-    getYTagId() {
-        return 'rbro_image_element_position_y';
-    }
-
-    getWidthTagId() {
-        return 'rbro_image_element_width';
-    }
-
-    getHeightTagId() {
-        return 'rbro_image_element_height';
     }
 
     createElement() {
@@ -177,7 +161,7 @@ export default class ImageElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_image_element_source', 'source', cmdGroup);
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_image_element_print_if', 'printIf', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'source', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
 }

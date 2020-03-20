@@ -102,8 +102,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_format', 'pageFormat',
-                        elPageFormat.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'pageFormat', elPageFormat.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -115,8 +115,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_width', 'pageWidth',
-                        elPageWidth.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'pageWidth', elPageWidth.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -127,8 +127,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_height', 'pageHeight',
-                        elPageHeight.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'pageHeight', elPageHeight.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -142,8 +142,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_unit', 'unit',
-                        elUnit.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'unit', elUnit.val(), SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
         });
@@ -164,8 +163,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_orientation', 'orientation',
-                        elOrientation.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'orientation', elOrientation.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -181,8 +180,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_content_height', 'contentHeight',
-                        elContentHeight.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'contentHeight', elContentHeight.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -209,8 +208,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_pattern_locale', 'patternLocale',
-                        elPatternLocale.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'patternLocale', elPatternLocale.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -226,8 +225,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(),
-                        'rbro_document_properties_pattern_currency_symbol', 'patternCurrencySymbol',
+                        selectedObject.getId(), 'patternCurrencySymbol',
                         elPatternCurrencySymbol.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
@@ -250,8 +248,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_margin_top', 'marginTop',
-                        elMarginTop.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'marginTop', elMarginTop.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -265,8 +263,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_margin_left', 'marginLeft',
-                        elMarginLeft.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'marginLeft', elMarginLeft.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -277,8 +275,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_margin_right', 'marginRight',
-                        elMarginRight.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'marginRight', elMarginRight.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -292,8 +290,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_page_margin_bottom', 'marginBottom',
-                        elMarginBottom.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'marginBottom', elMarginBottom.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -315,8 +313,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_header', 'header',
-                        elHeader.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                        selectedObject.getId(), 'header', elHeader.is(":checked"),
+                        SetValueCmd.type.checkbox, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -338,8 +336,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_header_size', 'headerSize',
-                        elHeaderSize.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'headerSize', elHeaderSize.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -359,8 +357,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_header_display', 'headerDisplay',
-                        elHeaderDisplay.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'headerDisplay', elHeaderDisplay.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -380,8 +378,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_footer', 'footer',
-                        elFooter.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                        selectedObject.getId(), 'footer', elFooter.is(":checked"),
+                        SetValueCmd.type.checkbox, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -403,8 +401,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_footer_size', 'footerSize',
-                        elFooterSize.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'footerSize', elFooterSize.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -424,8 +422,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_document_properties_footer_display', 'footerDisplay',
-                        elFooterDisplay.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'footerDisplay', elFooterDisplay.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });

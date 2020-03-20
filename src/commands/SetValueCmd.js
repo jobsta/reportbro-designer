@@ -4,10 +4,10 @@ import Command from './Command';
  * Command to set a single value of a data object.
  * @class
  */
-export default class SetValueCmd {
-    constructor(objId, tagId, field, value, type, rb) {
+export default class SetValueCmd extends Command {
+    constructor(objId, field, value, type, rb) {
+        super();
         this.objId = objId;
-        this.tagId = tagId;
         this.field = field;
         this.value = value;
         this.type = type;
@@ -44,9 +44,7 @@ export default class SetValueCmd {
 
     setValue(value) {
         let obj = this.rb.getDataObject(this.objId);
-        let isShown = this.rb.isSelectedObject(this.objId);
-        let elSelector = `#${this.tagId}`;
-        obj.setValue(this.field, value, elSelector, isShown);
+        obj.setValue(this.field, value);
 
         if (this.field === 'name') {
             $(`#rbro_menu_item_name${this.objId}`).text(value);
@@ -74,7 +72,7 @@ export default class SetValueCmd {
      */
     allowReplace(otherCmd) {
         return (otherCmd instanceof SetValueCmd && this.type === SetValueCmd.type.text &&
-            this.objId === otherCmd.objId && this.tagId === otherCmd.tagId && this.field === otherCmd.field);
+            this.objId === otherCmd.objId && this.field === otherCmd.field);
     }
 
     /**

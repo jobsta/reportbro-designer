@@ -86,46 +86,34 @@ export default class TextElement extends DocElement {
     handleDoubleClick(event) {
         super.handleDoubleClick(event);
         // focus text content input element and set caret at end of content
-        let el = $('#rbro_text_element_content').get(0);
+        let el = $('#rbro_doc_element_content').get(0);
         el.focus();
         if (typeof el.selectionStart === 'number') {
             el.selectionStart = el.selectionEnd = el.value.length;
         }
     }
 
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         if (field.indexOf('border') !== -1) {
-            // Style.setBorderValue needs to be called before super.setValue because it calls updateStyle() which expects
-            // the correct border settings
+            // Style.setBorderValue needs to be called before super.setValue
+            // because it calls updateStyle() which expects the correct border settings
             this[field] = value;
             if (field.substr(0, 3) === 'cs_') {
-                Style.setBorderValue(this, field, 'cs_', value, elSelector, isShown);
+                Style.setBorderValue(this, field, 'cs_', value, this.rb);
             } else {
                 if (field === 'borderWidth') {
                     this.borderWidthVal = utils.convertInputToNumber(value);
                 }
-                Style.setBorderValue(this, field, '', value, elSelector, isShown);
+                Style.setBorderValue(this, field, '', value, this.rb);
             }
         }
 
-        super.setValue(field, value, elSelector, isShown);
+        super.setValue(field, value);
 
         if (field === 'content') {
             this.updateContent(value);
         } else if (field === 'width' || field === 'height') {
             this.updateDisplay();
-        } else if (field === 'styleId') {
-            if (value !== '') {
-                $('#rbro_text_element_style_settings').hide();
-            } else {
-                $('#rbro_text_element_style_settings').show();
-            }
-        } else if (field === 'cs_styleId') {
-            if (value !== '') {
-                $('#rbro_text_element_cs_style_settings').hide();
-            } else {
-                $('#rbro_text_element_cs_style_settings').show();
-            }
         }
     }
 
@@ -252,22 +240,6 @@ export default class TextElement extends DocElement {
         $(`#rbro_el_content_text${this.id}`).css(styleProperties);
     }
 
-    getXTagId() {
-        return 'rbro_text_element_position_x';
-    }
-
-    getYTagId() {
-        return 'rbro_text_element_position_y';
-    }
-
-    getWidthTagId() {
-        return 'rbro_text_element_width';
-    }
-
-    getHeightTagId() {
-        return 'rbro_text_element_height';
-    }
-
     hasBorderSettings() {
         return true;
     }
@@ -306,9 +278,9 @@ export default class TextElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_text_element_content', 'content', cmdGroup);
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_text_element_print_if', 'printIf', cmdGroup);
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_text_element_cs_condition', 'cs_condition', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'content', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'cs_condition', cmdGroup);
     }
 
     toJS() {

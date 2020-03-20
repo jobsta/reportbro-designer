@@ -129,8 +129,8 @@ export default class SectionElement extends DocElement {
     }
 
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
 
         if (field === 'label' || field === 'dataSource') {
             this.updateName();
@@ -183,14 +183,6 @@ export default class SectionElement extends DocElement {
      */
     getSizers() {
         return [];
-    }
-
-    getYTagId() {
-        return 'rbro_section_element_position_y';
-    }
-
-    getHeightTagId() {
-        return '';
     }
 
     isDroppingAllowed() {
@@ -304,16 +296,16 @@ export default class SectionElement extends DocElement {
             let y = 0;
             if (this.header) {
                 if (this.headerData !== ignoreBandData) {
-                    this.headerData.setValue('y', '' + y, null, true);
+                    this.headerData.setValue('y', '' + y);
                 }
                 y += this.headerData.getValue('heightVal');
             }
             if (this.contentData !== ignoreBandData) {
-                this.contentData.setValue('y', '' + y, null, true);
+                this.contentData.setValue('y', '' + y);
             }
             y += this.contentData.getValue('heightVal');
             if (this.footer && this.footerData !== ignoreBandData) {
-                this.footerData.setValue('y', '' + y, null, true);
+                this.footerData.setValue('y', '' + y);
             }
         }
         this.updateHeight(null, -1);
@@ -364,8 +356,8 @@ export default class SectionElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_section_element_data_source', 'dataSource', cmdGroup);
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_section_element_print_if', 'printIf', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'dataSource', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
 
     toJS() {

@@ -488,8 +488,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('label') !== elLabel.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_label',
-                            'label', elLabel.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'label', elLabel.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -512,8 +511,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('dataSource') !== elDataSource.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_data_source', 'dataSource',
-                            elDataSource.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'dataSource', elDataSource.val(),
+                            SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -548,8 +547,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('content') !== elContent.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_content', 'content',
-                            elContent.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'content', elContent.val(),
+                            SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -588,8 +587,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('eval') !== evalChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_eval', 'eval',
-                            evalChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'eval', evalChecked, SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -612,8 +610,8 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     if (obj.getValue('format') !== elFormat.val()) {
-                        cmdGroup.addCommand(new SetValueCmd(this.selectedObjId, 'rbro_doc_element_format',
-                            'format', elFormat.val(), SetValueCmd.type.select, this.rb));
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'format', elFormat.val(), SetValueCmd.type.select, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -636,8 +634,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('displayValue') !== displayValueChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_display_value', 'displayValue',
-                            displayValueChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(),'displayValue', displayValueChecked,
+                            SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -659,8 +657,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('source') !== elSource.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_source', 'source',
-                            elSource.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'source', elSource.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -700,11 +697,9 @@ export default class DocElementPanel extends PanelBase {
                         let selectedObjects = rb.getSelectedObjects();
                         for (let obj of selectedObjects) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_image', 'image',
-                                e.target.result, SetValueCmd.type.file, rb));
+                                obj.getId(), 'image', e.target.result, SetValueCmd.type.file, rb));
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_image_filename', 'imageFilename',
-                                fileName, SetValueCmd.type.filename, rb));
+                                obj.getId(), 'imageFilename', fileName, SetValueCmd.type.filename, rb));
                         }
                         if (!cmdGroup.isEmpty()) {
                             rb.executeCommand(cmdGroup);
@@ -729,11 +724,9 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'rbro_doc_element_image', 'image',
-                        '', SetValueCmd.type.file, this.rb));
+                        obj.getId(), 'image', '', SetValueCmd.type.file, this.rb));
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'rbro_doc_element_image_filename', 'imageFilename',
-                        '', SetValueCmd.type.filename, this.rb));
+                        obj.getId(), 'imageFilename', '', SetValueCmd.type.filename, this.rb));
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
@@ -757,8 +750,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('x') !== elPosX.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_x', 'x',
-                            elPosX.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'x', elPosX.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -775,8 +767,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('y') !== elPosY.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_y', 'y',
-                            elPosY.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'y', elPosY.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -801,8 +792,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('width') !== elWidth.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_width', 'width',
-                            elWidth.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'width', elWidth.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -819,8 +809,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('height') !== elHeight.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_height', 'height',
-                            elHeight.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'height', elHeight.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -850,8 +839,7 @@ export default class DocElementPanel extends PanelBase {
                         elColspan.val(val);
                     }
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'rbro_text_element_colspan', 'colspan',
-                        elColspan.val(), SetValueCmd.type.text, this.rb));
+                        obj.getId(), 'colspan', elColspan.val(), SetValueCmd.type.text, this.rb));
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
@@ -906,8 +894,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('header') !== headerChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_section_element_header', 'header',
-                            headerChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'header', headerChecked, SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -965,8 +952,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('footer') !== footerChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_section_element_footer', 'footer',
-                            footerChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'footer', footerChecked, SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1024,8 +1010,7 @@ export default class DocElementPanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue('color') !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_color',
-                                'color', val, SetValueCmd.type.color, this.rb));
+                                obj.getId(), 'color', val, SetValueCmd.type.color, this.rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -1050,8 +1035,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('styleId') !== this.elStyle.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_style_id', 'styleId',
-                            this.elStyle.val(), SetValueCmd.type.select, this.rb));
+                            obj.getId(), 'styleId', this.elStyle.val(), SetValueCmd.type.select, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1108,8 +1092,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('groupExpression') !== elGroupExpression.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_table_band_element_group_expression', 'groupExpression',
-                            elGroupExpression.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'groupExpression', elGroupExpression.val(),
+                            SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1147,8 +1131,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('printIf') !== elPrintIf.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_print_if', 'printIf',
-                            elPrintIf.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'printIf', elPrintIf.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1185,8 +1168,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('repeatHeader') !== repeatHeaderChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_repeat_header', 'repeatHeader',
-                            repeatHeaderChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'repeatHeader', repeatHeaderChecked,
+                            SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1210,8 +1193,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('removeEmptyElement') !== removeEmptyElementChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_remove_empty_element', 'removeEmptyElement',
-                            removeEmptyElementChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'removeEmptyElement', removeEmptyElementChecked,
+                            SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1235,8 +1218,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('alwaysPrintOnSamePage') !== alwaysPrintOnSamePageChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_always_print_on_same_page', 'alwaysPrintOnSamePage',
-                            alwaysPrintOnSamePageChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'alwaysPrintOnSamePage', alwaysPrintOnSamePageChecked,
+                            SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1260,8 +1243,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('shrinkToContentHeight') !== shrinkToContentHeightChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_shrink_to_content_height', 'shrinkToContentHeight',
-                            shrinkToContentHeightChecked, SetValueCmd.type.checkbox, this.rb));
+                            obj.getId(), 'shrinkToContentHeight', shrinkToContentHeightChecked,
+                            SetValueCmd.type.checkbox, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1283,8 +1266,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('pattern') !== elPattern.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_pattern', 'pattern',
-                            elPattern.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'pattern', elPattern.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1313,8 +1295,7 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('link') !== elLink.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_link', 'link',
-                            elLink.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'link', elLink.val(), SetValueCmd.type.text, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1379,8 +1360,8 @@ export default class DocElementPanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue('cs_styleId') !== this.elCsStyle.val()) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_doc_element_cs_style_id', 'cs_styleId',
-                            this.elCsStyle.val(), SetValueCmd.type.select, this.rb));
+                            obj.getId(), 'cs_styleId', this.elCsStyle.val(),
+                            SetValueCmd.type.select, this.rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -1438,8 +1419,8 @@ export default class DocElementPanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue('spreadsheet_hide') !== spreadsheetHideChecked) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_spreadsheet_hide', 'spreadsheet_hide',
-                                spreadsheetHideChecked, SetValueCmd.type.checkbox, this.rb));
+                                obj.getId(), 'spreadsheet_hide', spreadsheetHideChecked,
+                                SetValueCmd.type.checkbox, this.rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -1461,8 +1442,8 @@ export default class DocElementPanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue('spreadsheet_column') !== elSpreadsheetColumn.val()) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_spreadsheet_column', 'spreadsheet_column',
-                                elSpreadsheetColumn.val(), SetValueCmd.type.text, this.rb));
+                                obj.getId(), 'spreadsheet_column', elSpreadsheetColumn.val(),
+                                SetValueCmd.type.text, this.rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -1486,8 +1467,8 @@ export default class DocElementPanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue('spreadsheet_colspan') !== elSpreadsheetColspan.val()) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_spreadsheet_colspan', 'spreadsheet_colspan',
-                                elSpreadsheetColspan.val(), SetValueCmd.type.text, this.rb));
+                                obj.getId(), 'spreadsheet_colspan', elSpreadsheetColspan.val(),
+                                SetValueCmd.type.text, this.rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -1512,7 +1493,7 @@ export default class DocElementPanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue('spreadsheet_addEmptyRow') !== spreadsheetAddEmptyRowChecked) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'rbro_doc_element_spreadsheet_add_empty_row', 'spreadsheet_addEmptyRow',
+                                obj.getId(), 'spreadsheet_addEmptyRow',
                                 spreadsheetAddEmptyRowChecked, SetValueCmd.type.checkbox, this.rb));
                         }
                     }

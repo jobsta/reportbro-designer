@@ -70,8 +70,8 @@ export default class SectionBandElement extends DocElement {
         return pos;
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
 
         if (field === 'height') {
             this[field + 'Val'] = utils.convertInputToNumber(value);
@@ -126,10 +126,6 @@ export default class SectionBandElement extends DocElement {
      */
     getSizers() {
         return ['S'];
-    }
-
-    getHeightTagId() {
-        return 'rbro_section_band_element_height';
     }
 
     getHeight() {

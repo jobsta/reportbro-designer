@@ -158,8 +158,8 @@ export default class PopupWindow {
                 let obj = this.rb.getDataObject(this.objId);
                 let testDataStr = JSON.stringify(testData);
                 if (obj !== null && obj.getValue('testData') !== testDataStr) {
-                    let cmd = new SetValueCmd(this.objId, 'rbro_parameter_test_data', 'testData',
-                        testDataStr, SetValueCmd.type.text, this.rb);
+                    let cmd = new SetValueCmd(
+                        this.objId, 'testData', testDataStr, SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
                 $('#rbro_background_overlay').remove();

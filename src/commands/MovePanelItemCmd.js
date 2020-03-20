@@ -7,8 +7,9 @@ import Document from '../Document';
  * the corresponding doc element is moved to the new container as well.
  * @class
  */
-export default class MovePanelItemCmd {
+export default class MovePanelItemCmd extends Command {
     constructor(panelItem, moveToParentPanel, moveToPosition, rb) {
+        super();
         this.objId = panelItem.getId();
         this.moveToParentId = moveToParentPanel.getId();
         this.moveToPosition = moveToPosition;

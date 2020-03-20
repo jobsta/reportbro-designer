@@ -30,8 +30,8 @@ export default class BarCodeElement extends DocElement {
         this.updateStyle();
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
         if (field === 'content' ||field === 'format' || field === 'displayValue' || field === 'height') {
             this.updateBarCode();
             this.updateDisplay();
@@ -66,18 +66,6 @@ export default class BarCodeElement extends DocElement {
      */
     getSizers() {
         return ['N', 'S'];
-    }
-
-    getXTagId() {
-        return 'rbro_bar_code_element_position_x';
-    }
-
-    getYTagId() {
-        return 'rbro_bar_code_element_position_y';
-    }
-
-    getHeightTagId() {
-        return 'rbro_bar_code_element_height';
     }
 
     createElement() {
@@ -138,7 +126,7 @@ export default class BarCodeElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_bar_code_element_content', 'content', cmdGroup);
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_bar_code_element_print_if', 'printIf', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'content', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
 }

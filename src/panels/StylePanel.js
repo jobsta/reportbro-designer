@@ -147,8 +147,7 @@ export default class StylePanel extends PanelBase {
                 if (obj !== null) {
                     if (elStyleName.val().trim() !== '') {
                         this.rb.executeCommand(new SetValueCmd(
-                            obj.getId(), 'rbro_style_name', 'name',
-                            elStyleName.val(), SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'name', elStyleName.val(), SetValueCmd.type.text, this.rb));
                     } else {
                         elStyleName.val(style.getName());
                     }
@@ -181,8 +180,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}bold`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}bold`,
-                            `${fieldPrefix}bold`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}bold`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -202,8 +200,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}italic`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}italic`,
-                            `${fieldPrefix}italic`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}italic`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -223,8 +220,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}underline`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}underline`,
-                            `${fieldPrefix}underline`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}underline`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -244,8 +240,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}strikethrough`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}strikethrough`,
-                            `${fieldPrefix}strikethrough`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}strikethrough`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -271,8 +266,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}halignment`,
-                        `${fieldPrefix}horizontalAlignment`, Style.alignment.left,
+                        obj.getId(), `${fieldPrefix}horizontalAlignment`, Style.alignment.left,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -290,8 +284,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}halignment`,
-                        `${fieldPrefix}horizontalAlignment`, Style.alignment.center,
+                        obj.getId(), `${fieldPrefix}horizontalAlignment`, Style.alignment.center,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -309,8 +302,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}halignment`,
-                        `${fieldPrefix}horizontalAlignment`, Style.alignment.right,
+                        obj.getId(), `${fieldPrefix}horizontalAlignment`, Style.alignment.right,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -327,8 +319,8 @@ export default class StylePanel extends PanelBase {
                 cmdGroup.handleSelection();
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
-                    cmdGroup.addCommand(new SetValueCmd(obj.getId(), `rbro_${idPrefix}halignment`,
-                        `${fieldPrefix}horizontalAlignment`, Style.alignment.justify,
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), `${fieldPrefix}horizontalAlignment`, Style.alignment.justify,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -349,8 +341,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}valignment`,
-                        `${fieldPrefix}verticalAlignment`, Style.alignment.top,
+                        obj.getId(), `${fieldPrefix}verticalAlignment`, Style.alignment.top,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -368,8 +359,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}valignment`,
-                        `${fieldPrefix}verticalAlignment`, Style.alignment.middle,
+                        obj.getId(), `${fieldPrefix}verticalAlignment`, Style.alignment.middle,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -387,8 +377,7 @@ export default class StylePanel extends PanelBase {
                 let selectedObjects = rb.getSelectedObjects();
                 for (let obj of selectedObjects) {
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `rbro_${idPrefix}valignment`,
-                        `${fieldPrefix}verticalAlignment`, Style.alignment.bottom,
+                        obj.getId(), `${fieldPrefix}verticalAlignment`, Style.alignment.bottom,
                         SetValueCmd.type.buttonGroup, rb));
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -414,8 +403,7 @@ export default class StylePanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}textColor`) !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `rbro_${idPrefix}text_color`,
-                                `${fieldPrefix}textColor`, val, SetValueCmd.type.color, rb));
+                                obj.getId(), `${fieldPrefix}textColor`, val, SetValueCmd.type.color, rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -444,8 +432,8 @@ export default class StylePanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}backgroundColor`) !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `rbro_${idPrefix}background_color`,
-                                `${fieldPrefix}backgroundColor`, val, SetValueCmd.type.color, rb));
+                                obj.getId(), `${fieldPrefix}backgroundColor`, val,
+                                SetValueCmd.type.color, rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -475,8 +463,8 @@ export default class StylePanel extends PanelBase {
                         for (let obj of selectedObjects) {
                             if (obj.getValue(`${fieldPrefix}alternateBackgroundColor`) !== val) {
                                 cmdGroup.addCommand(new SetValueCmd(
-                                    obj.getId(), `rbro_${idPrefix}alternate_background_color`,
-                                    `${fieldPrefix}alternateBackgroundColor`, val, SetValueCmd.type.color, rb));
+                                    obj.getId(), `${fieldPrefix}alternateBackgroundColor`, val,
+                                    SetValueCmd.type.color, rb));
                             }
                         }
                         if (!cmdGroup.isEmpty()) {
@@ -508,8 +496,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}font`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}font`,
-                            `${fieldPrefix}font`, val, SetValueCmd.type.select, rb));
+                            obj.getId(), `${fieldPrefix}font`, val, SetValueCmd.type.select, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -531,8 +518,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}fontSize`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}font_size`,
-                            `${fieldPrefix}fontSize`, val, SetValueCmd.type.select, rb));
+                            obj.getId(), `${fieldPrefix}fontSize`, val, SetValueCmd.type.select, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -569,8 +555,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}lineSpacing`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}line_spacing`,
-                            `${fieldPrefix}lineSpacing`, val, SetValueCmd.type.select, rb));
+                            obj.getId(), `${fieldPrefix}lineSpacing`, val, SetValueCmd.type.select, rb));
                     }
                 if (!cmdGroup.isEmpty()) {
                     rb.executeCommand(cmdGroup);
@@ -598,8 +583,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderAll`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_all`,
-                            `${fieldPrefix}borderAll`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}borderAll`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -619,8 +603,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderLeft`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_left`,
-                            `${fieldPrefix}borderLeft`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}borderLeft`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -640,8 +623,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderTop`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_top`,
-                            `${fieldPrefix}borderTop`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}borderTop`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -661,8 +643,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderRight`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_right`,
-                            `${fieldPrefix}borderRight`, val, SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}borderRight`, val, SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -683,9 +664,8 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderBottom`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_bottom`,
-                            `${fieldPrefix}borderBottom`, !elBorderBottom.hasClass('rbroButtonActive'),
-                            SetValueCmd.type.button, rb));
+                            obj.getId(), `${fieldPrefix}borderBottom`,
+                            !elBorderBottom.hasClass('rbroButtonActive'), SetValueCmd.type.button, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -712,8 +692,8 @@ export default class StylePanel extends PanelBase {
                     for (let obj of selectedObjects) {
                         if (obj.getValue(`${fieldPrefix}borderColor`) !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `rbro_${idPrefix}border_color`,
-                                `${fieldPrefix}borderColor`, val, SetValueCmd.type.color, rb));
+                                obj.getId(), `${fieldPrefix}borderColor`, val,
+                                SetValueCmd.type.color, rb));
                         }
                     }
                     if (!cmdGroup.isEmpty()) {
@@ -740,8 +720,8 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}borderWidth`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}border_width`,
-                            `${fieldPrefix}borderWidth`, val, SetValueCmd.type.text, rb));
+                            obj.getId(), `${fieldPrefix}borderWidth`, val,
+                            SetValueCmd.type.text, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -770,8 +750,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingTop`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}padding_top`,
-                            `${fieldPrefix}paddingTop`, val, SetValueCmd.type.text, rb));
+                            obj.getId(), `${fieldPrefix}paddingTop`, val, SetValueCmd.type.text, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -793,8 +772,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingLeft`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}padding_left`,
-                            `${fieldPrefix}paddingLeft`, val, SetValueCmd.type.text, rb));
+                            obj.getId(), `${fieldPrefix}paddingLeft`, val, SetValueCmd.type.text, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -813,8 +791,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingRight`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}padding_right`,
-                            `${fieldPrefix}paddingRight`, val, SetValueCmd.type.text, rb));
+                            obj.getId(), `${fieldPrefix}paddingRight`, val, SetValueCmd.type.text, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {
@@ -836,8 +813,7 @@ export default class StylePanel extends PanelBase {
                 for (let obj of selectedObjects) {
                     if (obj.getValue(`${fieldPrefix}paddingBottom`) !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `rbro_${idPrefix}padding_bottom`,
-                            `${fieldPrefix}paddingBottom`, val, SetValueCmd.type.text, rb));
+                            obj.getId(), `${fieldPrefix}paddingBottom`, val, SetValueCmd.type.text, rb));
                     }
                 }
                 if (!cmdGroup.isEmpty()) {

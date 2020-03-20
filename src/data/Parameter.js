@@ -105,13 +105,18 @@ export default class Parameter {
         return this[field];
     }
 
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         this[field] = value;
         if (field === 'type') {
             this.updateMenuItemDisplay();
         }
     }
 
+    /**
+     * Updates visibility of menu panel item (buttons, children) for this parameter.
+     *
+     * Must be called initially and when parameter type changes.
+     */
     updateMenuItemDisplay() {
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
             $(`#rbro_menu_item_add${this.getId()}`).show();
@@ -164,7 +169,7 @@ export default class Parameter {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_parameter_expression', 'expression', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'expression', cmdGroup);
         for (let child of this.getChildren()) {
             child.addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup);
         }
@@ -175,11 +180,10 @@ export default class Parameter {
      * specified object field.
      * @param {Parameter} parameter - parameter which will be renamed.
      * @param {String} newParameterName - new name of the parameter.
-     * @param {String} tagId
      * @param {String} field
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
-    addCommandForChangedParameterName(parameter, newParameterName, tagId, field, cmdGroup) {
+    addCommandForChangedParameterName(parameter, newParameterName, field, cmdGroup) {
         let paramParent = parameter.getParent();
         let paramRef = null;
         let newParamRef = null;
@@ -196,7 +200,7 @@ export default class Parameter {
 
         if (paramRef !== null && newParamRef !== null && this.getValue(field).indexOf(paramRef) !== -1) {
             let cmd = new SetValueCmd(
-                this.id, tagId, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
+                this.id, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
                 SetValueCmd.type.text, this.rb);
             cmdGroup.addCommand(cmd);
         }
@@ -231,8 +235,8 @@ export default class Parameter {
                 }
                 let testDataStr = JSON.stringify(rows);
                 if (this.testData !== testDataStr) {
-                    let cmd = new SetValueCmd(this.id, 'rbro_parameter_test_data', 'testData',
-                        testDataStr, SetValueCmd.type.text, this.rb);
+                    let cmd = new SetValueCmd(
+                        this.id, 'testData', testDataStr, SetValueCmd.type.text, this.rb);
                     cmdGroup.addCommand(cmd);
                 }
             } catch (e) {

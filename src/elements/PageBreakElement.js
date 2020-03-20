@@ -17,8 +17,8 @@ export default class PageBreakElement extends DocElement {
         this.updateStyle();
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
     }
 
     /**
@@ -47,10 +47,6 @@ export default class PageBreakElement extends DocElement {
      */
     getSizers() {
         return [];
-    }
-
-    getYTagId() {
-        return 'rbro_page_break_element_position_y';
     }
 
     createElement() {

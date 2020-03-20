@@ -103,7 +103,7 @@ export default class DocumentProperties {
         return this[field];
     }
 
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         this[field] = value;
         if (field === 'marginLeft' || field === 'marginTop' || field === 'marginRight' || field === 'marginBottom') {
             this[field + 'Val'] = utils.convertInputToNumber(value);

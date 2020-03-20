@@ -80,8 +80,8 @@ export default class TableTextElement extends TextElement {
         return null;
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
 
         if (field === 'width') {
             let table = this.getTable();
@@ -281,22 +281,6 @@ export default class TableTextElement extends TextElement {
         return ['E'];
     }
 
-    getXTagId() {
-        return '';
-    }
-
-    getYTagId() {
-        return '';
-    }
-
-    getWidthTagId() {
-        return 'rbro_text_element_width';
-    }
-
-    getHeightTagId() {
-        return '';
-    }
-
     hasBorderSettings() {
         return false;
     }
@@ -397,8 +381,7 @@ export default class TableTextElement extends TextElement {
             for (let i = widths.length - 1; i >= 0; i--) {
                 let cmd = new SetValueCmd(
                     tableBand.getColumn(this.columnIndex + i).getId(),
-                    this.getWidthTagId(), 'width', '' + widths[i],
-                    SetValueCmd.type.text, this.rb);
+                    'width', '' + widths[i], SetValueCmd.type.text, this.rb);
                 if (disableSelect || i > 0) {
                     cmd.disableSelect();
                 }
@@ -425,7 +408,7 @@ export default class TableTextElement extends TextElement {
 
                 // increase column count of table
                 let columns = utils.convertInputToNumber(table.getValue('columns')) + 1;
-                table.setValue('columns', columns, 'rbro_table_element_columns', false);
+                table.setValue('columns', columns);
 
                 // add a column to each table band
                 table.getValue('headerData').createColumns(columns, true, colIndex, left);
@@ -464,7 +447,7 @@ export default class TableTextElement extends TextElement {
 
                 // decrease column count of table
                 let columns = utils.convertInputToNumber(table.getValue('columns')) - 1;
-                table.setValue('columns', columns, 'rbro_table_element_columns', false);
+                table.setValue('columns', columns);
 
                 // remove column from each table band
                 table.getValue('headerData').deleteColumn(colIndex);

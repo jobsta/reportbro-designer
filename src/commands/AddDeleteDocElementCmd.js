@@ -14,8 +14,9 @@ import MainPanelItem from '../menu/MainPanelItem';
  * Command to add and delete a doc element.
  * @class
  */
-export default class AddDeleteDocElementCmd {
+export default class AddDeleteDocElementCmd extends Command {
     constructor(add, elementType, initialData, id, parentId, position, rb) {
+        super();
         this.add = add;
         this.elementType = elementType;
         this.initialData = initialData;

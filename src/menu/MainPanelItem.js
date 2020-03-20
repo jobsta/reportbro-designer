@@ -88,7 +88,8 @@ export default class MainPanelItem {
                                 draggedObj.getValue('widthVal'), draggedObj.getValue('heightVal'),
                                 dropInfo.container.getSize(), cmdGroup);
 
-                            let cmd = new SetValueCmd(draggedObj.getId(), null, 'containerId',
+                            let cmd = new SetValueCmd(
+                                draggedObj.getId(), 'containerId',
                                 dropInfo.container.getId(), SetValueCmd.type.internal, this.rb);
                             cmdGroup.addCommand(cmd);
                         }

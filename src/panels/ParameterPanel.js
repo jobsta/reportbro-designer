@@ -25,7 +25,7 @@ export default class ParameterPanel extends PanelBase {
             },
             'arrayItemType': {
                 'type': SetValueCmd.type.select,
-                'fieldId': 'arrayItemType'
+                'fieldId': 'array_item_type'
             },
             'eval': {
                 'type': SetValueCmd.type.checkbox,
@@ -64,8 +64,8 @@ export default class ParameterPanel extends PanelBase {
                         let newParameterName = elParameterName.val();
                         let cmdGroup = new CommandGroupCmd('Rename parameter');
                         let cmd = new SetValueCmd(
-                            selectedObject.getId(), 'rbro_parameter_name', 'name',
-                            newParameterName, SetValueCmd.type.text, this.rb);
+                            selectedObject.getId(), 'name', newParameterName,
+                            SetValueCmd.type.text, this.rb);
                         cmdGroup.addCommand(cmd);
                         let parent = selectedObject.getParent();
                         if (parent !== null) {
@@ -103,8 +103,8 @@ export default class ParameterPanel extends PanelBase {
                     let cmdGroup = new CommandGroupCmd('Set parameter type');
                     let parameterType = elType.val();
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_type', 'type',
-                        parameterType, SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'type', parameterType,
+                        SetValueCmd.type.select, this.rb);
                     cmdGroup.addCommand(cmd);
                     selectedObject.addCommandsForChangedParameterType(parameterType, cmdGroup);
                     this.rb.executeCommand(cmdGroup);
@@ -128,8 +128,8 @@ export default class ParameterPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_array_item_type',
-                        'arrayItemType', elArrayItemType.val(), SetValueCmd.type.select, this.rb);
+                        selectedObject.getId(), 'arrayItemType', elArrayItemType.val(),
+                        SetValueCmd.type.select, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -147,8 +147,8 @@ export default class ParameterPanel extends PanelBase {
                     let selectedObject = this.rb.getSelectedObject();
                     if (selectedObject !== null) {
                         let cmd = new SetValueCmd(
-                            selectedObject.getId(), 'rbro_parameter_eval', 'eval',
-                            elEval.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                            selectedObject.getId(), 'eval', elEval.is(":checked"),
+                            SetValueCmd.type.checkbox, this.rb);
                         this.rb.executeCommand(cmd);
                     }
                 });
@@ -165,8 +165,8 @@ export default class ParameterPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_nullable', 'nullable',
-                        elNullable.is(":checked"), SetValueCmd.type.checkbox, this.rb);
+                        selectedObject.getId(), 'nullable', elNullable.is(":checked"),
+                        SetValueCmd.type.checkbox, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -182,8 +182,7 @@ export default class ParameterPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_pattern', 'pattern',
-                        elPattern.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'pattern', elPattern.val(), SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -218,8 +217,8 @@ export default class ParameterPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_expression', 'expression',
-                        elExpression.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'expression', elExpression.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -256,8 +255,8 @@ export default class ParameterPanel extends PanelBase {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'rbro_parameter_test_data', 'testData',
-                        elTestData.val(), SetValueCmd.type.text, this.rb);
+                        selectedObject.getId(), 'testData', elTestData.val(),
+                        SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
             });
@@ -445,6 +444,9 @@ export default class ParameterPanel extends PanelBase {
         let selectedObject = this.rb.getSelectedObject();
 
         if (selectedObject !== null && selectedObject instanceof Parameter) {
+            // must be called before setValue so all parameter type options are available
+            this.updateVisibileRows(selectedObject, field);
+
             for (let property in this.propertyDescriptors) {
                 if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
                     let propertyDescriptor = this.propertyDescriptors[property];
@@ -461,7 +463,6 @@ export default class ParameterPanel extends PanelBase {
                 }
             }
 
-            this.updateVisibileRows(selectedObject, field);
             ParameterPanel.updateAutosizeInputs(field);
         }
     }

@@ -304,18 +304,12 @@ export default class ReportBro {
                         case 39:  // right
                         case 40: {  // down
                             let cmdGroup = new CommandGroupCmd('Move element', this);
-                            let tagId;
                             let field = (event.which === 37 || event.which === 39) ? 'x' : 'y';
                             let bandWidth = this.getDocumentProperties().getContentSize().width;
                             for (let selectionId of this.selections) {
                                 let obj = this.getDataObject(selectionId);
                                 if (obj instanceof DocElement) {
-                                    if (event.which === 37 || event.which === 39) {
-                                        tagId = obj.getXTagId();
-                                    } else {
-                                        tagId = obj.getYTagId();
-                                    }
-                                    if (tagId !== '') {
+                                    if (obj.hasProperty(field)) {
                                         let val = null;
                                         if (event.which === 37) {
                                             if (obj.getValue('xVal') > 0) {
@@ -337,8 +331,8 @@ export default class ReportBro {
                                             }
                                         }
                                         if (val !== null) {
-                                            let cmd = new SetValueCmd(selectionId, tagId, field,
-                                                val, SetValueCmd.type.text, this);
+                                            let cmd = new SetValueCmd(
+                                                selectionId, field, val, SetValueCmd.type.text, this);
                                             cmdGroup.addCommand(cmd);
                                         }
                                     }
@@ -731,7 +725,7 @@ export default class ReportBro {
         let elementSameContainerOffsetY = true;
         for (let selectionId of this.selections) {
             let obj = this.getDataObject(selectionId);
-            if (obj instanceof DocElement && obj.getXTagId() !== '') {
+            if (obj instanceof DocElement && obj.hasProperty('x')) {
                 elementCount++;
                 let container = obj.getContainer();
                 let offset = container.getOffset();
@@ -1032,7 +1026,7 @@ export default class ReportBro {
         let elementCount = 0;
         for (let selectionId of this.selections) {
             let obj = this.getDataObject(selectionId);
-            if (obj instanceof DocElement && obj.getXTagId() !== '') {
+            if (obj instanceof DocElement && obj.hasProperty('x')) {
                 elementCount++;
                 x = obj.getValue('xVal');
                 y = obj.getValue('yVal');
@@ -1061,38 +1055,42 @@ export default class ReportBro {
                 if (obj instanceof DocElement && !(obj instanceof PageBreakElement)) {
                     switch (alignment) {
                         case Style.alignment.left: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getXTagId(), 'x',
-                                '' + minX, SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'x', '' + minX, SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;
                         case Style.alignment.center: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getXTagId(), 'x',
-                                '' + (center - (obj.getValue('widthVal') / 2)), SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'x', '' + (center - (obj.getValue('widthVal') / 2)),
+                                SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;
                         case Style.alignment.right: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getXTagId(), 'x',
-                                '' + (maxX - obj.getValue('widthVal')), SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'x', '' + (maxX - obj.getValue('widthVal')),
+                                SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;
                         case Style.alignment.top: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getYTagId(), 'y',
-                                '' + minY, SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'y', '' + minY, SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;
                         case Style.alignment.middle: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getYTagId(), 'y',
-                                '' + (vcenter - (obj.getValue('heightVal') / 2)), SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'y', '' + (vcenter - (obj.getValue('heightVal') / 2)),
+                                SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;
                         case Style.alignment.bottom: {
-                            let cmd = new SetValueCmd(obj.getId(), obj.getYTagId(), 'y',
-                                '' + (maxY - obj.getValue('heightVal')), SetValueCmd.type.text, this);
+                            let cmd = new SetValueCmd(
+                                obj.getId(), 'y', '' + (maxY - obj.getValue('heightVal')),
+                                SetValueCmd.type.text, this);
                             cmdGroup.addCommand(cmd);
                         }
                         break;

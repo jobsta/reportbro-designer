@@ -124,8 +124,8 @@ export default class TableElement extends DocElement {
         return maxId;
     }
 
-    setValue(field, value, elSelector, isShown) {
-        super.setValue(field, value, elSelector, isShown);
+    setValue(field, value) {
+        super.setValue(field, value);
         if (field === 'dataSource') {
             this.updateName();
         } else if (field === 'header') {
@@ -249,22 +249,6 @@ export default class TableElement extends DocElement {
      */
     getSizers() {
         return [];
-    }
-
-    getXTagId() {
-        return 'rbro_table_element_position_x';
-    }
-
-    getYTagId() {
-        return 'rbro_table_element_position_y';
-    }
-
-    getWidthTagId() {
-        return 'rbro_table_element_width';
-    }
-
-    getHeightTagId() {
-        return 'rbro_table_element_height';
     }
 
     isDroppingAllowed() {
@@ -441,7 +425,7 @@ export default class TableElement extends DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
-        this.addCommandForChangedParameterName(parameter, newParameterName, 'rbro_table_element_data_source', 'dataSource', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'dataSource', cmdGroup);
     }
 
     /**

@@ -1,4 +1,5 @@
 import AddDeleteStyleCmd from "../commands/AddDeleteStyleCmd";
+import Command from "../commands/Command";
 import SetValueCmd from "../commands/SetValueCmd";
 import DocElement from "../elements/DocElement";
 import * as utils from "../utils";
@@ -84,7 +85,7 @@ export default class Style {
         return this[field];
     }
 
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         this[field] = value;
 
         if (field !== 'name') {
@@ -94,12 +95,8 @@ export default class Style {
         }
 
         if (field.indexOf('border') !== -1) {
-            Style.setBorderValue(this, field, '', value, elSelector, isShown);
+            Style.setBorderValue(this, field, '', value, this.rb);
         }
-    }
-
-    setBorderAll(fieldPrefix, value) {
-        this[fieldPrefix + 'borderAll'] = value;
     }
 
     /**
@@ -114,7 +111,7 @@ export default class Style {
                     element.getElementType() === DocElement.type.tableText) && element.getValue('styleId') &&
                     utils.convertInputToNumber(element.getValue('styleId')) === this.id) {
                 cmd = new SetValueCmd(
-                    element.getId(), 'rbro_text_element_style_id', 'styleId', '', SetValueCmd.type.text, this.rb);
+                    element.getId(), 'styleId', '', SetValueCmd.type.text, this.rb);
                 cmdGroup.addCommand(cmd);
             }
         }
@@ -160,32 +157,42 @@ export default class Style {
      * @param {String} fieldPrefix - prefix of field to reuse style settings for different
      * sections (e.g. for conditional style).
      * @param {Boolean} value - new value for specified field.
-     * @param {String} elSelector - jquery selector to specify the DOM element.
-     * @param {Boolean} isShown - true if the specified object is currently visible in the GUI.
+     * @param {ReportBro} rb - ReportBro instance.
      */
-    static setBorderValue(obj, field, fieldPrefix, value, elSelector, isShown) {
-        if (field === `${fieldPrefix}borderAll`) {
-            obj.borderLeft = obj.borderTop = obj.borderRight = obj.borderBottom = value;
-            if (isShown) {
-                if (value) {
-                    $(elSelector).parent().find('button').addClass('rbroButtonActive');
-                } else {
-                    $(elSelector).parent().find('button').removeClass('rbroButtonActive');
-                }
+    static setBorderValue(obj, field, fieldPrefix, value, rb) {
+        let fieldWithoutPrefix = field;
+        if (fieldPrefix.length > 0) {
+            fieldWithoutPrefix = fieldWithoutPrefix.substr(fieldPrefix.length);
+        }
+        if (fieldWithoutPrefix === 'borderAll') {
+            let borderLeftField = `${fieldPrefix}borderLeft`;
+            let borderTopField = `${fieldPrefix}borderTop`;
+            let borderRightField = `${fieldPrefix}borderRight`;
+            let borderBottomField = `${fieldPrefix}borderBottom`;
+            if (value !== obj[borderLeftField]) {
+                obj[borderLeftField] = value;
+                rb.notifyEvent(obj, Command.operation.change, borderLeftField);
             }
-        } else if (field === `${fieldPrefix}borderLeft` || field === `${fieldPrefix}borderTop` ||
-                field === `${fieldPrefix}borderRight` || field === `${fieldPrefix}borderBottom`) {
-            if (obj.getValue(`${fieldPrefix}borderLeft`) && obj.getValue(`${fieldPrefix}borderTop`) &&
-                    obj.getValue(`${fieldPrefix}borderRight`) && obj.getValue(`${fieldPrefix}borderBottom`)) {
-                obj.setBorderAll(fieldPrefix, true);
-                if (isShown) {
-                    $(elSelector).parent().find(`button[value="${fieldPrefix}borderAll"]`).addClass('rbroButtonActive');
-                }
-            } else {
-                obj.setBorderAll(fieldPrefix, false);
-                if (isShown) {
-                    $(elSelector).parent().find(`button[value="${fieldPrefix}borderAll"]`).removeClass('rbroButtonActive');
-                }
+            if (value !== obj[borderTopField]) {
+                obj[borderTopField] = value;
+                rb.notifyEvent(obj, Command.operation.change, borderTopField);
+            }
+            if (value !== obj[borderRightField]) {
+                obj[borderRightField] = value;
+                rb.notifyEvent(obj, Command.operation.change, borderRightField);
+            }
+            if (value !== obj[borderBottomField]) {
+                obj[borderBottomField] = value;
+                rb.notifyEvent(obj, Command.operation.change, borderBottomField);
+            }
+        } else if (fieldWithoutPrefix === 'borderLeft' || fieldWithoutPrefix === 'borderTop' ||
+                fieldWithoutPrefix === 'borderRight' || fieldWithoutPrefix === 'borderBottom') {
+            let borderAll = (obj.getValue(`${fieldPrefix}borderLeft`) && obj.getValue(`${fieldPrefix}borderTop`) &&
+                    obj.getValue(`${fieldPrefix}borderRight`) && obj.getValue(`${fieldPrefix}borderBottom`));
+            let borderAllField = `${fieldPrefix}borderAll`;
+            if (borderAll !== obj[borderAllField]) {
+                obj[borderAllField] = borderAll;
+                rb.notifyEvent(obj, Command.operation.change, borderAllField);
             }
         }
     }

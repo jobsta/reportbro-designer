@@ -68,14 +68,14 @@ export default class TableBandElement extends DocElement {
         return null;
     }
 
-    setValue(field, value, elSelector, isShown) {
+    setValue(field, value) {
         this[field] = value;
         if (field === 'height') {
             let height = utils.convertInputToNumber(value);
             this[field + 'Val'] = height;
             this.getElement().find('td').css({ height: this.rb.toPixel(height) });
             for (let col of this.columnData) {
-                col.setValue(field, value, elSelector, isShown);
+                col.setValue(field, value);
             }
             let table = this.getParent();
             if (table !== null) {
@@ -126,10 +126,6 @@ export default class TableBandElement extends DocElement {
      */
     getSizers() {
         return [];
-    }
-
-    getHeightTagId() {
-        return 'rbro_table_band_element_height';
     }
 
     getHeight() {
@@ -380,7 +376,7 @@ export default class TableBandElement extends DocElement {
 
                 // increase content row count of table
                 let contentRows = utils.convertInputToNumber(table.getValue('contentRows')) + 1;
-                table.setValue('contentRows', contentRows, 'rbro_table_element_content_rows', false);
+                table.setValue('contentRows', contentRows);
 
                 let contentRow = table.getValue('contentDataRows')[rowIndex];
                 let data = { height: contentRow.height, columnData: [] };
@@ -418,7 +414,7 @@ export default class TableBandElement extends DocElement {
                 cmdGroup.addCommand(cmd);
 
                 // decrease content row count of table
-                table.setValue('contentRows', contentRows - 1, 'rbro_table_element_content_rows', false);
+                table.setValue('contentRows', contentRows - 1);
 
                 // remove content row
                 table.getValue('contentDataRows').splice(rowIndex, 1);
