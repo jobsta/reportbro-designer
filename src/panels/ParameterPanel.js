@@ -57,7 +57,7 @@ export default class ParameterPanel extends PanelBase {
         elDiv.append(`<label for="rbro_parameter_name">${this.rb.getLabel('parameterName')}:</label>`);
         let elFormField = $('<div class="rbroFormField"></div>');
         let elParameterName = $('<input id="rbro_parameter_name">')
-            .change(event => {
+            .on('input', event => {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
                     if (elParameterName.val().trim() !== '') {
@@ -296,6 +296,31 @@ export default class ParameterPanel extends PanelBase {
             parentParameter = obj.getPanelItem().getParent().getData();
         }
 
+        if (field === null) {
+            let editable = obj.getValue('editable');
+            $('#rbro_parameter_name').prop('disabled', !editable);
+            $('#rbro_parameter_type').prop('disabled', !editable);
+            $('#rbro_parameter_eval').prop('disabled', !editable);
+            $('#rbro_parameter_nullable').prop('disabled', !editable);
+            $('#rbro_parameter_pattern').prop('disabled', !editable);
+            $('#rbro_parameter_expression').prop('disabled', !editable);
+            if (editable) {
+                $('#rbro_parameter_name_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_type_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_eval_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_nullable_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_pattern_row label').removeClass('rbroDisabled');
+                $('#rbro_parameter_expression_row label').removeClass('rbroDisabled');
+            } else {
+                $('#rbro_parameter_name_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_type_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_eval_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_nullable_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_pattern_row label').addClass('rbroDisabled');
+                $('#rbro_parameter_expression_row label').addClass('rbroDisabled');
+            }
+        }
+
         if (field === null || field === 'type') {
             if (type === Parameter.type.simpleArray) {
                 $('#rbro_parameter_array_item_type_row').show();
@@ -451,15 +476,4 @@ export default class ParameterPanel extends PanelBase {
             autosize.update($('#rbro_parameter_expression'));
         }
     }
-
-    // /**
-    //  * Is called when a data object was modified (including new and deleted data objects).
-    //  * @param {*} obj - new/deleted/modified data object.
-    //  * @param {String} operation - operation which caused the notification.
-    //  */
-    // notifyEvent(obj, operation) {
-    //     if (obj instanceof Parameter && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
-    //         this.updateDisplay();
-    //     }
-    // }
 }

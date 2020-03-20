@@ -57,6 +57,7 @@ export default class Parameter {
                 this.rb.notifyEvent(parameter, Command.operation.add);
             }
         }
+        this.updateMenuItemDisplay();
     }
 
     /**
@@ -107,22 +108,19 @@ export default class Parameter {
     setValue(field, value, elSelector, isShown) {
         this[field] = value;
         if (field === 'type') {
-            if (value === Parameter.type.array || value === Parameter.type.map) {
-                $(`#rbro_menu_item_add${this.getId()}`).show();
-                $(`#rbro_menu_item_children${this.getId()}`).show();
-                $(`#rbro_menu_item_children_toggle${this.getId()}`).show();
-            } else {
-                $(`#rbro_menu_item_add${this.getId()}`).hide();
-                $(`#rbro_menu_item_children${this.getId()}`).hide();
-                $(`#rbro_menu_item_children_toggle${this.getId()}`).hide();
-            }
+            this.updateMenuItemDisplay();
+        }
+    }
 
-            // TODO
-            if (isShown && value === Parameter.type.date) {
-                $('#rbro_parameter_test_data').attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
-            } else {
-                $('#rbro_parameter_test_data').attr('placeholder', '');
-            }
+    updateMenuItemDisplay() {
+        if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
+            $(`#rbro_menu_item_add${this.getId()}`).show();
+            $(`#rbro_menu_item_children${this.getId()}`).show();
+            $(`#rbro_menu_item_children_toggle${this.getId()}`).show();
+        } else {
+            $(`#rbro_menu_item_add${this.getId()}`).hide();
+            $(`#rbro_menu_item_children${this.getId()}`).hide();
+            $(`#rbro_menu_item_children_toggle${this.getId()}`).hide();
         }
     }
 
