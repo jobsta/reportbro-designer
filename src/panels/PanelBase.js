@@ -38,11 +38,7 @@ export default class PanelBase {
                 $(propertyId).attr('placeholder', '');
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.select) {
-            if (differentValues) {
-                $(propertyId).val('');
-            } else {
-                $(propertyId).val(value);
-            }
+            $(propertyId).val(value);
         } else if (propertyDescriptor['type'] === SetValueCmd.type.checkbox) {
             if (differentValues) {
                 $(propertyId).prop('checked', false);

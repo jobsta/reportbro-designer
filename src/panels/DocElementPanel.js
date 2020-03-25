@@ -73,7 +73,8 @@ export default class DocElementPanel extends PanelBase {
             },
             'format': {
                 'type': SetValueCmd.type.select,
-                'fieldId': 'format'
+                'fieldId': 'format',
+                'allowEmpty': false
             },
             'displayValue': {
                 'type': SetValueCmd.type.checkbox,
@@ -120,7 +121,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'style_id',
                 'section': 'style',
-                'showIfEmptyId': 'rbro_doc_element_style_settings'
+                'allowEmpty': true
             },
             'bold': {
                 'type': SetValueCmd.type.button,
@@ -183,18 +184,21 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'font',
                 'rowId': 'rbro_doc_element_font_row',
                 'rowProperties': ['font', 'fontSize'],
-                'section': 'style'
+                'section': 'style',
+                'allowEmpty': false
             },
             'fontSize': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'font_size',
                 'rowId': 'rbro_doc_element_font_row',
-                'section': 'style'
+                'section': 'style',
+                'allowEmpty': false
             },
             'lineSpacing': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'line_spacing',
-                'section': 'style'
+                'section': 'style',
+                'allowEmpty': false
             },
             'borderAll': {
                 'type': SetValueCmd.type.button,
@@ -311,7 +315,8 @@ export default class DocElementPanel extends PanelBase {
             'cs_styleId': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'cs_style_id',
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'allowEmpty': true
             },
             'cs_bold': {
                 'type': SetValueCmd.type.button,
@@ -368,18 +373,21 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'cs_font',
                 'rowId': 'rbro_doc_element_cs_font_row',
                 'rowProperties': ['cs_font', 'cs_fontSize'],
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'allowEmpty': false
             },
             'cs_fontSize': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'cs_font_size',
                 'rowId': 'rbro_doc_element_cs_font_row',
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'allowEmpty': false
             },
             'cs_lineSpacing': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'cs_line_spacing',
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'allowEmpty': false
             },
             'cs_borderAll': {
                 'type': SetValueCmd.type.button,
@@ -1567,15 +1575,13 @@ export default class DocElementPanel extends PanelBase {
                             }
                         }
 
-                        super.setValue(propertyDescriptor, value, differentValues);
-
-                        if ('showIfEmptyId' in propertyDescriptor) {
-                            if (value) {
-                                $('#' + propertyDescriptor['showIfEmptyId']).hide();
-                            } else {
-                                $('#' + propertyDescriptor['showIfEmptyId']).show();
-                            }
+                        if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
+                                propertyDescriptor['allowEmpty']) {
+                            // if values are different and dropdown has empty option then select
+                            // empty dropdown option
+                            value = '';
                         }
+                        super.setValue(propertyDescriptor, value, differentValues);
 
                         if ('section' in propertyDescriptor) {
                             let sectionName = propertyDescriptor['section'];
@@ -1686,23 +1692,4 @@ export default class DocElementPanel extends PanelBase {
         this.renderStyleSelect();
         super.show();
     }
-    // /**
-    //  * Is called when a data object was modified (including new and deleted data objects).
-    //  * @param {*} obj - new/deleted/modified data object.
-    //  * @param {String} operation - operation which caused the notification.
-    //  * @param {[String]} field - affected field in case of change operation.
-    //  */
-    // notifyEvent(obj, operation, field) {
-    //     if (obj instanceof DocElement && this.rb.isSelectedObject(obj.id) && operation === Command.operation.change) {
-    //         this.updateDisplay(field);
-    //     } else if (obj instanceof Style) {
-    //         if (operation === Command.operation.remove) {
-    //             this.elStyle.find(`option[value='${obj.getId()}']`).remove();
-    //             this.cs_elStyle.find(`option[value='${obj.getId()}']`).remove();
-    //         } else if (operation === Command.operation.rename) {
-    //             this.elStyle.find(`option[value='${obj.getId()}']`).text(obj.getName());
-    //             this.cs_elStyle.find(`option[value='${obj.getId()}']`).text(obj.getName());
-    //         }
-    //     }
-    // }
 }
