@@ -1243,12 +1243,25 @@ export default class ReportBro {
 
     /**
      * Sets the internal modified flag.
+     *
      * If true the save button is enabled, otherwise the save button is disabled.
      * @param {Boolean} modified
      */
     setModified(modified) {
         this.modified = modified;
         this.updateMenuButtons();
+    }
+
+    /**
+     * Returns the internal modified flag.
+     *
+     * If the flag is true the save button is enabled, otherwise the save button is disabled and
+     * there was no change to the report since the flag was last set to false (this happens
+     * after save or by calling the setModified API function).
+     * @returns {Boolean}
+     */
+    isModified() {
+        return this.modified;
     }
 
     /**
