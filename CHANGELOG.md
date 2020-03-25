@@ -2,9 +2,13 @@
 
 ## [1.4.0] - 2020
 
+### Features
+* dynamic document element panel which allows modifying multiple
+document elements (also of different kinds) at once
+
 ### Changes
 * add selectCallback which is called when an object is selected/deselected
-
+* add isModified API method to return modified flag
 
 ## [1.3.4] - 2019-12-23
 
