@@ -1,4 +1,5 @@
 import DocElement from './DocElement';
+import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
 import * as utils from '../utils';
 
@@ -99,6 +100,9 @@ export default class TextElement extends DocElement {
             // because it calls updateStyle() which expects the correct border settings
             this[field] = value;
             if (field.substr(0, 3) === 'cs_') {
+                if (field === 'cs_borderWidth') {
+                    this.borderWidthVal = utils.convertInputToNumber(value);
+                }
                 Style.setBorderValue(this, field, 'cs_', value, this.rb);
             } else {
                 if (field === 'borderWidth') {
@@ -165,6 +169,40 @@ export default class TextElement extends DocElement {
             }
         }
         return style;
+    }
+
+    /**
+     * Adds commands to command group parameter to set style properties of given style.
+     *
+     * This should be called when the style was changed so all style properties
+     * will be updated as well.
+     *
+     * @param {String} styleId - id of new style or empty string if no style was selected.
+     * @param {String} fieldPrefix - field prefix when accessing properties.
+     * @param {[Object]} propertyDescriptors - list of all property descriptors to get
+     * property type for SetValueCmd.
+     * @param {CommandGroupCmd} cmdGroup - commands will be added to this command group.
+     */
+    addCommandsForChangedStyle(styleId, fieldPrefix, propertyDescriptors, cmdGroup) {
+        if (styleId !== '') {
+            let style = this.rb.getStyleById(styleId);
+            if (style !== null) {
+                let fields = style.getFields().slice(2);  // get all fields except id and name
+                for (let field of fields) {
+                    let objField = fieldPrefix + field;
+                    let value = style.getValue(field);
+                    if (value !== this.getValue(objField)) {
+                        let propertyDescriptor = propertyDescriptors[objField];
+                        let cmd = new SetValueCmd(
+                            this.getId(), objField, value, propertyDescriptor['type'], this.rb);
+                        cmd.disableSelect();
+                        cmdGroup.addCommand(cmd);
+                    }
+                }
+            }
+        }
+        cmdGroup.addCommand(new SetValueCmd(
+            this.getId(), fieldPrefix + 'styleId', styleId, SetValueCmd.type.select, this.rb));
     }
 
     getContentSize(width, height, style) {

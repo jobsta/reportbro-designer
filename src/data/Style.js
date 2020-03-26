@@ -1,7 +1,6 @@
 import AddDeleteStyleCmd from "../commands/AddDeleteStyleCmd";
 import Command from "../commands/Command";
 import SetValueCmd from "../commands/SetValueCmd";
-import DocElement from "../elements/DocElement";
 import * as utils from "../utils";
 
 /**
@@ -88,14 +87,51 @@ export default class Style {
     setValue(field, value) {
         this[field] = value;
 
+        if (field.indexOf('border') !== -1) {
+            if (field === 'borderWidth') {
+                this.borderWidthVal = utils.convertInputToNumber(value);
+            }
+            Style.setBorderValue(this, field, '', value, this.rb);
+        }
+
         if (field !== 'name') {
             for (let docElement of this.rb.getDocElements(true)) {
                 docElement.updateChangedStyle(this.getId());
             }
         }
+    }
 
-        if (field.indexOf('border') !== -1) {
-            Style.setBorderValue(this, field, '', value, this.rb);
+    /**
+     * Adds commands to command group parameter to set changed property value
+     * for all document elements using this style.
+     *
+     * This should be called when a property of this style was changed so the property
+     * will be updated for all document elements as well.
+     *
+     * @param {String} field - changed field of this style.
+     * @param {Object} value - new value for given field.
+     * @param {String} type - property type for SetValueCmd.
+     * @param {CommandGroupCmd} cmdGroup - commands will be added to this command group.
+     */
+    addCommandsForChangedProperty(field, value, type, cmdGroup) {
+        let strId = '' + this.getId();
+        for (let docElement of this.rb.getDocElements(true)) {
+            if (docElement.hasProperty('styleId')) {
+                if (docElement.getValue('styleId') === strId &&
+                        docElement.getValue(field) !== value) {
+                    let cmd = new SetValueCmd(
+                        docElement.getId(), field, value, type, this.rb);
+                    cmd.disableSelect();
+                    cmdGroup.addCommand(cmd);
+                }
+                if (docElement.getValue('cs_styleId') === strId &&
+                        docElement.getValue('cs_' + field) !== value) {
+                    let cmd = new SetValueCmd(
+                        docElement.getId(), 'cs_' + field, value, type, this.rb)
+                    cmd.disableSelect();
+                    cmdGroup.addCommand(cmd);
+                }
+            }
         }
     }
 

@@ -8,10 +8,10 @@ import SetValueCmd from './SetValueCmd';
 export default class CommandGroupCmd extends Command {
     constructor(name, rb) {
         super();
-        this.name;
+        this.name = name;
         this.rb = rb;
         this.commands = [];
-        this.selectObjects = false;
+        this.selectObjectIds = [];
     }
 
     getName() {
@@ -19,32 +19,36 @@ export default class CommandGroupCmd extends Command {
     }
 
     do() {
-        let selectObjects = this.isSelectObjectsNeeded();
         for (let i=0; i < this.commands.length; i++) {
-            let cmd = this.commands[i];
-            if (selectObjects && cmd instanceof SetValueCmd) {
-                this.rb.selectObject(cmd.getObjId(), i === 0);
-            }
-            cmd.do();
+            this.commands[i].do();
         }
+        this.selectObjects();
     }
 
     undo() {
-        let selectObjects = this.isSelectObjectsNeeded();
         for (let i=this.commands.length - 1; i >= 0; i--) {
-            let cmd = this.commands[i];
-            if (selectObjects && cmd instanceof SetValueCmd) {
-                this.rb.selectObject(cmd.getObjId(), i === (this.commands.length - 1));
-            }
-            cmd.undo();
+            this.commands[i].undo();
         }
+        this.selectObjects();
     }
 
     addCommand(cmd) {
-        if (this.selectObjects && cmd instanceof SetValueCmd) {
+        if (cmd instanceof SetValueCmd) {
+            // disable select for specific command, selection is handled in command group
+            // when the commands are executed
             cmd.disableSelect();
         }
         this.commands.push(cmd);
+    }
+
+    /**
+     * Add id of object which should be selected when this command group is executed.
+     * @param {Number} objId - object id
+     */
+    addSelection(objId) {
+        if (this.selectObjectIds.indexOf(objId) === -1) {
+            this.selectObjectIds.push(objId);
+        }
     }
 
     isEmpty() {
@@ -55,30 +59,22 @@ export default class CommandGroupCmd extends Command {
         return this.commands;
     }
 
-    handleSelection() {
-        this.selectObjects = true;
-    }
-
-    /**
-     * Test if it is necessary to select object before executing command.
-     *
-     * If the commands to be executed contain the same objects as the current selection then
-     * no selection is needed.
-     * @returns {boolean}
-     */
-    isSelectObjectsNeeded() {
-        if (this.selectObjects) {
-            for (let i=0; i < this.commands.length; i++) {
-                let cmd = this.commands[i];
-                if (cmd instanceof SetValueCmd) {
-                    if (!this.rb.isSelectedObject(cmd.getObjId())) {
-                        return true;
-                    }
-                }
+    selectObjects() {
+        let allObjectsSelected = true;
+        for (let objId of this.selectObjectIds) {
+            if (!this.rb.isSelectedObject(objId)) {
+                allObjectsSelected = false;
+                break;
             }
-            return false;
         }
-        return false;
+        if (!allObjectsSelected) {
+            // only select objects if at least one object is not already selected
+            let firstSelection = true;
+            for (let objId of this.selectObjectIds) {
+                this.rb.selectObject(objId, firstSelection);
+                firstSelection = false;
+            }
+        }
     }
 
     /**
