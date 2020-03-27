@@ -269,7 +269,7 @@ export default class ReportBro {
                         // Ctrl + Y: redo
                         this.redoCommand();
                         event.preventDefault();
-                        break; 
+                        break;
                     }
                     case 90: {
                         // Ctrl + Z: undo
@@ -327,7 +327,7 @@ export default class ReportBro {
                                         } else if (event.which === 40) {
                                             let containerSize = obj.getContainerContentSize();
                                             if ((obj.getValue('yVal') + obj.getValue('heightVal')) < containerSize.height) {
-                                                val = obj.getValue('yVal') + 1;											
+                                                val = obj.getValue('yVal') + 1;
                                             }
                                         }
                                         if (val !== null) {
@@ -792,7 +792,7 @@ export default class ReportBro {
     }
 
     debugCommandStack() {
-        console.clear();		
+        console.clear();
         for (let i=0; i < this.commandStack.length; i++) {
             if (i > this.lastCommandIndex) {
                 console.log('( ' + i + ' ' + this.commandStack[i].getName() + ' )');
@@ -1259,7 +1259,7 @@ export default class ReportBro {
      *
      * If the flag is true the save button is enabled, otherwise the save button is disabled and
      * there was no change to the report since the flag was last set to false (this happens
-     * after save or by calling the setModified API function).
+     * after save or by calling the setModified API method).
      * @returns {Boolean}
      */
     isModified() {
@@ -1281,7 +1281,7 @@ export default class ReportBro {
             ret.styles.push(style.toJS());
         }
         ret.documentProperties = this.documentProperties.toJS();
-        
+
         return ret;
     }
 
@@ -1389,7 +1389,7 @@ export default class ReportBro {
             }
         }
     }
-  
+
     preview() {
         this.previewInternal(this.getTestData(), true);
     }
