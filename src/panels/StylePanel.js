@@ -916,7 +916,7 @@ export default class StylePanel extends PanelBase {
         elDiv.append(
             `<label for="rbro_${idPrefix}border_width">${rb.getLabel('styleBorderWidth')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width">`)
+        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number">`)
             .on('input', event => {
                 let val = elBorderWidth.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -944,7 +944,7 @@ export default class StylePanel extends PanelBase {
         elFormField.append(elBorderWidth);
         elDiv.append(elFormField);
         elBorderDiv.append(elDiv);
-        utils.setInputDecimal(elBorderWidth);
+        //utils.setInputDecimal(elBorderWidth);
         elPanel.append(elBorderDiv);
 
 
@@ -954,7 +954,8 @@ export default class StylePanel extends PanelBase {
 
         let elPaddingTopDiv = $('<div class="rbroColumnCenter"></div>');
         let elPaddingTop = $(
-            `<input id="rbro_${idPrefix}padding_top" placeholder="${rb.getLabel('orientationTop')}">`)
+            `<input id="rbro_${idPrefix}padding_top"
+             placeholder="${rb.getLabel('orientationTop')}" type="number">`)
             .on('input', event => {
                 let val = elPaddingTop.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -978,13 +979,14 @@ export default class StylePanel extends PanelBase {
                     rb.executeCommand(cmdGroup);
                 }
             });
-        utils.setInputPositiveInteger(elPaddingTop);
+        //utils.setInputPositiveInteger(elPaddingTop);
         elPaddingTopDiv.append(elPaddingTop);
         elFormField.append(elPaddingTopDiv);
 
         let elDiv2 = $('<div class="rbroSplit"></div>');
         let elPaddingLeft = $(
-            `<input id="rbro_${idPrefix}padding_left" placeholder="${rb.getLabel('orientationLeft')}">`)
+            `<input id="rbro_${idPrefix}padding_left"
+             placeholder="${rb.getLabel('orientationLeft')}" type="number">`)
             .on('input', event => {
                 let val = elPaddingLeft.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -1008,10 +1010,11 @@ export default class StylePanel extends PanelBase {
                     rb.executeCommand(cmdGroup);
                 }
             });
-        utils.setInputPositiveInteger(elPaddingLeft);
+        //utils.setInputPositiveInteger(elPaddingLeft);
         elDiv2.append(elPaddingLeft);
         let elPaddingRight = $(
-            `<input id="rbro_${idPrefix}padding_right" placeholder="${rb.getLabel('orientationRight')}">`)
+            `<input id="rbro_${idPrefix}padding_right"
+             placeholder="${rb.getLabel('orientationRight')}" type="number">`)
             .on('input', event => {
                 let val = elPaddingRight.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -1035,13 +1038,14 @@ export default class StylePanel extends PanelBase {
                     rb.executeCommand(cmdGroup);
                 }
             });
-        utils.setInputPositiveInteger(elPaddingRight);
+        //utils.setInputPositiveInteger(elPaddingRight);
         elDiv2.append(elPaddingRight);
         elFormField.append(elDiv2);
 
         let elPaddingBottomDiv = $('<div class="rbroColumnCenter"></div>');
         let elPaddingBottom = $(
-            `<input id="rbro_${idPrefix}padding_bottom" placeholder="${rb.getLabel('orientationBottom')}">`)
+            `<input id="rbro_${idPrefix}padding_bottom"
+             placeholder="${rb.getLabel('orientationBottom')}" type="number">`)
             .on('input', event => {
                 let val = elPaddingBottom.val();
                 let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -1065,7 +1069,7 @@ export default class StylePanel extends PanelBase {
                     rb.executeCommand(cmdGroup);
                 }
             });
-        utils.setInputPositiveInteger(elPaddingBottom);
+        //utils.setInputPositiveInteger(elPaddingBottom);
         elPaddingBottomDiv.append(elPaddingBottom);
         elFormField.append(elPaddingBottomDiv);
         elDiv.append(elFormField);

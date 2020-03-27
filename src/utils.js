@@ -1,12 +1,5 @@
 String.prototype.reverse = function () { return this.split('').reverse().join(''); };
 
-export function setInputInteger(el) {
-    el.on('keyup', function() {
-        var nvalue = this.value.reverse().replace(/[^0-9\-]|\-(?=.)/g, '').reverse();
-        if (this.value !== nvalue) this.value = nvalue;
-    });
-}
-
 export function setInputPositiveInteger(el) {
     el.on('keyup', function() {
         var nvalue = this.value.replace(/[^0-9]/g, '');
