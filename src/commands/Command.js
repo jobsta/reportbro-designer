@@ -1,8 +1,11 @@
 /**
- * Interface for all commands.
+ * Base class for all commands.
  * @class
  */
 export default class Command {
+    constructor() {
+    }
+
     getName() {}
     do() {}
     undo() {}

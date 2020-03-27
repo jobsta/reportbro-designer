@@ -214,11 +214,12 @@ export default class TableTextElement extends TextElement {
      */
     getProperties() {
         let fields = ['width', 'content', 'eval', 'colspan',
-            'styleId', 'bold', 'italic', 'underline',
+            'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
             'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
-            'pattern', 'link', 'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline',
+            'pattern', 'link', 'cs_condition', 'cs_styleId',
+            'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor',
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom'];

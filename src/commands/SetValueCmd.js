@@ -17,6 +17,7 @@ export default class SetValueCmd extends Command {
         this.oldValue = obj.getValue(field);
         this.firstExecution = true;
         this.select = true;
+        this.notifyChange = true;
     }
 
     getName() {
@@ -51,7 +52,9 @@ export default class SetValueCmd extends Command {
             $(`#rbro_menu_item_name${this.objId}`).attr('title', value);
             this.rb.notifyEvent(obj, Command.operation.rename);
         }
-        this.rb.notifyEvent(obj, Command.operation.change, this.field);
+        if (this.notifyChange) {
+            this.rb.notifyEvent(obj, Command.operation.change, this.field);
+        }
     }
 
     /**
@@ -60,6 +63,10 @@ export default class SetValueCmd extends Command {
      */
     disableSelect() {
         this.select = false;
+    }
+
+    setNotifyChange(notify) {
+        this.notifyChange = notify;
     }
 
     /**
