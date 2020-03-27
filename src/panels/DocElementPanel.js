@@ -539,12 +539,12 @@ export default class DocElementPanel extends PanelBase {
                     null, 'rbro_doc_element_data_source', 'dataSource', PopupWindow.type.parameterSet);
             });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_section_element_data_source_error" class="rbroErrorMessage"></div>');
+        elFormField.append('<div id="rbro_doc_element_data_source_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_content_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label for="rbro_text_element_content">${this.rb.getLabel('textElementContent')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_content">${this.rb.getLabel('textElementContent')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elContent = $(`<textarea id="rbro_doc_element_content" rows="1"></textarea>`)
             .on('input', event => {
@@ -1442,13 +1442,14 @@ export default class DocElementPanel extends PanelBase {
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetColumn = $(`<input id="rbro_doc_element_spreadsheet_column">`)
                 .on('input', event => {
+                    let val = elSpreadsheetColumn.val();
                     let cmdGroup = new CommandGroupCmd('Set value', this.rb);
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let obj of selectedObjects) {
                         cmdGroup.addSelection(obj.getId());
-                        if (obj.getValue('spreadsheet_column') !== elSpreadsheetColumn.val()) {
+                        if (obj.getValue('spreadsheet_column') !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'spreadsheet_column', elSpreadsheetColumn.val(),
+                                obj.getId(), 'spreadsheet_column', val,
                                 SetValueCmd.type.text, this.rb));
                         }
                     }

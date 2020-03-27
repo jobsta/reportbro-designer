@@ -115,21 +115,22 @@ export default class PanelBase {
     }
 
     /**
-     * Updates displayed errors of currently selected data object.
+     * Updates displayed errors of currently selected data objects.
      */
-    updateErrors(errors, displayedObjectId) {
+    updateErrors() {
         $(`#${this.panelId} .rbroFormRow`).removeClass('rbroError');
         $(`#${this.panelId} .rbroErrorMessage`).text('');
 
-        for (let error of errors) {
-            if (error.object_id === displayedObjectId) {
+        let selectedObjects = this.rb.getSelectedObjects();
+        for (let obj of selectedObjects) {
+            for (let error of obj.getErrors()) {
                 let errorMsg = this.rb.getLabel(error.msg_key);
                 if (error.info) {
                     errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
                         error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
                 }
-                $(`#${this.panelId}_${error.field}_row`).addClass('rbroError');
-                $(`#${this.panelId}_${error.field}_error`).html(errorMsg);
+                $(`#${this.idPrefix}_${error.field}_row`).addClass('rbroError');
+                $(`#${this.idPrefix}_${error.field}_error`).html(errorMsg);
             }
         }
     }
@@ -139,5 +140,6 @@ export default class PanelBase {
      */
     selectionChanged() {
         this.updateDisplay(null);
+        this.updateErrors();
     }
 }

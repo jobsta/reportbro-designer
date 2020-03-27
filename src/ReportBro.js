@@ -1178,8 +1178,8 @@ export default class ReportBro {
             }
         }
         if (errors.length > 0) {
-            this.docElementPanel.updateErrors(errors, errors[0].object_id);
-            this.selectObject(errors[0].object_id, true);
+            this.deselectAll(false);
+            this.selectObject(errors[0].object_id, false);
         }
     }
 
@@ -1191,12 +1191,14 @@ export default class ReportBro {
      */
     previewInternal(data, isTestData) {
         let self = this;
+        // clear all error classes and texts
         $('.rbroMenuItem').removeClass('rbroError');
+        $('.rbroFormRow').removeClass('rbroError');
+        $('.rbroErrorMessage').text('');
         for (let objId in this.objectMap) {
             this.objectMap[objId].clearErrors();
         }
-        //this.detailPanels[this.activeDetailPanel].updateErrors();
-        this.docElementPanel.updateErrors();
+
         this.showLoading();
         $.ajax(this.properties.reportServerUrl, {
             data: JSON.stringify({
