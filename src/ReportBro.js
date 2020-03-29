@@ -1180,6 +1180,7 @@ export default class ReportBro {
         if (errors.length > 0) {
             this.deselectAll(false);
             this.selectObject(errors[0].object_id, false);
+            this.detailPanels[this.activeDetailPanel].scrollToFirstError();
         }
     }
 

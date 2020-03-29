@@ -54,22 +54,18 @@ export default class CommandGroupCmd extends Command {
     }
 
     /**
-     * Add id of object which should be selected when this command group is executed.
+     * Add id of object which should be selected when this command group is executed and sets
+     * notifyChange flag for following addCommand calls.
      * @param {Number} objId - object id
+     * @param {Boolean} notifyChange - notify flag which is valid until changed again with this method.
      */
-    addSelection(objId) {
+    addSelection(objId, notifyChange) {
         if (this.selectObjectIds.indexOf(objId) === -1) {
             this.selectObjectIds.push(objId);
         }
-    }
-
-    /**
-     * Allows to enable/disable notification of change event for the following commands
-     * added with addCommand.
-     * @param {Boolean} notify - notify flag which is valid until changed again with this method.
-     */
-    setNotifyChange(notify) {
-        this.notifyChange = notify;
+        // allows to enable/disable notification of change event for the following commands
+        // added with addCommand
+        this.notifyChange = notifyChange;
     }
 
     isEmpty() {

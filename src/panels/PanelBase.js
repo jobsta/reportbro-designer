@@ -121,16 +121,24 @@ export default class PanelBase {
         $(`#${this.panelId} .rbroFormRow`).removeClass('rbroError');
         $(`#${this.panelId} .rbroErrorMessage`).text('');
 
-        let selectedObjects = this.rb.getSelectedObjects();
-        for (let obj of selectedObjects) {
+        let obj = this.rb.getSelectedObject();
+        if (obj !== null) {
             for (let error of obj.getErrors()) {
-                let errorMsg = this.rb.getLabel(error.msg_key);
-                if (error.info) {
-                    errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
-                        error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+                let propertyDescriptor = this.propertyDescriptors[error.field];
+                if (propertyDescriptor) {
+                    if ('section' in propertyDescriptor) {
+                        let sectionName = propertyDescriptor['section'];
+                        $(`#${this.idPrefix}_${sectionName}_header`).addClass('rbroError');
+                    }
+
+                    let errorMsg = this.rb.getLabel(error.msg_key);
+                    if (error.info) {
+                        errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
+                            error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+                    }
+                    $(`#${this.idPrefix}_${propertyDescriptor.fieldId}_row`).addClass('rbroError');
+                    $(`#${this.idPrefix}_${propertyDescriptor.fieldId}_error`).html(errorMsg);
                 }
-                $(`#${this.idPrefix}_${error.field}_row`).addClass('rbroError');
-                $(`#${this.idPrefix}_${error.field}_error`).html(errorMsg);
             }
         }
     }
@@ -141,5 +149,46 @@ export default class PanelBase {
     selectionChanged() {
         this.updateDisplay(null);
         this.updateErrors();
+    }
+
+    /**
+     * Expands all sections in case there is an error for a field inside a section and
+     * scrolls to the uppermost error.
+     */
+    scrollToFirstError() {
+        let obj = this.rb.getSelectedObject();
+        if (obj !== null) {
+            // open all sections containing errors
+            for (let error of obj.getErrors()) {
+                let propertyDescriptor = this.propertyDescriptors[error.field];
+                if (propertyDescriptor) {
+                    if ('section' in propertyDescriptor) {
+                        let sectionName = propertyDescriptor['section'];
+                        if (!$(`#${this.idPrefix}_${sectionName}_header`).hasClass('rbroPanelSectionHeaderOpen')) {
+                            $(`#${this.idPrefix}_${sectionName}_header`).trigger('click');
+                        }
+                    }
+                }
+            }
+
+            // scroll to first visible error
+            let firstErrorRowId = '';
+            let firstErrorRowOffset = -1;
+            for (let error of obj.getErrors()) {
+                let propertyDescriptor = this.propertyDescriptors[error.field];
+                if (propertyDescriptor) {
+                    let rowId = `${this.idPrefix}_${propertyDescriptor.fieldId}_row`;
+                    let elRow = document.getElementById(rowId);
+                    let rowOffset = elRow.offsetTop;
+                    if (firstErrorRowId === '' || rowOffset < firstErrorRowOffset) {
+                        firstErrorRowId = rowId;
+                        firstErrorRowOffset = rowOffset;
+                    }
+                }
+            }
+            if (firstErrorRowId !== '') {
+                $('#rbro_detail_panel').scrollTop(firstErrorRowOffset);
+            }
+        }
     }
 }

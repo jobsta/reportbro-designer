@@ -494,8 +494,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('label') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'label', val, SetValueCmd.type.text, this.rb));
@@ -520,8 +519,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('dataSource') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'dataSource', val, SetValueCmd.type.text, this.rb));
@@ -558,8 +556,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('content') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'content', val, SetValueCmd.type.text, this.rb));
@@ -599,8 +596,7 @@ export default class DocElementPanel extends PanelBase {
                 let evalChecked = elEval.is(":checked");
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('eval') !== evalChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'eval', evalChecked, SetValueCmd.type.checkbox, this.rb));
@@ -626,8 +622,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('format') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'format', val, SetValueCmd.type.select, this.rb));
@@ -651,8 +646,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('displayValue') !== displayValueChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(),'displayValue', displayValueChecked,
@@ -677,8 +671,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('source') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'source', val, SetValueCmd.type.text, this.rb));
@@ -720,8 +713,7 @@ export default class DocElementPanel extends PanelBase {
                         let selectedObjects = rb.getSelectedObjects();
                         for (let i=selectedObjects.length - 1; i >= 0; i--) {
                             let obj = selectedObjects[i];
-                            cmdGroup.addSelection(obj.getId());
-                            cmdGroup.setNotifyChange(i === 0);
+                            cmdGroup.addSelection(obj.getId(), i === 0);
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'image', e.target.result, SetValueCmd.type.file, rb));
                             cmdGroup.addCommand(new SetValueCmd(
@@ -749,8 +741,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     cmdGroup.addCommand(new SetValueCmd(
                         obj.getId(), 'image', '', SetValueCmd.type.file, this.rb));
                     cmdGroup.addCommand(new SetValueCmd(
@@ -777,8 +768,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('x') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'x', val, SetValueCmd.type.text, this.rb));
@@ -796,8 +786,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('y') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'y', val, SetValueCmd.type.text, this.rb));
@@ -823,8 +812,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('width') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'width', val, SetValueCmd.type.text, this.rb));
@@ -842,8 +830,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('height') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'height', val, SetValueCmd.type.text, this.rb));
@@ -867,8 +854,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
 
                     let val = elColspan.val().trim();
                     if (val !== '') {
@@ -905,8 +891,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('columns') !== val) {
                         let newColumns = obj.addCommandsForChangedColumns(columns, cmdGroup);
                         if (newColumns !== columns) {
@@ -933,8 +918,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('header') !== headerChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'header', headerChecked, SetValueCmd.type.checkbox, this.rb));
@@ -968,8 +952,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('contentRows') !== val) {
                         let contentRows = utils.convertInputToNumber(val);
                         obj.addCommandsForChangedContentRows(contentRows, cmdGroup);
@@ -994,8 +977,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('footer') !== footerChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'footer', footerChecked, SetValueCmd.type.checkbox, this.rb));
@@ -1021,7 +1003,7 @@ export default class DocElementPanel extends PanelBase {
         let elStyleSectionContainer = $('<div id="rbro_doc_element_style_section_container"></div>');
         let elStyleHeader = $('<div class="rbroPanelSectionHeader"></div>');
         let elStyleHeaderIcon = $(
-            '<span id="rbro_doc_element_style_header_icon" class="rbroPanelSectionHeaderOpen rbroIcon-minus"></span>');
+            '<span id="rbro_doc_element_style_header_icon" class="rbroIcon-minus"></span>');
         elDiv = $(
             `<div id="rbro_doc_element_style_header"
              class="rbroFormRow rbroPanelSection rbroPanelSectionHeaderOpen"></div>`)
@@ -1054,8 +1036,7 @@ export default class DocElementPanel extends PanelBase {
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                         if (obj.getValue('color') !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'color', val, SetValueCmd.type.color, this.rb));
@@ -1081,8 +1062,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('styleId') !== this.elStyle.val()) {
                         obj.addCommandsForChangedStyle(
                             this.elStyle.val(), '', this.propertyDescriptors, cmdGroup);
@@ -1141,8 +1121,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('groupExpression') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'groupExpression', val, SetValueCmd.type.text, this.rb));
@@ -1182,8 +1161,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('printIf') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'printIf', val, SetValueCmd.type.text, this.rb));
@@ -1221,8 +1199,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('repeatHeader') !== repeatHeaderChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'repeatHeader', repeatHeaderChecked,
@@ -1248,8 +1225,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('removeEmptyElement') !== removeEmptyElementChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'removeEmptyElement', removeEmptyElementChecked,
@@ -1275,8 +1251,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('alwaysPrintOnSamePage') !== alwaysPrintOnSamePageChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'alwaysPrintOnSamePage', alwaysPrintOnSamePageChecked,
@@ -1302,8 +1277,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('shrinkToContentHeight') !== shrinkToContentHeightChecked) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'shrinkToContentHeight', shrinkToContentHeightChecked,
@@ -1328,8 +1302,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('pattern') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'pattern', val, SetValueCmd.type.text, this.rb));
@@ -1360,8 +1333,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('link') !== val) {
                         cmdGroup.addCommand(new SetValueCmd(
                             obj.getId(), 'link', val, SetValueCmd.type.text, this.rb));
@@ -1400,8 +1372,7 @@ export default class DocElementPanel extends PanelBase {
         let elCsStyleHeaderIcon = $(
             '<span id="rbro_doc_element_cs_style_header_icon" class="rbroIcon-plus"></span>');
         elDiv = $(
-            `<div id="rbro_doc_element_cs_style_header"
-             class="rbroFormRow rbroPanelSection rbroPanelSectionHeaderOpen"></div>`)
+            '<div id="rbro_doc_element_cs_style_header" class="rbroFormRow rbroPanelSection"></div>')
             .click(event => {
                 $('#rbro_doc_element_cs_style_header').toggleClass('rbroPanelSectionHeaderOpen');
                 $('#rbro_doc_element_cs_style_section').toggleClass('rbroHidden');
@@ -1418,6 +1389,45 @@ export default class DocElementPanel extends PanelBase {
         elCsStyleSectionContainer.append(elDiv);
 
         let elCsStyleSectionDiv = $('<div id="rbro_doc_element_cs_style_section" class="rbroHidden"></div>');
+
+        elDiv = $('<div id="rbro_doc_element_cs_condition_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_cs_condition">
+                      ${this.rb.getLabel('docElementConditionalStyleCondition')}:</label>`);
+        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
+        let elCondStyleCondition = $('<textarea id="rbro_doc_element_cs_condition" rows="1"></textarea>')
+            .on('input', event => {
+                let val = elCondStyleCondition.val();
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId(), i === 0);
+                    if (obj.getValue('cs_condition') !== val) {
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'cs_condition', val, SetValueCmd.type.text, this.rb));
+                    }
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        autosize(elCondStyleCondition);
+        elFormField.append(elCondStyleCondition);
+        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+            .click(event => {
+                let selectedObjects = this.rb.getSelectedObjects();
+                // data source parameters are not shown in case multiple objects are selected
+                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+
+                this.rb.getPopupWindow().show(
+                    this.rb.getParameterItems(selectedObject), null,
+                    'rbro_doc_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
+            });
+        elFormField.append(elParameterButton);
+        elFormField.append('<div id="rbro_doc_element_cs_condition_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        elCsStyleSectionDiv.append(elDiv);
+
         elDiv = $('<div id="rbro_doc_element_cs_style_id_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_cs_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
@@ -1428,8 +1438,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.setNotifyChange(i === 0);
+                    cmdGroup.addSelection(obj.getId(), i === 0);
                     if (obj.getValue('cs_styleId') !== val) {
                         obj.addCommandsForChangedStyle(
                             val, 'cs_', this.propertyDescriptors, cmdGroup);
@@ -1488,8 +1497,7 @@ export default class DocElementPanel extends PanelBase {
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                         if (obj.getValue('spreadsheet_hide') !== spreadsheetHideChecked) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'spreadsheet_hide', spreadsheetHideChecked,
@@ -1514,8 +1522,7 @@ export default class DocElementPanel extends PanelBase {
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                         if (obj.getValue('spreadsheet_column') !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'spreadsheet_column', val,
@@ -1541,8 +1548,7 @@ export default class DocElementPanel extends PanelBase {
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                         if (obj.getValue('spreadsheet_colspan') !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'spreadsheet_colspan', val,
@@ -1568,8 +1574,7 @@ export default class DocElementPanel extends PanelBase {
                     let selectedObjects = this.rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.setNotifyChange(i === 0);
+                        cmdGroup.addSelection(obj.getId(), i === 0);
                         if (obj.getValue('spreadsheet_addEmptyRow') !== spreadsheetAddEmptyRowChecked) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), 'spreadsheet_addEmptyRow',
