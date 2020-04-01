@@ -50,7 +50,7 @@ export default class CommandGroupCmd extends Command {
             // with the last command) and this can lead to reseting the cursor caret in an input field
             // if the cursor is not at the end of the input text.
             let secondSelectionCmdIndex = this.selectionCmdIndex.length > 1 ?
-                this.selectionCmdIndex[1] : 1;
+                this.selectionCmdIndex[1] : this.commands.length;
             for (let i=this.commands.length - 1; i >= 0; i--) {
                 let cmd = this.commands[i];
                 if (cmd instanceof SetValueCmd) {
