@@ -454,19 +454,34 @@ export default class TableElement extends DocElement {
     }
 
     /**
-     * Adds commands to command group parameter to recreate table with new column count.
-     * @param {Number} columns - requested new column count.
-     * @param {CommandGroupCmd} cmdGroup - possible commands will be added to this command group.
-     * @returns {Number} either new column count or existing column count in case there is not enough space
-     * for all column.
+     * Returns true if there is enough space for the given column count, false otherwise.
+     * @param {Number} columns - column count to test for available space.
+     * @returns {Boolean}
      */
-    addCommandsForChangedColumns(columns, cmdGroup) {
+    hasEnoughAvailableSpace(columns) {
         let existingColumns = utils.convertInputToNumber(this.columns);
         let maxColumns = Math.floor(this.widthVal / TableElement.getColumnMinWidth());
         if (columns > existingColumns && columns > maxColumns) {
             // not enough space for all columns
-            return existingColumns;
+            return false;
         }
+        return true;
+    }
+    /**
+     * Adds commands to command group parameter to recreate table with new column count.
+     *
+     * The commands are only added if there is enough space available for the new columns.
+     * This should be checked beforehand by calling hasEnoughAvailableSpace.
+     *
+     * @param {Number} columns - requested new column count.
+     * @param {CommandGroupCmd} cmdGroup - possible commands will be added to this command group.
+     */
+    addCommandsForChangedColumns(columns, cmdGroup) {
+        if (!this.hasEnoughAvailableSpace(columns)) {
+            return;
+        }
+
+        let existingColumns = utils.convertInputToNumber(this.columns);
 
         // delete table with current settings and restore below with new columns, necessary for undo/redo
         let cmd = new AddDeleteDocElementCmd(false, this.getPanelItem().getPanelName(),
@@ -498,8 +513,6 @@ export default class TableElement extends DocElement {
         cmd = new AddDeleteDocElementCmd(true, this.getPanelItem().getPanelName(),
             this.toJS(), this.id, this.getContainerId(), -1, this.rb);
         cmdGroup.addCommand(cmd);
-        
-        return columns;
     }
 
     /**

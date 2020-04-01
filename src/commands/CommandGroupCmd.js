@@ -12,14 +12,8 @@ export default class CommandGroupCmd extends Command {
         this.rb = rb;
         this.commands = [];
         this.selectObjectIds = [];
-
-        // if false then notifyEvent will not be called for change event in SetValue commands added.
-        // this can be useful if multiple elements are selected and modified simultaneously.
-        // the change event may only be fired for the last object because in between command execution
-        // the objects contain different values (although they will be changed to the same value
-        // with the last command) and this can lead to reseting the cursor caret in an input field
-        // if the cursor is not at the end of the input text.
-        this.notifyChange = true;
+        // command index in commands list for each entry in selectObjectIds
+        this.selectionCmdIndex = [];
     }
 
     getName() {
@@ -27,6 +21,21 @@ export default class CommandGroupCmd extends Command {
     }
 
     do() {
+        if (this.selectionCmdIndex.length > 0) {
+            // enable notifyEvent only for SetValue commands of last selected object.
+            // the change event may only be fired for the last object because in between command execution
+            // the objects contain different values (although they will be changed to the same value
+            // with the last command) and this can lead to reseting the cursor caret in an input field
+            // if the cursor is not at the end of the input text.
+            let lastSelectionCmdIndex = this.selectionCmdIndex[this.selectionCmdIndex.length - 1];
+            for (let i=0; i < this.commands.length; i++) {
+                let cmd = this.commands[i];
+                if (cmd instanceof SetValueCmd) {
+                    cmd.setNotifyChange(i >= lastSelectionCmdIndex);
+                }
+            }
+        }
+
         for (let i=0; i < this.commands.length; i++) {
             this.commands[i].do();
         }
@@ -34,6 +43,22 @@ export default class CommandGroupCmd extends Command {
     }
 
     undo() {
+        if (this.selectionCmdIndex.length > 0) {
+            // enable notifyEvent only for SetValue commands of last selected object.
+            // the change event may only be fired for the last object because in between command execution
+            // the objects contain different values (although they will be changed to the same value
+            // with the last command) and this can lead to reseting the cursor caret in an input field
+            // if the cursor is not at the end of the input text.
+            let secondSelectionCmdIndex = this.selectionCmdIndex.length > 1 ?
+                this.selectionCmdIndex[1] : 1;
+            for (let i=this.commands.length - 1; i >= 0; i--) {
+                let cmd = this.commands[i];
+                if (cmd instanceof SetValueCmd) {
+                    cmd.setNotifyChange(i < secondSelectionCmdIndex);
+                }
+            }
+        }
+
         for (let i=this.commands.length - 1; i >= 0; i--) {
             this.commands[i].undo();
         }
@@ -45,27 +70,21 @@ export default class CommandGroupCmd extends Command {
             // disable select for specific command, selection is handled in command group
             // when the commands are executed
             cmd.disableSelect();
-
-            if (!this.notifyChange) {
-                cmd.setNotifyChange(false);
-            }
         }
         this.commands.push(cmd);
     }
 
     /**
-     * Add id of object which should be selected when this command group is executed and sets
-     * notifyChange flag for following addCommand calls.
+     * Add id of object which should be selected when this command group is executed.
      * @param {Number} objId - object id
-     * @param {Boolean} notifyChange - notify flag which is valid until changed again with this method.
      */
-    addSelection(objId, notifyChange) {
+    addSelection(objId) {
         if (this.selectObjectIds.indexOf(objId) === -1) {
             this.selectObjectIds.push(objId);
         }
-        // allows to enable/disable notification of change event for the following commands
-        // added with addCommand
-        this.notifyChange = notifyChange;
+        // notification of change event will only be enabled for commands after
+        // the last selection
+        this.selectionCmdIndex.push(this.commands.length);
     }
 
     isEmpty() {
