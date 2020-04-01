@@ -36,6 +36,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'x',
                 'rowId': 'rbro_doc_element_position_row',
+                'singleRowProperty': false,
                 'rowProperties': ['x', 'y'],
                 'labelId': 'rbro_doc_element_position_label',
                 'defaultLabel': 'docElementPosition',
@@ -45,6 +46,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'y',
                 'rowId': 'rbro_doc_element_position_row',
+                'singleRowProperty': false,
                 'labelId': 'rbro_doc_element_position_label',
                 'defaultLabel': 'docElementPosition',
                 'singlePropertyLabel': 'docElementPositionY'
@@ -53,6 +55,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'width',
                 'rowId': 'rbro_doc_element_size_row',
+                'singleRowProperty': false,
                 'rowProperties': ['width', 'height'],
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
@@ -62,6 +65,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'height',
                 'rowId': 'rbro_doc_element_size_row',
+                'singleRowProperty': false,
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
                 'singlePropertyLabel': 'docElementHeight'
@@ -87,12 +91,14 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.file,
                 'fieldId': 'image',
                 'rowId': 'rbro_doc_element_image_row',
+                'singleRowProperty': false,
                 'rowProperties': ['image', 'imageFilename']
             },
             'imageFilename': {
                 'type': SetValueCmd.type.filename,
                 'fieldId': 'image_filename',
                 'rowId': 'rbro_doc_element_image_row',
+                'singleRowProperty': false
             },
             'columns': {
                 'type': SetValueCmd.type.text,
@@ -126,6 +132,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'bold',
                 'rowId': 'rbro_doc_element_textstyle_row',
+                'singleRowProperty': false,
                 'rowProperties': ['bold', 'italic', 'underline', 'strikethrough'],
                 'section': 'style'
             },
@@ -133,24 +140,28 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'italic',
                 'rowId': 'rbro_doc_element_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'underline': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'underline',
                 'rowId': 'rbro_doc_element_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'strikethrough': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'strikethrough',
                 'rowId': 'rbro_doc_element_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'horizontalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
                 'fieldId': 'halignment',
                 'rowId': 'rbro_doc_element_alignment_row',
+                'singleRowProperty': false,
                 'rowProperties': ['horizontalAlignment', 'verticalAlignment'],
                 'section': 'style'
             },
@@ -158,6 +169,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.buttonGroup,
                 'fieldId': 'valignment',
                 'rowId': 'rbro_doc_element_alignment_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'textColor': {
@@ -182,6 +194,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'font',
                 'rowId': 'rbro_doc_element_font_row',
+                'singleRowProperty': false,
                 'rowProperties': ['font', 'fontSize'],
                 'section': 'style',
                 'allowEmpty': false
@@ -190,6 +203,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'font_size',
                 'rowId': 'rbro_doc_element_font_row',
+                'singleRowProperty': false,
                 'section': 'style',
                 'allowEmpty': false
             },
@@ -203,6 +217,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'border_all',
                 'rowId': 'rbro_doc_element_border_row',
+                'singleRowProperty': false,
                 'rowProperties': ['borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom'],
                 'section': 'style'
             },
@@ -210,24 +225,34 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'border_left',
                 'rowId': 'rbro_doc_element_border_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'borderTop': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'border_top',
                 'rowId': 'rbro_doc_element_border_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'borderRight': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'border_right',
                 'rowId': 'rbro_doc_element_border_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'borderBottom': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'border_bottom',
                 'rowId': 'rbro_doc_element_border_row',
+                'singleRowProperty': false,
+                'section': 'style'
+            },
+            'border': {
+                'type': SetValueCmd.type.buttonGroup,
+                'fieldId': 'table_border',
+                'rowId': 'rbro_doc_element_table_border_row',
                 'section': 'style'
             },
             'borderColor': {
@@ -245,6 +270,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_left',
                 'rowId': 'rbro_doc_element_padding_row',
+                'singleRowProperty': false,
                 'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
                 'section': 'style'
             },
@@ -252,18 +278,21 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_top',
                 'rowId': 'rbro_doc_element_padding_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'paddingRight': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_right',
                 'rowId': 'rbro_doc_element_padding_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'paddingBottom': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_bottom',
                 'rowId': 'rbro_doc_element_padding_row',
+                'singleRowProperty': false,
                 'section': 'style'
             },
             'groupExpression': {
@@ -321,6 +350,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_bold',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'singleRowProperty': false,
                 'rowProperties': ['cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough'],
                 'section': 'cs_style'
             },
@@ -328,24 +358,28 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_italic',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_underline': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_underline',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_strikethrough': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_strikethrough',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_horizontalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
                 'fieldId': 'cs_halignment',
                 'rowId': 'rbro_doc_element_cs_alignment_row',
+                'singleRowProperty': false,
                 'rowProperties': ['cs_horizontalAlignment', 'cs_verticalAlignment'],
                 'section': 'cs_style'
             },
@@ -353,6 +387,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.buttonGroup,
                 'fieldId': 'cs_valignment',
                 'rowId': 'rbro_doc_element_cs_alignment_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_textColor': {
@@ -371,6 +406,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'cs_font',
                 'rowId': 'rbro_doc_element_cs_font_row',
+                'singleRowProperty': false,
                 'rowProperties': ['cs_font', 'cs_fontSize'],
                 'section': 'cs_style',
                 'allowEmpty': false
@@ -379,6 +415,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'cs_font_size',
                 'rowId': 'rbro_doc_element_cs_font_row',
+                'singleRowProperty': false,
                 'section': 'cs_style',
                 'allowEmpty': false
             },
@@ -392,6 +429,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_border_all',
                 'rowId': 'rbro_doc_element_cs_border_row',
+                'singleRowProperty': false,
                 'rowProperties': [
                     'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom'
                 ],
@@ -401,24 +439,28 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_border_left',
                 'rowId': 'rbro_doc_element_cs_border_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_borderTop': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_border_top',
                 'rowId': 'rbro_doc_element_cs_border_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_borderRight': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_border_right',
                 'rowId': 'rbro_doc_element_cs_border_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_borderBottom': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_border_bottom',
                 'rowId': 'rbro_doc_element_cs_border_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_borderColor': {
@@ -436,6 +478,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'cs_padding_left',
                 'rowId': 'rbro_doc_element_cs_padding_row',
+                'singleRowProperty': false,
                 'rowProperties': ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'],
                 'section': 'cs_style'
             },
@@ -443,18 +486,21 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'cs_padding_top',
                 'rowId': 'rbro_doc_element_cs_padding_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_paddingRight': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'cs_padding_right',
                 'rowId': 'rbro_doc_element_cs_padding_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'cs_paddingBottom': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'cs_padding_bottom',
                 'rowId': 'rbro_doc_element_cs_padding_row',
+                'singleRowProperty': false,
                 'section': 'cs_style'
             },
             'spreadsheet_hide': {
@@ -547,7 +593,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_content_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label for="rbro_doc_element_content">${this.rb.getLabel('textElementContent')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_content">${this.rb.getLabel('docElementContent')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elContent = $(`<textarea id="rbro_doc_element_content" rows="1"></textarea>`)
             .on('input', event => {
@@ -587,7 +633,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_eval_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label for="rbro_doc_element_eval">${this.rb.getLabel('textElementEval')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_eval">${this.rb.getLabel('docElementEval')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elEval = $('<input id="rbro_doc_element_eval" type="checkbox">')
             .change(event => {
@@ -611,7 +657,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_format_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_format">${this.rb.getLabel('barCodeElementFormat')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_format">${this.rb.getLabel('docElementFormat')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elFormat = $(`<select id="rbro_doc_element_format" disabled="disabled">
                 <option value="CODE128">CODE128</option>
@@ -637,7 +683,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_display_value_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_display_value">${this.rb.getLabel('barCodeElementDisplayValue')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_display_value">${this.rb.getLabel('docElementDisplayValue')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elDisplayValue = $('<input id="rbro_doc_element_display_value" type="checkbox">')
             .change(event => {
@@ -662,7 +708,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_source_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_source">${this.rb.getLabel('imageElementSource')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_source">${this.rb.getLabel('docElementSource')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elSource = $('<textarea id="rbro_doc_element_source" rows="1"></textarea>')
             .on('input', event => {
@@ -699,7 +745,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_image_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_image">${this.rb.getLabel('imageElementImage')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_image">${this.rb.getLabel('docElementImageFile')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elImage = $('<input id="rbro_doc_element_image" type="file">')
             .change(event => {
@@ -724,7 +770,7 @@ export default class DocElementPanel extends PanelBase {
                         }
                     };
                     fileReader.onerror = function(e) {
-                        alert(rb.getLabel('imageElementLoadErrorMsg'));
+                        alert(rb.getLabel('docElementLoadImageErrorMsg'));
                     };
                     fileReader.readAsDataURL(files[0]);
                 }
@@ -846,7 +892,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_colspan_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_colspan">${this.rb.getLabel('tableElementColspan')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_colspan">${this.rb.getLabel('docElementColspan')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elColspan = $('<input id="rbro_doc_element_colspan" type="number">')
             .change(event => {
@@ -878,7 +924,7 @@ export default class DocElementPanel extends PanelBase {
         panel.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_columns_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_columns">${this.rb.getLabel('tableElementColumns')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_columns">${this.rb.getLabel('docElementColumns')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elColumns = $('<input id="rbro_doc_element_columns" type="number">')
             .change(event => {
@@ -940,7 +986,7 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = $('<div id="rbro_doc_element_content_rows_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_content_rows">
-                      ${this.rb.getLabel('tableElementContentRows')}:</label>`);
+                      ${this.rb.getLabel('docElementContentRows')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elContentRows = $('<input id="rbro_doc_element_content_rows" type="number">')
             .change(event => {
@@ -1112,7 +1158,7 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = $('<div id="rbro_doc_element_group_expression_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_group_expression">
-                      ${this.rb.getLabel('tableElementGroupExpression')}:</label>`);
+                      ${this.rb.getLabel('docElementGroupExpression')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elGroupExpression = $('<textarea id="rbro_doc_element_group_expression" rows="1"></textarea>')
             .on('input', event => {
@@ -1190,7 +1236,7 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = $('<div id="rbro_doc_element_repeat_header_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_repeat_header">
-                      ${this.rb.getLabel('tableElementRepeatHeader')}:</label>`);
+                      ${this.rb.getLabel('docElementRepeatHeader')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elRepeatHeader = $('<input id="rbro_doc_element_repeat_header" type="checkbox">')
             .change(event => {
@@ -1268,7 +1314,7 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = $('<div id="rbro_doc_element_shrink_to_content_height_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_shrink_to_content_height">
-                      ${this.rb.getLabel('frameElementShrinkToContentHeight')}:</label>`);
+                      ${this.rb.getLabel('docElementShrinkToContentHeight')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
         let elShrinkToContentHeight = $('<input id="rbro_doc_element_shrink_to_content_height" type="checkbox">')
             .change(event => {
@@ -1293,7 +1339,7 @@ export default class DocElementPanel extends PanelBase {
         elPrintSectionDiv.append(elDiv);
 
         elDiv = $('<div id="rbro_doc_element_pattern_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_pattern">${this.rb.getLabel('textElementPattern')}:</label>`);
+        elDiv.append(`<label for="rbro_doc_element_pattern">${this.rb.getLabel('docElementPattern')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
         let elPattern = $('<input id="rbro_doc_element_pattern">')
             .on('input', event => {
@@ -1673,22 +1719,27 @@ export default class DocElementPanel extends PanelBase {
                     }
                 }
 
-                // only handle row visibility if rowId is not set, otherwise row visibility will be handled
-                // below, e.g. for button groups
-                let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
-                if (!('rowId' in propertyDescriptor)) {
-                    let propertyRowId = propertyId + '_row';
-                    if (show) {
-                        $(propertyRowId).removeClass('rbroHidden');
-                    } else {
-                        $(propertyRowId).addClass('rbroHidden');
-                    }
-                } else {
-                    // only handle visibility of control and not of whole row
+                if ('singleRowProperty' in propertyDescriptor &&
+                        !propertyDescriptor['singleRowProperty']) {
+                    // only handle visibility of control and not of whole row.
+                    // row visibility will be handled below, e.g. for button groups
+                    let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
                     if (show) {
                         $(propertyId).removeClass('rbroHidden');
                     } else {
                         $(propertyId).addClass('rbroHidden');
+                    }
+                } else {
+                    let rowId;
+                    if ('rowId' in propertyDescriptor) {
+                        rowId = propertyDescriptor['rowId'];
+                    } else {
+                        rowId = `rbro_doc_element_${propertyDescriptor['fieldId']}_row`;
+                    }
+                    if (show) {
+                        $('#' + rowId).removeClass('rbroHidden');
+                    } else {
+                        $('#' + rowId).addClass('rbroHidden');
                     }
                 }
             }

@@ -14,6 +14,9 @@ export default class PanelBase {
         this.rb = rb;
 
         this.propertyDescriptors = {};  // is overriden in derived class
+
+        this.differentValuesLabel = this.rb.getLabel('differentValues');
+        this.differentFilesLabel = this.rb.getLabel('differentFiles');
     }
 
     render(data) {
@@ -32,7 +35,7 @@ export default class PanelBase {
         if (propertyDescriptor['type'] === SetValueCmd.type.text) {
             if (differentValues) {
                 $(propertyId).val('');
-                $(propertyId).attr('placeholder', 'different values ...');
+                $(propertyId).attr('placeholder', this.differentValuesLabel);
             } else {
                 $(propertyId).val(value);
                 $(propertyId).attr('placeholder', '');
@@ -72,7 +75,7 @@ export default class PanelBase {
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.filename) {
             if (differentValues) {
-                $(propertyId).text('different files ...');
+                $(propertyId).text(this.differentFilesLabel);
                 $(propertyId + '_container').removeClass('rbroHidden');
             } else {
                 $(propertyId).text(value);
