@@ -1195,27 +1195,43 @@ export default class StylePanel extends PanelBase {
         let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number">`)
             .on('input', event => {
                 let val = elBorderWidth.val();
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
+                if (val !== '') {
+                    val = utils.checkInputDecimal(val, 1, 99);
+                }
+                if (val !== elBorderWidth.val()) {
+                    elBorderWidth.val(val);
+                }
                 let selectedObjects = rb.getSelectedObjects();
+                let valueChanged = false;
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}borderWidth`, val,
-                        SetValueCmd.type.text, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}borderWidth`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'borderWidth', val, SetValueCmd.type.text, cmdGroup);
+                    if (selectedObjects[i].getValue(`${fieldPrefix}borderWidth`) !== val) {
+                        valueChanged = true;
+                        break;
                     }
                 }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
+
+                if (valueChanged) {
+                    let cmdGroup = new CommandGroupCmd('Set value', rb);
+                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                        let obj = selectedObjects[i];
+                        cmdGroup.addSelection(obj.getId());
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), `${fieldPrefix}borderWidth`, val,
+                            SetValueCmd.type.text, rb));
+
+                        if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
+                            if (obj.getValue(`${fieldPrefix}borderWidth`) !== val) {
+                                cmdGroup.addCommand(new SetValueCmd(
+                                    obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
+                            }
+                        } else if (obj instanceof Style) {
+                            obj.addCommandsForChangedProperty(
+                                'borderWidth', val, SetValueCmd.type.text, cmdGroup);
+                        }
+                    }
+                    if (!cmdGroup.isEmpty()) {
+                        rb.executeCommand(cmdGroup);
+                    }
                 }
             });
         elFormField.append(elBorderWidth);

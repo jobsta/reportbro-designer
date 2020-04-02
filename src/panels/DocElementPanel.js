@@ -926,7 +926,7 @@ export default class DocElementPanel extends PanelBase {
                     if (obj.getValue('columns') !== val) {
                         valueChanged = true;
                     }
-                    if (!obj.hasEnoughAvailableSpace()) {
+                    if (!obj.hasEnoughAvailableSpace(columns)) {
                         enoughSpaceAvailable = false;
                     }
                 }
@@ -989,8 +989,8 @@ export default class DocElementPanel extends PanelBase {
             .change(event => {
                 let val = utils.checkInputDecimal(elContentRows.val(), 1, 99);
                 let contentRows = utils.convertInputToNumber(val);
-                if (val !== elColspan.val()) {
-                    elColspan.val(val);
+                if (val !== elContentRows.val()) {
+                    elContentRows.val(val);
                 }
                 let selectedObjects = this.rb.getSelectedObjects();
                 let valueChanged = false;
@@ -1541,17 +1541,33 @@ export default class DocElementPanel extends PanelBase {
             let elSpreadsheetColumn = $('<input id="rbro_doc_element_spreadsheet_column" type="number">')
                 .on('input', event => {
                     let val = elSpreadsheetColumn.val();
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'spreadsheet_column', val,
-                            SetValueCmd.type.text, this.rb));
+                    if (val !== '') {
+                        val = utils.checkInputDecimal(val, 1, 99);
                     }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
+                    if (val !== elSpreadsheetColumn.val()) {
+                        elSpreadsheetColumn.val(val);
+                    }
+                    let selectedObjects = this.rb.getSelectedObjects();
+                    let valueChanged = false;
+                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                        if (selectedObjects[i].getValue('spreadsheet_column') !== val) {
+                            valueChanged = true;
+                            break;
+                        }
+                    }
+
+                    if (valueChanged) {
+                        let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                        for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                            let obj = selectedObjects[i];
+                            cmdGroup.addSelection(obj.getId());
+                            cmdGroup.addCommand(new SetValueCmd(
+                                obj.getId(), 'spreadsheet_column', val,
+                                SetValueCmd.type.text, this.rb));
+                        }
+                        if (!cmdGroup.isEmpty()) {
+                            this.rb.executeCommand(cmdGroup);
+                        }
                     }
                 });
             elFormField.append(elSpreadsheetColumn);
