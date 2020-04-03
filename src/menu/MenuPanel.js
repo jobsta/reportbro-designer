@@ -43,6 +43,7 @@ export default class MenuPanel {
                             if (typeof report.docElements === "object" && typeof report.parameters === "object" &&
                                     typeof report.styles === "object" && typeof report.documentProperties === "object") {
                                 this.rb.load(report);
+                                this.rb.setModified(true);
                             } else {
                                 alert('Invalid report template data');
                             }
@@ -259,7 +260,7 @@ export default class MenuPanel {
         );
 
         panelRight.append(elElementsDiv);
-        
+
         let elActionsDiv = $('<div class="rbroActionButtons"></div>');
         let elAlignDiv = $('<div id="rbro_menu_align" style="display: none;"></div>');
         let elAlignLeft = $(`<button id="rbro_menu_align_left"
