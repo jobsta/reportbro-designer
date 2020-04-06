@@ -241,7 +241,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         let elDiv = $('<div class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_document_properties_page_margin_top">${this.rb.getLabel('pageMargins')}:</label>`);
         let elFormField = $('<div class="rbroFormField rbroSmallInput"></div>');
-        
+
         let elMarginTopDiv = $('<div class="rbroColumnCenter"></div>');
         let elMarginTop = $(`<input id="rbro_document_properties_page_margin_top" placeholder="${this.rb.getLabel('orientationTop')}">`)
             .change(event => {
@@ -484,18 +484,4 @@ export default class DocumentPropertiesPanel extends PanelBase {
             DocumentPropertiesPanel.updateVisibileRows(selectedObject, field);
         }
     }
-
-    // /**
-    //  * Is called when a data object was modified (including new and deleted data objects).
-    //  * @param {*} obj - new/deleted/modified data object.
-    //  * @param {String} operation - operation which caused the notification.
-    //  * @param {[String]} field - affected field in case of change operation.
-    //  */
-    // notifyEvent(obj, operation, field) {
-    //     if (obj instanceof DocumentProperties && this.rb.isSelectedObject(obj.id) &&
-    //             operation === Command.operation.change) {
-    //         this.updateDisplay(field);
-    //     }
-    // }
-    //
 }

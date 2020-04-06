@@ -80,6 +80,14 @@ export default class TableTextElement extends TextElement {
         return null;
     }
 
+    getValue(field) {
+        if (field === 'xReadOnly') {
+            // offset of this cell relative to table, needed for display in read-only field
+            return this.getOffsetX();
+        }
+        return super.getValue(field);
+    }
+
     setValue(field, value) {
         super.setValue(field, value);
 
@@ -102,8 +110,10 @@ export default class TableTextElement extends TextElement {
 
     /**
      * Returns value to use for updating input control.
-     * Needed for columns with colspan > 1 because internal width is only for 1 cell but
+     *
+     * Needed for cells with colspan > 1 because internal width is only for 1 cell but
      * displayed width in input field is total width for all cells included in colspan.
+     *
      * @param {Number} field - field name.
      * @param {Number} value - value for update.
      */
@@ -204,7 +214,8 @@ export default class TableTextElement extends TextElement {
      */
     getFields() {
         let fields = this.getProperties();
-        fields.splice(0, 0, 'id');
+        // remove 'xReadOnly' field and add 'id'
+        fields.splice(0, 1, 'id');
         return fields;
     }
 
@@ -213,7 +224,7 @@ export default class TableTextElement extends TextElement {
      * @returns {String[]}
      */
     getProperties() {
-        let fields = ['width', 'content', 'eval', 'colspan',
+        let fields = ['xReadOnly', 'width', 'content', 'eval', 'colspan',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
             'font', 'fontSize', 'lineSpacing',

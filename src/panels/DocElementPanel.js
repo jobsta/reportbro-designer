@@ -32,6 +32,10 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'data_source'
             },
+            'xReadOnly': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'x_read_only'
+            },
             'x': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'x',
@@ -533,7 +537,7 @@ export default class DocElementPanel extends PanelBase {
         elDiv = $('<div id="rbro_doc_element_label_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_label">${this.rb.getLabel('docElementLabel')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elLabel = $(`<input id="rbro_doc_element_label">`)
+        let elLabel = $('<input id="rbro_doc_element_label">')
             .on('input', event => {
                 let val = elLabel.val();
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -786,6 +790,15 @@ export default class DocElementPanel extends PanelBase {
         );
         elFormField.append(elFilenameDiv);
         elFormField.append('<div id="rbro_doc_element_image_error" class="rbroErrorMessage"></div>');
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = $('<div id="rbro_doc_element_x_read_only_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_x_read_only" class="rbroDisabled">
+                      ${this.rb.getLabel('docElementPositionX')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elXReadOnly = $('<input id="rbro_doc_element_x_read_only" disabled="true">');
+        elFormField.append(elXReadOnly);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
