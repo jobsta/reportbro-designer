@@ -1075,8 +1075,9 @@ export default class DocElementPanel extends PanelBase {
                 elStyleHeaderIcon.toggleClass('rbroIcon-plus');
                 elStyleHeaderIcon.toggleClass('rbroIcon-minus');
                 if (elStyleHeaderIcon.hasClass('rbroIcon-minus')) {
-                    $('#rbro_detail_panel').scrollTop(
-                        $('#rbro_detail_panel').scrollTop() + elStyleHeader.position().top);
+                    let sectionOffset = document.getElementById(
+                        'rbro_doc_element_style_section_container').offsetTop;
+                    $('#rbro_detail_panel').scrollTop(sectionOffset);
                 }
             });
         elStyleHeader.append(elStyleHeaderIcon);
@@ -1156,8 +1157,9 @@ export default class DocElementPanel extends PanelBase {
                 elPrintHeaderIcon.toggleClass('rbroIcon-plus');
                 elPrintHeaderIcon.toggleClass('rbroIcon-minus');
                 if (elPrintHeaderIcon.hasClass('rbroIcon-minus')) {
-                    $('#rbro_detail_panel').scrollTop(
-                        $('#rbro_detail_panel').scrollTop() + elPrintHeader.position().top);
+                    let sectionOffset = document.getElementById(
+                        'rbro_doc_element_print_section_container').offsetTop;
+                    $('#rbro_detail_panel').scrollTop(sectionOffset);
                 }
                 autosize.update($('#rbro_doc_element_print_if'));
             });
@@ -1421,8 +1423,9 @@ export default class DocElementPanel extends PanelBase {
                 elCsStyleHeaderIcon.toggleClass('rbroIcon-plus');
                 elCsStyleHeaderIcon.toggleClass('rbroIcon-minus');
                 if (elCsStyleHeaderIcon.hasClass('rbroIcon-minus')) {
-                    $('#rbro_detail_panel').scrollTop(
-                        $('#rbro_detail_panel').scrollTop() + elStyleHeader.position().top);
+                    let sectionOffset = document.getElementById(
+                        'rbro_doc_element_cs_style_section_container').offsetTop;
+                    $('#rbro_detail_panel').scrollTop(sectionOffset);
                 }
             });
         elCsStyleHeader.append(elCsStyleHeaderIcon);
@@ -1514,8 +1517,9 @@ export default class DocElementPanel extends PanelBase {
                     elSpreadsheetHeaderIcon.toggleClass('rbroIcon-plus');
                     elSpreadsheetHeaderIcon.toggleClass('rbroIcon-minus');
                     if (elSpreadsheetHeaderIcon.hasClass('rbroIcon-minus')) {
-                        $('#rbro_detail_panel').scrollTop(
-                            $('#rbro_detail_panel').scrollTop() + elSpreadsheetHeader.position().top);
+                        let sectionOffset = document.getElementById(
+                            'rbro_doc_element_spreadsheet_section_container').offsetTop;
+                        $('#rbro_detail_panel').scrollTop(sectionOffset);
                     }
                 });
             elSpreadsheetHeader.append(elSpreadsheetHeaderIcon);
