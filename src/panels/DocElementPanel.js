@@ -1,8 +1,10 @@
 import PanelBase from './PanelBase';
 import StylePanel from './StylePanel';
+import Command from '../commands/Command';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Parameter from '../data/Parameter';
+import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
@@ -40,6 +42,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'x',
                 'rowId': 'rbro_doc_element_position_row',
+                'errorMsgId': 'rbro_doc_element_position_error',
                 'singleRowProperty': false,
                 'rowProperties': ['x', 'y'],
                 'labelId': 'rbro_doc_element_position_label',
@@ -50,6 +53,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'y',
                 'rowId': 'rbro_doc_element_position_row',
+                'errorMsgId': 'rbro_doc_element_position_error',
                 'singleRowProperty': false,
                 'labelId': 'rbro_doc_element_position_label',
                 'defaultLabel': 'docElementPosition',
@@ -59,6 +63,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'width',
                 'rowId': 'rbro_doc_element_size_row',
+                'errorMsgId': 'rbro_doc_element_size_error',
                 'singleRowProperty': false,
                 'rowProperties': ['width', 'height'],
                 'labelId': 'rbro_doc_element_size_label',
@@ -69,6 +74,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'height',
                 'rowId': 'rbro_doc_element_size_row',
+                'errorMsgId': 'rbro_doc_element_size_error',
                 'singleRowProperty': false,
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
@@ -1664,7 +1670,7 @@ export default class DocElementPanel extends PanelBase {
     /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data objects.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
         let selectedObjects = this.rb.getSelectedObjects();
@@ -1734,12 +1740,7 @@ export default class DocElementPanel extends PanelBase {
                         $(propertyId).addClass('rbroHidden');
                     }
                 } else {
-                    let rowId;
-                    if ('rowId' in propertyDescriptor) {
-                        rowId = propertyDescriptor['rowId'];
-                    } else {
-                        rowId = `rbro_doc_element_${propertyDescriptor['fieldId']}_row`;
-                    }
+                    let rowId = this.getRowId(propertyDescriptor);
                     if (show) {
                         $('#' + rowId).removeClass('rbroHidden');
                     } else {
@@ -1822,5 +1823,23 @@ export default class DocElementPanel extends PanelBase {
     show() {
         this.renderStyleSelect();
         super.show();
+    }
+
+    /**
+     * Is called when a data object was modified (including new and deleted data objects).
+     * @param {*} obj - new/deleted/modified data object.
+     * @param {String} operation - operation which caused the notification.
+     * @param {String} [field] - affected field in case of change operation.
+     */
+    notifyEvent(obj, operation, field) {
+        if (obj instanceof Style) {
+            if (operation === Command.operation.add || operation === Command.operation.remove ||
+                    operation === Command.operation.move ||
+                    (operation === Command.operation.change && field === 'name')) {
+                this.renderStyleSelect();
+            }
+        } else {
+            super.notifyEvent(obj, operation, field);
+        }
     }
 }

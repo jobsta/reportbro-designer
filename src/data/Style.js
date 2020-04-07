@@ -1,6 +1,7 @@
 import AddDeleteStyleCmd from "../commands/AddDeleteStyleCmd";
 import Command from "../commands/Command";
 import SetValueCmd from "../commands/SetValueCmd";
+import DocElement from "../elements/DocElement";
 import * as utils from "../utils";
 
 /**
@@ -14,7 +15,7 @@ export default class Style {
         this.name = rb.getLabel('style');
         this.panelItem = null;
         this.errors = [];
-        
+
         this.bold = false;
         this.italic = false;
         this.underline = false;

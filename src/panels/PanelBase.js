@@ -91,7 +91,7 @@ export default class PanelBase {
     /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data object.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
     }
@@ -108,7 +108,7 @@ export default class PanelBase {
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     notifyEvent(obj, operation, field) {
         if (obj instanceof this.dataBaseClass && this.rb.isSelectedObject(obj.id) &&
@@ -139,8 +139,18 @@ export default class PanelBase {
                         errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
                             error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
                     }
-                    $(`#${this.idPrefix}_${propertyDescriptor.fieldId}_row`).addClass('rbroError');
-                    $(`#${this.idPrefix}_${propertyDescriptor.fieldId}_error`).html(errorMsg);
+
+                    // highlight row containing error
+                    let rowId = this.getRowId(propertyDescriptor);
+                    $('#' + rowId).addClass('rbroError');
+                    // show error message
+                    let errorMsgId;
+                    if ('errorMsgId' in propertyDescriptor) {
+                        errorMsgId = propertyDescriptor['errorMsgId'];
+                    } else {
+                        errorMsgId = `rbro_doc_element_${propertyDescriptor['fieldId']}_error`;
+                    }
+                    $('#' + errorMsgId).html(errorMsg);
                 }
             }
         }
@@ -180,7 +190,7 @@ export default class PanelBase {
             for (let error of obj.getErrors()) {
                 let propertyDescriptor = this.propertyDescriptors[error.field];
                 if (propertyDescriptor) {
-                    let rowId = `${this.idPrefix}_${propertyDescriptor.fieldId}_row`;
+                    let rowId = this.getRowId(propertyDescriptor);
                     let elRow = document.getElementById(rowId);
                     let rowOffset = elRow.offsetTop;
                     if (firstErrorRowId === '' || rowOffset < firstErrorRowOffset) {
@@ -193,5 +203,20 @@ export default class PanelBase {
                 $('#rbro_detail_panel').scrollTop(firstErrorRowOffset);
             }
         }
+    }
+
+    /**
+     * Returns row id of html element for given property.
+     * @param {String} propertyDescriptor - object containing all information about a property.
+     * @returns {String}
+     */
+    getRowId(propertyDescriptor) {
+        let rowId;
+        if ('rowId' in propertyDescriptor) {
+            rowId = propertyDescriptor['rowId'];
+        } else {
+            rowId = `${this.idPrefix}_${propertyDescriptor['fieldId']}_row`;
+        }
+        return rowId;
     }
 }

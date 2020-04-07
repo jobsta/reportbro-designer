@@ -36,7 +36,7 @@ export default class TextElement extends DocElement {
         this.paddingTop = '2';
         this.paddingRight = '2';
         this.paddingBottom = '2';
-        
+
         this.cs_condition = '';
         this.cs_styleId = '';
         this.cs_bold = false;
@@ -61,7 +61,7 @@ export default class TextElement extends DocElement {
         this.cs_paddingTop = '2';
         this.cs_paddingRight = '2';
         this.cs_paddingBottom = '2';
-        
+
         this.alwaysPrintOnSamePage = true;
         this.pattern = '';
         this.link = '';
@@ -179,7 +179,7 @@ export default class TextElement extends DocElement {
      *
      * @param {String} styleId - id of new style or empty string if no style was selected.
      * @param {String} fieldPrefix - field prefix when accessing properties.
-     * @param {[Object]} propertyDescriptors - list of all property descriptors to get
+     * @param {Object[]} propertyDescriptors - list of all property descriptors to get
      * property type for SetValueCmd.
      * @param {CommandGroupCmd} cmdGroup - commands will be added to this command group.
      */

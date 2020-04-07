@@ -1541,9 +1541,9 @@ export default class ReportBro {
     deleteDocElement(element) {
         for (let i=0; i < this.docElements.length; i++) {
             if (this.docElements[i].getId() === element.getId()) {
-                this.notifyEvent(element, Command.operation.remove);
                 this.docElements.splice(i, 1);
                 this.deleteDataObject(element);
+                this.notifyEvent(element, Command.operation.remove);
                 break;
             }
         }
@@ -1555,9 +1555,9 @@ export default class ReportBro {
      * @param {Parameter} parameter - parameter to delete.
      */
     deleteParameter(parameter) {
-        this.notifyEvent(parameter, Command.operation.remove);
         this.deleteDataObject(parameter);
         parameter.getPanelItem().getParent().removeChild(parameter.getPanelItem());
+        this.notifyEvent(parameter, Command.operation.remove);
     }
 
     /**
@@ -1566,8 +1566,8 @@ export default class ReportBro {
      * @param {Style} style - style to delete.
      */
     deleteStyle(style) {
-        this.notifyEvent(style, Command.operation.remove);
         this.deleteDataObject(style);
         style.getPanelItem().getParent().removeChild(style.getPanelItem());
+        this.notifyEvent(style, Command.operation.remove);
     }
 }

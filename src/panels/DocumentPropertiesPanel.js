@@ -438,7 +438,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
      * Is called when the selected element was changed.
      * The panel is updated to show the values of the selected data object.
      * @param {DocumentProperties} obj - currently selected object.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     static updateVisibileRows(obj, field) {
         if (field === null || field === 'pageFormat') {

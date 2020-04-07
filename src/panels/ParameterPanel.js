@@ -438,7 +438,7 @@ export default class ParameterPanel extends PanelBase {
     /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data object.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
         let selectedObject = this.rb.getSelectedObject();
@@ -470,7 +470,7 @@ export default class ParameterPanel extends PanelBase {
     /**
      * Is called when the selected element was changed.
      * The panel is updated to show the values of the selected data object.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     static updateAutosizeInputs(field) {
         if (field === null || field === 'expression') {

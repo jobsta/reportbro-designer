@@ -1371,7 +1371,7 @@ export default class StylePanel extends PanelBase {
     /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data object.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
         let selectedObject = this.rb.getSelectedObject();
