@@ -846,16 +846,31 @@ export default class StylePanel extends PanelBase {
                     let obj = selectedObjects[i];
                     cmdGroup.addSelection(obj.getId());
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}borderAll`, val, SetValueCmd.type.button, rb));
+                        obj.getId(), `${fieldPrefix}borderLeft`, val, SetValueCmd.type.button, rb));
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), `${fieldPrefix}borderTop`, val, SetValueCmd.type.button, rb));
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), `${fieldPrefix}borderRight`, val, SetValueCmd.type.button, rb));
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), `${fieldPrefix}borderBottom`, val, SetValueCmd.type.button, rb));
 
                     if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}borderAll`) !== val) {
+                        if (obj.getValue(`${fieldPrefix}borderLeft`) !== val ||
+                                obj.getValue(`${fieldPrefix}borderTop`) !== val ||
+                                obj.getValue(`${fieldPrefix}borderRight`) !== val ||
+                                obj.getValue(`${fieldPrefix}borderBottom`) !== val) {
                             cmdGroup.addCommand(new SetValueCmd(
                                 obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
                         }
                     } else if (obj instanceof Style) {
                         obj.addCommandsForChangedProperty(
-                            'borderAll', val, SetValueCmd.type.button, cmdGroup);
+                            'borderLeft', val, SetValueCmd.type.button, cmdGroup);
+                        obj.addCommandsForChangedProperty(
+                            'borderTop', val, SetValueCmd.type.button, cmdGroup);
+                        obj.addCommandsForChangedProperty(
+                            'borderRight', val, SetValueCmd.type.button, cmdGroup);
+                        obj.addCommandsForChangedProperty(
+                            'borderBottom', val, SetValueCmd.type.button, cmdGroup);
                     }
                 }
                 if (!cmdGroup.isEmpty()) {

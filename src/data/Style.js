@@ -128,7 +128,7 @@ export default class Style {
                 if (docElement.getValue('cs_styleId') === strId &&
                         docElement.getValue('cs_' + field) !== value) {
                     let cmd = new SetValueCmd(
-                        docElement.getId(), 'cs_' + field, value, type, this.rb)
+                        docElement.getId(), 'cs_' + field, value, type, this.rb);
                     cmd.disableSelect();
                     cmdGroup.addCommand(cmd);
                 }
@@ -201,28 +201,7 @@ export default class Style {
         if (fieldPrefix.length > 0) {
             fieldWithoutPrefix = fieldWithoutPrefix.substr(fieldPrefix.length);
         }
-        if (fieldWithoutPrefix === 'borderAll') {
-            let borderLeftField = `${fieldPrefix}borderLeft`;
-            let borderTopField = `${fieldPrefix}borderTop`;
-            let borderRightField = `${fieldPrefix}borderRight`;
-            let borderBottomField = `${fieldPrefix}borderBottom`;
-            if (value !== obj[borderLeftField]) {
-                obj[borderLeftField] = value;
-                rb.notifyEvent(obj, Command.operation.change, borderLeftField);
-            }
-            if (value !== obj[borderTopField]) {
-                obj[borderTopField] = value;
-                rb.notifyEvent(obj, Command.operation.change, borderTopField);
-            }
-            if (value !== obj[borderRightField]) {
-                obj[borderRightField] = value;
-                rb.notifyEvent(obj, Command.operation.change, borderRightField);
-            }
-            if (value !== obj[borderBottomField]) {
-                obj[borderBottomField] = value;
-                rb.notifyEvent(obj, Command.operation.change, borderBottomField);
-            }
-        } else if (fieldWithoutPrefix === 'borderLeft' || fieldWithoutPrefix === 'borderTop' ||
+        if (fieldWithoutPrefix === 'borderLeft' || fieldWithoutPrefix === 'borderTop' ||
                 fieldWithoutPrefix === 'borderRight' || fieldWithoutPrefix === 'borderBottom') {
             let borderAll = (obj.getValue(`${fieldPrefix}borderLeft`) && obj.getValue(`${fieldPrefix}borderTop`) &&
                     obj.getValue(`${fieldPrefix}borderRight`) && obj.getValue(`${fieldPrefix}borderBottom`));
