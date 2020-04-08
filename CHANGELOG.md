@@ -9,6 +9,7 @@ document elements (also of different kinds) at once
 ### Changes
 * add selectCallback which is called when an object is selected/deselected
 * add isModified API method to return modified flag
+* allow image parameter type in list parameter
 
 ## [1.3.4] - 2019-12-23
 
