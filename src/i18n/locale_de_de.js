@@ -77,7 +77,7 @@ var locale_de = {
     errorMsgInvalidExpressionNameNotDefined: 'Name ${info} ist nicht definiert',
     errorMsgInvalidLink: 'Link muss mit http:// oder https:// beginnen',
     errorMsgInvalidImage: 'Ungültige Bilddaten, Bild muss base64 kodiert sein',
-    errorMsgInvalidImageSource: 'Ungültige Bildquelle, Url muss mit http:// oder https:// beginnen',
+    errorMsgInvalidImageSource: 'Ungültige Bildquelle, Url beginnend mit http:// bzw. https:// oder Dateipfad mit file: erwartet',
     errorMsgInvalidImageSourceParameter: 'Parameter vom Typ Bild oder String (mit einer Url) notwendig',
     errorMsgInvalidMap: 'Ungültige Auflistung',
     errorMsgInvalidNumber: 'Ungültige Zahl',
