@@ -151,7 +151,7 @@ export default class Document {
             return false;
         });
     }
-    
+
     processMouseMove(event) {
         if (this.dragging) {
             this.processDrag(event);
@@ -228,7 +228,7 @@ export default class Document {
             $('#rbro_menu_element_drag_item').addClass('rbroHidden');
         }
     }
-    
+
     processDrag(event) {
         let absPos = getEventAbsPos(event);
         if (this.dragType === DocElement.dragType.element) {
@@ -467,6 +467,19 @@ export default class Document {
             if (this.dragType === DocElement.dragType.element) {
                 container = this.rb.getDataObject(this.dragCurrentContainerId);
             }
+
+            // do not allow to change container of elements when multiple elements are
+            // dragged together as this could lead to unexpected results for the user
+            let selectedObjects = this.rb.getSelectedObjects();
+            if (selectedObjects.length > 1 && container !== null) {
+                for (let selectedObj of selectedObjects) {
+                    if (selectedObj.getContainerId() !== container.getId()) {
+                        container = null;
+                        break;
+                    }
+                }
+            }
+
             let dragDiff = dragObject.getDragDiff(
                 diffX, diffY, this.dragType, (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
             this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, container, true);
