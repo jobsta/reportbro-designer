@@ -387,7 +387,7 @@ export default class ParameterPanel extends PanelBase {
             // do not allow nested array/map (only for top-level parameters)
             let topLevelParameter = (obj.getPanelItem() !== null &&
                 obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem());
-            // do not allow image and sum/average parameter in list
+            // do not allow sum/average parameter in list
             let listFieldParameter = (parentParameter !== null &&
                 parentParameter.getValue('type') === Parameter.type.array);
 
@@ -395,9 +395,7 @@ export default class ParameterPanel extends PanelBase {
             parameterTypeOptions.push({value: 'number', label: this.rb.getLabel('parameterTypeNumber')});
             parameterTypeOptions.push({value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean')});
             parameterTypeOptions.push({value: 'date', label: this.rb.getLabel('parameterTypeDate')});
-            if (!listFieldParameter) {
-                parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
-            }
+            parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
             if (topLevelParameter) {
                 parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
             }
