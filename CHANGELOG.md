@@ -10,6 +10,11 @@ document elements (also of different kinds) at once
 * add selectCallback which is called when an object is selected/deselected
 * add isModified API method to return modified flag
 * allow image parameter type in list parameter
+* add smaller font sizes to drop down (starting from 4)
+* show image preview for images specified by url
+
+### Bug Fixes
+* fix initialization of ReportBro when called without properties
 
 ## [1.3.4] - 2019-12-23
 
