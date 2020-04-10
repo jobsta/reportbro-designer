@@ -30,10 +30,8 @@ export default class ImageElement extends DocElement {
     setup(openPanelItem) {
         super.setup(openPanelItem);
         this.createElement();
-        if (this.image !== '') {
-            // setImage must be called after createElement so load event handler of image element is triggered
-            this.setImage(this.image);
-        }
+        // setImage must be called after createElement so load event handler of image element is triggered
+        this.setImage();
         this.updateDisplay();
         this.updateStyle();
         this.updateName();
@@ -43,8 +41,9 @@ export default class ImageElement extends DocElement {
         super.setValue(field, value);
         if (field === 'source' || field === 'imageFilename') {
             this.updateName();
-        } else if (field === 'image') {
-            this.setImage(value);
+        }
+        if (field === 'source' || field === 'image') {
+            this.setImage();
         }
     }
 
@@ -120,7 +119,6 @@ export default class ImageElement extends DocElement {
                 .append(this.elImg)
             );
         this.appendToContainer();
-        this.setImage(this.image);
         super.registerEventHandlers();
     }
 
@@ -129,11 +127,16 @@ export default class ImageElement extends DocElement {
         super.remove();
     }
 
-    setImage(imgBase64) {
+    setImage() {
         this.elImg.attr('src', '');
-        if (imgBase64 !== '') {
-            this.elImg.attr('src', imgBase64);
+        if (this.source.startsWith('https://') || this.source.startsWith('http://')) {
+            // image specified by url
+            this.elImg.attr('src', this.source);
+        } else if (this.image !== '') {
+            // image base64 encoded
+            this.elImg.attr('src', this.image);
         } else {
+            // no image preview
             this.imageWidth = 0;
             this.imageHeight = 0;
             this.imageRatio = 0;
