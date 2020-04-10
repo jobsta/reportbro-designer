@@ -750,7 +750,7 @@ export default class StylePanel extends PanelBase {
             });
         elFormField.append(elFont);
         let strFontSize = `<select id="rbro_${idPrefix}font_size">`;
-        for (let size of [8,9,10,11,12,13,14,15,16,18,20,22,24,26,28,32,36,40,44,48,54,60,66,72,80]) {
+        for (let size of [4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,22,24,26,28,32,36,40,44,48,54,60,66,72,80]) {
             strFontSize += `<option value="${size}">${size}</option>`;
         }
         strFontSize += '</select>';
