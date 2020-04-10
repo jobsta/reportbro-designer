@@ -101,7 +101,7 @@ export default class MainPanelItem {
                     }
                 }
             });
-        
+
         let nameDiv = $(`<div class="rbroMenuItemText"><span id="rbro_menu_item_name${this.id}">${name}</span></div>`);
         if (this.properties.showAdd) {
             itemDiv.append($(`<div id="rbro_menu_item_add${this.id}" class="rbroButton rbroRoundButton rbroIcon-plus"></div>`)
@@ -130,10 +130,7 @@ export default class MainPanelItem {
                     } else if (panelName === 'style') {
                         cmd = new CommandGroupCmd('Delete', this);
                         this.getData().addCommandsForDelete(cmd);
-                    } else if (panelName === DocElement.type.text || panelName === DocElement.type.image ||
-                            panelName === DocElement.type.line || panelName === DocElement.type.table ||
-                            panelName === DocElement.type.pageBreak ||
-                            panelName === DocElement.type.frame || panelName === DocElement.type.section) {
+                    } else if (this.isDocElementPanel()) {
                         if (this.getData() instanceof DocElement) {
                             cmd = new CommandGroupCmd('Delete', this);
                             this.getData().addCommandsForDelete(cmd);
@@ -155,7 +152,17 @@ export default class MainPanelItem {
                 }
             }
             if (this.properties.hasDetails) {
-                this.rb.selectObject(this.id, true);
+                if (!this.rb.isSelectedObject(this.id)) {
+                    let clearSelection =  true;
+                    if (this.isDocElementPanel()) {
+                        clearSelection = !event.shiftKey;
+                    }
+                    this.rb.selectObject(this.id, clearSelection);
+                } else {
+                    if (event.shiftKey) {
+                        this.rb.deselectObject(this.id);
+                    }
+                }
             }
         });
         if (this.properties.hasChildren) {
@@ -403,5 +410,12 @@ export default class MainPanelItem {
             }
         }
         return rv;
+    }
+
+    isDocElementPanel() {
+        return this.panelName === DocElement.type.text || this.panelName === DocElement.type.image ||
+            this.panelName === DocElement.type.line || this.panelName === DocElement.type.table ||
+            this.panelName === DocElement.type.pageBreak || this.panelName === DocElement.type.barCode ||
+            this.panelName === DocElement.type.frame || this.panelName === DocElement.type.section;
     }
 }
