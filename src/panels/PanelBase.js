@@ -148,7 +148,7 @@ export default class PanelBase {
                     if ('errorMsgId' in propertyDescriptor) {
                         errorMsgId = propertyDescriptor['errorMsgId'];
                     } else {
-                        errorMsgId = `rbro_doc_element_${propertyDescriptor['fieldId']}_error`;
+                        errorMsgId = `${this.idPrefix}_${propertyDescriptor['fieldId']}_error`;
                     }
                     $('#' + errorMsgId).html(errorMsg);
                 }
