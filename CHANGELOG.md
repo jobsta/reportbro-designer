@@ -15,6 +15,7 @@ document elements (also of different kinds) at once
 
 ### Bug Fixes
 * fix initialization of ReportBro when called without properties
+* fix adding new elements when preview tab exists (Chrome on macOS)
 
 ## [1.3.4] - 2019-12-23
 
