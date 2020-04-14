@@ -337,13 +337,13 @@ export default class Document {
         if (tab === Document.tab.pdfLayout) {
             $('#rbro_document_tab_pdf_layout').addClass('rbroActive');
             $('#rbro_document_pdf').removeClass('rbroHidden');
-            $('#rbro_document_pdf_preview').css('z-index', '');
+            $('#rbro_document_pdf_preview').addClass('rbroHidden').css('z-index', '');
             $('.rbroElementButtons .rbroMenuButton').removeClass('rbroDisabled').prop('draggable', true);
             $('.rbroActionButtons .rbroActionButton').prop('disabled', false);
         } else if (this.pdfPreviewExists && tab === Document.tab.pdfPreview) {
             $('#rbro_document_tab_pdf_preview').addClass('rbroActive');
             $('#rbro_document_pdf').addClass('rbroHidden');
-            $('#rbro_document_pdf_preview').css('z-index', '1');
+            $('#rbro_document_pdf_preview').removeClass('rbroHidden').css('z-index', '1');
             $('.rbroElementButtons .rbroMenuButton').addClass('rbroDisabled').prop('draggable', false);
             $('.rbroActionButtons .rbroActionButton').prop('disabled', true);
         }
