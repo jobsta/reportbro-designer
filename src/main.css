@@ -520,8 +520,8 @@ ul ul .rbroMenuItemText {
 .rbroDocumentPreview {
     height: calc(100% - 50px);
     width: 100%;
-    position: absolute;
-    top: 45px;
+    position: relative;
+    top: 0;
     left: 0;
     z-index: -1;
 }
