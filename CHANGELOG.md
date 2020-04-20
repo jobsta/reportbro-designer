@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.4.0] - 2020
+## [1.4.0] - 2020-04-20
 
 ### Features
 * dynamic document element panel which allows modifying multiple
