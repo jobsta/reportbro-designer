@@ -3,8 +3,8 @@ const webpack = require('webpack');
 var CopyWebpackPlugin = require("copy-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
-var banner = 
-`Copyright (C) 2018 jobsta
+var banner =
+`Copyright (C) 2020 jobsta
 
 This file is part of ReportBro, a library to generate PDF and Excel reports.
 Demos can be found at https://www.reportbro.com
