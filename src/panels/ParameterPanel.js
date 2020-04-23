@@ -1,10 +1,8 @@
 import PanelBase from './PanelBase';
-import Command from '../commands/Command';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Parameter from '../data/Parameter';
 import PopupWindow from '../PopupWindow';
-import * as utils from '../utils';
 
 /**
  * Panel to edit all parameter properties.
@@ -60,32 +58,28 @@ export default class ParameterPanel extends PanelBase {
             .on('input', event => {
                 let selectedObject = this.rb.getSelectedObject();
                 if (selectedObject !== null) {
-                    if (elParameterName.val().trim() !== '') {
-                        let newParameterName = elParameterName.val();
-                        let cmdGroup = new CommandGroupCmd('Rename parameter');
-                        let cmd = new SetValueCmd(
-                            selectedObject.getId(), 'name', newParameterName,
-                            SetValueCmd.type.text, this.rb);
-                        cmdGroup.addCommand(cmd);
-                        let parent = selectedObject.getParent();
-                        if (parent !== null) {
-                            parent.addUpdateTestDataCmdForChangedParameter(
-                                selectedObject.getName(), newParameterName, cmdGroup);
-                        }
-                        // add commands to convert all values containing the currently changed parameter
-                        let docElements = this.rb.getDocElements(true);
-                        for (let docElement of docElements) {
-                            docElement.addCommandsForChangedParameterName(
-                                selectedObject, newParameterName, cmdGroup);
-                        }
-                        for (let parameter of this.rb.getParameters()) {
-                            parameter.addCommandsForChangedParameterName(
-                                selectedObject, newParameterName, cmdGroup);
-                        }
-                        this.rb.executeCommand(cmdGroup);
-                    } else {
-                        elParameterName.val(parameter.getName());
+                    let newParameterName = elParameterName.val();
+                    let cmdGroup = new CommandGroupCmd('Rename parameter');
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'name', newParameterName,
+                        SetValueCmd.type.text, this.rb);
+                    cmdGroup.addCommand(cmd);
+                    let parent = selectedObject.getParent();
+                    if (parent !== null) {
+                        parent.addUpdateTestDataCmdForChangedParameter(
+                            selectedObject.getName(), newParameterName, cmdGroup);
                     }
+                    // add commands to convert all values containing the currently changed parameter
+                    let docElements = this.rb.getDocElements(true);
+                    for (let docElement of docElements) {
+                        docElement.addCommandsForChangedParameterName(
+                            selectedObject, newParameterName, cmdGroup);
+                    }
+                    for (let parameter of this.rb.getParameters()) {
+                        parameter.addCommandsForChangedParameterName(
+                            selectedObject, newParameterName, cmdGroup);
+                    }
+                    this.rb.executeCommand(cmdGroup);
                 }
             });
         elFormField.append(elParameterName);
