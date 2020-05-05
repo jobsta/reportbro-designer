@@ -1,5 +1,10 @@
 # Changelog
 
+## [Upcoming Release]
+
+### Bug Fixes
+* fix javascript error when parameter name is empty
+
 ## [1.4.0] - 2020-04-20
 
 ### Features
