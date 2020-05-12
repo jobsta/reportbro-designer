@@ -2,6 +2,10 @@
 
 ## [Upcoming Release]
 
+### Changes
+* show list parameters in popup window for expression
+(this allows to reference fields of the same row in the expression)
+
 ### Bug Fixes
 * fix javascript error when parameter name is empty
 
