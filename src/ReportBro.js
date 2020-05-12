@@ -512,6 +512,8 @@ export default class ReportBro {
                     }
                 }
             }
+        } else if (obj instanceof Parameter) {
+            obj.appendFieldParameterItems(parameters, allowedTypes, true);
         }
 
         parameters.push({ separator: true, name: this.getLabel('parameters') });
@@ -531,19 +533,19 @@ export default class ReportBro {
     /**
      * Returns a list of all array field parameter items.
      * Used for parameter popup window.
-     * @param {String} fieldType - allowed parameter type which will be added to the
-     * parameter list. If empty all parameter types are allowed.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will
+     * be added to the parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
      * optional separator (Boolean).
      */
-    getArrayFieldParameterItems(fieldType) {
+    getArrayFieldParameterItems(allowedTypes) {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         for (let parameterItem of parameterItems) {
             let parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.array) {
-                parameter.appendFieldParameterItems(parameters, fieldType);
+                parameter.appendFieldParameterItems(parameters, allowedTypes, false);
             }
         }
         return parameters;

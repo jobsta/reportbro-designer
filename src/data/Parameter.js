@@ -15,7 +15,7 @@ export default class Parameter {
         this.name = rb.getLabel('parameter');
         this.panelItem = null;
         this.errors = [];
-        
+
         this.type = Parameter.type.string;
         this.arrayItemType = Parameter.type.string;
         this.eval = !rb.getProperty('adminMode');  // if false value comes from database
@@ -301,13 +301,14 @@ export default class Parameter {
     }
 
     /**
-     * In case of map parameter all child parameters are appended, for other parameter types the
-     * parameter itself is appended. Parameters with type array are only added if explicitly
-     * specified in allowedTypes parameter.
-     * Used for parameter popup window.
+     * In case of map parameter all child parameters are appended,
+     * for other parameter types the parameter itself is appended.
+     * Parameters with type array are only added if explicitly specified
+     * in allowedTypes parameter. Used for parameter popup window.
+
      * @param {Object[]} parameters - list where parameter items will be appended to.
-     * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
-     * parameter list. If not set all parameter types are allowed.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will be
+     * added to the parameter list. If not set all parameter types are allowed.
      */
     appendParameterItems(parameters, allowedTypes) {
         if (this.type === Parameter.type.map) {
@@ -348,18 +349,54 @@ export default class Parameter {
 
     /**
      * Appends field parameters of array parameter.
-     * Used for parameter popup window of sum/average expression field.
+     *
+     * Used in parameter popup window for parameter expression.
+     *
      * @param {Object[]} parameters - list where parameter items will be appended to.
-     * @param {String} fieldType - allowed parameter type which will be added to the
-     * parameter list. If empty all parameter types are allowed.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will be
+     * added to the parameter list. If not set all parameter types are allowed.
+     * @param {Boolean} relative - if true then added parameters are relative
+     * to this one. This means that only the parameter name itself will
+     * be set for the added parameters and parent parameters will also be searched.
+     * If false then the full name including name of parent parameter will be set.
+     * This is used when a parameter is selected for a function, e.g. sum or average
+     * of a list field.
      */
-    appendFieldParameterItems(parameters, fieldType) {
+    appendFieldParameterItems(parameters, allowedTypes, relative) {
         if (this.type === Parameter.type.array) {
+            let firstRowParam = true;
             for (let child of this.panelItem.getChildren()) {
                 let parameter = child.getData();
-                if (!fieldType || parameter.getValue('type') === fieldType) {
-                    parameters.push({ name: this.name + '.' + parameter.getName(), description: '' });
+                if (!Array.isArray(allowedTypes) ||
+                        allowedTypes.indexOf(parameter.getValue('type')) !== -1) {
+                    if (relative) {
+                        if (firstRowParam) {
+                            parameters.push({
+                                separator: true, id: this.id,
+                                separatorClass: 'rbroParameterRowGroup',
+                                name: this.rb.getLabel('parameterRowParams')
+                            });
+                        }
+                        let paramName = parameter.getName();
+                        parameters.push({
+                            name: paramName, nameLowerCase: paramName.toLowerCase(),
+                            id: parameter.getId(), description: ''
+                        });
+                    } else {
+                        let paramName = this.name + '.' + parameter.getName();
+                        parameters.push({
+                            name: paramName, nameLowerCase: paramName.toLowerCase(),
+                            id: parameter.getId(), description: ''
+                        });
+                    }
+                    firstRowParam = false;
                 }
+            }
+        }
+        if (relative) {
+            let parent = this.getParent();
+            if (parent !== null) {
+                parent.appendFieldParameterItems(parameters, allowedTypes, relative);
             }
         }
     }
