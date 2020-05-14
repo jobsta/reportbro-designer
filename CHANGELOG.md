@@ -2,6 +2,9 @@
 
 ## [Upcoming Release]
 
+### Features
+* option to enable text wrap in spreadsheet cell
+
 ### Changes
 * show list parameters in popup window for expression
 (this allows to reference fields of the same row in the expression)
@@ -14,6 +17,7 @@
 ### Features
 * dynamic document element panel which allows modifying multiple
 document elements (also of different kinds) at once
+* allow modifying text style settings when a style is selected
 
 ### Changes
 * add selectCallback which is called when an object is selected/deselected
