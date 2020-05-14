@@ -53,6 +53,7 @@ var locale_de = {
     docElementSpreadsheetColspan: 'Anz. verbundene Zellen',
     docElementSpreadsheetColumn: 'Fixe Spalte',
     docElementSpreadsheetHide: 'Ausblenden',
+    docElementSpreadsheetTextWrap: 'Zeilenumbruch',
     docElementStyle: 'Formatvorlage',
     docElementTable: 'Tabelle',
     docElementText: 'Text',

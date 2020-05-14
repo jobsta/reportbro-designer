@@ -233,7 +233,8 @@ export default class TableTextElement extends TextElement {
             'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor',
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',
-            'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom'];
+            'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
+            'spreadsheet_textWrap'];
         let tableBandObj = this.rb.getDataObject(this.parentId);
         if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
             fields.push('printIf');

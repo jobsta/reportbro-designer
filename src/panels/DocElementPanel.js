@@ -532,6 +532,11 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'spreadsheet_add_empty_row',
                 'section': 'spreadsheet'
+            },
+            'spreadsheet_textWrap': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'spreadsheet_text_wrap',
+                'section': 'spreadsheet'
             }
         };
     }
@@ -1559,7 +1564,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_column_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_column">${this.rb.getLabel('docElementSpreadsheetColumn')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_column">
+                          ${this.rb.getLabel('docElementSpreadsheetColumn')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetColumn = $('<input id="rbro_doc_element_spreadsheet_column" type="number">')
                 .on('input', event => {
@@ -1599,7 +1605,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_colspan_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_colspan">${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_colspan">
+                          ${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetColspan = $('<input id="rbro_doc_element_spreadsheet_colspan" type="number">')
                 .on('input', event => {
@@ -1623,7 +1630,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_add_empty_row_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_add_empty_row">${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_add_empty_row">
+                          ${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetAddEmptyRow = $('<input id="rbro_doc_element_spreadsheet_add_empty_row" type="checkbox">')
                 .change(event => {
@@ -1644,6 +1652,31 @@ export default class DocElementPanel extends PanelBase {
             elFormField.append(elSpreadsheetAddEmptyRow);
             elDiv.append(elFormField);
             elSpreadsheetSectionDiv.append(elDiv);
+
+            elDiv = $('<div id="rbro_doc_element_spreadsheet_text_wrap_row" class="rbroFormRow"></div>');
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_text_wrap">
+                          ${this.rb.getLabel('docElementSpreadsheetTextWrap')}:</label>`);
+            elFormField = $('<div class="rbroFormField"></div>');
+            let elSpreadsheetTextWrap = $('<input id="rbro_doc_element_spreadsheet_text_wrap" type="checkbox">')
+                .change(event => {
+                    let spreadsheetTextWrapChecked = elSpreadsheetTextWrap.is(":checked");
+                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                    let selectedObjects = this.rb.getSelectedObjects();
+                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                        let obj = selectedObjects[i];
+                        cmdGroup.addSelection(obj.getId());
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'spreadsheet_textWrap',
+                            spreadsheetTextWrapChecked, SetValueCmd.type.checkbox, this.rb));
+                    }
+                    if (!cmdGroup.isEmpty()) {
+                        this.rb.executeCommand(cmdGroup);
+                    }
+                });
+            elFormField.append(elSpreadsheetTextWrap);
+            elDiv.append(elFormField);
+            elSpreadsheetSectionDiv.append(elDiv);
+
             elSpreadsheetSectionContainer.append(elSpreadsheetSectionDiv);
             panel.append(elSpreadsheetSectionContainer);
             // -------------------------------

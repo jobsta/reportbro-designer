@@ -53,6 +53,7 @@ var locale_en = {
     docElementSpreadsheetColspan: 'Colspan',
     docElementSpreadsheetColumn: 'Fixed column',
     docElementSpreadsheetHide: 'Hide',
+    docElementSpreadsheetTextWrap: 'Text wrap',
     docElementStyle: 'Style',
     docElementTable: 'Table',
     docElementText: 'Text',
