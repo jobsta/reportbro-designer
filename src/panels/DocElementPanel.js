@@ -335,6 +335,12 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'shrink_to_content_height',
                 'section': 'print'
             },
+            'growWeight': {
+                'type': SetValueCmd.type.select,
+                'allowEmpty': false,
+                'fieldId': 'grow_weight',
+                'section': 'print'
+            },
             'pattern': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'pattern',
@@ -1413,6 +1419,36 @@ export default class DocElementPanel extends PanelBase {
         elFormField.append('<div id="rbro_doc_element_link_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div id="rbro_doc_element_grow_weight_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_grow_weight">
+                      ${this.rb.getLabel('docElementGrowWeight')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elGrowWeight = $(`<select id="rbro_doc_element_grow_weight">
+                <option value="0">-</option>
+                <option value="1">1 (${this.rb.getLabel('docElementGrowWeightLow')})</option>
+                <option value="2">2</option>
+                <option value="3">3 (${this.rb.getLabel('docElementGrowWeightHigh')})</option>
+            </select>`)
+            .change(event => {
+                let val = elGrowWeight.val();
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'growWeight', val, SetValueCmd.type.select, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elGrowWeight);
+        elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('docElementGrowWeightInfo')}</div>`);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
         elPrintSectionContainer.append(elPrintSectionDiv);
         panel.append(elPrintSectionContainer);
         // -------------------------

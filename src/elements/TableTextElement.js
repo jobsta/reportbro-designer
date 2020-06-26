@@ -24,6 +24,7 @@ export default class TableTextElement extends TextElement {
     }
 
     setInitialData(initialData) {
+        this.growWeight = 0;
         super.setInitialData(initialData);
     }
 
@@ -238,6 +239,7 @@ export default class TableTextElement extends TextElement {
         let tableBandObj = this.rb.getDataObject(this.parentId);
         if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
             fields.push('printIf');
+            fields.push('growWeight');
         }
         return fields;
     }
@@ -477,5 +479,11 @@ export default class TableTextElement extends TextElement {
                 this.rb.executeCommand(cmdGroup);
             }
         }
+    }
+
+    toJS() {
+        let rv = super.toJS();
+        rv['growWeight'] = utils.convertInputToNumber(rv['growWeight']);
+        return rv;
     }
 }

@@ -25,7 +25,7 @@ export default class TableBandElement extends DocElement {
         this.columnData = [];
 
         this.heightVal = 0;
-        
+
         this.setInitialData(initialData);
     }
 
@@ -290,6 +290,10 @@ export default class TableBandElement extends DocElement {
             return this.columnData[columnIndex];
         }
         return null;
+    }
+
+    getColumns() {
+        return this.columnData;
     }
 
     /**
