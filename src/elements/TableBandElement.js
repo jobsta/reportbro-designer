@@ -18,6 +18,7 @@ export default class TableBandElement extends DocElement {
         this.bandType = bandType;
         this.repeatHeader = false;
         this.alwaysPrintOnSamePage = true;
+        this.pageBreak = false;
         this.backgroundColor = '';
         this.alternateBackgroundColor = '';
         this.groupExpression = '';
@@ -109,6 +110,7 @@ export default class TableBandElement extends DocElement {
             fields.push('groupExpression');
             fields.push('printIf');
             fields.push('alwaysPrintOnSamePage');
+            fields.push('pageBreak');
         }
         return fields;
     }

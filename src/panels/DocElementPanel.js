@@ -310,6 +310,12 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'group_expression',
                 'section': 'print'
             },
+            'pageBreak': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'page_break',
+                'visibleIf': 'groupExpression',
+                'section': 'print'
+            },
             'printIf': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'print_if',
@@ -1226,6 +1232,30 @@ export default class DocElementPanel extends PanelBase {
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
+        elDiv = $('<div id="rbro_doc_element_page_break_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_page_break">
+                      ${this.rb.getLabel('docElementTableBandPageBreak')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elPageBreak = $('<input id="rbro_doc_element_page_break" type="checkbox">')
+            .change(event => {
+                let pageBreakChecked = elPageBreak.is(":checked");
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'pageBreak', pageBreakChecked,
+                        SetValueCmd.type.checkbox, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elPageBreak);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
         elDiv = $('<div id="rbro_doc_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
@@ -1759,61 +1789,74 @@ export default class DocElementPanel extends PanelBase {
 
         // show/hide property depending if it is available in all selected objects
         for (let property in this.propertyDescriptors) {
-            if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+            if (this.propertyDescriptors.hasOwnProperty(property)) {
                 let propertyDescriptor = this.propertyDescriptors[property];
-                let show = false;
-                if (property in sharedProperties) {
-                    if (sharedProperties[property] === selectedObjects.length) {
-                        let value = null;
-                        let differentValues = false;
+                if (field === null || property === field ||
+                        ('visibleIf' in propertyDescriptor && propertyDescriptor['visibleIf'] === field)) {
+                    let show = false;
+                    if (property in sharedProperties) {
+                        if (sharedProperties[property] === selectedObjects.length) {
+                            let value = null;
+                            let differentValues = false;
+                            for (let obj of selectedObjects) {
+                                let objValue = obj.getUpdateValue(property, obj.getValue(property));
+                                if (value === null) {
+                                    value = objValue;
+                                } else if (objValue !== value) {
+                                    differentValues = true;
+                                    break;
+                                }
+                            }
+
+                            if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
+                                propertyDescriptor['allowEmpty']) {
+                                // if values are different and dropdown has empty option then select
+                                // empty dropdown option
+                                value = '';
+                            }
+                            super.setValue(propertyDescriptor, value, differentValues);
+
+                            if ('section' in propertyDescriptor) {
+                                let sectionName = propertyDescriptor['section'];
+                                if (sectionName in sectionPropertyCount) {
+                                    sectionPropertyCount[sectionName] += 1;
+                                } else {
+                                    sectionPropertyCount[sectionName] = 1;
+                                }
+                            }
+                            show = true;
+                        } else {
+                            delete sharedProperties[property];
+                        }
+                    }
+
+                    if (show && 'visibleIf' in propertyDescriptor) {
+                        let visibleIfField = propertyDescriptor['visibleIf'];
                         for (let obj of selectedObjects) {
-                            let objValue = obj.getUpdateValue(property, obj.getValue(property));
-                            if (value === null) {
-                                value = objValue;
-                            } else if (objValue !== value) {
-                                differentValues = true;
+                            if (!obj.getValue(visibleIfField)) {
+                                show = false;
                                 break;
                             }
                         }
-
-                        if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
-                                propertyDescriptor['allowEmpty']) {
-                            // if values are different and dropdown has empty option then select
-                            // empty dropdown option
-                            value = '';
-                        }
-                        super.setValue(propertyDescriptor, value, differentValues);
-
-                        if ('section' in propertyDescriptor) {
-                            let sectionName = propertyDescriptor['section'];
-                            if (sectionName in sectionPropertyCount) {
-                                sectionPropertyCount[sectionName] += 1;
-                            } else {
-                                sectionPropertyCount[sectionName] = 1;
-                            }
-                        }
-                        show = true;
-                    } else {
-                        delete sharedProperties[property];
                     }
-                }
 
-                if ('singleRowProperty' in propertyDescriptor &&
+                    if ('singleRowProperty' in propertyDescriptor &&
                         !propertyDescriptor['singleRowProperty']) {
-                    // only handle visibility of control and not of whole row.
-                    // row visibility will be handled below, e.g. for button groups
-                    let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
-                    if (show) {
-                        $(propertyId).removeClass('rbroHidden');
+                        // only handle visibility of control and not of whole row.
+                        // row visibility will be handled below, e.g. for button groups
+                        let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
+                        if (show) {
+                            $(propertyId).removeClass('rbroHidden');
+                        } else {
+                            $(propertyId).addClass('rbroHidden');
+                        }
                     } else {
-                        $(propertyId).addClass('rbroHidden');
-                    }
-                } else {
-                    let rowId = this.getRowId(propertyDescriptor);
-                    if (show) {
-                        $('#' + rowId).removeClass('rbroHidden');
-                    } else {
-                        $('#' + rowId).addClass('rbroHidden');
+                        let rowId = this.getRowId(propertyDescriptor);
+                        if (show) {
+                            $('#' + rowId).removeClass('rbroHidden');
+                        } else {
+                            $('#' + rowId).addClass('rbroHidden');
+                        }
                     }
                 }
             }
