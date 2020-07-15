@@ -1,9 +1,10 @@
 # Changelog
 
-## [Upcoming Release]
+## [1.5.0] - 2020-07-15
 
 ### Features
 * option to expand column width if there are hidden columns
+* option to force page break for each new group in a table
 * option to enable text wrap in spreadsheet cell
 
 ### Changes
