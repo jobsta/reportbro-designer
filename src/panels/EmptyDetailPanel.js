@@ -15,6 +15,9 @@ export default class EmptyDetailPanel {
             </div>`);
     }
 
+    destroy() {
+    }
+
     show(data) {
         $('#rbro_empty_detail_panel').removeClass('rbroHidden');
     }

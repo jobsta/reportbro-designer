@@ -94,7 +94,6 @@ export default class ReportBro {
             this.properties.patternNumbers = this.properties.patternNumbers.concat(this.properties.patternAdditionalNumbers);
         }
 
-        //this.detailData = null;
         this.document = new Document(element, this.properties.showGrid, this);
         this.popupWindow = new PopupWindow(element, this);
         this.docElements = [];
@@ -109,7 +108,6 @@ export default class ReportBro {
         this.mainPanel = new MainPanel(element, this.headerBand, this.contentBand, this.footerBand,
                 this.parameterContainer, this.styleContainer, this);
         this.menuPanel = new MenuPanel(element, this);
-        this.docElementPanel = new DocElementPanel(element, this);
         this.activeDetailPanel = 'none';
         this.detailPanels = {
             'none': new EmptyDetailPanel(element, this),
@@ -387,7 +385,7 @@ export default class ReportBro {
         for (let panelName in this.detailPanels) {
             this.detailPanels[panelName].render();
         }
-        this.detailPanels[this.activeDetailPanel].show(this.detailData);
+        this.detailPanels[this.activeDetailPanel].show();
         this.document.render();
         this.popupWindow.render();
         this.updateMenuButtons();
@@ -1408,6 +1406,19 @@ export default class ReportBro {
         if (this.reportKey !== null) {
             window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
         }
+    }
+
+    /**
+     * Delete ReportBro Instance including all dom nodes and all registered event handlers.
+     */
+    destroy() {
+        this.popupWindow.destroy();
+        for (let panelName in this.detailPanels) {
+            this.detailPanels[panelName].destroy();
+        }
+        this.element.remove();
+        $(document).off('keydown');
+        $(document).off('mouseup');
     }
 
     /**

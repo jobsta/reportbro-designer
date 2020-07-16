@@ -1383,6 +1383,17 @@ export default class StylePanel extends PanelBase {
         elPanel.append(elDiv);
     }
 
+    destroy() {
+        StylePanel.destroyStyle('style_');
+    }
+
+    static destroyStyle(idPrefix) {
+        $(`#rbro_${idPrefix}text_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}background_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}alternate_background_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}border_color`).spectrum('destroy');
+    }
+
     /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data object.

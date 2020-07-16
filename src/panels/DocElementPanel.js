@@ -1767,6 +1767,16 @@ export default class DocElementPanel extends PanelBase {
     }
 
     /**
+     * Is called when the ReportBro instance is deleted and should be used
+     * to cleanup elements and event handlers.
+     */
+    destroy() {
+        $('#rbro_doc_element_color').spectrum('destroy');
+        StylePanel.destroyStyle('doc_element_');
+        StylePanel.destroyStyle('doc_element_cs_');
+    }
+
+    /**
      * Is called when the selection is changed or the selected element was changed.
      * The panel is updated to show the values of the selected data objects.
      * @param {String} [field] - affected field in case of change operation.

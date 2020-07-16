@@ -22,6 +22,13 @@ export default class PanelBase {
     render(data) {
     }
 
+    /**
+     * Is called when the ReportBro instance is deleted and should be used
+     * to cleanup elements and event handlers.
+     */
+    destroy() {
+    }
+
     setValue(propertyDescriptor, value, differentValues) {
         let propertyId = `#${this.idPrefix}_${propertyDescriptor['fieldId']}`;
 

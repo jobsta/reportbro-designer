@@ -37,6 +37,14 @@ export default class PopupWindow {
     }
 
     /**
+     * Is called when the ReportBro instance is deleted and should be used
+     * to cleanup elements and event handlers.
+     */
+    destroy() {
+        this.elWindow.remove();
+    }
+
+    /**
      * Shows a popup window for the given items.
      * @param {Object[]} items - items to display in the popup window. Each item must contain a name (String), and
      * optional a description (String) and separator (Boolean). If separator is true the item is not selectable.
