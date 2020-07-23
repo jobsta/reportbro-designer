@@ -1,5 +1,6 @@
 import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import Command from '../commands/Command';
+import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
@@ -37,6 +38,14 @@ export default class Parameter {
         }
         if ('showOnlyNameType' in initialData && initialData['showOnlyNameType']) {
             this.editable = false;
+        }
+    }
+
+    setHighlightUnused(highlightUnused) {
+        if (highlightUnused) {
+            $(`#rbro_menu_item${this.panelItem.getId()}`).addClass('rbroUnusedParameter');
+        } else {
+            $(`#rbro_menu_item${this.panelItem.getId()}`).removeClass('rbroUnusedParameter');
         }
     }
 

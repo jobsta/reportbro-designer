@@ -55,6 +55,7 @@ export default class ReportBro {
             saveCallback: null,
             selectCallback: null,
             showGrid: true,
+            highlightUnusedParameters: false,
             patternAdditionalDates: [],
             patternAdditionalNumbers: [],
             patternCurrencySymbol: '$',
@@ -1303,6 +1304,16 @@ export default class ReportBro {
                 }
             }
         }
+
+        if (this.getProperty('highlightUnusedParameters')) {
+            // if unused parameters are highlighted the marker is removed on save
+            for (let parameter of this.getParameters()) {
+                if (parameter.editable) {
+                    parameter.setHighlightUnused(false);
+                }
+            }
+        }
+
         this.updateMenuButtons();
     }
 
@@ -1362,6 +1373,33 @@ export default class ReportBro {
         }
         for (let docElementData of report.docElements) {
             this.createDocElement(docElementData);
+        }
+
+        if (this.getProperty('highlightUnusedParameters')) {
+            // highlight unused parameters when report is loaded
+
+            // to determine if a parameter is used we query the commands
+            // which would be necessary in case the parameter name is changed.
+            // if no commands are returned then the parameter is not used
+            let docElements = this.getDocElements(true);
+            for (let parameter of this.getParameters()) {
+                if (parameter.editable) {
+                    let cmdGroup = new CommandGroupCmd('Temp group');
+                    for (let docElement of docElements) {
+                        docElement.addCommandsForChangedParameterName(
+                            parameter, parameter.getName(), cmdGroup);
+                    }
+                    for (let otherParam of this.getParameters()) {
+                        if (otherParam.getId() !== parameter.getId()) {
+                            otherParam.addCommandsForChangedParameterName(
+                                parameter, parameter.getName(), cmdGroup);
+                        }
+                    }
+                    if (cmdGroup.isEmpty()) {
+                        parameter.setHighlightUnused(true);
+                    }
+                }
+            }
         }
 
         this.browserDragType = '';
