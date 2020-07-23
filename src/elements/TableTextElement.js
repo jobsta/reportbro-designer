@@ -464,6 +464,10 @@ export default class TableTextElement extends TextElement {
                 let columns = utils.convertInputToNumber(table.getValue('columns')) - 1;
                 table.setValue('columns', columns);
 
+                // subtract column width from table width
+                let tableWidth = table.getValue('widthVal');
+                table.setValue('width', tableWidth - this.widthVal);
+
                 // remove column from each table band
                 table.getValue('headerData').deleteColumn(colIndex);
                 for (let i=0; i < table.getValue('contentDataRows').length; i++) {
