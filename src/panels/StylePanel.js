@@ -1207,11 +1207,11 @@ export default class StylePanel extends PanelBase {
         elDiv.append(
             `<label for="rbro_${idPrefix}border_width">${rb.getLabel('styleBorderWidth')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number">`)
+        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number" step="0.5">`)
             .on('input', event => {
                 let val = elBorderWidth.val();
                 if (val !== '') {
-                    val = utils.checkInputDecimal(val, 1, 99);
+                    val = utils.checkInputDecimal(val, 0.5, 99);
                 }
                 if (val !== elBorderWidth.val()) {
                     elBorderWidth.val(val);
