@@ -2,6 +2,9 @@
 
 ## [Upcoming Release]
 
+### Features
+* option to highlight unused parameters on report load
+
 ### Changes
 * add destroy method to remove dom nodes and event handlers
 
