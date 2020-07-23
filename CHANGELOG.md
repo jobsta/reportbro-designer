@@ -1,5 +1,13 @@
 # Changelog
 
+## [Upcoming Release]
+
+### Changes
+* add destroy method to remove dom nodes and event handlers
+
+### Bug Fixes
+* update table width after deleting column
+
 ## [1.5.0] - 2020-07-15
 
 ### Features
