@@ -1,6 +1,6 @@
 # Changelog
 
-## [Upcoming Release]
+## [1.5.1] - 2020-07-27
 
 ### Features
 * option to highlight unused parameters on report load
