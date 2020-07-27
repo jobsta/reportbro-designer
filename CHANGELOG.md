@@ -7,6 +7,7 @@
 
 ### Changes
 * add destroy method to remove dom nodes and event handlers
+* allow border width in 0.5 steps
 
 ### Bug Fixes
 * update table width after deleting column
