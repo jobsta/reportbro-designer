@@ -44,10 +44,11 @@ export default class ReportBro {
             cmdExecutedCallback: null,
             enableSpreadsheet: true,
             fonts: [
-                { name: 'Courier', value: 'courier' },
-                { name: 'Helvetica', value: 'helvetica' },
-                { name: 'Times New Roman', value: 'times' }
+                { name: 'Courier', value: Style.font.courier },
+                { name: 'Helvetica', value: Style.font.helvetica },
+                { name: 'Times New Roman', value: Style.font.times }
             ],
+            defaultFont: Style.font.helvetica,
             localStorageReportKey: null,
             menuShowButtonLabels: false,
             menuShowDebug: false,
@@ -88,6 +89,22 @@ export default class ReportBro {
         if (this.properties.additionalFonts.length > 0) {
             this.properties.fonts = this.properties.fonts.concat(this.properties.additionalFonts);
         }
+        // make sure defaultFont is available, otherwise use first entry of font list
+        let defaultFontExists = false;
+        for (let font of this.properties.fonts) {
+            if (this.properties.defaultFont === font.value) {
+                defaultFontExists = true;
+                break;
+            }
+        }
+        if (!defaultFontExists) {
+            if (this.properties.fonts.length > 0) {
+                this.properties.defaultFont = this.properties.fonts[0].value;
+            } else {
+                this.properties.defaultFont = '';
+            }
+        }
+
         if (this.properties.patternAdditionalDates.length > 0) {
             this.properties.patternDates = this.properties.patternDates.concat(this.properties.patternAdditionalDates);
         }

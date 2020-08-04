@@ -24,7 +24,7 @@ export default class Style {
         this.verticalAlignment = Style.alignment.top;
         this.textColor = '#000000';
         this.backgroundColor = '';
-        this.font = Style.font.courier;
+        this.font = rb.getProperty('defaultFont');
         this.fontSize = 12;
         this.lineSpacing = 1;
         this.borderColor = '#000000';
@@ -219,7 +219,7 @@ export default class Style {
 Style.font = {
     courier: 'courier',
     helvetica: 'helvetica',
-    timesRoman: 'times_roman'
+    times: 'times'
 };
 
 Style.alignment = {
