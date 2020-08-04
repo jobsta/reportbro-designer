@@ -1,5 +1,10 @@
 # Changelog
 
+## [Upcoming Release]
+
+### Changes
+* option to set default font for new text and style
+
 ## [1.5.1] - 2020-07-27
 
 ### Features
