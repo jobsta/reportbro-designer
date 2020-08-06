@@ -22,7 +22,7 @@ export default class TextElement extends DocElement {
         this.verticalAlignment = Style.alignment.top;
         this.textColor = '#000000';
         this.backgroundColor = '';
-        this.font = Style.font.helvetica;
+        this.font = rb.getProperty('defaultFont');
         this.fontSize = 12;
         this.lineSpacing = 1;
         this.borderColor = '#000000';

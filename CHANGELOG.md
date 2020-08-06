@@ -2,11 +2,17 @@
 
 ## [Upcoming Release]
 
+### Changes
+* option to set default font for new text and style
+
+## [1.5.1] - 2020-07-27
+
 ### Features
 * option to highlight unused parameters on report load
 
 ### Changes
 * add destroy method to remove dom nodes and event handlers
+* allow border width in 0.5 steps
 
 ### Bug Fixes
 * update table width after deleting column
