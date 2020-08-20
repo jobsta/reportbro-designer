@@ -1,10 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800');
 
-*, html {
-    font-family:inherit;
-    outline:none;
-}
-
 #reportbro {
     font-family: 'Open Sans', sans-serif;
     text-rendering: optimizelegibility;
@@ -14,6 +9,12 @@
     font-size: 16px;
     margin: 0;
     padding: 0;
+}
+
+#reportbro * {
+    font-family: inherit;
+    font-weight: inherit;
+    outline: none;
 }
 
 #reportbro {
@@ -705,6 +706,7 @@ ul ul .rbroMenuItemText {
     box-sizing: border-box;
     background-color: transparent;
     text-align: left;
+    box-shadow: none;
 }
 
 .rbroTableTextElement {
