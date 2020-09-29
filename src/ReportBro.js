@@ -42,13 +42,14 @@ export default class ReportBro {
             additionalFonts: [],
             adminMode: true,
             cmdExecutedCallback: null,
+            defaultFont: Style.font.helvetica,
             enableSpreadsheet: true,
             fonts: [
                 { name: 'Courier', value: Style.font.courier },
                 { name: 'Helvetica', value: Style.font.helvetica },
                 { name: 'Times New Roman', value: Style.font.times }
             ],
-            defaultFont: Style.font.helvetica,
+            highlightUnusedParameters: false,
             localStorageReportKey: null,
             menuShowButtonLabels: false,
             menuShowDebug: false,
@@ -56,7 +57,6 @@ export default class ReportBro {
             saveCallback: null,
             selectCallback: null,
             showGrid: true,
-            highlightUnusedParameters: false,
             patternAdditionalDates: [],
             patternAdditionalNumbers: [],
             patternCurrencySymbol: '$',
