@@ -103,7 +103,7 @@ export default class SectionElement extends DocElement {
     registerEventHandlers() {
         super.registerContainerEventHandlers();
     }
-    
+
     /**
      * Returns highest id of this component, this is the max id of the footer band because it is created last.
      * @returns {Number}
@@ -366,5 +366,15 @@ export default class SectionElement extends DocElement {
         ret['contentData'] = this.contentData.toJS();
         ret['footerData'] = this.footerData.toJS();
         return ret;
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'SectionElement';
     }
 }

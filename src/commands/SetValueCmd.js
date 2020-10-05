@@ -91,6 +91,16 @@ export default class SetValueCmd extends Command {
     replace(otherCmd) {
         this.oldValue = otherCmd.oldValue;
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'SetValueCmd';
+    }
 }
 
 SetValueCmd.type = {

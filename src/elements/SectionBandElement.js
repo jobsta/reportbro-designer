@@ -162,4 +162,14 @@ export default class SectionBandElement extends DocElement {
     isVisible() {
         return this.visible;
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'SectionBandElement';
+    }
 }

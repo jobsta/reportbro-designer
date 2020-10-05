@@ -56,7 +56,7 @@ export default class AddDeleteDocElementCmd extends Command {
         let parent = this.rb.getDataObject(this.parentId);
         if (parent !== null) {
             let element = AddDeleteDocElementCmd.createElement(this.id, this.initialData, this.elementType, this.position, true, this.rb);
-            
+
             this.rb.notifyEvent(element, Command.operation.add);
             this.rb.selectObject(this.id, true);
 
@@ -105,5 +105,15 @@ export default class AddDeleteDocElementCmd extends Command {
         parentPanel.insertChild(panelPos, panelItem);
         element.setup(openPanelItem);
         return element;
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'AddDeleteDocElementCmd';
     }
 }

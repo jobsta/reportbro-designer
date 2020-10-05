@@ -60,4 +60,14 @@ export default class AddDeleteStyleCmd extends Command {
             this.rb.deleteStyle(style);
         }
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'AddDeleteStyleCmd';
+    }
 }

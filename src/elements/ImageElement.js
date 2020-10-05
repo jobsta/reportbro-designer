@@ -167,4 +167,14 @@ export default class ImageElement extends DocElement {
         this.addCommandForChangedParameterName(parameter, newParameterName, 'source', cmdGroup);
         this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'ImageElement';
+    }
 }

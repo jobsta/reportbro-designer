@@ -490,4 +490,14 @@ export default class TableTextElement extends TextElement {
         rv['growWeight'] = utils.convertInputToNumber(rv['growWeight']);
         return rv;
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'TableTextElement';
+    }
 }
