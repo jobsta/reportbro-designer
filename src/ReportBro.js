@@ -76,7 +76,8 @@ export default class ReportBro {
             ],
             reportServerTimeout: 20000,
             reportServerUrl: 'https://www.reportbro.com/report/run',
-            reportServerUrlCrossDomain: false
+            reportServerUrlCrossDomain: false,
+            theme: ''
         };
         if (properties) {
             for (let prop in properties) {
@@ -388,6 +389,11 @@ export default class ReportBro {
         this.element.empty();
         if (this.getProperty('menuSidebar')) {
             this.element.addClass('rbroMenuPanelSidebar');
+        }
+        if (this.getProperty('theme') === 'classic') {
+            $('body').addClass('rbroClassicTheme');
+        } else {
+            $('body').addClass('rbroDefaultTheme');
         }
         this.element.append('<div class="rbroLogo"></div>');
         this.element.append('<div class="rbroMenuPanel" id="rbro_menu_panel"></div>');
@@ -1142,7 +1148,7 @@ export default class ReportBro {
      * Shows a global loading image which disables all controls.
      */
     showLoading() {
-        if ($('#rbro_loading_div').length == 0) {
+        if ($('#rbro_loading_div').length === 0) {
             $('body').append('<div id="rbro_loading_div" class="rbroLoadingIndicator"></div>');
         }
     }
