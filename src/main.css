@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,800');
 
 :root {
-    --rbro-logo-image: url("rb_logo_white.png");
-    --rbro-watermark-image: url("rb_logo_dark.png");
     --rbro-primary-text-color: #191919;
     --rbro-active-button-color: #191919;
     --rbro-mainPanel-bg-color: #3B3B3B;
@@ -26,8 +24,6 @@
 }
 
 .rbroClassicTheme {
-    --rbro-logo-image: url("rb_logo_dark.png");
-    --rbro-watermark-image: url("rb_logo_dark.png");
     --rbro-primary-text-color: #444444;
     --rbro-active-button-color: #004864;
     --rbro-mainPanel-bg-color: #004864;
@@ -179,13 +175,17 @@
     left: 0;
     top: 0;
     width: 230px;
-    background-image: var(--rbro-logo-image);
+    background-image: url("rb_logo_white.png");
     background-repeat: no-repeat;
     height: 45px;
     background-size: auto 85%;
     background-position: center;
     background-color: var(--rbro-mainPanel-logo-bg-color);
     z-index: 10;
+}
+
+.rbroClassicTheme .rbroLogo {
+    background-image: url("rb_logo_dark.png");
 }
 
 .rbroToolButtonContainer {
@@ -437,7 +437,7 @@ ul ul .rbroMenuItemText {
 }
 
 .rbroEmptyDetailPanel .rbroLogo {
-    background-image: var(--rbro-watermark-image);
+    background-image: url("rb_logo_dark.png");
     width: 390px;
     height: 70px;
     background-size: auto 80%;
