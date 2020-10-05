@@ -71,6 +71,7 @@ var locale_de = {
     emptyPanel: 'Leer',
     errorMsgDuplicateParameter: 'Parameter existiert bereits',
     errorMsgDuplicateParameterField: 'Feld existiert bereits',
+    errorMsgFontNotAvailable: 'Schrift ist am Server nicht vorhanden',
     errorMsgLoadingImageFailed: 'Bild laden fehlgeschlagen: ${info}',
     errorMsgInvalidArray: 'Ungültige Liste',
     errorMsgInvalidAvgSumExpression: 'Ausdruck muss ein Zahl-Feld einer Liste enthalten',

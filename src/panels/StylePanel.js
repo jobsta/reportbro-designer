@@ -781,6 +781,7 @@ export default class StylePanel extends PanelBase {
             });
         elFormField.append(elFontSize);
         elFormField.append(`<span>${rb.getLabel('styleFontSizeUnit')}</span>`);
+        elFormField.append(`<div id="rbro_${idPrefix}font_error" class="rbroErrorMessage"></div>`);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
 
