@@ -299,8 +299,7 @@
 }
 
 .rbroMainPanel > ul > li {
-    border-bottom: 1px solid;
-    border-color: #E4E7EA;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     line-height: 20px;
 }
 
