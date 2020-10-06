@@ -23,7 +23,7 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 ## Basic usage
 
-Go to the [docs](https://www.reportbro.com/docs) for more information. There are demos for different use cases available at: https://www.reportbro.com/demos.
+Go to the [docs](https://www.reportbro.com/doc/api) for more information. There are demos for different use cases available at: https://www.reportbro.com/demo/invoice.
 
 Include the ReportBro, jQuery, Autosize, JsBarcode, Spectrum JavaScript files as well as the ReportBro and Spectrum stylesheets in the `<head>` of your page. Make sure to load jQuery before ReportBro's JavaScript. 
 
