@@ -351,7 +351,7 @@
 }
 
 .rbroMenuItem.rbroError {
-    background-color: #FF9999;
+    background-color: #FFCCCC;
     color: var(--rbro-primary-text-color);
 }
 
@@ -543,7 +543,7 @@ ul ul .rbroMenuItemText {
 }
 
 .rbroFormRow.rbroError {
-    background-color: #FFFFFF;
+    background-color: #FFCCCC;
     align-items: flex-start;
 }
 
