@@ -1,12 +1,12 @@
 # Changelog
 
-## [Upcoming Release]
+## [1.5.2] - 2020-10-06
 
 ### Changes
 * option to set default font for new text and style
 * update logo and css styling
 * option to set css theme
-* add getClassName method for introspection to commands, data and elements
+* add getClassName method for introspection to command, data and element classes
 
 ## [1.5.1] - 2020-07-27
 
