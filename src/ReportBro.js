@@ -706,7 +706,7 @@ export default class ReportBro {
         this.selectionSinceLastCommand = false;
         this.updateMenuButtons();
         if (this.properties.cmdExecutedCallback) {
-            this.properties.cmdExecutedCallback(cmd);
+            this.properties.cmdExecutedCallback(cmd, true);
         }
     }
 
@@ -718,7 +718,7 @@ export default class ReportBro {
             this.modified = (this.lastCommandIndex >= 0);
             this.updateMenuButtons();
             if (this.properties.cmdExecutedCallback) {
-                this.properties.cmdExecutedCallback(cmd);
+                this.properties.cmdExecutedCallback(cmd, false);
             }
         }
     }
@@ -731,7 +731,7 @@ export default class ReportBro {
             this.modified = true;
             this.updateMenuButtons();
             if (this.properties.cmdExecutedCallback) {
-                this.properties.cmdExecutedCallback(cmd);
+                this.properties.cmdExecutedCallback(cmd, false);
             }
         }
     }

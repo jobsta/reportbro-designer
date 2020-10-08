@@ -1,5 +1,10 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* add parameter to cmdExecutedCallback which indicates if command was done or undone
+
 ## [1.5.2] - 2020-10-06
 
 ### Changes
