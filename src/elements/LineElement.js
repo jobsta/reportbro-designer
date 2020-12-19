@@ -67,4 +67,14 @@ export default class LineElement extends DocElement {
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
         this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'LineElement';
+    }
 }

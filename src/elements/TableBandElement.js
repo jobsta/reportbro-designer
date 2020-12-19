@@ -18,6 +18,7 @@ export default class TableBandElement extends DocElement {
         this.bandType = bandType;
         this.repeatHeader = false;
         this.alwaysPrintOnSamePage = true;
+        this.pageBreak = false;
         this.backgroundColor = '';
         this.alternateBackgroundColor = '';
         this.groupExpression = '';
@@ -25,7 +26,7 @@ export default class TableBandElement extends DocElement {
         this.columnData = [];
 
         this.heightVal = 0;
-        
+
         this.setInitialData(initialData);
     }
 
@@ -109,6 +110,7 @@ export default class TableBandElement extends DocElement {
             fields.push('groupExpression');
             fields.push('printIf');
             fields.push('alwaysPrintOnSamePage');
+            fields.push('pageBreak');
         }
         return fields;
     }
@@ -292,6 +294,10 @@ export default class TableBandElement extends DocElement {
         return null;
     }
 
+    getColumns() {
+        return this.columnData;
+    }
+
     /**
      * Is called when column width of a cell was changed to update all DOM elements accordingly.
      * @param {Number} columnIndex - column index of changed cell.
@@ -442,5 +448,15 @@ export default class TableBandElement extends DocElement {
             ret['columnData'].push(column.toJS());
         }
         return ret;
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'TableBandElement';
     }
 }

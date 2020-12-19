@@ -69,4 +69,14 @@ export default class AddDeleteParameterCmd extends Command {
             this.rb.deleteParameter(parameter);
         }
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'AddDeleteParameterCmd';
+    }
 }

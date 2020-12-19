@@ -53,4 +53,14 @@ export default class MovePanelItemCmd extends Command {
             this.rb.notifyEvent(obj, Command.operation.move);
         }
     }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'MovePanelItemCmd';
+    }
 }

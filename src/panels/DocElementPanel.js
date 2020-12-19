@@ -310,6 +310,12 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'group_expression',
                 'section': 'print'
             },
+            'pageBreak': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'page_break',
+                'visibleIf': 'groupExpression',
+                'section': 'print'
+            },
             'printIf': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'print_if',
@@ -333,6 +339,12 @@ export default class DocElementPanel extends PanelBase {
             'shrinkToContentHeight': {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'shrink_to_content_height',
+                'section': 'print'
+            },
+            'growWeight': {
+                'type': SetValueCmd.type.select,
+                'allowEmpty': false,
+                'fieldId': 'grow_weight',
                 'section': 'print'
             },
             'pattern': {
@@ -531,6 +543,11 @@ export default class DocElementPanel extends PanelBase {
             'spreadsheet_addEmptyRow': {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'spreadsheet_add_empty_row',
+                'section': 'spreadsheet'
+            },
+            'spreadsheet_textWrap': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'spreadsheet_text_wrap',
                 'section': 'spreadsheet'
             }
         };
@@ -1215,6 +1232,30 @@ export default class DocElementPanel extends PanelBase {
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
+        elDiv = $('<div id="rbro_doc_element_page_break_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_page_break">
+                      ${this.rb.getLabel('docElementTableBandPageBreak')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elPageBreak = $('<input id="rbro_doc_element_page_break" type="checkbox">')
+            .change(event => {
+                let pageBreakChecked = elPageBreak.is(":checked");
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'pageBreak', pageBreakChecked,
+                        SetValueCmd.type.checkbox, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elPageBreak);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
         elDiv = $('<div id="rbro_doc_element_print_if_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
         elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
@@ -1408,6 +1449,36 @@ export default class DocElementPanel extends PanelBase {
         elFormField.append('<div id="rbro_doc_element_link_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div id="rbro_doc_element_grow_weight_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_grow_weight">
+                      ${this.rb.getLabel('docElementGrowWeight')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elGrowWeight = $(`<select id="rbro_doc_element_grow_weight">
+                <option value="0">-</option>
+                <option value="1">1 (${this.rb.getLabel('docElementGrowWeightLow')})</option>
+                <option value="2">2</option>
+                <option value="3">3 (${this.rb.getLabel('docElementGrowWeightHigh')})</option>
+            </select>`)
+            .change(event => {
+                let val = elGrowWeight.val();
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'growWeight', val, SetValueCmd.type.select, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elGrowWeight);
+        elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('docElementGrowWeightInfo')}</div>`);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
         elPrintSectionContainer.append(elPrintSectionDiv);
         panel.append(elPrintSectionContainer);
         // -------------------------
@@ -1559,7 +1630,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_column_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_column">${this.rb.getLabel('docElementSpreadsheetColumn')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_column">
+                          ${this.rb.getLabel('docElementSpreadsheetColumn')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetColumn = $('<input id="rbro_doc_element_spreadsheet_column" type="number">')
                 .on('input', event => {
@@ -1599,7 +1671,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_colspan_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_colspan">${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_colspan">
+                          ${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetColspan = $('<input id="rbro_doc_element_spreadsheet_colspan" type="number">')
                 .on('input', event => {
@@ -1623,7 +1696,8 @@ export default class DocElementPanel extends PanelBase {
             elSpreadsheetSectionDiv.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_spreadsheet_add_empty_row_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_add_empty_row">${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_add_empty_row">
+                          ${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
             elFormField = $('<div class="rbroFormField"></div>');
             let elSpreadsheetAddEmptyRow = $('<input id="rbro_doc_element_spreadsheet_add_empty_row" type="checkbox">')
                 .change(event => {
@@ -1644,6 +1718,31 @@ export default class DocElementPanel extends PanelBase {
             elFormField.append(elSpreadsheetAddEmptyRow);
             elDiv.append(elFormField);
             elSpreadsheetSectionDiv.append(elDiv);
+
+            elDiv = $('<div id="rbro_doc_element_spreadsheet_text_wrap_row" class="rbroFormRow"></div>');
+            elDiv.append(`<label for="rbro_doc_element_spreadsheet_text_wrap">
+                          ${this.rb.getLabel('docElementSpreadsheetTextWrap')}:</label>`);
+            elFormField = $('<div class="rbroFormField"></div>');
+            let elSpreadsheetTextWrap = $('<input id="rbro_doc_element_spreadsheet_text_wrap" type="checkbox">')
+                .change(event => {
+                    let spreadsheetTextWrapChecked = elSpreadsheetTextWrap.is(":checked");
+                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                    let selectedObjects = this.rb.getSelectedObjects();
+                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                        let obj = selectedObjects[i];
+                        cmdGroup.addSelection(obj.getId());
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'spreadsheet_textWrap',
+                            spreadsheetTextWrapChecked, SetValueCmd.type.checkbox, this.rb));
+                    }
+                    if (!cmdGroup.isEmpty()) {
+                        this.rb.executeCommand(cmdGroup);
+                    }
+                });
+            elFormField.append(elSpreadsheetTextWrap);
+            elDiv.append(elFormField);
+            elSpreadsheetSectionDiv.append(elDiv);
+
             elSpreadsheetSectionContainer.append(elSpreadsheetSectionDiv);
             panel.append(elSpreadsheetSectionContainer);
             // -------------------------------
@@ -1665,6 +1764,16 @@ export default class DocElementPanel extends PanelBase {
             this.elStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
             this.elCsStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
         }
+    }
+
+    /**
+     * Is called when the ReportBro instance is deleted and should be used
+     * to cleanup elements and event handlers.
+     */
+    destroy() {
+        $('#rbro_doc_element_color').spectrum('destroy');
+        StylePanel.destroyStyle('doc_element_');
+        StylePanel.destroyStyle('doc_element_cs_');
     }
 
     /**
@@ -1690,61 +1799,74 @@ export default class DocElementPanel extends PanelBase {
 
         // show/hide property depending if it is available in all selected objects
         for (let property in this.propertyDescriptors) {
-            if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
+            if (this.propertyDescriptors.hasOwnProperty(property)) {
                 let propertyDescriptor = this.propertyDescriptors[property];
-                let show = false;
-                if (property in sharedProperties) {
-                    if (sharedProperties[property] === selectedObjects.length) {
-                        let value = null;
-                        let differentValues = false;
+                if (field === null || property === field ||
+                        ('visibleIf' in propertyDescriptor && propertyDescriptor['visibleIf'] === field)) {
+                    let show = false;
+                    if (property in sharedProperties) {
+                        if (sharedProperties[property] === selectedObjects.length) {
+                            let value = null;
+                            let differentValues = false;
+                            for (let obj of selectedObjects) {
+                                let objValue = obj.getUpdateValue(property, obj.getValue(property));
+                                if (value === null) {
+                                    value = objValue;
+                                } else if (objValue !== value) {
+                                    differentValues = true;
+                                    break;
+                                }
+                            }
+
+                            if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
+                                propertyDescriptor['allowEmpty']) {
+                                // if values are different and dropdown has empty option then select
+                                // empty dropdown option
+                                value = '';
+                            }
+                            super.setValue(propertyDescriptor, value, differentValues);
+
+                            if ('section' in propertyDescriptor) {
+                                let sectionName = propertyDescriptor['section'];
+                                if (sectionName in sectionPropertyCount) {
+                                    sectionPropertyCount[sectionName] += 1;
+                                } else {
+                                    sectionPropertyCount[sectionName] = 1;
+                                }
+                            }
+                            show = true;
+                        } else {
+                            delete sharedProperties[property];
+                        }
+                    }
+
+                    if (show && 'visibleIf' in propertyDescriptor) {
+                        let visibleIfField = propertyDescriptor['visibleIf'];
                         for (let obj of selectedObjects) {
-                            let objValue = obj.getUpdateValue(property, obj.getValue(property));
-                            if (value === null) {
-                                value = objValue;
-                            } else if (objValue !== value) {
-                                differentValues = true;
+                            if (!obj.getValue(visibleIfField)) {
+                                show = false;
                                 break;
                             }
                         }
-
-                        if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
-                                propertyDescriptor['allowEmpty']) {
-                            // if values are different and dropdown has empty option then select
-                            // empty dropdown option
-                            value = '';
-                        }
-                        super.setValue(propertyDescriptor, value, differentValues);
-
-                        if ('section' in propertyDescriptor) {
-                            let sectionName = propertyDescriptor['section'];
-                            if (sectionName in sectionPropertyCount) {
-                                sectionPropertyCount[sectionName] += 1;
-                            } else {
-                                sectionPropertyCount[sectionName] = 1;
-                            }
-                        }
-                        show = true;
-                    } else {
-                        delete sharedProperties[property];
                     }
-                }
 
-                if ('singleRowProperty' in propertyDescriptor &&
+                    if ('singleRowProperty' in propertyDescriptor &&
                         !propertyDescriptor['singleRowProperty']) {
-                    // only handle visibility of control and not of whole row.
-                    // row visibility will be handled below, e.g. for button groups
-                    let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
-                    if (show) {
-                        $(propertyId).removeClass('rbroHidden');
+                        // only handle visibility of control and not of whole row.
+                        // row visibility will be handled below, e.g. for button groups
+                        let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
+                        if (show) {
+                            $(propertyId).removeClass('rbroHidden');
+                        } else {
+                            $(propertyId).addClass('rbroHidden');
+                        }
                     } else {
-                        $(propertyId).addClass('rbroHidden');
-                    }
-                } else {
-                    let rowId = this.getRowId(propertyDescriptor);
-                    if (show) {
-                        $('#' + rowId).removeClass('rbroHidden');
-                    } else {
-                        $('#' + rowId).addClass('rbroHidden');
+                        let rowId = this.getRowId(propertyDescriptor);
+                        if (show) {
+                            $('#' + rowId).removeClass('rbroHidden');
+                        } else {
+                            $('#' + rowId).addClass('rbroHidden');
+                        }
                     }
                 }
             }

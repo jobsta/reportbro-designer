@@ -226,7 +226,7 @@ export default class ParameterPanel extends PanelBase {
                     let items, popupType;
                     if (selectedObject.getValue('type') === Parameter.type.sum ||
                             selectedObject.getValue('type') === Parameter.type.average) {
-                        items = this.rb.getArrayFieldParameterItems(Parameter.type.number);
+                        items = this.rb.getArrayFieldParameterItems([Parameter.type.number]);
                         popupType = PopupWindow.type.parameterSet;
                     } else {
                         items = this.rb.getParameterItems(selectedObject);

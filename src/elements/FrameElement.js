@@ -25,13 +25,13 @@ export default class FrameElement extends DocElement {
         this.borderBottom = false;
         this.borderColor = '#000000';
         this.borderWidth = '1';
-        
+
         this.shrinkToContentHeight = false;
 
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_addEmptyRow = false;
-        
+
         this.setInitialData(initialData);
 
         this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
@@ -74,7 +74,7 @@ export default class FrameElement extends DocElement {
     getMaxId() {
         return this.linkedContainerId;
     }
-    
+
     setValue(field, value) {
         if (field.indexOf('border') !== -1) {
             // Style.setBorderValue needs to be called before super.setValue
@@ -202,5 +202,15 @@ export default class FrameElement extends DocElement {
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
         this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'FrameElement';
     }
 }

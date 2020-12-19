@@ -24,6 +24,7 @@ export default class TableTextElement extends TextElement {
     }
 
     setInitialData(initialData) {
+        this.growWeight = 0;
         super.setInitialData(initialData);
     }
 
@@ -233,10 +234,12 @@ export default class TableTextElement extends TextElement {
             'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor',
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',
-            'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom'];
+            'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
+            'spreadsheet_textWrap'];
         let tableBandObj = this.rb.getDataObject(this.parentId);
         if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
             fields.push('printIf');
+            fields.push('growWeight');
         }
         return fields;
     }
@@ -461,6 +464,10 @@ export default class TableTextElement extends TextElement {
                 let columns = utils.convertInputToNumber(table.getValue('columns')) - 1;
                 table.setValue('columns', columns);
 
+                // subtract column width from table width
+                let tableWidth = table.getValue('widthVal');
+                table.setValue('width', tableWidth - this.widthVal);
+
                 // remove column from each table band
                 table.getValue('headerData').deleteColumn(colIndex);
                 for (let i=0; i < table.getValue('contentDataRows').length; i++) {
@@ -476,5 +483,21 @@ export default class TableTextElement extends TextElement {
                 this.rb.executeCommand(cmdGroup);
             }
         }
+    }
+
+    toJS() {
+        let rv = super.toJS();
+        rv['growWeight'] = utils.convertInputToNumber(rv['growWeight']);
+        return rv;
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'TableTextElement';
     }
 }

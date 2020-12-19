@@ -78,11 +78,13 @@ export function roundValueToUpperInterval(val, interval) {
 
 export function replaceAll(str, oldVal, newVal) {
     // not the fastest solution but works
-    let ret = str;
-    while (ret.indexOf(oldVal) !== -1) {
-        ret = ret.replace(oldVal, newVal);
+    let rv = str;
+    if (oldVal !== newVal) {
+        while (rv.indexOf(oldVal) !== -1) {
+            rv = rv.replace(oldVal, newVal);
+        }
     }
-    return ret;
+    return rv;
 }
 
 export function initColorPicker(el, rb, options) {

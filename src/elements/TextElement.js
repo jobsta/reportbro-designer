@@ -22,7 +22,7 @@ export default class TextElement extends DocElement {
         this.verticalAlignment = Style.alignment.top;
         this.textColor = '#000000';
         this.backgroundColor = '';
-        this.font = Style.font.helvetica;
+        this.font = rb.getProperty('defaultFont');
         this.fontSize = 12;
         this.lineSpacing = 1;
         this.borderColor = '#000000';
@@ -70,6 +70,7 @@ export default class TextElement extends DocElement {
         this.spreadsheet_column = '';
         this.spreadsheet_colspan = '';
         this.spreadsheet_addEmptyRow = false;
+        this.spreadsheet_textWrap = false;
 
         this.setInitialData(initialData);
 
@@ -139,7 +140,8 @@ export default class TextElement extends DocElement {
             'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan',
+            'spreadsheet_addEmptyRow', 'spreadsheet_textWrap'];
     }
 
     getElementType() {
@@ -328,5 +330,15 @@ export default class TextElement extends DocElement {
             ret[field] = utils.convertInputToNumber(this.getValue(field));
         }
         return ret;
+    }
+
+    /**
+     * Returns class name.
+     * This can be useful for introspection when the class names are mangled
+     * due to the webpack uglification process.
+     * @returns {string}
+     */
+    getClassName() {
+        return 'TextElement';
     }
 }

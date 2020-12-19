@@ -781,6 +781,7 @@ export default class StylePanel extends PanelBase {
             });
         elFormField.append(elFontSize);
         elFormField.append(`<span>${rb.getLabel('styleFontSizeUnit')}</span>`);
+        elFormField.append(`<div id="rbro_${idPrefix}font_error" class="rbroErrorMessage"></div>`);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
 
@@ -1207,11 +1208,11 @@ export default class StylePanel extends PanelBase {
         elDiv.append(
             `<label for="rbro_${idPrefix}border_width">${rb.getLabel('styleBorderWidth')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number">`)
+        let elBorderWidth = $(`<input id="rbro_${idPrefix}border_width" type="number" step="0.5">`)
             .on('input', event => {
                 let val = elBorderWidth.val();
                 if (val !== '') {
-                    val = utils.checkInputDecimal(val, 1, 99);
+                    val = utils.checkInputDecimal(val, 0.5, 99);
                 }
                 if (val !== elBorderWidth.val()) {
                     elBorderWidth.val(val);
@@ -1381,6 +1382,17 @@ export default class StylePanel extends PanelBase {
         elFormField.append(elPaddingBottomDiv);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
+    }
+
+    destroy() {
+        StylePanel.destroyStyle('style_');
+    }
+
+    static destroyStyle(idPrefix) {
+        $(`#rbro_${idPrefix}text_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}background_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}alternate_background_color`).spectrum('destroy');
+        $(`#rbro_${idPrefix}border_color`).spectrum('destroy');
     }
 
     /**

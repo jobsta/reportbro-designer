@@ -1,6 +1,35 @@
 # Changelog
 
-## [Upcoming Release]
+## [1.5.2] - 2020-10-06
+
+### Changes
+* option to set default font for new text and style
+* update logo and css styling
+* option to set css theme
+* add getClassName method for introspection to command, data and element classes
+
+## [1.5.1] - 2020-07-27
+
+### Features
+* option to highlight unused parameters on report load
+
+### Changes
+* add destroy method to remove dom nodes and event handlers
+* allow border width in 0.5 steps
+
+### Bug Fixes
+* update table width after deleting column
+
+## [1.5.0] - 2020-07-15
+
+### Features
+* option to expand column width if there are hidden columns
+* option to force page break for each new group in a table
+* option to enable text wrap in spreadsheet cell
+
+### Changes
+* show list parameters in popup window for expression
+(this allows to reference fields of the same row in the expression)
 
 ### Bug Fixes
 * fix javascript error when parameter name is empty
@@ -10,6 +39,7 @@
 ### Features
 * dynamic document element panel which allows modifying multiple
 document elements (also of different kinds) at once
+* allow modifying text style settings when a style is selected
 
 ### Changes
 * add selectCallback which is called when an object is selected/deselected

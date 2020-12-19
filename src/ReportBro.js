@@ -42,12 +42,14 @@ export default class ReportBro {
             additionalFonts: [],
             adminMode: true,
             cmdExecutedCallback: null,
+            defaultFont: Style.font.helvetica,
             enableSpreadsheet: true,
             fonts: [
-                { name: 'Courier', value: 'courier' },
-                { name: 'Helvetica', value: 'helvetica' },
-                { name: 'Times New Roman', value: 'times' }
+                { name: 'Courier', value: Style.font.courier },
+                { name: 'Helvetica', value: Style.font.helvetica },
+                { name: 'Times New Roman', value: Style.font.times }
             ],
+            highlightUnusedParameters: false,
             localStorageReportKey: null,
             menuShowButtonLabels: false,
             menuShowDebug: false,
@@ -74,7 +76,8 @@ export default class ReportBro {
             ],
             reportServerTimeout: 20000,
             reportServerUrl: 'https://www.reportbro.com/report/run',
-            reportServerUrlCrossDomain: false
+            reportServerUrlCrossDomain: false,
+            theme: ''
         };
         if (properties) {
             for (let prop in properties) {
@@ -87,6 +90,22 @@ export default class ReportBro {
         if (this.properties.additionalFonts.length > 0) {
             this.properties.fonts = this.properties.fonts.concat(this.properties.additionalFonts);
         }
+        // make sure defaultFont is available, otherwise use first entry of font list
+        let defaultFontExists = false;
+        for (let font of this.properties.fonts) {
+            if (this.properties.defaultFont === font.value) {
+                defaultFontExists = true;
+                break;
+            }
+        }
+        if (!defaultFontExists) {
+            if (this.properties.fonts.length > 0) {
+                this.properties.defaultFont = this.properties.fonts[0].value;
+            } else {
+                this.properties.defaultFont = '';
+            }
+        }
+
         if (this.properties.patternAdditionalDates.length > 0) {
             this.properties.patternDates = this.properties.patternDates.concat(this.properties.patternAdditionalDates);
         }
@@ -94,7 +113,6 @@ export default class ReportBro {
             this.properties.patternNumbers = this.properties.patternNumbers.concat(this.properties.patternAdditionalNumbers);
         }
 
-        //this.detailData = null;
         this.document = new Document(element, this.properties.showGrid, this);
         this.popupWindow = new PopupWindow(element, this);
         this.docElements = [];
@@ -109,7 +127,6 @@ export default class ReportBro {
         this.mainPanel = new MainPanel(element, this.headerBand, this.contentBand, this.footerBand,
                 this.parameterContainer, this.styleContainer, this);
         this.menuPanel = new MenuPanel(element, this);
-        this.docElementPanel = new DocElementPanel(element, this);
         this.activeDetailPanel = 'none';
         this.detailPanels = {
             'none': new EmptyDetailPanel(element, this),
@@ -373,6 +390,11 @@ export default class ReportBro {
         if (this.getProperty('menuSidebar')) {
             this.element.addClass('rbroMenuPanelSidebar');
         }
+        if (this.getProperty('theme') === 'classic') {
+            $('body').addClass('rbroClassicTheme');
+        } else {
+            $('body').addClass('rbroDefaultTheme');
+        }
         this.element.append('<div class="rbroLogo"></div>');
         this.element.append('<div class="rbroMenuPanel" id="rbro_menu_panel"></div>');
         this.element.append(
@@ -387,7 +409,7 @@ export default class ReportBro {
         for (let panelName in this.detailPanels) {
             this.detailPanels[panelName].render();
         }
-        this.detailPanels[this.activeDetailPanel].show(this.detailData);
+        this.detailPanels[this.activeDetailPanel].show();
         this.document.render();
         this.popupWindow.render();
         this.updateMenuButtons();
@@ -512,6 +534,8 @@ export default class ReportBro {
                     }
                 }
             }
+        } else if (obj instanceof Parameter) {
+            obj.appendFieldParameterItems(parameters, allowedTypes, true);
         }
 
         parameters.push({ separator: true, name: this.getLabel('parameters') });
@@ -531,19 +555,19 @@ export default class ReportBro {
     /**
      * Returns a list of all array field parameter items.
      * Used for parameter popup window.
-     * @param {String} fieldType - allowed parameter type which will be added to the
-     * parameter list. If empty all parameter types are allowed.
+     * @param {String[]} allowedTypes - specify allowed parameter types which will
+     * be added to the parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
      * optional separator (Boolean).
      */
-    getArrayFieldParameterItems(fieldType) {
+    getArrayFieldParameterItems(allowedTypes) {
         let parameters = [];
         let parameterItems = this.getMainPanel().getParametersItem().getChildren();
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         for (let parameterItem of parameterItems) {
             let parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.array) {
-                parameter.appendFieldParameterItems(parameters, fieldType);
+                parameter.appendFieldParameterItems(parameters, allowedTypes, false);
             }
         }
         return parameters;
@@ -1124,7 +1148,7 @@ export default class ReportBro {
      * Shows a global loading image which disables all controls.
      */
     showLoading() {
-        if ($('#rbro_loading_div').length == 0) {
+        if ($('#rbro_loading_div').length === 0) {
             $('body').append('<div id="rbro_loading_div" class="rbroLoadingIndicator"></div>');
         }
     }
@@ -1303,6 +1327,16 @@ export default class ReportBro {
                 }
             }
         }
+
+        if (this.getProperty('highlightUnusedParameters')) {
+            // if unused parameters are highlighted the marker is removed on save
+            for (let parameter of this.getParameters()) {
+                if (parameter.editable) {
+                    parameter.setHighlightUnused(false);
+                }
+            }
+        }
+
         this.updateMenuButtons();
     }
 
@@ -1364,6 +1398,33 @@ export default class ReportBro {
             this.createDocElement(docElementData);
         }
 
+        if (this.getProperty('highlightUnusedParameters')) {
+            // highlight unused parameters when report is loaded
+
+            // to determine if a parameter is used we query the commands
+            // which would be necessary in case the parameter name is changed.
+            // if no commands are returned then the parameter is not used
+            let docElements = this.getDocElements(true);
+            for (let parameter of this.getParameters()) {
+                if (parameter.editable) {
+                    let cmdGroup = new CommandGroupCmd('Temp group');
+                    for (let docElement of docElements) {
+                        docElement.addCommandsForChangedParameterName(
+                            parameter, parameter.getName(), cmdGroup);
+                    }
+                    for (let otherParam of this.getParameters()) {
+                        if (otherParam.getId() !== parameter.getId()) {
+                            otherParam.addCommandsForChangedParameterName(
+                                parameter, parameter.getName(), cmdGroup);
+                        }
+                    }
+                    if (cmdGroup.isEmpty()) {
+                        parameter.setHighlightUnused(true);
+                    }
+                }
+            }
+        }
+
         this.browserDragType = '';
         this.browserDragId = '';
 
@@ -1406,6 +1467,19 @@ export default class ReportBro {
         if (this.reportKey !== null) {
             window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
         }
+    }
+
+    /**
+     * Delete ReportBro Instance including all dom nodes and all registered event handlers.
+     */
+    destroy() {
+        this.popupWindow.destroy();
+        for (let panelName in this.detailPanels) {
+            this.detailPanels[panelName].destroy();
+        }
+        this.element.remove();
+        $(document).off('keydown');
+        $(document).off('mouseup');
     }
 
     /**
