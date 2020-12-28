@@ -69,15 +69,28 @@ export default class ParameterPanel extends PanelBase {
                         parent.addUpdateTestDataCmdForChangedParameter(
                             selectedObject.getName(), newParameterName, cmdGroup);
                     }
-                    // add commands to convert all values containing the currently changed parameter
-                    let docElements = this.rb.getDocElements(true);
-                    for (let docElement of docElements) {
-                        docElement.addCommandsForChangedParameterName(
-                            selectedObject, newParameterName, cmdGroup);
+
+                    let parentPanelItem = null;
+                    if (parent !== null) {
+                        parentPanelItem = parent.getPanelItem();
+                    } else {
+                        parentPanelItem = this.rb.getMainPanel().getParametersItem();
                     }
-                    for (let parameter of this.rb.getParameters()) {
-                        parameter.addCommandsForChangedParameterName(
-                            selectedObject, newParameterName, cmdGroup);
+
+                    // only update parameter references on name change if the parameter name is unique
+                    if (parentPanelItem !== null &&
+                            parentPanelItem.getChildByNameExclude(selectedObject.getName(), selectedObject) === null &&
+                            parentPanelItem.getChildByNameExclude(newParameterName, selectedObject) === null) {
+                        // add commands to convert all values containing the currently changed parameter
+                        let docElements = this.rb.getDocElements(true);
+                        for (let docElement of docElements) {
+                            docElement.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
+                        }
+                        for (let parameter of this.rb.getParameters()) {
+                            parameter.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
+                        }
                     }
                     this.rb.executeCommand(cmdGroup);
                 }
