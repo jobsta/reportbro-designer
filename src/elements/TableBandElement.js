@@ -211,6 +211,7 @@ export default class TableBandElement extends DocElement {
                     data.band = this.band;
                     data.parentId = this.id;
                     data.tableId = this.parentId;
+                    data.height = this.height;
                 }
             } else {
                 data = { band: this.band, columnIndex: i, parentId: this.id, tableId: this.parentId,
