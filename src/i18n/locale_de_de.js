@@ -138,6 +138,7 @@ var locale_de = {
     menuToggleGrid: 'Raster ein-/ausblenden',
     menuUndo: 'RÜCKG.',
     menuUndoTip: 'Letzten Befehl rückgängig machen',
+    nameCopySuffix: 'Kopie',
     orientation: 'Ausrichtung',
     orientationBottom: 'unten',
     orientationLandscape: 'Querformat',
