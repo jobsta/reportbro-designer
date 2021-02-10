@@ -103,6 +103,7 @@ var locale_de = {
     errorMsgMissingParameter: 'Parameter nicht gefunden',
     errorMsgMissingParameterData: 'Daten für Parameter {info} nicht gefunden',
     errorMsgSectionBandNotOnSamePage: 'Abschnittsbereich passt nicht auf eine Seite',
+    errorMsgSectionBandPageBreakNotAllowed: 'Manueller Seitenumbruch ist nicht erlaubt',
     errorMsgUnicodeEncodeError: 'Text enthält nicht druckbare Zeichen',
     errorMsgUnsupportedImageType: 'Bildtyp wird nicht unterstützt (nur .jpg und .png erlaubt)',
     footer: 'Fußzeile',

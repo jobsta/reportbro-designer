@@ -1360,6 +1360,7 @@ export default class DocElementPanel extends PanelBase {
                 }
             });
         elFormField.append(elAlwaysPrintOnSamePage);
+        elFormField.append('<div id="rbro_doc_element_always_print_on_same_page_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
