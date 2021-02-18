@@ -21,6 +21,8 @@ export default class Document {
         this.elSelectionArea = null;
         this.gridVisible = showGrid;
         this.gridSize = 10;
+        this.zoom = 100;  // zoom level in percent
+        this.zoomLevels = [25, 50, 75, 100, 150, 200, 400];
         this.pdfPreviewExists = false;
 
         // moving/resizing of element
@@ -52,7 +54,8 @@ export default class Document {
                 }
                 let offset = this.elDocContent.offset();
                 this.startSelectionArea(
-                    event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
+                    this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
+                    this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top));
             });
 
         let elDocTabs = $('<div id="rbro_document_tabs" class="rbroDocumentTabs"></div>')
@@ -158,7 +161,8 @@ export default class Document {
         } else if (this.selectionAreaStarted) {
             let offset = this.elDocContent.offset();
             let area = this.getSelectionArea(
-                event.originalEvent.pageX - offset.left, event.originalEvent.pageY - offset.top);
+                this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
+                this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top));
             let props = {
                 left: this.rb.toPixel(area.left), top: this.rb.toPixel(area.top),
                 width: this.rb.toPixel(area.width), height: this.rb.toPixel(area.height)};
@@ -201,7 +205,6 @@ export default class Document {
                 this.dragCurrentY = absPos.y;
             }
             $('.rbroElementContainer').removeClass('rbroElementDragOver');
-            let docProperties = this.rb.getDocumentProperties();
             let container = this.getContainer(
                 this.dragCurrentX, this.dragCurrentY, this.dragElementType);
             while (container !== null && !container.isElementAllowed(this.dragElementType)) {
@@ -209,8 +212,8 @@ export default class Document {
             }
             if (container !== null && container.isElementAllowed(this.dragElementType)) {
                 let offset = this.elDocContent.offset();
-                let x = this.dragCurrentX - offset.left;
-                let y = this.dragCurrentY - offset.top;
+                let x = this.getCoordWithoutZoom(this.dragCurrentX - offset.left);
+                let y = this.getCoordWithoutZoom(this.dragCurrentY - offset.top);
                 let containerOffset = container.getOffset();
                 x -= containerOffset.x;
                 y -= containerOffset.y;
@@ -259,8 +262,8 @@ export default class Document {
         let dragObject = this.rb.getDataObject(this.dragObjectId);
         if (dragObject !== null) {
             let dragDiff = dragObject.getDragDiff(
-                absPos.x - this.dragStartX,
-                absPos.y - this.dragStartY, this.dragType,
+                this.getCoordWithoutZoom(absPos.x - this.dragStartX),
+                this.getCoordWithoutZoom(absPos.y - this.dragStartY), this.dragType,
                 (this.dragSnapToGrid && this.isGridVisible()) ? this.getGridSize() : 0);
             this.rb.updateSelectionDrag(dragDiff.x, dragDiff.y, this.dragType, null, false);
         }
@@ -392,7 +395,9 @@ export default class Document {
      */
     getContainer(absPosX, absPosY, elementType) {
         let offset = this.elDocContent.offset();
-        return this.rb.getContainer(absPosX - offset.left, absPosY - offset.top, elementType);
+        return this.rb.getContainer(
+            this.getCoordWithoutZoom(absPosX - offset.left),
+            this.getCoordWithoutZoom(absPosY - offset.top), elementType);
     }
 
     /**
@@ -416,6 +421,51 @@ export default class Document {
         } else {
             this.elDocContent.removeClass('rbroDocumentGrid');
         }
+    }
+
+    zoomIn() {
+        for (let i=0; i < this.zoomLevels.length - 1; i++) {
+            if (this.zoom === this.zoomLevels[i]) {
+                this.updateZoomLevel(this.zoomLevels[i + 1]);
+                break;
+            }
+        }
+    }
+
+    zoomOut() {
+        for (let i=1; i < this.zoomLevels.length; i++) {
+            if (this.zoom === this.zoomLevels[i]) {
+                this.updateZoomLevel(this.zoomLevels[i - 1]);
+                break;
+            }
+        }
+    }
+
+    isZoomInPossible() {
+        return this.zoom < this.zoomLevels[this.zoomLevels.length - 1];
+    }
+
+    isZoomOutPossible() {
+        return this.zoom > this.zoomLevels[0];
+    }
+
+    updateZoomLevel(zoom) {
+        this.zoom = zoom;
+        if (zoom !== 100) {
+            let size = this.rb.getDocumentProperties().getPageSize();
+            let translateX = Math.round(((size.width * (zoom / 100)) / 2) - (size.width / 2));
+            let translateY = Math.round(((size.height * (zoom / 100)) / 2) - (size.height / 2));
+            $('#rbro_menu_zoom_level').text(zoom + ' %');
+            $('#rbro_document_pdf').css(
+                'transform', `translate(${translateX}px, ${translateY}px) scale(${this.zoom / 100})`);
+        } else {
+            $('#rbro_menu_zoom_level').text('');
+            $('#rbro_document_pdf').css('transform', '');
+        }
+    }
+
+    getCoordWithoutZoom(coord) {
+        return Math.round(coord * (100 / this.zoom));
     }
 
     getGridSize() {
@@ -459,8 +509,8 @@ export default class Document {
     }
 
     stopDrag() {
-        let diffX = this.dragCurrentX - this.dragStartX;
-        let diffY = this.dragCurrentY - this.dragStartY;
+        let diffX = this.getCoordWithoutZoom(this.dragCurrentX - this.dragStartX);
+        let diffY = this.getCoordWithoutZoom(this.dragCurrentY - this.dragStartY);
         let dragObject = this.rb.getDataObject(this.dragObjectId);
         if (dragObject !== null && (diffX !== 0 || diffY !== 0)) {
             let container = null;
@@ -574,8 +624,8 @@ export default class Document {
         if (this.selectionAreaStarted) {
             let offset = this.elDocContent.offset();
             this.stopSelectionArea(
-                event.originalEvent.pageX - offset.left,
-                event.originalEvent.pageY - offset.top,
+                this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
+                this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top),
                 !event.shiftKey);
         }
     }

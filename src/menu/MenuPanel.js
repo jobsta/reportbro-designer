@@ -375,6 +375,24 @@ export default class MenuPanel {
         elRowActionsDiv.append(elRowDelete);
         elActionsDiv.append(elRowActionsDiv);
 
+        elActionsDiv.append($('<span id="rbro_menu_zoom_level"></span>'));
+        let elMenuZoomIn = $(`<button id="rbro_menu_zoom_in"
+                class="rbroButton rbroGridButton rbroActionButton rbroIcon-zoomIn
+                ${!this.rb.getDocument().isZoomInPossible() ? 'rbroButtonInactive' : ''}" type="button"
+                title="${this.rb.getLabel('menuZoomIn')}">ZI</button>`)
+            .click(event => {
+                this.rb.getDocument().zoomIn();
+            });
+        elActionsDiv.append(elMenuZoomIn);
+        let elMenuZoomOut = $(`<button id="rbro_menu_zoom_out"
+                class="rbroButton rbroGridButton rbroActionButton rbroIcon-zoomOut
+                ${!this.rb.getDocument().isZoomOutPossible() ? 'rbroButtonInactive' : ''}" type="button"
+                title="${this.rb.getLabel('menuZoomOut')}">ZO</button>`)
+            .click(event => {
+                this.rb.getDocument().zoomOut();
+            });
+        elActionsDiv.append(elMenuZoomOut);
+
         let elMenuToggleGrid = $(`<button id="rbro_menu_toggle_grid"
                 class="rbroButton rbroGridButton rbroActionButton rbroIcon-grid ${this.rb.getProperty('showGrid') ? 'rbroButtonActive' : ''}" type="button"
                 title="${this.rb.getLabel('menuToggleGrid')}"></button>`)
@@ -383,6 +401,7 @@ export default class MenuPanel {
                 this.rb.getDocument().toggleGrid();
             });
         elActionsDiv.append(elMenuToggleGrid);
+
         panelRight.append(elActionsDiv);
         panel.append(panelRight);
     }
