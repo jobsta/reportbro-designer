@@ -446,6 +446,11 @@ export default class ReportBro {
             this.document.mouseUp(event);
             this.popupWindow.hide();
         });
+
+        $(window).resize(event => {
+            this.document.windowResized();
+        });
+
         this.element
             .on('dragstart', event => {
                 // disable dragging per default, otherwise e.g. a text selection can be dragged in Chrome
@@ -456,6 +461,14 @@ export default class ReportBro {
                    this.document.processMouseMove(event);
                }
            });
+    }
+
+    /**
+     * Returns total width of element containing ReportBro Designer.
+     * @returns {Number}
+     */
+    getWidth() {
+        return this.element.width();
     }
 
     setup() {

@@ -14,6 +14,7 @@ export default class Document {
     constructor(rootElement, showGrid, rb) {
         this.rootElement = rootElement;
         this.rb = rb;
+        this.elDoc = null;
         this.elDocContent = null;
         this.elHeader = null;
         this.elContent = null;
@@ -88,8 +89,8 @@ export default class Document {
         elDocTabs.append(btnPdfPreview);
         panel.append(elDocTabs);
 
-        let elDoc = $('<div id="rbro_document_pdf" class="rbroDocument rbroDragTarget rbroHidden"></div>');
         let docProperties = this.rb.getDocumentProperties();
+        this.elDoc = $('<div id="rbro_document_pdf" class="rbroDocument rbroDragTarget rbroHidden"></div>');
         this.elDocContent = $(`<div id="rbro_document_content"
             class="rbroDocumentContent ${this.gridVisible ? 'rbroDocumentGrid' : ''}"></div>`);
         this.elHeader = $(`<div id="rbro_header" class="rbroDocumentBand rbroElementContainer"
@@ -103,20 +104,20 @@ export default class Document {
             style="bottom: 0px; left 0px;"></div>`);
         this.elFooter.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandFooter')}</div>`));
         this.elDocContent.append(this.elFooter);
-        elDoc.append(this.elDocContent);
+        this.elDoc.append(this.elDocContent);
 
         this.elSelectionArea = $('<div id="rbro_selection_area" class="rbroHidden rbroSelectionArea"></div>');
         this.elDocContent.append(this.elSelectionArea);
 
         this.initializeEventHandlers();
 
-        elDoc.append('<div id="rbro_divider_margin_left" class="rbroDivider rbroDividerMarginLeft"></div>');
-        elDoc.append('<div id="rbro_divider_margin_top" class="rbroDivider rbroDividerMarginTop"></div>');
-        elDoc.append('<div id="rbro_divider_margin_right" class="rbroDivider rbroDividerMarginRight"></div>');
-        elDoc.append('<div id="rbro_divider_margin_bottom" class="rbroDivider rbroDividerMarginBottom"></div>');
-        elDoc.append('<div id="rbro_divider_header" class="rbroDivider rbroDividerHeader"></div>');
-        elDoc.append('<div id="rbro_divider_footer" class="rbroDivider rbroDividerFooter"></div>');
-        panel.append(elDoc);
+        this.elDoc.append('<div id="rbro_divider_margin_left" class="rbroDivider rbroDividerMarginLeft"></div>');
+        this.elDoc.append('<div id="rbro_divider_margin_top" class="rbroDivider rbroDividerMarginTop"></div>');
+        this.elDoc.append('<div id="rbro_divider_margin_right" class="rbroDivider rbroDividerMarginRight"></div>');
+        this.elDoc.append('<div id="rbro_divider_margin_bottom" class="rbroDivider rbroDividerMarginBottom"></div>');
+        this.elDoc.append('<div id="rbro_divider_header" class="rbroDivider rbroDividerHeader"></div>');
+        this.elDoc.append('<div id="rbro_divider_footer" class="rbroDivider rbroDividerFooter"></div>');
+        panel.append(this.elDoc);
 
         panel.append($('<div id="rbro_document_pdf_preview" class="rbroDocumentPreview"></div>'));
 
@@ -270,7 +271,7 @@ export default class Document {
     }
 
     updatePageSize(width, height) {
-        $('#rbro_document_pdf').css({ width: this.rb.toPixel(width), height: this.rb.toPixel(height) });
+        this.elDoc.css({ width: this.rb.toPixel(width), height: this.rb.toPixel(height) });
     }
 
     updatePageMargins() {
@@ -339,13 +340,13 @@ export default class Document {
         // use z-index to show pdf preview instead of show/hide of div because otherwise pdf is reloaded (and generated) again
         if (tab === Document.tab.pdfLayout) {
             $('#rbro_document_tab_pdf_layout').addClass('rbroActive');
-            $('#rbro_document_pdf').removeClass('rbroHidden');
+            this.elDoc.removeClass('rbroHidden');
             $('#rbro_document_pdf_preview').css({ 'z-index': '', 'height': '0' });
             $('.rbroElementButtons .rbroMenuButton').removeClass('rbroDisabled').prop('draggable', true);
             $('.rbroActionButtons .rbroActionButton').prop('disabled', false);
         } else if (this.pdfPreviewExists && tab === Document.tab.pdfPreview) {
             $('#rbro_document_tab_pdf_preview').addClass('rbroActive');
-            $('#rbro_document_pdf').addClass('rbroHidden');
+            this.elDoc.addClass('rbroHidden');
             $('#rbro_document_pdf_preview').css({ 'z-index': '1', 'height': '' });
             $('.rbroElementButtons .rbroMenuButton').addClass('rbroDisabled').prop('draggable', false);
             $('.rbroActionButtons .rbroActionButton').prop('disabled', true);
@@ -453,14 +454,30 @@ export default class Document {
         this.zoom = zoom;
         if (zoom !== 100) {
             let size = this.rb.getDocumentProperties().getPageSize();
-            let translateX = Math.round(((size.width * (zoom / 100)) / 2) - (size.width / 2));
+            let scaledWidth = size.width * (zoom / 100);
+            let rbWidth = this.rb.getWidth();
+            let panelWidth = this.rb.getMainPanel().getTotalPanelWidth();
+            let translateX = 0;
+            if (scaledWidth > (rbWidth - panelWidth)) {
+                // if there is not enough space in the document panel we remove any margin and
+                // manually center the content by translating x coord with difference of center
+                // for document panel and content
+                this.elDoc.css('margin', '0');
+                translateX = Math.round((scaledWidth / 2) - (size.width / 2));
+            } else {
+                // if there is enough space in the document panel we use the default margin (auto)
+                // so the content is automatically centered in the available space
+                this.elDoc.css('margin', '');
+            }
             let translateY = Math.round(((size.height * (zoom / 100)) / 2) - (size.height / 2));
             $('#rbro_menu_zoom_level').text(zoom + ' %');
-            $('#rbro_document_pdf').css(
+            this.elDoc.css(
                 'transform', `translate(${translateX}px, ${translateY}px) scale(${this.zoom / 100})`);
         } else {
             $('#rbro_menu_zoom_level').text('');
-            $('#rbro_document_pdf').css('transform', '');
+            // remove margin and transform used for zoomed content
+            this.elDoc.css('margin', '10px auto');
+            this.elDoc.css('transform', '');
         }
     }
 
@@ -628,6 +645,11 @@ export default class Document {
                 this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top),
                 !event.shiftKey);
         }
+    }
+
+    windowResized() {
+        // the document content position must be updated in case the available space changed
+        this.updateZoomLevel(this.zoom);
     }
 }
 
