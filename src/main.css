@@ -49,7 +49,6 @@
 /* normalizing styles */
 #reportbro * {
     font-family: inherit;
-    font-weight: inherit;
     outline: none;
 }
 
@@ -64,7 +63,7 @@
     padding: 0;
     position: absolute;
     width: 100%;
-    min-width: 1060px; /* prevent menu item wrap on too small screens */
+    min-width: 1140px; /* prevent menu item wrap on too small screens */
     height: 100%;
     top: auto;
     left: auto;
@@ -208,6 +207,15 @@
     display: inline-block;
 }
 
+.rbroActionButtons .rbroZoomLevel {
+    position: absolute;
+    bottom: -3px;
+    width: 86px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+}
+
 /* Sidebar menu enabled  */
 
 .rbroMenuPanelSidebar .rbroMainPanel {
@@ -269,6 +277,11 @@
 .rbroMenuPanelSidebar .rbroActionButtons button {
     display: block;
     margin: 4px;
+}
+
+.rbroMenuPanelSidebar .rbroActionButtons .rbroZoomLevel {
+    width: 98px;
+    bottom: 34px;
 }
 
 .rbroMenuPanelSidebar .rbroContainer {
