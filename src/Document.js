@@ -276,16 +276,27 @@ export default class Document {
 
     updatePageMargins() {
         let docProperties = this.rb.getDocumentProperties();
-        let left = this.rb.toPixel(utils.convertInputToNumber(docProperties.getValue('marginLeft')) - 1);
-        let top = this.rb.toPixel(utils.convertInputToNumber(docProperties.getValue('marginTop')) - 1);
+        let marginLeft = utils.convertInputToNumber(docProperties.getValue('marginLeft'));
+        let marginTop = utils.convertInputToNumber(docProperties.getValue('marginTop'));
         let marginRight = utils.convertInputToNumber(docProperties.getValue('marginRight'));
         let marginBottom = utils.convertInputToNumber(docProperties.getValue('marginBottom'));
+        let left = this.rb.toPixel(marginLeft - 1);
+        let top = this.rb.toPixel(marginTop - 1);
         let right = this.rb.toPixel(marginRight);
         let bottom = this.rb.toPixel(marginBottom);
         $('#rbro_divider_margin_left').css('left', left);
         $('#rbro_divider_margin_top').css('top', top);
-        // hide right/bottom divider in case margin is 0, otherwise divider is still visible
-        // because it is one pixel to the left/top of document border
+        // hide divider in case margin is 0, otherwise divider is still visible
+        if (marginLeft !== 0) {
+            $('#rbro_divider_margin_left').css('left', left).show();
+        } else {
+            $('#rbro_divider_margin_left').hide();
+        }
+        if (marginTop !== 0) {
+            $('#rbro_divider_margin_top').css('top', top).show();
+        } else {
+            $('#rbro_divider_margin_top').hide();
+        }
         if (marginRight !== 0) {
             $('#rbro_divider_margin_right').css('right', right).show();
         } else {
@@ -476,7 +487,7 @@ export default class Document {
         } else {
             $('#rbro_menu_zoom_level').text('');
             // remove margin and transform used for zoomed content
-            this.elDoc.css('margin', '10px auto');
+            this.elDoc.css('margin', '');
             this.elDoc.css('transform', '');
         }
     }

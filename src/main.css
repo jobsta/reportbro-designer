@@ -563,19 +563,19 @@ ul ul .rbroMenuItemText {
 /* Document Panel - Template layouting and PDF preview */
 
 .rbroDocumentPanel {
-    right: 0;
+    padding: 10px;
+}
+
+.rbroHasTabs.rbroDocumentPanel {
+    padding: 0 10px;
 }
 
 .rbroDocument {
     background-color: #FFFFFF;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-    margin: 10px auto;
+    margin: 0 auto;
     overflow: hidden;
     position: relative;
-}
-
-.rbroHasTabs .rbroDocument {
-    margin: 0 auto 10px auto;
 }
 
 .rbroDocumentContent {

@@ -154,7 +154,7 @@ export default class MainPanel {
             totalPanelWidth += 104;
             $('#reportbro .rbroLogo').css({ width: mainPanelWidth });
         }
-        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)` });
+        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)`,left: totalPanelWidth });
     }
 
     checkMainPanelWidth(mainPanelWidth) {
