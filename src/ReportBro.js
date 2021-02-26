@@ -508,6 +508,10 @@ export default class ReportBro {
         return this.mainPanel;
     }
 
+    getMenuPanel() {
+        return this.menuPanel;
+    }
+
     getDocument() {
         return this.document;
     }

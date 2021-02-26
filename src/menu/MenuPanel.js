@@ -405,4 +405,17 @@ export default class MenuPanel {
         panelRight.append(elActionsDiv);
         panel.append(panelRight);
     }
+
+    updateZoomButtons(zoomInPossible, zoomOutPossible) {
+        if (zoomInPossible) {
+            $('#rbro_menu_zoom_in').removeAttr('disabled');
+        } else {
+            $('#rbro_menu_zoom_in').attr('disabled', 'disabled');
+        }
+        if (zoomOutPossible) {
+            $('#rbro_menu_zoom_out').removeAttr('disabled');
+        } else {
+            $('#rbro_menu_zoom_out').attr('disabled', 'disabled');
+        }
+    }
 }

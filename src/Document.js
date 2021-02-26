@@ -490,6 +490,7 @@ export default class Document {
             this.elDoc.css('margin', '');
             this.elDoc.css('transform', '');
         }
+        this.rb.getMenuPanel().updateZoomButtons(this.isZoomInPossible(), this.isZoomOutPossible());
     }
 
     getCoordWithoutZoom(coord) {
