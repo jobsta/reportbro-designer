@@ -461,6 +461,14 @@ export default class Document {
         return this.zoom > this.zoomLevels[0];
     }
 
+    /**
+     * Is called when the page size was changed.
+     * Updates document style properties and is necessary in case the document is zoomed.
+     */
+    pageSizeChanged() {
+        this.updateZoomLevel(this.zoom);
+    }
+
     updateZoomLevel(zoom) {
         this.zoom = zoom;
         if (zoom !== 100) {
