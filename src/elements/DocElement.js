@@ -49,7 +49,7 @@ export default class DocElement {
         this.y = '' + this.y;
         this.width = '' + this.width;
         this.height = '' + this.height;
-        
+
         this.xVal = utils.convertInputToNumber(this.x);
         this.yVal = utils.convertInputToNumber(this.y);
         this.widthVal = utils.convertInputToNumber(this.width);
@@ -487,7 +487,8 @@ export default class DocElement {
             rv.y = dragY - posY1;
         } else {
             let containerSize = this.getContainerContentSize();
-            if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN || dragType === DocElement.dragType.sizerNE) {
+            if (dragType === DocElement.dragType.sizerNW || dragType === DocElement.dragType.sizerN ||
+                    dragType === DocElement.dragType.sizerNE) {
                 dragY = posY1 + diffY;
                 if (gridSize !== 0) {
                     dragY = utils.roundValueToInterval(dragY, gridSize);
@@ -503,7 +504,8 @@ export default class DocElement {
                 }
                 rv.y = dragY - posY1;
             }
-            if (dragType === DocElement.dragType.sizerNE || dragType === DocElement.dragType.sizerE || dragType === DocElement.dragType.sizerSE) {
+            if (dragType === DocElement.dragType.sizerNE || dragType === DocElement.dragType.sizerE ||
+                    dragType === DocElement.dragType.sizerSE) {
                 dragX = posX2 + diffX;
                 if (gridSize !== 0) {
                     dragX = utils.roundValueToInterval(dragX, gridSize);
@@ -519,7 +521,8 @@ export default class DocElement {
                 }
                 rv.x = dragX - posX2;
             }
-            if (dragType === DocElement.dragType.sizerSE || dragType === DocElement.dragType.sizerS || dragType === DocElement.dragType.sizerSW) {
+            if (dragType === DocElement.dragType.sizerSE || dragType === DocElement.dragType.sizerS ||
+                    dragType === DocElement.dragType.sizerSW) {
                 dragY = posY2 + diffY;
                 if (gridSize !== 0) {
                     dragY = utils.roundValueToInterval(dragY, gridSize);
@@ -535,7 +538,8 @@ export default class DocElement {
                 }
                 rv.y = dragY - posY2;
             }
-            if (dragType === DocElement.dragType.sizerSW || dragType === DocElement.dragType.sizerW || dragType === DocElement.dragType.sizerNW) {
+            if (dragType === DocElement.dragType.sizerSW || dragType === DocElement.dragType.sizerW ||
+                    dragType === DocElement.dragType.sizerNW) {
                 dragX = posX1 + diffX;
                 if (gridSize !== 0) {
                     dragX = utils.roundValueToInterval(dragX, gridSize);
@@ -817,7 +821,7 @@ export default class DocElement {
         let dataSources = [];
         let paramRef = null;
         let newParamRef = null;
-        
+
         this.getAllDataSources(dataSources, null);
 
         if (paramParent !== null && paramParent.getValue('type') === Parameter.type.array) {
@@ -925,10 +929,6 @@ export default class DocElement {
             }
         }
         return ret;
-    }
-
-    toJSON() {
-        return JSON.stringify(this.toJS());
     }
 }
 

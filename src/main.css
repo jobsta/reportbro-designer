@@ -49,7 +49,6 @@
 /* normalizing styles */
 #reportbro * {
     font-family: inherit;
-    font-weight: inherit;
     outline: none;
 }
 
@@ -64,7 +63,7 @@
     padding: 0;
     position: absolute;
     width: 100%;
-    min-width: 1060px; /* prevent menu item wrap on too small screens */
+    min-width: 1140px; /* prevent menu item wrap on too small screens */
     height: 100%;
     top: auto;
     left: auto;
@@ -208,6 +207,31 @@
     display: inline-block;
 }
 
+.rbroZoom {
+    margin: 4px;
+}
+
+.rbroZoom .rbroZoomLevel {
+    font-size: 11px;
+    vertical-align: middle;
+    width: 32px;
+    display: inline-block;
+    text-align: right;
+}
+
+.rbroZoomButton.rbroRoundButton {
+    margin: 0 0 0 4px;
+}
+
+.rbroZoomButton.rbroRoundButton:not([disabled]) {
+    color: var(--rbro-primary-text-color);
+    background-color: #E4E7EA;
+}
+
+.rbroZoomButton.rbroRoundButton:not([disabled]):hover {
+    background-color: rgba(0,0,0,0.15);
+}
+
 /* Sidebar menu enabled  */
 
 .rbroMenuPanelSidebar .rbroMainPanel {
@@ -221,14 +245,15 @@
 }
 
 .rbroMenuPanelSidebar .rbroDocumentPanel {
-    right: 104px;
+    right: 92px;
+    padding: 10px 0;
 }
 
 .rbroMenuPanelSidebar .rbroMenuPanel {
     right: 0;
     top: 0;
     left: auto;
-    width: 104px;
+    width: 92px;
     height: 100%;
     padding: 2px;
     box-sizing: border-box;
@@ -266,9 +291,17 @@
     flex-wrap: wrap;
 }
 
-.rbroMenuPanelSidebar .rbroActionButtons button {
+.rbroMenuPanelSidebar .rbroActionButtons .rbroActionButton {
     display: block;
-    margin: 4px;
+    margin: 4px 1px;
+}
+
+.rbroMenuPanelSidebar .rbroZoom {
+    margin: 4px 0;
+}
+
+.rbroMenuPanelSidebar .rbroZoomButton {
+    display: inline-block;
 }
 
 .rbroMenuPanelSidebar .rbroContainer {
@@ -550,19 +583,22 @@ ul ul .rbroMenuItemText {
 /* Document Panel - Template layouting and PDF preview */
 
 .rbroDocumentPanel {
+    padding-top: 10px;
     right: 0;
+    border: 2px solid #E4E7EA;
+}
+
+.rbroHasTabs.rbroDocumentPanel {
+    padding: 0 10px;
 }
 
 .rbroDocument {
     background-color: #FFFFFF;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-    margin: 10px auto;
+    margin: 0 auto;
     overflow: hidden;
     position: relative;
-}
-
-.rbroHasTabs .rbroDocument {
-    margin: 0 auto 10px auto;
+    transform-origin: top left;
 }
 
 .rbroDocumentContent {
@@ -889,7 +925,6 @@ ul ul .rbroMenuItemText {
     cursor: pointer;
     transition: all 0.2s linear;
     display: inline-block;
-    vertical-align: top;
     box-sizing: border-box;
     border: inherit;
     margin: 0;
@@ -921,7 +956,7 @@ button.rbroActionButton.rbroButtonActive {
 
 .rbroMenuButton {
     height: 45px;
-    padding: 12px 14px;
+    padding: 12px 13px;
     text-align: center;
     border-right: 1px solid #E4E7EA;
     font-size: 16px;

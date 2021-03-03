@@ -161,7 +161,6 @@ export function getDataTransferType(transferType, prefix) {
 }
 
 export function getEventAbsPos(event) {
-    let absPosX = 0, absPosY = 0;
     if (window.TouchEvent && event.originalEvent instanceof TouchEvent) {
         if (event.touches.length > 0) {
             let lastTouch = event.touches[event.touches.length - 1];

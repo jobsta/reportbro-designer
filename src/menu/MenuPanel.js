@@ -375,6 +375,26 @@ export default class MenuPanel {
         elRowActionsDiv.append(elRowDelete);
         elActionsDiv.append(elRowActionsDiv);
 
+        let elZoomDiv = $('<div id="rbro_menu_zoom" class="rbroZoom"></div>');
+        elZoomDiv.append($('<span id="rbro_menu_zoom_level" class="rbroZoomLevel"></span>'));
+        let elMenuZoomIn = $(`<button id="rbro_menu_zoom_in"
+                class="rbroButton rbroRoundButton rbroZoomButton rbroIcon-plus
+                ${!this.rb.getDocument().isZoomInPossible() ? 'rbroButtonInactive' : ''}" type="button"
+                title="${this.rb.getLabel('menuZoomIn')}"></button>`)
+            .click(event => {
+                this.rb.getDocument().zoomIn();
+            });
+        elZoomDiv.append(elMenuZoomIn);
+        let elMenuZoomOut = $(`<button id="rbro_menu_zoom_out"
+                class="rbroButton rbroRoundButton rbroZoomButton rbroIcon-minus
+                ${!this.rb.getDocument().isZoomOutPossible() ? 'rbroButtonInactive' : ''}" type="button"
+                title="${this.rb.getLabel('menuZoomOut')}"></button>`)
+            .click(event => {
+                this.rb.getDocument().zoomOut();
+            });
+        elZoomDiv.append(elMenuZoomOut);
+        elActionsDiv.append(elZoomDiv);
+
         let elMenuToggleGrid = $(`<button id="rbro_menu_toggle_grid"
                 class="rbroButton rbroGridButton rbroActionButton rbroIcon-grid ${this.rb.getProperty('showGrid') ? 'rbroButtonActive' : ''}" type="button"
                 title="${this.rb.getLabel('menuToggleGrid')}"></button>`)
@@ -383,7 +403,21 @@ export default class MenuPanel {
                 this.rb.getDocument().toggleGrid();
             });
         elActionsDiv.append(elMenuToggleGrid);
+
         panelRight.append(elActionsDiv);
         panel.append(panelRight);
+    }
+
+    updateZoomButtons(zoomInPossible, zoomOutPossible) {
+        if (zoomInPossible) {
+            $('#rbro_menu_zoom_in').removeAttr('disabled');
+        } else {
+            $('#rbro_menu_zoom_in').attr('disabled', 'disabled');
+        }
+        if (zoomOutPossible) {
+            $('#rbro_menu_zoom_out').removeAttr('disabled');
+        } else {
+            $('#rbro_menu_zoom_out').attr('disabled', 'disabled');
+        }
     }
 }

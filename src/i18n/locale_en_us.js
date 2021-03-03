@@ -139,6 +139,8 @@ var locale_en = {
     menuToggleGrid: 'Show/Hide grid',
     menuUndo: 'UNDO',
     menuUndoTip: 'Undo last command',
+    menuZoomIn: 'Zoom in',
+    menuZoomOut: 'Zoom out',
     nameCopySuffix: 'copy',
     orientation: 'Orientation',
     orientationBottom: 'bottom',

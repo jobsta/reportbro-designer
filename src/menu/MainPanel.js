@@ -14,11 +14,11 @@ export default class MainPanel {
         this.headerItem = new MainPanelItem(
             'band', null, headerBand,
             { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false, visible: this.rb.getDocumentProperties().getValue('header') }, rb);
-        
+
         this.documentItem = new MainPanelItem(
             'band', null, contentBand,
             { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false }, rb);
-        
+
         this.footerItem = new MainPanelItem(
             'band', null, footerBand,
             { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false, visible: this.rb.getDocumentProperties().getValue('footer') }, rb);
@@ -30,10 +30,10 @@ export default class MainPanel {
         this.stylesItem = new MainPanelItem(
             'style', null, styleContainer,
             { hasChildren: true, showAdd: true, showDelete: false, hasDetails: false }, rb);
-        
+
         this.documentPropertiesItem = new MainPanelItem(
             'documentProperties', null, rb.getDocumentProperties(), { showDelete: false, hasDetails: true }, rb);
-        
+
         this.items = [
             this.headerItem,
             this.documentItem,
@@ -131,6 +131,19 @@ export default class MainPanel {
         }
     }
 
+    /**
+     * Returns total panel width. This is the width of the main panel (containing the elements),
+     * the property panel and an optional menu sidebar.
+     * @returns {Number}
+     */
+    getTotalPanelWidth() {
+        let totalPanelWidth = this.mainPanelWidth + this.mainPanelSizerWidth + 390;
+        if (this.rb.getProperty('menuSidebar')) {
+            totalPanelWidth += 92;
+        }
+        return totalPanelWidth;
+    }
+
     updateMainPanelWidth(mainPanelWidth) {
         $('#rbro_main_panel').css({ width: mainPanelWidth });
         $('#rbro_main_panel_sizer').css({ left: mainPanelWidth });
@@ -138,7 +151,7 @@ export default class MainPanel {
         // calculate width of main panel, detail panel and sidebar (if available)
         let totalPanelWidth = mainPanelWidth + this.mainPanelSizerWidth + 390;
         if (this.rb.getProperty('menuSidebar')) {
-            totalPanelWidth += 104;
+            totalPanelWidth += 92;
             $('#reportbro .rbroLogo').css({ width: mainPanelWidth });
         }
         $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)` });

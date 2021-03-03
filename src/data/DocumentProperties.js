@@ -143,6 +143,7 @@ export default class DocumentProperties {
                 docElement.setWidth(size.width);
             }
         }
+        this.rb.getDocument().pageSizeChanged();
     }
 
     updateHeader() {
