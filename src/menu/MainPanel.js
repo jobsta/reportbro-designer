@@ -139,7 +139,7 @@ export default class MainPanel {
     getTotalPanelWidth() {
         let totalPanelWidth = this.mainPanelWidth + this.mainPanelSizerWidth + 390;
         if (this.rb.getProperty('menuSidebar')) {
-            totalPanelWidth += 104;
+            totalPanelWidth += 92;
         }
         return totalPanelWidth;
     }
@@ -151,10 +151,10 @@ export default class MainPanel {
         // calculate width of main panel, detail panel and sidebar (if available)
         let totalPanelWidth = mainPanelWidth + this.mainPanelSizerWidth + 390;
         if (this.rb.getProperty('menuSidebar')) {
-            totalPanelWidth += 104;
+            totalPanelWidth += 92;
             $('#reportbro .rbroLogo').css({ width: mainPanelWidth });
         }
-        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)`,left: totalPanelWidth });
+        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)` });
     }
 
     checkMainPanelWidth(mainPanelWidth) {

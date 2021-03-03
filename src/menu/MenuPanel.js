@@ -375,23 +375,25 @@ export default class MenuPanel {
         elRowActionsDiv.append(elRowDelete);
         elActionsDiv.append(elRowActionsDiv);
 
-        elActionsDiv.append($('<span id="rbro_menu_zoom_level" class="rbroZoomLevel"></span>'));
+        let elZoomDiv = $('<div id="rbro_menu_zoom" class="rbroZoom"></div>');
+        elZoomDiv.append($('<span id="rbro_menu_zoom_level" class="rbroZoomLevel"></span>'));
         let elMenuZoomIn = $(`<button id="rbro_menu_zoom_in"
-                class="rbroButton rbroGridButton rbroActionButton rbroIcon-zoom-in
+                class="rbroButton rbroRoundButton rbroZoomButton rbroIcon-plus
                 ${!this.rb.getDocument().isZoomInPossible() ? 'rbroButtonInactive' : ''}" type="button"
                 title="${this.rb.getLabel('menuZoomIn')}"></button>`)
             .click(event => {
                 this.rb.getDocument().zoomIn();
             });
-        elActionsDiv.append(elMenuZoomIn);
+        elZoomDiv.append(elMenuZoomIn);
         let elMenuZoomOut = $(`<button id="rbro_menu_zoom_out"
-                class="rbroButton rbroGridButton rbroActionButton rbroIcon-zoom-out
+                class="rbroButton rbroRoundButton rbroZoomButton rbroIcon-minus
                 ${!this.rb.getDocument().isZoomOutPossible() ? 'rbroButtonInactive' : ''}" type="button"
                 title="${this.rb.getLabel('menuZoomOut')}"></button>`)
             .click(event => {
                 this.rb.getDocument().zoomOut();
             });
-        elActionsDiv.append(elMenuZoomOut);
+        elZoomDiv.append(elMenuZoomOut);
+        elActionsDiv.append(elZoomDiv);
 
         let elMenuToggleGrid = $(`<button id="rbro_menu_toggle_grid"
                 class="rbroButton rbroGridButton rbroActionButton rbroIcon-grid ${this.rb.getProperty('showGrid') ? 'rbroButtonActive' : ''}" type="button"

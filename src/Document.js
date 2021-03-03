@@ -280,7 +280,7 @@ export default class Document {
         let marginTop = utils.convertInputToNumber(docProperties.getValue('marginTop'));
         let marginRight = utils.convertInputToNumber(docProperties.getValue('marginRight'));
         let marginBottom = utils.convertInputToNumber(docProperties.getValue('marginBottom'));
-        let left = this.rb.toPixel(marginLeft - 1);
+        let left = this.rb.toPixel(marginLeft);
         let top = this.rb.toPixel(marginTop - 1);
         let right = this.rb.toPixel(marginRight);
         let bottom = this.rb.toPixel(marginBottom);
@@ -471,34 +471,57 @@ export default class Document {
 
     updateZoomLevel(zoom) {
         this.zoom = zoom;
+        let panel = $('#rbro_document_panel');
+        let size = this.rb.getDocumentProperties().getPageSize();
+        let scaledWidth = size.width * (zoom / 100);
+        let scaledHeight = size.height * (zoom / 100);
+        let rbWidth = this.rb.getWidth();
+        let docPanelWidth = rbWidth - this.rb.getMainPanel().getTotalPanelWidth();
+        let docPanelHeight = panel.height();
+        let translateX = 0;
         if (zoom !== 100) {
-            let size = this.rb.getDocumentProperties().getPageSize();
-            let scaledWidth = size.width * (zoom / 100);
-            let rbWidth = this.rb.getWidth();
-            let panelWidth = this.rb.getMainPanel().getTotalPanelWidth();
-            let translateX = 0;
-            if (scaledWidth > (rbWidth - panelWidth)) {
-                // if there is not enough space in the document panel we remove any margin and
-                // manually center the content by translating x coord with difference of center
-                // for document panel and content
+            if (size.width > docPanelWidth) {
+                // if there is not enough space in the document panel initially and we zoom out we keep the content
+                // in default (top left) position and move it to the center manually
+                this.elDoc.css('transform-origin', '');
+                if ((zoom < 100) && (scaledWidth < docPanelWidth)) {
+                    translateX = Math.round(((docPanelWidth - scaledWidth) / 2));
+                }
+            } else if (scaledWidth > docPanelWidth) {
+                // if there is not enough space in the document panel with zoom level applied
+                // we remove any margin and apply the default transformation (top left)
                 this.elDoc.css('margin', '0');
-                translateX = Math.round((scaledWidth / 2) - (size.width / 2));
+                this.elDoc.css('transform-origin', '');
             } else {
                 // if there is enough space in the document panel we use the default margin (auto)
-                // so the content is automatically centered in the available space
+                // and apply the transformation from top center
+                // so the content is automatically centered in the available horizontal space
                 this.elDoc.css('margin', '');
+                this.elDoc.css('transform-origin', 'top center');
             }
-            let translateY = Math.round(((size.height * (zoom / 100)) / 2) - (size.height / 2));
-            $('#rbro_menu_zoom_level').text(zoom + ' %');
-            this.elDoc.css(
-                'transform', `translate(${translateX}px, ${translateY}px) scale(${this.zoom / 100})`);
+            this.elDoc.css('transform', `translateX(${translateX}px) scale(${this.zoom / 100})`);
         } else {
-            $('#rbro_menu_zoom_level').text('');
-            // remove margin and transform used for zoomed content
+            // use default values if no zoom is applied
             this.elDoc.css('margin', '');
             this.elDoc.css('transform', '');
+            this.elDoc.css('transform-origin', '');
         }
+        $('#rbro_menu_zoom_level').text(zoom + ' %');
         this.rb.getMenuPanel().updateZoomButtons(this.isZoomInPossible(), this.isZoomOutPossible());
+
+
+        // if there is enough space in the document panel don't show scrollbar
+        if (scaledWidth < docPanelWidth) {
+            panel.css('overflow-x', 'hidden');
+        }  else {
+            panel.css('overflow-x', '');
+        }
+        if (scaledHeight < docPanelHeight) {
+            panel.css('overflow-y', 'hidden');
+        } else {
+            panel.css('overflow-y', '');
+        }
+
     }
 
     getCoordWithoutZoom(coord) {
