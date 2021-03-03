@@ -509,7 +509,6 @@ export default class Document {
         $('#rbro_menu_zoom_level').text(zoom + ' %');
         this.rb.getMenuPanel().updateZoomButtons(this.isZoomInPossible(), this.isZoomOutPossible());
 
-
         // if there is enough space in the document panel don't show scrollbar
         if (scaledWidth < docPanelWidth) {
             panel.css('overflow-x', 'hidden');
@@ -521,7 +520,6 @@ export default class Document {
         } else {
             panel.css('overflow-y', '');
         }
-
     }
 
     getCoordWithoutZoom(coord) {
