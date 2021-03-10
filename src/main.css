@@ -589,7 +589,7 @@ ul ul .rbroMenuItemText {
 }
 
 .rbroHasTabs.rbroDocumentPanel {
-    padding: 0 10px;
+    padding: 0;
 }
 
 .rbroDocument {
