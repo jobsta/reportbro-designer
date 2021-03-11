@@ -1,6 +1,9 @@
 # Changelog
 
-## Upcoming Release
+## [1.6.0] - 2021-03-19
+
+### Features
+* zoom buttons for document panel
 
 ### Changes
 * add parameter to cmdExecutedCallback which indicates if command was done or undone
