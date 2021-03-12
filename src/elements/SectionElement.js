@@ -128,7 +128,6 @@ export default class SectionElement extends DocElement {
         }
     }
 
-
     setValue(field, value) {
         super.setValue(field, value);
 
@@ -177,12 +176,25 @@ export default class SectionElement extends DocElement {
         return DocElement.type.section;
     }
 
+    select() {
+        super.select();
+        let elSizerContainer = this.getSizerContainerElement();
+        // create sizers (to indicate selection) which do not support resizing
+        for (let sizer of ['N', 'S']) {
+            elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerMove"></div>`));
+        }
+    }
+
     /**
      * Returns allowed sizers when element is selected.
      * @returns {String[]}
      */
     getSizers() {
         return [];
+    }
+
+    isAreaSelectionAllowed() {
+        return false;
     }
 
     isDroppingAllowed() {

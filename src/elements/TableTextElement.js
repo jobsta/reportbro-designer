@@ -300,6 +300,10 @@ export default class TableTextElement extends TextElement {
         return false;
     }
 
+    isAreaSelectionAllowed() {
+        return false;
+    }
+
     isDraggingAllowed() {
         return false;
     }

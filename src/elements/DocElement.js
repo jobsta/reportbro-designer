@@ -96,16 +96,17 @@ export default class DocElement {
             .mousedown(event => {
                 if (event.shiftKey) {
                     this.rb.deselectObject(this.id);
+                    event.stopPropagation();
                 } else {
                     if (this.rb.isSelectedObject(this.id)) {
                         this.rb.getDocument().startDrag(event.originalEvent.pageX, event.originalEvent.pageY,
                             this.id, this.containerId, this.linkedContainerId,
                             this.getElementType(), DocElement.dragType.element);
+                        event.stopPropagation();
                     } else {
                         this.rb.deselectAll(true);
                     }
                 }
-                event.stopPropagation();
             })
             .on('touchstart', event => {
                 if (this.rb.isSelectedObject(this.id)) {
@@ -706,6 +707,14 @@ export default class DocElement {
 
     hasBorderSettings() {
         return false;
+    }
+
+    /**
+     * Returns true if the element can be selected when it is inside a
+     * selection area (rectangle specified with pressed mouse button).
+     */
+    isAreaSelectionAllowed() {
+        return true;
     }
 
     isDraggingAllowed() {

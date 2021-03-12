@@ -163,6 +163,10 @@ export default class FrameElement extends DocElement {
         return DocElement.type.frame;
     }
 
+    isAreaSelectionAllowed() {
+        return false;
+    }
+
     createElement() {
         this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroFrameElement rbroElementContainer"></div>`);
         // rbroContentContainerHelper contains border styles

@@ -132,6 +132,10 @@ export default class SectionBandElement extends DocElement {
         return this.heightVal;
     }
 
+    isAreaSelectionAllowed() {
+        return false;
+    }
+
     isDraggingAllowed() {
         return false;
     }

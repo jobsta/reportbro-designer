@@ -134,6 +134,10 @@ export default class TableBandElement extends DocElement {
         return this.heightVal;
     }
 
+    isAreaSelectionAllowed() {
+        return false;
+    }
+
     isDraggingAllowed() {
         return false;
     }

@@ -625,8 +625,8 @@ export default class Document {
         if (area.width > 10 && area.height > 10) {
             let docElements = this.rb.getDocElements(true);
             for (let docElement of docElements) {
-                // do not select table text and table band elements
-                if (docElement.isDraggingAllowed()) {
+                // do not select table text, band elements and containers
+                if (docElement.isAreaSelectionAllowed()) {
                     let pos = docElement.getAbsolutePosition();
                     if (area.left < (pos.x + docElement.getValue('widthVal')) &&
                         (area.left + area.width) >= pos.x &&

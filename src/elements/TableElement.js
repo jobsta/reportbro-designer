@@ -238,6 +238,7 @@ export default class TableElement extends DocElement {
     select() {
         super.select();
         let elSizerContainer = this.getSizerContainerElement();
+        // create sizers (to indicate selection) which do not support resizing
         for (let sizer of ['NE', 'SE', 'SW', 'NW']) {
             elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerMove"></div>`));
         }
