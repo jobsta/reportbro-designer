@@ -6,6 +6,8 @@
 * add parameter to cmdExecutedCallback which indicates if command was done or undone
 * add "copy" suffix to name of pasted parameter and style for unique names
 * only update parameter references on name change if the parameter name is unique
+* Allow starting area selection inside container (frame/section) and
+  do not include container element in area selection
 
 ### Bug Fixes
 * set correct cell height when table is created/updated
