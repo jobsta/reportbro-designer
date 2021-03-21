@@ -10,6 +10,31 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: "tangerine";
+  src: url("fonts/tangerine.ttf");
+}
+
+@font-face {
+  font-family: "Microsoft Yahei";
+  src: url("fonts/Microsoft Yahei.ttf");
+}
+
+@font-face {
+  font-family: "仿宋_GB2312";
+  src: url("fonts/仿宋_GB2312.ttf");
+}
+
+@font-face {
+  font-family: "方正小标宋简体";
+  src: url("fonts/方正小标宋简体.ttf");
+}
+
+@font-face {
+  font-family: "楷体_GB2312";
+  src: url("fonts/楷体_GB2312.ttf");
+}
+
 [class^="rbroIcon-"], [class*=" rbroIcon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'reportbro' !important;
