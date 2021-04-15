@@ -87,8 +87,7 @@ export default class TextElement extends DocElement {
         this.updateStyle();
 
         if (this.richText) {
-            this.updateRichTextContent(this.richTextContent);
-            $(`#rbro_el_content_text_data${this.id}`).html(this.richTextHtml);
+            this.setupRichText();
         } else {
             this.updateContent(this.content);
         }
@@ -130,9 +129,9 @@ export default class TextElement extends DocElement {
             this.updateDisplay();
         } else if (field === 'richText') {
             if (value) {
-                this.updateRichTextContent(this.getValue('richTextContent'));
+                this.setupRichText();
             } else {
-                this.updateContent(this.getValue('content'));
+                this.updateContent(this.content);
             }
         } else if (field === 'richTextContent') {
             this.updateRichTextContent(value);
@@ -352,6 +351,15 @@ export default class TextElement extends DocElement {
         }
         $(`#rbro_menu_item_name${this.id}`).text(this.name);
         $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
+    }
+
+    /**
+     * Sets name of this element and html using rich text.
+     *
+     */
+    setupRichText() {
+        this.updateRichTextContent(this.richTextContent);
+        $(`#rbro_el_content_text_data${this.id}`).html(this.richTextHtml);
     }
 
     /**
