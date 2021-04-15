@@ -27,6 +27,7 @@ import MainPanel from './menu/MainPanel';
 import MainPanelItem from './menu/MainPanelItem';
 import MenuPanel from './menu/MenuPanel';
 import * as utils from './utils';
+import Quill from "quill";
 
 /**
  * Used for the main ReportBro instance.
@@ -44,6 +45,7 @@ export default class ReportBro {
             cmdExecutedCallback: null,
             defaultFont: Style.font.helvetica,
             enableSpreadsheet: true,
+            fontSizes: [4,5,6,7,8,9,10,11,12,13,14,15,16,18,20,22,24,26,28,32,36,40,44,48,54,60,66,72,80],
             fonts: [
                 { name: 'Courier', value: Style.font.courier },
                 { name: 'Helvetica', value: Style.font.helvetica },
@@ -57,6 +59,8 @@ export default class ReportBro {
             saveCallback: null,
             selectCallback: null,
             showGrid: true,
+            showPlusFeatures: true,
+            showPlusFeaturesInfo: true,
             patternAdditionalDates: [],
             patternAdditionalNumbers: [],
             patternCurrencySymbol: '$',

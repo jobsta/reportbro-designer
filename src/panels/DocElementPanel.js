@@ -8,7 +8,8 @@ import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
-
+import Quill from 'quill';
+import Delta from 'quill-delta';
 /**
  * Generic panel to edit all shared properties of selected document elements.
  * @class
@@ -24,11 +25,22 @@ export default class DocElementPanel extends PanelBase {
             },
             'content': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'content'
+                'fieldId': 'content',
+                'visibleIf': '!richText'
+            },
+            'richText': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'rich_text'
+            },
+            'richTextContent': {
+                'type': SetValueCmd.type.richText,
+                'fieldId': 'rich_text_content',
+                'visibleIf': 'richText'
             },
             'eval': {
                 'type': SetValueCmd.type.checkbox,
-                'fieldId': 'eval'
+                'fieldId': 'eval',
+                'visibleIf': '!richText'
             },
             'dataSource': {
                 'type': SetValueCmd.type.text,
@@ -144,28 +156,32 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_textstyle_row',
                 'singleRowProperty': false,
                 'rowProperties': ['bold', 'italic', 'underline', 'strikethrough'],
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'italic': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'italic',
                 'rowId': 'rbro_doc_element_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'underline': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'underline',
                 'rowId': 'rbro_doc_element_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'strikethrough': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'strikethrough',
                 'rowId': 'rbro_doc_element_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'horizontalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
@@ -173,7 +189,8 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_alignment_row',
                 'singleRowProperty': false,
                 'rowProperties': ['horizontalAlignment', 'verticalAlignment'],
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'verticalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
@@ -186,7 +203,8 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.color,
                 'allowEmpty': false,
                 'fieldId': 'text_color',
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': '!richText'
             },
             'backgroundColor': {
                 'type': SetValueCmd.type.color,
@@ -207,7 +225,8 @@ export default class DocElementPanel extends PanelBase {
                 'singleRowProperty': false,
                 'rowProperties': ['font', 'fontSize'],
                 'section': 'style',
-                'allowEmpty': false
+                'allowEmpty': false,
+                'visibleIf': '!richText'
             },
             'fontSize': {
                 'type': SetValueCmd.type.select,
@@ -215,7 +234,8 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_font_row',
                 'singleRowProperty': false,
                 'section': 'style',
-                'allowEmpty': false
+                'allowEmpty': false,
+                'visibleIf': '!richText'
             },
             'lineSpacing': {
                 'type': SetValueCmd.type.select,
@@ -374,28 +394,32 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
                 'singleRowProperty': false,
                 'rowProperties': ['cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough'],
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_italic': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_italic',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_underline': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_underline',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_strikethrough': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_strikethrough',
                 'rowId': 'rbro_doc_element_cs_textstyle_row',
                 'singleRowProperty': false,
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_horizontalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
@@ -403,7 +427,8 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_cs_alignment_row',
                 'singleRowProperty': false,
                 'rowProperties': ['cs_horizontalAlignment', 'cs_verticalAlignment'],
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_verticalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
@@ -416,7 +441,8 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.color,
                 'allowEmpty': false,
                 'fieldId': 'cs_text_color',
-                'section': 'cs_style'
+                'section': 'cs_style',
+                'visibleIf': '!richText'
             },
             'cs_backgroundColor': {
                 'type': SetValueCmd.type.color,
@@ -431,7 +457,8 @@ export default class DocElementPanel extends PanelBase {
                 'singleRowProperty': false,
                 'rowProperties': ['cs_font', 'cs_fontSize'],
                 'section': 'cs_style',
-                'allowEmpty': false
+                'allowEmpty': false,
+                'visibleIf': '!richText'
             },
             'cs_fontSize': {
                 'type': SetValueCmd.type.select,
@@ -439,7 +466,8 @@ export default class DocElementPanel extends PanelBase {
                 'rowId': 'rbro_doc_element_cs_font_row',
                 'singleRowProperty': false,
                 'section': 'cs_style',
-                'allowEmpty': false
+                'allowEmpty': false,
+                'visibleIf': '!richText'
             },
             'cs_lineSpacing': {
                 'type': SetValueCmd.type.select,
@@ -551,6 +579,23 @@ export default class DocElementPanel extends PanelBase {
                 'section': 'spreadsheet'
             }
         };
+
+        // collect all fields which are referenced in the visibleIf property
+        this.visibleIfFields = [];
+        for (let property in this.propertyDescriptors) {
+            if (this.propertyDescriptors.hasOwnProperty(property)) {
+                let propertyDescriptor = this.propertyDescriptors[property];
+                if ('visibleIf' in propertyDescriptor) {
+                    let visibleIfField = propertyDescriptor['visibleIf'];
+                    if (visibleIfField.substr(0, 1) === '!') {
+                        visibleIfField = visibleIfField.substr(1);
+                    }
+                    if (!this.visibleIfFields.includes(visibleIfField)) {
+                        this.visibleIfFields.push(visibleIfField);
+                    }
+                }
+            }
+        }
     }
 
     render() {
@@ -652,6 +697,99 @@ export default class DocElementPanel extends PanelBase {
         elFormField.append('<div id="rbro_doc_element_content_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
+
+        // Rich-Text-Editor
+        if (this.rb.getProperty('showPlusFeatures')) {
+            elDiv = $('<div id="rbro_doc_element_rich_text_row" class="rbroFormRow"></div>');
+            elDiv.append(`<label for="rbro_doc_element_rich_text">${this.rb.getLabel('docElementRichText')}:</label>`);
+            elFormField = $('<div class="rbroFormField"></div>');
+            let elRichTextLabel = $('<label class="switch-light switch-material"></label>');
+            let elRichText = $('<input id="rbro_doc_element_rich_text" type="checkbox">')
+                .change(event => {
+                    let richTextChecked = elRichText.is(":checked");
+                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                    let selectedObjects = this.rb.getSelectedObjects();
+                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                        let obj = selectedObjects[i];
+                        cmdGroup.addSelection(obj.getId());
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'richText', richTextChecked, SetValueCmd.type.checkbox, this.rb));
+                    }
+                    if (!cmdGroup.isEmpty()) {
+                        this.rb.executeCommand(cmdGroup);
+                    }
+                });
+            elRichTextLabel.append(elRichText);
+            let elRichTextSpan = $('<span></span>');
+            elRichTextSpan.append($('<span></span>'));
+            elRichTextSpan.append($('<span></span>'));
+            elRichTextSpan.append($('<a></a>'));
+            elRichTextLabel.append(elRichTextSpan);
+            elFormField.append(elRichTextLabel);
+            elDiv.append(elFormField);
+            if (this.rb.getProperty('showPlusFeaturesInfo')) {
+                elDiv.append(`<div class="plusFeatureInfo">${this.rb.getLabel('plusFeatureInfo')}</div>`);
+            }
+            panel.append(elDiv);
+
+            elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroHidden"></div>');
+            let strRichTextFont = '<select class="ql-font">';
+            let defaultFont = this.rb.getProperty('defaultFont');
+            for (let font of this.rb.getFonts()) {
+                strRichTextFont += `<option value="${font.value}" ${font.value === defaultFont ? 'selected="selected"' : ''}>${font.name}</option>`;
+/*                if (font.value === defaultFont) {
+                    strRichTextFont += `<option value="${font.value}" selected="selected">${font.name}</option>`;
+                } else {
+                    strRichTextFont += `<option value="${font.value}">${font.name}</option>`;
+                }*/
+            }
+            strRichTextFont += '</select>';
+            let strRichTextFontSize = '<select class="ql-size">';
+            for (let size of this.rb.getProperty('fontSizes')) {
+                strRichTextFontSize += `<option value="${size}px" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
+            }
+            strRichTextFontSize += '</select>';
+
+            elDiv.append(`
+                <div id="rbro_doc_element_rich_text_content_toolbar">
+                    <span class="ql-formats">
+                        <button class="ql-bold" title="${this.rb.getLabel('styleBold')}"></button>
+                        <button class="ql-italic" title="${this.rb.getLabel('styleItalic')}"></button>
+                        <button class="ql-underline" title="${this.rb.getLabel('styleUnderline')}"></button>
+                        <button class="ql-strike" title="${this.rb.getLabel('styleStrikethrough')}"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <button class="ql-link"></button>
+                    </span>
+                    <span class="ql-formats">
+                        <select class="ql-align" title="${this.rb.getLabel('styleAlignment')}"></select>
+                    </span>                    
+                    <span class="ql-formats">
+                        <select class="ql-color" title="${this.rb.getLabel('styleTextColor')}">
+                        </select>
+                        <select class="ql-background" title="${this.rb.getLabel('styleBackgroundColor')}">
+                        </select>
+                    </span>
+                    ${strRichTextFont}
+                    ${strRichTextFontSize}
+                </div>
+            `);
+            let elRichTextContent = $('<div id="rbro_doc_element_rich_text_content"></div>');
+            elDiv.append(elRichTextContent);
+            elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
+                .click(event => {
+                    let selectedObjects = this.rb.getSelectedObjects();
+                    // data source parameters are not shown in case multiple objects are selected
+                    let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+
+                    this.rb.getPopupWindow().show(
+                        this.rb.getParameterItems(selectedObject), null,
+                        'rbro_doc_element_rich_text_content', 'richTextContent', PopupWindow.type.parameterAppend);
+                });
+            elDiv.append(elParameterButton);
+            elDiv.append('<div id="rbro_doc_element_rich_text_content_error" class="rbroErrorMessage"></div>');
+            panel.append(elDiv);
+        }
 
         elDiv = $('<div id="rbro_doc_element_eval_row" class="rbroFormRow rbroHidden"></div>');
         elDiv.append(`<label for="rbro_doc_element_eval">${this.rb.getLabel('docElementEval')}:</label>`);
@@ -1751,8 +1889,9 @@ export default class DocElementPanel extends PanelBase {
             // -------------------------------
         }
 
-
         $('#rbro_detail_panel').append(panel);
+
+        this.setupRichText();
     }
 
     renderStyleSelect() {
@@ -1765,6 +1904,50 @@ export default class DocElementPanel extends PanelBase {
             this.elStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
             this.elCsStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
         }
+    }
+
+    setupRichText() {
+        let font = Quill.import('formats/font');
+        font.whitelist = ['courier', 'helvetica', 'times'];
+        Quill.register(font, true);
+
+        let fontSizeStyle = Quill.import('attributors/style/size');
+        let fontSizes = this.rb.getProperty('fontSizes');
+        let richTextFontSize = [];
+        for (let fontSize of fontSizes) {
+            richTextFontSize.push(fontSize + 'px');
+        }
+        fontSizeStyle.whitelist = richTextFontSize;
+        Quill.register(fontSizeStyle, true);
+        let quill = new Quill('#rbro_doc_element_rich_text_content', {
+            modules: {
+                toolbar: '#rbro_doc_element_rich_text_content_toolbar'
+            },
+            placeholder: '',
+            theme: 'snow'  // or 'bubble'
+        });
+        let rb = this.rb;
+        quill.on('blur', function() {
+            console.log('blur');
+        });
+        quill.on('text-change', function(delta, oldDelta, source) {
+            let content = quill.getContents();
+            let html = quill.root.innerHTML;
+            let cmdGroup = new CommandGroupCmd('Set value', rb);
+            let selectedObjects = rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'richTextContent', content, SetValueCmd.type.richText, rb));
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'richTextHtml', html, SetValueCmd.type.text, rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                rb.executeCommand(cmdGroup);
+            }
+        });
+        this.quill = quill;
     }
 
     /**
@@ -1802,8 +1985,16 @@ export default class DocElementPanel extends PanelBase {
         for (let property in this.propertyDescriptors) {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
                 let propertyDescriptor = this.propertyDescriptors[property];
-                if (field === null || property === field ||
-                        ('visibleIf' in propertyDescriptor && propertyDescriptor['visibleIf'] === field)) {
+                let visibleIfField = null;
+                let visibleIfFieldNegate = false;
+                if ('visibleIf' in propertyDescriptor) {
+                    visibleIfField = propertyDescriptor['visibleIf'];
+                    if (visibleIfField.substr(0, 1) === '!') {
+                        visibleIfField = visibleIfField.substr(1);
+                        visibleIfFieldNegate = true;
+                    }
+                }
+                if (field === null || property === field || visibleIfField === field) {
                     let show = false;
                     if (property in sharedProperties) {
                         if (sharedProperties[property] === selectedObjects.length) {
@@ -1813,6 +2004,14 @@ export default class DocElementPanel extends PanelBase {
                                 let objValue = obj.getUpdateValue(property, obj.getValue(property));
                                 if (value === null) {
                                     value = objValue;
+                                } else if (propertyDescriptor['type'] === SetValueCmd.type.richText) {
+                                    if (objValue && value) {
+                                        let diff = new Delta(objValue).diff(new Delta(value));
+                                        if (diff.ops.length > 0) {
+                                            differentValues = true;
+                                            break;
+                                        }
+                                    }
                                 } else if (objValue !== value) {
                                     differentValues = true;
                                     break;
@@ -1841,11 +2040,13 @@ export default class DocElementPanel extends PanelBase {
                         }
                     }
 
-                    if (show && 'visibleIf' in propertyDescriptor) {
-                        let visibleIfField = propertyDescriptor['visibleIf'];
+                    if (show && visibleIfField) {
                         for (let obj of selectedObjects) {
-                            if (!obj.getValue(visibleIfField)) {
+                            let visibleIfValue = obj.getValue(visibleIfField);
+                            if ((!visibleIfFieldNegate && !visibleIfValue) ||
+                                (visibleIfFieldNegate && visibleIfValue)) {
                                 show = false;
+                                delete sharedProperties[property];
                                 break;
                             }
                         }
@@ -1873,8 +2074,10 @@ export default class DocElementPanel extends PanelBase {
             }
         }
 
-        if (field === null) {
+        if (field === null || this.visibleIfFields.includes(field)) {
             // only update labels, visible rows and sections if selection was changed (no specific field update)
+            // or field is referenced in visibleIf property (and therefor could have
+            // influence on visibility of other fields)
 
             // sharedProperties now only contains properties shared by all objects
 

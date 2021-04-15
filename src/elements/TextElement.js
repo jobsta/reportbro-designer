@@ -11,6 +11,9 @@ export default class TextElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementText'), id, 100, 20, rb);
         this.content = '';
+        this.richText = false;
+        this.richTextContent = null;
+        this.richTextHtml = '';
         this.eval = false;
 
         this.styleId = '';
@@ -82,7 +85,13 @@ export default class TextElement extends DocElement {
         this.createElement();
         this.updateDisplay();
         this.updateStyle();
-        this.updateContent(this.content);
+
+        if (this.richText) {
+            this.updateRichTextContent(this.richTextContent);
+            $(`#rbro_el_content_text_data${this.id}`).html(this.richTextHtml);
+        } else {
+            this.updateContent(this.content);
+        }
     }
 
     handleDoubleClick(event) {
@@ -119,6 +128,16 @@ export default class TextElement extends DocElement {
             this.updateContent(value);
         } else if (field === 'width' || field === 'height') {
             this.updateDisplay();
+        } else if (field === 'richText') {
+            if (value) {
+                this.updateRichTextContent(this.getValue('richTextContent'));
+            } else {
+                this.updateContent(this.getValue('content'));
+            }
+        } else if (field === 'richTextContent') {
+            this.updateRichTextContent(value);
+        } else if (field === 'richTextHtml') {
+            $(`#rbro_el_content_text_data${this.id}`).html(value);
         }
     }
 
@@ -127,7 +146,7 @@ export default class TextElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'width', 'height', 'content', 'eval',
+        return ['x', 'y', 'width', 'height', 'content', 'richText', 'richTextContent', 'richTextHtml', 'eval',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',
@@ -308,6 +327,31 @@ export default class TextElement extends DocElement {
         $(`#rbro_menu_item_name${this.id}`).text(this.name);
         $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
         $(`#rbro_el_content_text_data${this.id}`).text(value);
+    }
+
+    updateRichTextContent(delta) {
+        let text = '';
+        if (delta && delta.ops) {
+            for (let op of delta.ops) {
+                if ('insert' in op) {
+                    text += op.insert;
+                }
+            }
+            // remove line breaks
+            text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
+            // truncate text if it is too long
+            if (text.length > 80) {
+                text = text.substr(0, 80);
+            }
+            text = text.trim();
+        }
+        if (text === '') {
+            this.name = this.rb.getLabel('docElementText');
+        } else {
+            this.name = text;
+        }
+        $(`#rbro_menu_item_name${this.id}`).text(this.name);
+        $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
     }
 
     /**

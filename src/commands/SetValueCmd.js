@@ -52,7 +52,9 @@ export default class SetValueCmd extends Command {
             $(`#rbro_menu_item_name${this.objId}`).attr('title', value);
             this.rb.notifyEvent(obj, Command.operation.rename);
         }
-        if (this.notifyChange) {
+        // do not send event notification for setting richText value the first time because
+        // this would loose current status (cursor position) in rich text editor while typing
+        if (this.notifyChange && (this.type !== SetValueCmd.type.richText || !this.firstExecution)) {
             this.rb.notifyEvent(obj, Command.operation.change, this.field);
         }
     }
@@ -78,7 +80,8 @@ export default class SetValueCmd extends Command {
      * @returns {boolean}
      */
     allowReplace(otherCmd) {
-        return (otherCmd instanceof SetValueCmd && this.type === SetValueCmd.type.text &&
+        return (otherCmd instanceof SetValueCmd &&
+            (this.type === SetValueCmd.type.text || this.type === SetValueCmd.type.richText) &&
             this.objId === otherCmd.objId && this.field === otherCmd.field);
     }
 
@@ -105,6 +108,7 @@ export default class SetValueCmd extends Command {
 
 SetValueCmd.type = {
     text: 'text',
+    richText: 'richText',
     select: 'select',
     file: 'file',
     filename: 'filename',

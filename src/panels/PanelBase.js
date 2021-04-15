@@ -17,6 +17,8 @@ export default class PanelBase {
 
         this.differentValuesLabel = this.rb.getLabel('differentValues');
         this.differentFilesLabel = this.rb.getLabel('differentFiles');
+
+        this.quill = null;
     }
 
     render(data) {
@@ -46,6 +48,14 @@ export default class PanelBase {
             } else {
                 $(propertyId).val(value);
                 $(propertyId).attr('placeholder', '');
+            }
+        } else if (propertyDescriptor['type'] === SetValueCmd.type.richText) {
+            if (this.quill) {
+                if (differentValues || !value) {
+                    this.quill.setContents({}, 'silent');
+                } else {
+                    this.quill.setContents(value, 'silent');
+                }
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.select) {
             $(propertyId).val(value);
