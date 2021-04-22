@@ -370,12 +370,14 @@ export default class DocElementPanel extends PanelBase {
             'pattern': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'pattern',
-                'section': 'print'
+                'section': 'print',
+                'visibleIf': '!richText'
             },
             'link': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'link',
-                'section': 'print'
+                'section': 'print',
+                'visibleIf': '!richText'
             },
             'cs_condition': {
                 'type': SetValueCmd.type.text,
