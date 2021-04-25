@@ -122,6 +122,18 @@ export default class PanelBase {
     }
 
     /**
+     * Returns true if global key events are disabled.
+     *
+     * If rich text editor has focus we do not allow any global key events,
+     * otherwise the text element would be moved or deleted when special keys like
+     * cursor or backspace/del are pressed.
+     * @returns {Boolean}
+     */
+    isKeyEventDisabled() {
+        return this.quill && this.quill.hasFocus();
+    }
+
+    /**
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.

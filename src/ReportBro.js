@@ -158,6 +158,10 @@ export default class ReportBro {
         this.initObjectMap();
 
         $(document).keydown(event => {
+            if (this.detailPanels[this.activeDetailPanel].isKeyEventDisabled()) {
+                return;
+            }
+
             // check metaKey instead of ctrl for Mac
             if (event.metaKey || event.ctrlKey) {
                 switch (event.which) {

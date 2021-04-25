@@ -739,16 +739,11 @@ export default class DocElementPanel extends PanelBase {
             let defaultFont = this.rb.getProperty('defaultFont');
             for (let font of this.rb.getFonts()) {
                 strRichTextFont += `<option value="${font.value}" ${font.value === defaultFont ? 'selected="selected"' : ''}>${font.name}</option>`;
-/*                if (font.value === defaultFont) {
-                    strRichTextFont += `<option value="${font.value}" selected="selected">${font.name}</option>`;
-                } else {
-                    strRichTextFont += `<option value="${font.value}">${font.name}</option>`;
-                }*/
             }
             strRichTextFont += '</select>';
             let strRichTextFontSize = '<select class="ql-size">';
             for (let size of this.rb.getProperty('fontSizes')) {
-                strRichTextFontSize += `<option value="${size}px" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
+                strRichTextFontSize += `<option value="${size}" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
             }
             strRichTextFontSize += '</select>';
 
@@ -1929,9 +1924,6 @@ export default class DocElementPanel extends PanelBase {
             theme: 'snow'  // or 'bubble'
         });
         let rb = this.rb;
-        quill.on('blur', function() {
-            console.log('blur');
-        });
         quill.on('text-change', function(delta, oldDelta, source) {
             let content = quill.getContents();
             let html = quill.root.innerHTML;
