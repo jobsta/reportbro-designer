@@ -743,7 +743,7 @@ export default class DocElementPanel extends PanelBase {
             strRichTextFont += '</select>';
             let strRichTextFontSize = '<select class="ql-size">';
             for (let size of this.rb.getProperty('fontSizes')) {
-                strRichTextFontSize += `<option value="${size}" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
+                strRichTextFontSize += `<option value="${size}px" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
             }
             strRichTextFontSize += '</select>';
 
