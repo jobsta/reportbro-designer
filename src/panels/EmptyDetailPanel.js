@@ -26,6 +26,10 @@ export default class EmptyDetailPanel {
         $('#rbro_empty_detail_panel').addClass('rbroHidden');
     }
 
+    isKeyEventDisabled() {
+        return false;
+    }
+
     notifyEvent(obj, operation) {
     }
 
