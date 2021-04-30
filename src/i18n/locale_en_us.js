@@ -199,7 +199,7 @@ var locale_en = {
     patternNumber5: 'Show currency symbol in front of number',
     patternSeparatorDates: '--- Date patterns ---',
     patternSeparatorNumbers: '--- Number patterns ---',
-    plusFeatureInfo: 'Only available in commerical <a href="https://www.reportbro.com/license/index" target="_blank">PLUS version</a>',
+    plusFeatureInfo: 'Requires commerical <a href="https://www.reportbro.com/license/index" target="_blank">PLUS version</a>',
     select: 'select...',
     style: 'Style',
     styleAlignment: 'Alignment',

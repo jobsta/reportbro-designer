@@ -199,7 +199,7 @@ var locale_de = {
     patternNumber5: 'Währungssymbol vor Zahl',
     patternSeparatorDates: '--- Datum Pattern ---',
     patternSeparatorNumbers: '--- Zahlen Pattern ---',
-    plusFeatureInfo: 'Nur in kommerzieller <a href="https://www.reportbro.com/license/index" target="_blank">PLUS Version</a> verfügbar',
+    plusFeatureInfo: 'Benötigt kommerzielle <a href="https://www.reportbro.com/license/index" target="_blank">PLUS Version</a>',
     select: 'auswählen...',
     style: 'Formatvorlage',
     styleAlignment: 'Ausrichtung',

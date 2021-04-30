@@ -728,13 +728,13 @@ export default class DocElementPanel extends PanelBase {
             elRichTextSpan.append($('<a></a>'));
             elRichTextLabel.append(elRichTextSpan);
             elFormField.append(elRichTextLabel);
-            elDiv.append(elFormField);
             if (this.rb.getProperty('showPlusFeaturesInfo')) {
-                elDiv.append(`<div class="plusFeatureInfo">${this.rb.getLabel('plusFeatureInfo')}</div>`);
+                elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('plusFeatureInfo')}</div>`);
             }
+            elDiv.append(elFormField);
             panel.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroHidden"></div>');
+            elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroRichTextEditor rbroHidden"></div>');
             let strRichTextFont = '<select class="ql-font">';
             let defaultFont = this.rb.getProperty('defaultFont');
             for (let font of this.rb.getFonts()) {
