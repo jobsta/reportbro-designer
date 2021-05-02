@@ -1897,6 +1897,24 @@ export default class DocElementPanel extends PanelBase {
     }
 
     setupRichText() {
+        // add protocol to link if not present, by default quill discards the link if there is not protocol
+        let Link = Quill.import('formats/link');
+        let sanitizeLinkSuper = Link.sanitize;
+        Link.sanitize = function customSanitizeLinkInput(linkValueInput) {
+            let val = linkValueInput;
+            if (/^\w+:/.test(val)) {
+                // do nothing, user is already using a custom protocol
+            } else if (!/^https?:/.test(val)) {
+                // add missing http protocol to url
+                if (val.startsWith('/')) {
+                    val = "http:" + val;
+                } else {
+                    val = "http://" + val;
+                }
+            }
+            return sanitizeLinkSuper.call(this, val);
+        };
+
         $('#rbro_doc_element_rich_text_content_toolbar_parameter').click(event => {
             let selectedObjects = this.rb.getSelectedObjects();
             // data source parameters are not shown in case multiple objects are selected
