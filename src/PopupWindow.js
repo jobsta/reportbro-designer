@@ -54,17 +54,26 @@ export default class PopupWindow {
      * input element available.
      * @param {String} field - field of data object where selected item will be written into.
      * @param {PopupWindow.type} type
+     * @param {Quill} quill - rich text editor instance, must be set if parameter is appended to rich text control,
+     * otherwise the text input of element with tagId will be used (default).
      */
-    show(items, objId, tagId, field, type) {
+    show(items, objId, tagId, field, type, quill) {
         let winWidth = $(window).width();
         let winHeight = $(window).height();
         let elSearch = null;
+        let quillSelectionRange = null;
         this.input = (tagId !== '') ? $('#' + tagId) : null;
         this.objId = objId;
         this.type = type;
         this.items = items;
         this.elContent.empty();
         $('#rbro_background_overlay').remove();
+
+        if (quill) {
+            // save selection of rich text editor because selection is lost when editor looses focus
+            quillSelectionRange = quill.getSelection();
+        }
+
         if (type === PopupWindow.type.testData) {
             this.parameters = items[0];
             items.splice(0, 1);
@@ -120,9 +129,15 @@ export default class PopupWindow {
                             this.hide();
                         } else if (type === PopupWindow.type.parameterAppend) {
                             let paramText = '${' + item.name + '}';
-                            utils.insertAtCaret(this.input.get(0), paramText);
-                            autosize.update(this.input);
-                            this.input.trigger('input');
+                            if (quill) {
+                                if (quillSelectionRange) {
+                                    quill.insertText(quillSelectionRange.index, paramText);
+                                }
+                            } else {
+                                utils.insertAtCaret(this.input.get(0), paramText);
+                                autosize.update(this.input);
+                                this.input.trigger('input');
+                            }
                             this.hide();
                         }
                         event.preventDefault();

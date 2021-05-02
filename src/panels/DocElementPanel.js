@@ -10,6 +10,7 @@ import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 import Quill from 'quill';
 import Delta from 'quill-delta';
+
 /**
  * Generic panel to edit all shared properties of selected document elements.
  * @class
@@ -769,21 +770,13 @@ export default class DocElementPanel extends PanelBase {
                     </span>
                     ${strRichTextFont}
                     ${strRichTextFontSize}
+                    <div id="rbro_doc_element_rich_text_content_toolbar_parameter"
+                         class="rbroButton rbroRoundButton rbroIcon-select"></div>
                 </div>
             `);
+
             let elRichTextContent = $('<div id="rbro_doc_element_rich_text_content"></div>');
             elDiv.append(elRichTextContent);
-            elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-                .click(event => {
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    // data source parameters are not shown in case multiple objects are selected
-                    let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
-
-                    this.rb.getPopupWindow().show(
-                        this.rb.getParameterItems(selectedObject), null,
-                        'rbro_doc_element_rich_text_content', 'richTextContent', PopupWindow.type.parameterAppend);
-                });
-            elDiv.append(elParameterButton);
             elDiv.append('<div id="rbro_doc_element_rich_text_content_error" class="rbroErrorMessage"></div>');
             panel.append(elDiv);
         }
@@ -1904,6 +1897,17 @@ export default class DocElementPanel extends PanelBase {
     }
 
     setupRichText() {
+        $('#rbro_doc_element_rich_text_content_toolbar_parameter').click(event => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_rich_text_content', 'richTextContent',
+                PopupWindow.type.parameterAppend, this.quill);
+        });
+
         let font = Quill.import('formats/font');
         font.whitelist = ['courier', 'helvetica', 'times'];
         Quill.register(font, true);
