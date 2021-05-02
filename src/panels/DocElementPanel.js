@@ -736,6 +736,19 @@ export default class DocElementPanel extends PanelBase {
             panel.append(elDiv);
 
             elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroRichTextEditor rbroHidden"></div>');
+
+            let colorRows = this.rb.getProperty('colors');
+            let strRichTextColor = `<select class="ql-color" title="${this.rb.getLabel('styleTextColor')}">`;
+            let strRichTextBackgroundColor = `<select class="ql-background" title="${this.rb.getLabel('styleBackgroundColor')}">`;
+            for (let colorRow of colorRows) {
+                for (let color of colorRow) {
+                    strRichTextColor += `<option value="${color}">${color}</option>`;
+                    strRichTextBackgroundColor += `<option value="${color}">${color}</option>`;
+                }
+            }
+            strRichTextColor += '</select>';
+            strRichTextBackgroundColor += '</select>';
+
             let strRichTextFont = '<select class="ql-font">';
             let defaultFont = this.rb.getProperty('defaultFont');
             for (let font of this.rb.getFonts()) {
@@ -763,10 +776,8 @@ export default class DocElementPanel extends PanelBase {
                         <select class="ql-align" title="${this.rb.getLabel('styleAlignment')}"></select>
                     </span>                    
                     <span class="ql-formats">
-                        <select class="ql-color" title="${this.rb.getLabel('styleTextColor')}">
-                        </select>
-                        <select class="ql-background" title="${this.rb.getLabel('styleBackgroundColor')}">
-                        </select>
+                        ${strRichTextColor}
+                        ${strRichTextBackgroundColor}
                     </span>
                     ${strRichTextFont}
                     ${strRichTextFontSize}
@@ -1938,6 +1949,7 @@ export default class DocElementPanel extends PanelBase {
         }
         fontSizeStyle.whitelist = richTextFontSize;
         Quill.register(fontSizeStyle, true);
+
         let quill = new Quill('#rbro_doc_element_rich_text_content', {
             modules: {
                 toolbar: '#rbro_doc_element_rich_text_content_toolbar'
