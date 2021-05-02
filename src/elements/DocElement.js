@@ -867,11 +867,24 @@ export default class DocElement {
             }
         }
 
-        if (paramRef !== null && newParamRef !== null && this.getValue(field).indexOf(paramRef) !== -1) {
-            let cmd = new SetValueCmd(
-                this.id, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
-                SetValueCmd.type.text, this.rb);
-            cmdGroup.addCommand(cmd);
+        if (paramRef !== null && newParamRef !== null) {
+            let value = this.getValue(field);
+            let valueType = SetValueCmd.type.text;
+            if (typeof value === 'object') {
+                // for rich text we have to convert the rich text content to a string to replace all
+                // parameter occurrences and afterwards convert it back to a JS object
+                value = JSON.stringify(value);
+                valueType = SetValueCmd.type.richText;
+            }
+
+            if (value.indexOf(paramRef) !== -1) {
+                let updatedValue = utils.replaceAll(value, paramRef, newParamRef);
+                if (valueType === SetValueCmd.type.richText) {
+                    updatedValue = JSON.parse(updatedValue);
+                }
+                let cmd = new SetValueCmd(this.id, field, updatedValue, valueType, this.rb);
+                cmdGroup.addCommand(cmd);
+            }
         }
     }
 

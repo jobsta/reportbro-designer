@@ -371,6 +371,8 @@ export default class TextElement extends DocElement {
      */
     addCommandsForChangedParameterName(parameter, newParameterName, cmdGroup) {
         this.addCommandForChangedParameterName(parameter, newParameterName, 'content', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'richTextContent', cmdGroup);
+        this.addCommandForChangedParameterName(parameter, newParameterName, 'richTextHtml', cmdGroup);
         this.addCommandForChangedParameterName(parameter, newParameterName, 'printIf', cmdGroup);
         this.addCommandForChangedParameterName(parameter, newParameterName, 'cs_condition', cmdGroup);
     }
