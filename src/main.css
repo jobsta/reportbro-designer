@@ -534,6 +534,7 @@ ul ul .rbroMenuItemText {
 
 .rbroSelector textarea, .rbroSelector input {
     width: 85%;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .rbroSmallInput input {
@@ -541,105 +542,15 @@ ul ul .rbroMenuItemText {
 }
 
 /* Rich Text Editor */
+
 .rbroFormRow.rbroRichTextEditor {
     flex-direction: column;
 }
 
-.rbroRichTextEditor .ql-container {
-    width: 100%;
+.rbroRichTextEditor .rbroButton {
+    margin: 5px 2px 0 0;
 }
 
-.rbroRichTextEditor .ql-snow.ql-toolbar button:hover,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:hover,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:focus,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:focus,
-.rbroRichTextEditor .ql-snow.ql-toolbar button.ql-active,
-.rbroRichTextEditor .ql-snow .ql-toolbar button.ql-active,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label:hover,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label:hover,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label.ql-active,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label.ql-active,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item:hover,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item:hover,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
-    color: var(--rbro-detailPanel-focus-color);
-}
-.rbroRichTextEditor .ql-snow.ql-toolbar button:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:focus .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:focus .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar button.ql-active .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar button.ql-active .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:focus .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:focus .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
-    stroke: var(--rbro-detailPanel-focus-color);
-}
-
-.rbroRichTextEditor .ql-snow.ql-toolbar button:hover .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:hover .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:focus .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:focus .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar button.ql-active .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button.ql-active .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
-.rbroRichTextEditor .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
-    fill: var(--rbro-detailPanel-focus-color);
-}
-
-.rbroRichTextEditor .ql-snow .ql-picker.ql-expanded .ql-picker-options {
-    right: 0;
-}
-
-.rbroRichTextEditor .ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,
-.rbroRichTextEditor .ql-toolbar.ql-snow .ql-color-picker .ql-picker-item:hover {
-    border: 2px solid var(--rbro-popup-main-color)
-}
-
-.rbroRichTextEditor .ql-picker-item {
-    border-radius: 10px;
-    overflow: hidden;
-}
 
 /* For styling font selection only */
 .rbroSelectFont select:first-child {
@@ -841,11 +752,6 @@ ul ul .rbroMenuItemText {
     display: flex;
 }
 
-.rbroDocElementContentText p {
-    margin: 0;
-    padding: 0;
-}
-
 .rbroDocElementContentText span {
     width: 100%;
 }
@@ -927,6 +833,29 @@ ul ul .rbroMenuItemText {
 .rbroSelectionArea {
     position: absolute;
     border: 1px solid #000000;
+}
+
+/* Rich text layout styles */
+.rbroDocElementContentText p {
+    margin: 0;
+    padding: 0;
+}
+
+.rbroDocElementContentText a {
+    color: inherit;
+}
+
+.rbroDocElementContentText p.ql-align-center {
+    text-align: center;
+}
+
+.rbroDocElementContentText p.ql-align-right {
+    text-align: right;
+}
+
+.rbroDocElementContentText p.ql-align-justify {
+    text-align: justify;
+    white-space: initial;
 }
 
 /* Document template styling, element resizer  */
@@ -1427,6 +1356,7 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     background-color: #F1F3F4;
     border: 1px solid #F1F3F4;
     border-radius: 4px;
+    box-shadow: rgba(0,0,0,0.2) 0 2px 8px;
 }
 
 .rbroColorContainer .sp-dragger {
