@@ -734,3 +734,17 @@
 .ql-container.ql-snow {
     border: 1px solid #ccc;
 }
+
+/* Clear color option */
+.ql-color .ql-picker-options [data-value=clear-color], .ql-background .ql-picker-options [data-value=clear-color] {
+  background: none !important;
+  width: 100% !important;
+  height: 20px !important;
+  text-align: center;
+}
+.ql-color .ql-picker-options [data-value=clear-color]:before, .ql-background .ql-picker-options [data-value=clear-color]:before {
+  content: 'Clear Color';
+}
+.ql-color .ql-picker-options [data-value=clear-color]:hover, .ql-background .ql-picker-options [data-value=clear-color]:hover {
+  border-color: transparent !important;
+}

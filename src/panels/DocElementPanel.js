@@ -746,7 +746,9 @@ export default class DocElementPanel extends PanelBase {
                     strRichTextBackgroundColor += `<option value="${color}">${color}</option>`;
                 }
             }
+            strRichTextColor += '<option value="clear-color"></option>';
             strRichTextColor += '</select>';
+            strRichTextBackgroundColor += '<option value="clear-color"></option>';
             strRichTextBackgroundColor += '</select>';
 
             let strRichTextFont = '<select class="ql-font">';
@@ -1957,6 +1959,23 @@ export default class DocElementPanel extends PanelBase {
             placeholder: '',
             theme: 'snow'  // or 'bubble'
         });
+
+        // handle additional "color" to clear current color format
+        quill.getModule('toolbar').addHandler('color', (value) => {
+            if (value === 'clear-color') {
+                quill.format('color', '');
+            } else {
+                quill.format('color', value);
+            }
+        });
+        quill.getModule('toolbar').addHandler('background', (value) => {
+            if (value === 'clear-color') {
+                quill.format('background', '');
+            } else {
+                quill.format('background', value);
+            }
+        });
+
         let rb = this.rb;
         quill.on('text-change', function(delta, oldDelta, source) {
             let content = quill.getContents();
