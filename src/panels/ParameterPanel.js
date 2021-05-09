@@ -3,6 +3,7 @@ import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import Parameter from '../data/Parameter';
 import PopupWindow from '../PopupWindow';
+import autosize from 'autosize';
 
 /**
  * Panel to edit all parameter properties.

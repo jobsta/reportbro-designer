@@ -1,6 +1,7 @@
 import SetValueCmd from './commands/SetValueCmd';
 import Parameter from './data/Parameter';
 import * as utils from './utils';
+import autosize from 'autosize';
 
 /**
  * Popup window to show selectable items (parameters, patterns, etc.) or to edit test data for array parameter.

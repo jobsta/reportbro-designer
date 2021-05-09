@@ -10,6 +10,7 @@ import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 import Quill from 'quill';
 import Delta from 'quill-delta';
+import autosize from 'autosize';
 
 /**
  * Generic panel to edit all shared properties of selected document elements.

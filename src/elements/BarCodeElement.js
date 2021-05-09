@@ -1,4 +1,5 @@
 import DocElement from './DocElement';
+import JsBarcode from 'jsbarcode';
 
 /**
  * Barcode doc element. Currently only Code-128 is supported.
