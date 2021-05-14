@@ -630,10 +630,10 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elTextColorContainer.append(elTextColor);
+        utils.createColorPicker(elTextColorContainer, elTextColor, false, rb);
         elFormField.append(elTextColorContainer);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
-        utils.initColorPicker(elTextColor, rb);
 
         elDiv = $(`<div id="rbro_${idPrefix}background_color_row" class="rbroFormRow"></div>`);
         elDiv.append(`<label for="rbro_${idPrefix}background_color">
@@ -669,10 +669,10 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elBgColorContainer.append(elBgColor);
+        utils.createColorPicker(elBgColorContainer, elBgColor, true, rb);
         elFormField.append(elBgColorContainer);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
-        utils.initColorPicker(elBgColor, rb, { allowEmpty: true });
 
         if (renderDocElementMainStyle) {
             elDiv = $(`<div id="rbro_${idPrefix}alternate_background_color_row" class="rbroFormRow"></div>`);
@@ -709,10 +709,10 @@ export default class StylePanel extends PanelBase {
                     }
                 });
             elAlternateBgColorContainer.append(elAlternateBgColor);
+            utils.createColorPicker(elAlternateBgColorContainer, elAlternateBgColor, true, rb);
             elFormField.append(elAlternateBgColorContainer);
             elDiv.append(elFormField);
             elPanel.append(elDiv);
-            utils.initColorPicker(elAlternateBgColor, rb, { allowEmpty: true });
         }
 
         elDiv = $(`<div id="rbro_${idPrefix}font_row" class="rbroFormRow"></div>`);
@@ -1199,10 +1199,10 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elBorderColorContainer.append(elBorderColor);
+        utils.createColorPicker(elBorderColorContainer, elBorderColor, false, rb);
         elFormField.append(elBorderColorContainer);
         elDiv.append(elFormField);
         elBorderDiv.append(elDiv);
-        utils.initColorPicker(elBorderColor, rb);
 
         elDiv = $(`<div id="rbro_${idPrefix}border_width_row" class="rbroFormRow"></div>`);
         elDiv.append(
@@ -1389,10 +1389,10 @@ export default class StylePanel extends PanelBase {
     }
 
     static destroyStyle(idPrefix) {
-        $(`#rbro_${idPrefix}text_color`).spectrum('destroy');
-        $(`#rbro_${idPrefix}background_color`).spectrum('destroy');
-        $(`#rbro_${idPrefix}alternate_background_color`).spectrum('destroy');
-        $(`#rbro_${idPrefix}border_color`).spectrum('destroy');
+        // $(`#rbro_${idPrefix}text_color`).spectrum('destroy');
+        // $(`#rbro_${idPrefix}background_color`).spectrum('destroy');
+        // $(`#rbro_${idPrefix}alternate_background_color`).spectrum('destroy');
+        // $(`#rbro_${idPrefix}border_color`).spectrum('destroy');
     }
 
     /**

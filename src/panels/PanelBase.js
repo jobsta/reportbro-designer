@@ -83,12 +83,15 @@ export default class PanelBase {
         } else if (propertyDescriptor['type'] === SetValueCmd.type.color) {
             if (differentValues) {
                 if (propertyDescriptor['allowEmpty']) {
-                    $(propertyId).spectrum("set", '');
+                    $(propertyId).val('');
+                    $(propertyId + '_select').css('color', '').addClass('rbroTransparentColorSelect');
                 } else {
-                    $(propertyId).spectrum("set", '#000000');
+                    $(propertyId).val('#000000');
+                    $(propertyId + '_select').css('color', '#000000').removeClass('rbroTransparentColorSelect');
                 }
             } else {
-                $(propertyId).spectrum("set", value);
+                $(propertyId).val(value);
+                $(propertyId + '_select').css('color', value).removeClass('rbroTransparentColorSelect');
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.filename) {
             if (differentValues) {

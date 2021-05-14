@@ -86,35 +86,49 @@ export function replaceAll(str, oldVal, newVal) {
     }
     return rv;
 }
+export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
+    let colors = rb.getProperty('colors');
+    let strColorPalette = '<div class="rbroColorPalette rbroHidden">';
+    for (let color of colors) {
+        strColorPalette += `<span style="color: ${color}" data-value="${color}">C</span>`;
+    }
+    if (allowEmpty) {
+        strColorPalette += '<span data-value="clear">Clear</span>';
+    }
+    strColorPalette += '</div>';
+    let elColorPalette = $(strColorPalette)
+        .click(event => {
+            let color = event.target.dataset.value;
+            if (color) {
+                if (color === 'clear') {
+                    elInput.val('').trigger('change');
+                } else {
+                    elInput.val(color).trigger('change');
+                }
+            }
+            elColorPalette.addClass('rbroHidden');
+            event.stopImmediatePropagation();
+        });
+    let inputId = elInput.attr('id');
+    let elColorButton = $(`<div id="${inputId}_select">O</div>`)
+        .click(event => {
+            elColorPalette.toggleClass('rbroHidden');
+            event.stopImmediatePropagation();
+        });
+    elContainer.prepend(elColorButton);
+    elContainer.append(elColorPalette);
 
-export function initColorPicker(el, rb, options) {
-    var allOptions = {
-        showInitial: false,
-        preferredFormat: "hex",
-        containerClassName: "rbroColorContainer",
-        replacerClassName: "rbroColorPicker",
-        showPalette: true,
-        showButtons: false,
-        showSelectionPalette: false,  // disable showing previous selections by user
-        palette: rb.getProperty('colors'),
-        change: function(color) {
-            el.spectrum("hide");
-        },
-        show: function(color) {
-            el.parent().addClass('rbroActive');
-        },
-        hide: function(color) {
-            el.parent().removeClass('rbroActive');
-        }
-    };
-    $.extend( allOptions, options || {} );
-    el.spectrum(allOptions);
-    el.show();  // show original text input
-    el.focus(event => {
-        el.parent().addClass('rbroActive');
+    elInput.focus(event => {
+        elContainer.addClass('rbroActive');
     });
-    el.blur(event => {
-        el.parent().removeClass('rbroActive');
+    elInput.blur(event => {
+        elContainer.removeClass('rbroActive');
+    });
+
+    document.addEventListener('click', event => {
+        if (!elColorPalette.hasClass('rbroHidden')) {
+            elColorPalette.addClass('rbroHidden');
+        }
     });
 }
 

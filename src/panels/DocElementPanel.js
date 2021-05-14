@@ -738,14 +738,12 @@ export default class DocElementPanel extends PanelBase {
 
             elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroRichTextEditor rbroHidden"></div>');
 
-            let colorRows = this.rb.getProperty('colors');
+            let colors = this.rb.getProperty('colors');
             let strRichTextColor = `<select class="ql-color" title="${this.rb.getLabel('styleTextColor')}">`;
             let strRichTextBackgroundColor = `<select class="ql-background" title="${this.rb.getLabel('styleBackgroundColor')}">`;
-            for (let colorRow of colorRows) {
-                for (let color of colorRow) {
-                    strRichTextColor += `<option value="${color}">${color}</option>`;
-                    strRichTextBackgroundColor += `<option value="${color}">${color}</option>`;
-                }
+            for (let color of colors) {
+                strRichTextColor += `<option value="${color}">${color}</option>`;
+                strRichTextBackgroundColor += `<option value="${color}">${color}</option>`;
             }
             strRichTextColor += '<option value="clear-color"></option>';
             strRichTextColor += '</select>';
@@ -1274,10 +1272,10 @@ export default class DocElementPanel extends PanelBase {
                 }
             });
         elColorContainer.append(elColor);
+        utils.createColorPicker(elColorContainer, elColor, false, this.rb);
         elFormField.append(elColorContainer);
         elDiv.append(elFormField);
         elStyleSectionDiv.append(elDiv);
-        utils.initColorPicker(elColor, this.rb);
 
         elDiv = $('<div id="rbro_doc_element_style_id_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
@@ -2003,7 +2001,7 @@ export default class DocElementPanel extends PanelBase {
      * to cleanup elements and event handlers.
      */
     destroy() {
-        $('#rbro_doc_element_color').spectrum('destroy');
+        // $('#rbro_doc_element_color').spectrum('destroy');
         StylePanel.destroyStyle('doc_element_');
         StylePanel.destroyStyle('doc_element_cs_');
     }
