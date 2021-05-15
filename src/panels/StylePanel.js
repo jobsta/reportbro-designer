@@ -176,12 +176,12 @@ export default class StylePanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        StylePanel.renderStyle(panel, 'style_', '', false, this.rb);
+        StylePanel.renderStyle(panel, 'style_', '', false, this.controls, this.rb);
 
         $('#rbro_detail_panel').append(panel);
     }
 
-    static renderStyle(elPanel, idPrefix, fieldPrefix, renderDocElementMainStyle, rb) {
+    static renderStyle(elPanel, idPrefix, fieldPrefix, renderDocElementMainStyle, controls, rb) {
         let elDiv, elFormField;
         elDiv = $(`<div id="rbro_${idPrefix}textstyle_row" class="rbroFormRow"></div>`);
         elDiv.append(`<label>${rb.getLabel('styleTextStyle')}:</label>`);
@@ -630,7 +630,7 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elTextColorContainer.append(elTextColor);
-        utils.createColorPicker(elTextColorContainer, elTextColor, false, rb);
+        controls[fieldPrefix + 'textColor'] = utils.createColorPicker(elTextColorContainer, elTextColor, false, rb);
         elFormField.append(elTextColorContainer);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
@@ -669,7 +669,7 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elBgColorContainer.append(elBgColor);
-        utils.createColorPicker(elBgColorContainer, elBgColor, true, rb);
+        controls[fieldPrefix + 'backgroundColor'] = utils.createColorPicker(elBgColorContainer, elBgColor, true, rb);
         elFormField.append(elBgColorContainer);
         elDiv.append(elFormField);
         elPanel.append(elDiv);
@@ -709,7 +709,8 @@ export default class StylePanel extends PanelBase {
                     }
                 });
             elAlternateBgColorContainer.append(elAlternateBgColor);
-            utils.createColorPicker(elAlternateBgColorContainer, elAlternateBgColor, true, rb);
+            controls[fieldPrefix + 'alternateBackgroundColor'] = utils.createColorPicker(
+                elAlternateBgColorContainer, elAlternateBgColor, true, rb);
             elFormField.append(elAlternateBgColorContainer);
             elDiv.append(elFormField);
             elPanel.append(elDiv);
@@ -1199,7 +1200,8 @@ export default class StylePanel extends PanelBase {
                 }
             });
         elBorderColorContainer.append(elBorderColor);
-        utils.createColorPicker(elBorderColorContainer, elBorderColor, false, rb);
+        controls[fieldPrefix + 'borderColor'] = utils.createColorPicker(
+            elBorderColorContainer, elBorderColor, false, rb);
         elFormField.append(elBorderColorContainer);
         elDiv.append(elFormField);
         elBorderDiv.append(elDiv);
@@ -1385,14 +1387,17 @@ export default class StylePanel extends PanelBase {
     }
 
     destroy() {
-        StylePanel.destroyStyle('style_');
+        StylePanel.destroyStyle('', this.controls);
     }
 
-    static destroyStyle(idPrefix) {
-        // $(`#rbro_${idPrefix}text_color`).spectrum('destroy');
-        // $(`#rbro_${idPrefix}background_color`).spectrum('destroy');
-        // $(`#rbro_${idPrefix}alternate_background_color`).spectrum('destroy');
-        // $(`#rbro_${idPrefix}border_color`).spectrum('destroy');
+    static destroyStyle(fieldPrefix, controls) {
+        controls[fieldPrefix + 'textColor'].destroy();
+        controls[fieldPrefix + 'backgroundColor'].destroy();
+        if ((fieldPrefix + 'alternateBackgroundColor') in controls) {
+            // control is only created for main style
+            controls[fieldPrefix + 'alternateBackgroundColor'].destroy();
+        }
+        controls[fieldPrefix + 'borderColor'].destroy();
     }
 
     /**

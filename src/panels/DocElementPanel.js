@@ -1272,7 +1272,7 @@ export default class DocElementPanel extends PanelBase {
                 }
             });
         elColorContainer.append(elColor);
-        utils.createColorPicker(elColorContainer, elColor, false, this.rb);
+        this.controls['color'] = utils.createColorPicker(elColorContainer, elColor, false, this.rb);
         elFormField.append(elColorContainer);
         elDiv.append(elFormField);
         elStyleSectionDiv.append(elDiv);
@@ -1299,7 +1299,7 @@ export default class DocElementPanel extends PanelBase {
         elStyleSectionDiv.append(elDiv);
 
         let elStyleDiv = $('<div id="rbro_doc_element_style_settings"></div>');
-        StylePanel.renderStyle(elStyleDiv, 'doc_element_', '', true, this.rb);
+        StylePanel.renderStyle(elStyleDiv, 'doc_element_', '', true, this.controls, this.rb);
         elStyleSectionDiv.append(elStyleDiv);
         elStyleSectionContainer.append(elStyleSectionDiv);
         panel.append(elStyleSectionContainer);
@@ -1712,7 +1712,7 @@ export default class DocElementPanel extends PanelBase {
         elCsStyleSectionDiv.append(elDiv);
 
         let elCsStyleDiv = $('<div id="rbro_doc_element_cs_style_settings"></div>');
-        StylePanel.renderStyle(elCsStyleDiv, 'doc_element_cs_', 'cs_', false, this.rb);
+        StylePanel.renderStyle(elCsStyleDiv, 'doc_element_cs_', 'cs_', false, this.controls, this.rb);
         elCsStyleSectionDiv.append(elCsStyleDiv);
         elCsStyleSectionContainer.append(elCsStyleSectionDiv);
         panel.append(elCsStyleSectionContainer);
@@ -2001,9 +2001,9 @@ export default class DocElementPanel extends PanelBase {
      * to cleanup elements and event handlers.
      */
     destroy() {
-        // $('#rbro_doc_element_color').spectrum('destroy');
-        StylePanel.destroyStyle('doc_element_');
-        StylePanel.destroyStyle('doc_element_cs_');
+        this.controls['color'].destroy();
+        StylePanel.destroyStyle('', this.controls);
+        StylePanel.destroyStyle('cs_', this.controls);
     }
 
     /**

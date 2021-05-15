@@ -87,6 +87,9 @@ export function replaceAll(str, oldVal, newVal) {
     return rv;
 }
 export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
+    let instance = {
+        shown: false
+    };
     let colors = rb.getProperty('colors');
     let strColorPalette = '<div class="rbroColorPalette rbroHidden">';
     for (let color of colors) {
@@ -113,6 +116,7 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     let elColorButton = $(`<div id="${inputId}_select">O</div>`)
         .click(event => {
             elColorPalette.toggleClass('rbroHidden');
+            instance.shown = !instance.shown;
             event.stopImmediatePropagation();
         });
     elContainer.prepend(elColorButton);
@@ -125,11 +129,24 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
         elContainer.removeClass('rbroActive');
     });
 
-    document.addEventListener('click', event => {
-        if (!elColorPalette.hasClass('rbroHidden')) {
+    instance.documentClickListener = function(event) {
+        if (instance.shown) {
             elColorPalette.addClass('rbroHidden');
+            instance.shown = false;
         }
-    });
+    };
+    document.addEventListener('click', instance.documentClickListener);
+    instance.destroy = function() {
+        if (instance.documentClickListener) {
+            document.removeEventListener('click', instance.documentClickListener);
+            instance.documentClickListener = null;
+        }
+    };
+    return instance;
+}
+
+export function destroyColorPicker(instance) {
+    document.removeEventListener(instance.documentClickListener);
 }
 
 export function isValidColor(color) {

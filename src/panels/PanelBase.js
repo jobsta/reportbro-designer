@@ -19,6 +19,7 @@ export default class PanelBase {
         this.differentFilesLabel = this.rb.getLabel('differentFiles');
 
         this.quill = null;
+        this.controls = {};
     }
 
     render(data) {
