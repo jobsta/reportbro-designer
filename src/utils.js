@@ -93,10 +93,10 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     let colors = rb.getProperty('colors');
     let strColorPalette = '<div class="rbroColorPalette rbroHidden">';
     for (let color of colors) {
-        strColorPalette += `<span style="color: ${color}" data-value="${color}">C</span>`;
+        strColorPalette += `<span style="color: ${color}" data-value="${color}" class="rbroColorPaletteItem"></span>`;
     }
     if (allowEmpty) {
-        strColorPalette += '<span data-value="clear">Clear</span>';
+        strColorPalette += '<span data-value="clear" class="rbroClearColorPalette">Clear</span>';
     }
     strColorPalette += '</div>';
     let elColorPalette = $(strColorPalette)
@@ -113,7 +113,7 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
             event.stopImmediatePropagation();
         });
     let inputId = elInput.attr('id');
-    let elColorButton = $(`<div id="${inputId}_select">O</div>`)
+    let elColorButton = $(`<div id="${inputId}_select" class="rbroColorPicker"></div>`)
         .click(event => {
             elColorPalette.toggleClass('rbroHidden');
             instance.shown = !instance.shown;

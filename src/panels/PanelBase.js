@@ -85,14 +85,21 @@ export default class PanelBase {
             if (differentValues) {
                 if (propertyDescriptor['allowEmpty']) {
                     $(propertyId).val('');
-                    $(propertyId + '_select').css('color', '').addClass('rbroTransparentColorSelect');
+                    $(propertyId + '_select').css('color', '');
+                    $(propertyId + '_select').addClass('rbroTransparentColorSelect');
                 } else {
                     $(propertyId).val('#000000');
-                    $(propertyId + '_select').css('color', '#000000').removeClass('rbroTransparentColorSelect');
+                    $(propertyId + '_select').css('color', '#000000');
+                    $(propertyId + '_select').removeClass('rbroTransparentColorSelect');
                 }
             } else {
                 $(propertyId).val(value);
-                $(propertyId + '_select').css('color', value).removeClass('rbroTransparentColorSelect');
+                $(propertyId + '_select').css('color', value);
+                if (value) {
+                    $(propertyId + '_select').removeClass('rbroTransparentColorSelect');
+                } else {
+                    $(propertyId + '_select').addClass('rbroTransparentColorSelect');
+                }
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.filename) {
             if (differentValues) {

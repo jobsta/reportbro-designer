@@ -1285,7 +1285,7 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     box-shadow: none;
 }
 
-/* ReportBro spectrum color picker */
+/* ReportBro color picker */
 .rbroColorPickerContainer {
     transition: all 0.2s linear;
     background-color: #F1F3F4;
@@ -1316,65 +1316,56 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     background-color: #FFFFFF;
 }
 
-.rbroColorContainer .sp-color, .rbroColorContainer .sp-hue, .rbroColorContainer .sp-clear {
-    border: none;
-}
-
-.rbroColorContainer .sp-clear {
+.rbroColorPicker {
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    background-color: currentColor;
+    border-radius: 100%;
     cursor: pointer;
 }
 
-.rbroColorPicker.sp-replacer {
-    border-radius: 15px;
-    float: left;
-    left: 2px;
-    position: absolute;
-    top: 2px;
+.rbroColorPicker.rbroTransparentColorSelect {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAIAAADZF8uwAAAAGUlEQVQYV2M4gwH+YwCGIasIUwhT25BVBADtzYNYrHvv4gAAAABJRU5ErkJggg==);
 }
 
-.rbroColorPicker.sp-replacer .sp-preview {
-    height: 24px;
-    width: 24px;
-}
-
-.rbroColorPicker.sp-replacer, .rbroColorPicker.sp-replacer * {
-    border: none;
-    margin: 0;
-    padding: 0;
-    border-radius: 50%;
-}
-
-.rbroColorPicker .sp-dd {
-    display: none;
-}
-
-.rbroColorPicker .sp-clear-display {
-    background: transparent;
-}
-
-.rbroColorContainer.sp-container {
+.rbroColorPalette {
     background-color: #F1F3F4;
     border: 1px solid #F1F3F4;
     border-radius: 4px;
+    position: absolute;
+    padding: 3px 5px;
+    width: 172px;
     box-shadow: rgba(0,0,0,0.2) 0 2px 8px;
-}
-
-.rbroColorContainer .sp-dragger {
-    background-color: #FFFFFF;
-}
-
-.rbroColorContainer .sp-palette .sp-thumb-el {
-    border-radius: 10px;
-    border: none;
     box-sizing: border-box;
-    overflow: hidden;
+    z-index: 1;
 }
 
-.rbroColorContainer .sp-palette .sp-thumb-el:hover, .sp-container .sp-palette .sp-thumb-el.sp-thumb-active {
+.rbroColorPalette .rbroColorPaletteItem {
+    float: left;
+    height: 16px;
+    margin: 2px;
+    padding: 0;
+    width: 16px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: block;
+    border-radius: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    background-color: currentColor;
+}
+
+.rbroColorPalette .rbroColorPaletteItem:hover {
     border: 2px solid var(--rbro-popup-main-color);
 }
 
-.rbroColorContainer .sp-palette .sp-thumb-light.sp-thumb-active .sp-thumb-inner,
-.rbroColorContainer .sp-palette .sp-thumb-dark.sp-thumb-active .sp-thumb-inner{
-    background-image: none;
+.rbroColorPalette .rbroClearColorPalette {
+    display: inline-block;
+    width: 100%;
+    cursor: pointer;
+    padding: 2px;
+    text-align: center;
 }
