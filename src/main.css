@@ -541,6 +541,15 @@ ul ul .rbroMenuItemText {
     width: 70px;
 }
 
+.rbroInfo a, .rbroInfo a:hover, .rbroInfo a:visited, .rbroInfo a:focus, .rbroInfo a:active {
+    color: var(--rbro-detailPanel-button-color);
+    text-decoration: none;
+}
+
+.rbroInfo a:hover {
+    color: var(--rbro-detailPanel-button-hover-color);
+}
+
 /* Rich Text Editor */
 
 .rbroFormRow.rbroRichTextEditor {

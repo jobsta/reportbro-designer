@@ -42,12 +42,9 @@
 .ql-editor {
     line-height: 1.2;
     height: 100%;
-    outline: none;
+    min-height: 100px;
     overflow-y: auto;
     padding: 6px;
-    tab-size: 4;
-    -moz-tab-size: 4;
-    text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
 }
@@ -402,15 +399,16 @@
 
 .ql-snow .ql-tooltip a {
     cursor: pointer;
+    text-decoration: none;
+    color: var(--rbro-detailPanel-button-color);
+}
+
+.ql-snow .ql-tooltip a:hover {
+    color: var(--rbro-detailPanel-button-hover-color);
 }
 
 .ql-snow .ql-tooltip a::after, .ql-snow .ql-tooltip a::before {
     font-size: 18px;
-    color: var(--rbro-detailPanel-button-color);
-}
-
-.ql-snow .ql-tooltip a:hover::after, .ql-snow .ql-tooltip a:hover::before {
-    color: var(--rbro-detailPanel-button-hover-color);
 }
 
 .ql-snow .ql-tooltip.ql-flip {
@@ -656,7 +654,7 @@
   text-align: center;
 }
 .ql-color .ql-picker-options [data-value=clear-color]:before, .ql-background .ql-picker-options [data-value=clear-color]:before {
-  content: 'Clear Color';
+  content: 'Clear';
 }
 .ql-color .ql-picker-options [data-value=clear-color]:hover, .ql-background .ql-picker-options [data-value=clear-color]:hover {
   border-color: transparent !important;
