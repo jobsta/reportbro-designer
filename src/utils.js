@@ -87,8 +87,11 @@ export function replaceAll(str, oldVal, newVal) {
     return rv;
 }
 export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
+    let inputId = elInput.attr('id');
     let instance = {
-        shown: false
+        shown: false,
+        paletteId: inputId + '_select'
+
     };
     let colors = rb.getProperty('colors');
     let strColorPalette = '<div class="rbroColorPalette rbroHidden">';
@@ -112,12 +115,10 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
             elColorPalette.addClass('rbroHidden');
             event.stopImmediatePropagation();
         });
-    let inputId = elInput.attr('id');
-    let elColorButton = $(`<div id="${inputId}_select" class="rbroColorPicker"></div>`)
+    let elColorButton = $(`<div id="${instance.paletteId}" class="rbroColorPicker"></div>`)
         .click(event => {
             elColorPalette.toggleClass('rbroHidden');
             instance.shown = !instance.shown;
-            event.stopImmediatePropagation();
         });
     elContainer.prepend(elColorButton);
     elContainer.append(elColorPalette);
@@ -130,7 +131,9 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     });
 
     instance.documentClickListener = function(event) {
-        if (instance.shown) {
+        let targetId = event.target.id;
+        // close all open color palettes except if it was just opened by clicking the select button
+        if (instance.shown && targetId !== instance.paletteId) {
             elColorPalette.addClass('rbroHidden');
             instance.shown = false;
         }
