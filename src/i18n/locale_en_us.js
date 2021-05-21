@@ -2,6 +2,7 @@ var locale_en = {
     bandContent: 'Content',
     bandFooter: 'Footer',
     bandHeader: 'Header',
+    clear: 'Clear',
     contentHeight: 'Content height',
     contentHeightInfo: 'affects only GUI size to place elements and not the real page size',
     differentFiles: 'different files...',

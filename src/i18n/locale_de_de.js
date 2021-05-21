@@ -2,6 +2,7 @@ var locale_de = {
     bandContent: 'Inhalt',
     bandFooter: 'Fußzeile',
     bandHeader: 'Kopfzeile',
+    clear: 'Löschen',
     contentHeight: 'Inhaltshöhe',
     contentHeightInfo: 'Höhe des Inhaltsbereichs, um Elemente zu platzieren (betrifft nicht die tatsächliche Seitengröße)',
     differentFiles: 'versch. Dateien...',

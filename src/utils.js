@@ -96,7 +96,7 @@ export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
         strColorPalette += `<span style="color: ${color}" data-value="${color}" class="rbroColorPaletteItem"></span>`;
     }
     if (allowEmpty) {
-        strColorPalette += '<span data-value="clear" class="rbroClearColorPalette">Clear</span>';
+        strColorPalette += `<span data-value="clear" class="rbroClearColorPalette">${rb.getLabel('clear')}</span>`;
     }
     strColorPalette += '</div>';
     let elColorPalette = $(strColorPalette)
