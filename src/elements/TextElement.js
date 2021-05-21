@@ -133,6 +133,7 @@ export default class TextElement extends DocElement {
             } else {
                 this.updateContent(this.content);
             }
+            this.updateStyle();
         } else if (field === 'richTextContent') {
             this.updateRichTextContent(value);
         } else if (field === 'richTextHtml') {
@@ -249,29 +250,40 @@ export default class TextElement extends DocElement {
         let borderStyleProperties = {};
         let style = this.getStyle();
         let contentSize = this.getContentSize(this.getDisplayWidth(), this.getDisplayHeight(), style);
+        styleProperties['width'] = this.rb.toPixel(contentSize.width);
+        styleProperties['height'] = this.rb.toPixel(contentSize.height);
         let horizontalAlignment = style.getValue('horizontalAlignment');
         let verticalAlignment = style.getValue('verticalAlignment');
         let alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() + horizontalAlignment.slice(1);
         let valignClass = 'rbroDocElementVAlign' + verticalAlignment.charAt(0).toUpperCase() + verticalAlignment.slice(1);
-        styleProperties['width'] = this.rb.toPixel(contentSize.width);
-        styleProperties['height'] = this.rb.toPixel(contentSize.height);
-        styleProperties['text-align'] = horizontalAlignment;
         styleProperties['vertical-align'] = verticalAlignment;
         styleProperties['background-color'] = style.getValue('backgroundColor');
-        styleProperties['font-weight'] = style.getValue('bold') ? 'bold' : '';
-        styleProperties['font-style'] = style.getValue('italic') ? 'italic' : 'normal';
-        if (style.getValue('underline') && style.getValue('strikethrough')) {
-            styleProperties['text-decoration'] = 'underline line-through';
-        } else if (style.getValue('underline')) {
-            styleProperties['text-decoration'] = 'underline';
-        } else if (style.getValue('strikethrough')) {
-            styleProperties['text-decoration'] = 'line-through';
+        if (!this.richText) {
+            styleProperties['font-weight'] = style.getValue('bold') ? 'bold' : '';
+            styleProperties['font-style'] = style.getValue('italic') ? 'italic' : 'normal';
+            if (style.getValue('underline') && style.getValue('strikethrough')) {
+                styleProperties['text-decoration'] = 'underline line-through';
+            } else if (style.getValue('underline')) {
+                styleProperties['text-decoration'] = 'underline';
+            } else if (style.getValue('strikethrough')) {
+                styleProperties['text-decoration'] = 'line-through';
+            } else {
+                styleProperties['text-decoration'] = 'none';
+            }
+            styleProperties['text-align'] = horizontalAlignment;
+            styleProperties['color'] = style.getValue('textColor');
+            styleProperties['font-family'] = style.getValue('font');
+            styleProperties['font-size'] = style.getValue('fontSize') + 'px';
         } else {
+            // attributes are set by rich text content itself
+            styleProperties['font-weight'] = 'unset';
+            styleProperties['font-style'] = 'normal';
             styleProperties['text-decoration'] = 'none';
+            styleProperties['text-align'] = 'unset';
+            styleProperties['color'] = '#000000';
+            styleProperties['font-family'] = this.rb.getProperty('defaultFont');
+            styleProperties['font-size'] = '12px';
         }
-        styleProperties['color'] = style.getValue('textColor');
-        styleProperties['font-family'] = style.getValue('font');
-        styleProperties['font-size'] = style.getValue('fontSize') + 'px';
         styleProperties['line-height'] = (style.getValue('lineSpacing') * 100.0) + '%';
         if (style.getValue('borderLeft') || style.getValue('borderTop') ||
                 style.getValue('borderRight') || style.getValue('borderBottom')) {
