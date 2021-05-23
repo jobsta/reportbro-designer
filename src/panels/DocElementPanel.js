@@ -742,6 +742,7 @@ export default class DocElementPanel extends PanelBase {
             elRichTextSpan.append($('<a></a>'));
             elRichTextLabel.append(elRichTextSpan);
             elFormField.append(elRichTextLabel);
+            elFormField.append('<div id="rbro_doc_element_rich_text_error" class="rbroErrorMessage"></div>');
             if (this.rb.getProperty('showPlusFeaturesInfo')) {
                 elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('plusFeatureInfo')}</div>`);
             }

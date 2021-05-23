@@ -111,6 +111,7 @@ var locale_en = {
     errorMsgMissingParameter: 'Parameter not found',
     errorMsgMissingParameterData: 'Data for parameter {info} not found',
     errorMsgRepeatGroupHeaderAfterContent: 'Not allowed for group after content row',
+    errorMsgPlusVersionRequired: 'Requires commerical PLUS version',
     errorMsgSectionBandNotOnSamePage: 'Section band does not fit on same page',
     errorMsgSectionBandPageBreakNotAllowed: 'Manual page break not allowed',
     errorMsgUnicodeEncodeError: 'Text contains non printable character',

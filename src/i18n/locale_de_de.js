@@ -111,6 +111,7 @@ var locale_de = {
     errorMsgMissingParameter: 'Parameter nicht gefunden',
     errorMsgMissingParameterData: 'Daten für Parameter {info} nicht gefunden',
     errorMsgRepeatGroupHeaderAfterContent: 'Nicht erlaubt für Gruppe nach Inhaltszeile',
+    errorMsgPlusVersionRequired: 'Benötigt kommerzielle PLUS Version',
     errorMsgSectionBandNotOnSamePage: 'Abschnittsbereich passt nicht auf eine Seite',
     errorMsgSectionBandPageBreakNotAllowed: 'Manueller Seitenumbruch ist nicht erlaubt',
     errorMsgUnicodeEncodeError: 'Text enthält nicht druckbare Zeichen',
