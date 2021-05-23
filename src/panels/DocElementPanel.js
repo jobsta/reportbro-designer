@@ -1981,8 +1981,9 @@ export default class DocElementPanel extends PanelBase {
         let sanitizeLinkSuper = Link.sanitize;
         Link.sanitize = function customSanitizeLinkInput(linkValueInput) {
             let val = linkValueInput;
-            if (/^\w+:/.test(val)) {
-                // do nothing, user is already using a custom protocol
+            if (/^\w+:/.test(val) || val.startsWith('${')) {
+                // do nothing, user is already using a custom protocol or a parameter value
+                return val;
             } else if (!/^https?:/.test(val)) {
                 // add missing http protocol to url
                 if (val.startsWith('/')) {
