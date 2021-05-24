@@ -74,6 +74,8 @@ export default class ReportBro {
                 { name: '#,##0.00', description: this.locale['patternNumber4'] },
                 { name: '$ #,##0.00', description: this.locale['patternNumber5'] }
             ],
+            reportServerBasicAuth: null,
+            reportServerHeaders: {},
             reportServerTimeout: 20000,
             reportServerUrl: 'https://www.reportbro.com/report/run',
             reportServerUrlCrossDomain: false,
@@ -1268,6 +1270,13 @@ export default class ReportBro {
             this.objectMap[objId].clearErrors();
         }
 
+        // use headers from properties and set basic auth header if basic auth info is available
+        let headers = this.properties.reportServerHeaders;
+        if (this.properties.reportServerBasicAuth) {
+            headers['Authorization'] = 'Basic ' + btoa(
+                this.properties.reportServerBasicAuth.username + ':' + this.properties.reportServerBasicAuth.password);
+        }
+
         this.showLoading();
         $.ajax(this.properties.reportServerUrl, {
             data: JSON.stringify({
@@ -1277,6 +1286,7 @@ export default class ReportBro {
                 isTestData: isTestData
             }),
             type: "PUT", contentType: "application/json",
+            headers: headers,
             timeout: this.properties.reportServerTimeout,
             crossDomain: this.properties.reportServerUrlCrossDomain,
             success: function(data) {
