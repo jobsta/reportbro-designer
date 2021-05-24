@@ -1,5 +1,11 @@
 # Changelog
 
+## Upcoming Release
+
+### Features
+* option to set basic auth for report preview request
+* option to set custom headers for report preview request
+
 ## [1.6.0] - 2021-03-19
 
 ### Features
