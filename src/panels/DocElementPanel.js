@@ -338,6 +338,12 @@ export default class DocElementPanel extends PanelBase {
                 'visibleIf': 'groupExpression',
                 'section': 'print'
             },
+            'repeatGroupHeader': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'repeat_group_header',
+                'visibleIf': 'groupExpression',
+                'section': 'print'
+            },
             'printIf': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'print_if',
@@ -1393,6 +1399,31 @@ export default class DocElementPanel extends PanelBase {
                 }
             });
         elFormField.append(elPageBreak);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
+        elDiv = $('<div id="rbro_doc_element_repeat_group_header_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_repeat_group_header">
+                      ${this.rb.getLabel('docElementRepeatGroupHeader')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elRepeatGroupHeader = $('<input id="rbro_doc_element_repeat_group_header" type="checkbox">')
+            .change(event => {
+                let repeatGroupHeaderChecked = elRepeatGroupHeader.is(":checked");
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'repeatGroupHeader', repeatGroupHeaderChecked,
+                        SetValueCmd.type.checkbox, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elRepeatGroupHeader);
+        elFormField.append('<div id="rbro_doc_element_repeat_group_header_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 

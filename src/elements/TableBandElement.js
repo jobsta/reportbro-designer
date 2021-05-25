@@ -22,6 +22,7 @@ export default class TableBandElement extends DocElement {
         this.backgroundColor = '';
         this.alternateBackgroundColor = '';
         this.groupExpression = '';
+        this.repeatGroupHeader = false;
         this.parentId = initialData.parentId;
         this.columnData = [];
 
@@ -111,6 +112,7 @@ export default class TableBandElement extends DocElement {
             fields.push('printIf');
             fields.push('alwaysPrintOnSamePage');
             fields.push('pageBreak');
+            fields.push('repeatGroupHeader');
         }
         return fields;
     }
