@@ -3,6 +3,7 @@
 ## Upcoming Release
 
 ### Features
+* QR Code
 * option to set basic auth for report preview request
 * option to set custom headers for report preview request
 

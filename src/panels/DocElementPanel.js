@@ -105,7 +105,13 @@ export default class DocElementPanel extends PanelBase {
             },
             'displayValue': {
                 'type': SetValueCmd.type.checkbox,
-                'fieldId': 'display_value'
+                'fieldId': 'display_value',
+                'visibleIf': 'format==CODE128'
+            },
+            'errorCorrectionLevel': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'error_correction_level',
+                'visibleIf': 'format==QRCode'
             },
             'source': {
                 'type': SetValueCmd.type.text,
@@ -824,8 +830,9 @@ export default class DocElementPanel extends PanelBase {
         elDiv = $('<div id="rbro_doc_element_format_row" class="rbroFormRow"></div>');
         elDiv.append(`<label for="rbro_doc_element_format">${this.rb.getLabel('docElementFormat')}:</label>`);
         elFormField = $('<div class="rbroFormField"></div>');
-        let elFormat = $(`<select id="rbro_doc_element_format" disabled="disabled">
+        let elFormat = $(`<select id="rbro_doc_element_format">
                 <option value="CODE128">CODE128</option>
+                <option value="QRCode">QR Code</option>
             </select>`)
             .change(event => {
                 let val = elFormat.val();
@@ -865,6 +872,34 @@ export default class DocElementPanel extends PanelBase {
                 }
             });
         elFormField.append(elDisplayValue);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = $('<div id="rbro_doc_element_error_correction_level_row" class="rbroFormRow"></div>');
+        elDiv.append(`<label for="rbro_doc_element_error_correction_level">
+                      ${this.rb.getLabel('docElementErrorCorrectionLevel')}:</label>`);
+        elFormField = $('<div class="rbroFormField"></div>');
+        let elErrorCorrectionLevel = $(`<select id="rbro_doc_element_error_correction_level">
+                <option value="L">${this.rb.getLabel('docElementErrorCorrectionLevelLow')}</option>
+                <option value="M">${this.rb.getLabel('docElementErrorCorrectionLevelMedium')}</option>
+                <option value="Q">${this.rb.getLabel('docElementErrorCorrectionLevelQuartile')}</option>
+                <option value="H">${this.rb.getLabel('docElementErrorCorrectionLevelHigh')}</option>
+            </select>`)
+            .change(event => {
+                let val = elErrorCorrectionLevel.val();
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'errorCorrectionLevel', val, SetValueCmd.type.select, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elErrorCorrectionLevel);
         elDiv.append(elFormField);
         panel.append(elDiv);
 

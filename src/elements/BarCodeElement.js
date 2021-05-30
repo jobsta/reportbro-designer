@@ -1,5 +1,5 @@
 import DocElement from './DocElement';
-import JsBarcode from 'jsbarcode';
+import QRCode from 'qrcode';
 
 /**
  * Barcode doc element. Currently only Code-128 is supported.
@@ -11,7 +11,8 @@ export default class BarCodeElement extends DocElement {
         this.elBarCode = null;
         this.content = '';
         this.format = 'CODE128';
-        this.displayValue = true;
+        this.displayValue = false;
+        this.errorCorrectionLevel = 'M';
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_colspan = '';
@@ -33,7 +34,8 @@ export default class BarCodeElement extends DocElement {
 
     setValue(field, value) {
         super.setValue(field, value);
-        if (field === 'content' ||field === 'format' || field === 'displayValue' || field === 'height') {
+        if (field === 'content' ||field === 'format' || field === 'displayValue' ||
+                field === 'height' || field === 'errorCorrectionLevel') {
             this.updateBarCode();
             this.updateDisplay();
         }
@@ -44,7 +46,7 @@ export default class BarCodeElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'height', 'content', 'format', 'displayValue',
+        return ['x', 'y', 'height', 'content', 'format', 'displayValue', 'errorCorrectionLevel',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
     }
@@ -83,40 +85,60 @@ export default class BarCodeElement extends DocElement {
     }
 
     updateBarCode() {
-        let valid = false;
-        let options = { format: this.format, height: this.displayValue ? (this.heightVal - 22) : this.heightVal,
-                margin: 0, displayValue: this.displayValue };
-        if (this.content !== '' && this.content.indexOf('${') === -1) {
-            try {
-                this.elBarCode.JsBarcode(this.content, options);
-                valid = true;
-            } catch (ex) {
+        if (this.format === 'QRCode') {
+            this.widthVal = this.heightVal;
+            this.width = '' + this.widthVal;
+            let content = this.content;
+            if (content === '') {
+                content = 'https://www.reportbro.com';
             }
-        }
-        if (!valid) {
-            // in case barcode cannot be created because of invalid input use default content appropriate
-            // for selected format
-            let content = '';
-            if (this.format === 'CODE39' || this.format === 'CODE128') {
-                content = '12345678';
-            } else if (this.format === 'EAN13') {
-                content = '5901234123457';
-            } else if (this.format === 'EAN8') {
-                content = '96385074';
-            } else if (this.format === 'EAN5') {
-                content = '12345';
-            } else if (this.format === 'EAN2') {
-                content = '12';
-            } else if (this.format === 'ITF14') {
-                content = '12345678901231';
-            } else if (this.format === 'MSI' ||this.format === 'MSI10' || this.format === 'MSI11' ||
-                    this.format === 'MSI1010' || this.format === 'MSI1110' || this.format == 'pharmacode') {
-                content = '1234';
+            let options = {
+                width: this.widthVal,
+                margin: 0,
+                errorCorrectionLevel : this.errorCorrectionLevel
+            };
+            QRCode.toCanvas(this.elBarCode.get(0), content, options);
+        } else {
+            let valid = false;
+            let options = {
+                format: this.format, height: this.displayValue ? (this.heightVal - 22) : this.heightVal,
+                margin: 0, displayValue: this.displayValue
+            };
+            if (this.content !== '' && this.content.indexOf('${') === -1) {
+                try {
+                    this.elBarCode.JsBarcode(this.content, options);
+                    valid = true;
+                } catch (ex) {
+                }
             }
-            this.elBarCode.JsBarcode(content, options);
+            if (!valid) {
+                // in case barcode cannot be created because of invalid input use default content appropriate
+                // for selected format
+                let content = '';
+                if (this.format === 'CODE39' || this.format === 'CODE128') {
+                    content = '12345678';
+                } else if (this.format === 'EAN13') {
+                    content = '5901234123457';
+                } else if (this.format === 'EAN8') {
+                    content = '96385074';
+                } else if (this.format === 'EAN5') {
+                    content = '12345';
+                } else if (this.format === 'EAN2') {
+                    content = '12';
+                } else if (this.format === 'ITF14') {
+                    content = '12345678901231';
+                } else if (this.format === 'MSI' ||this.format === 'MSI10' || this.format === 'MSI11' ||
+                        this.format === 'MSI1010' || this.format === 'MSI1110' || this.format === 'pharmacode') {
+                    content = '1234';
+                }
+                // clear width and height which is set on canvas element when QR code is generated
+                this.elBarCode.css('width', '');
+                this.elBarCode.css('height', '');
+                this.elBarCode.JsBarcode(content, options);
+            }
+            this.widthVal = this.elBarCode.width();
+            this.width = '' + this.widthVal;
         }
-        this.widthVal = this.elBarCode.width();
-        this.width = '' + this.widthVal;
     }
 
     /**
