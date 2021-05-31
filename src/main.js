@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2018 jobsta
+// Copyright (C) 2021 jobsta
 //
 // This file is part of ReportBro, a library to generate PDF and Excel reports.
 // Demos can be found at https://www.reportbro.com
