@@ -284,7 +284,7 @@ export default class TextElement extends DocElement {
             styleProperties['font-family'] = this.rb.getProperty('defaultFont');
             styleProperties['font-size'] = '12px';
         }
-        styleProperties['line-height'] = (style.getValue('lineSpacing') * 100.0) + '%';
+        styleProperties['line-height'] = style.getValue('lineSpacing');
         if (style.getValue('borderLeft') || style.getValue('borderTop') ||
                 style.getValue('borderRight') || style.getValue('borderBottom')) {
             borderStyleProperties['border-style'] = style.getValue('borderTop') ? 'solid' : 'none';
