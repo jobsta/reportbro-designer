@@ -2006,9 +2006,13 @@ export default class DocElementPanel extends PanelBase {
                 PopupWindow.type.parameterAppend, this.quill);
         });
 
-        let font = Quill.import('formats/font');
-        font.whitelist = ['courier', 'helvetica', 'times'];
-        Quill.register(font, true);
+        let fontFormat = Quill.import('formats/font');
+        let richTextFonts = [];
+        for (let font of this.rb.getFonts()) {
+            richTextFonts.push(font.value);
+        }
+        fontFormat.whitelist = richTextFonts;
+        Quill.register(fontFormat, true);
 
         let fontSizeStyle = Quill.import('attributors/style/size');
         let fontSizes = this.rb.getProperty('fontSizes');
