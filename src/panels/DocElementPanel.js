@@ -2170,8 +2170,13 @@ export default class DocElementPanel extends PanelBase {
 
                     if (show && visibleIfField) {
                         for (let obj of selectedObjects) {
-                            if ((!visibleIfFieldNegate && obj.getValue(visibleIfField) !== visibleIfValue) ||
-                                (visibleIfFieldNegate && obj.getValue(visibleIfField) === visibleIfValue)) {
+                            let objValue = obj.getValue(visibleIfField);
+                            if (typeof visibleIfValue === 'boolean' && typeof objValue !== 'boolean') {
+                                // convert object value to boolean if compared to a boolean value
+                                objValue = !!objValue;
+                            }
+                            if ((!visibleIfFieldNegate && objValue !== visibleIfValue) ||
+                                (visibleIfFieldNegate && objValue === visibleIfValue)) {
                                 show = false;
                                 delete sharedProperties[property];
                                 break;
