@@ -1,4 +1,5 @@
 import DocElement from './DocElement';
+import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
 
 /**
