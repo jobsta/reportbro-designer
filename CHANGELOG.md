@@ -6,6 +6,10 @@
 * option to set basic auth for report preview request
 * option to set custom headers for report preview request
 
+### Changes
+* update all package dependencies and adapt webpack configuration for webpack 5
+  to remove build warnings (upgrade to npm v7)
+
 ## [1.6.0] - 2021-03-19
 
 ### Features
