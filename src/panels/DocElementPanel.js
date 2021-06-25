@@ -2104,15 +2104,25 @@ export default class DocElementPanel extends PanelBase {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
                 let propertyDescriptor = this.propertyDescriptors[property];
                 let visibleIfField = null;
+                let visibleIfValue = null;
                 let visibleIfFieldNegate = false;
                 if ('visibleIf' in propertyDescriptor) {
-                    visibleIfField = propertyDescriptor['visibleIf'];
-                    if (visibleIfField.substr(0, 1) === '!') {
-                        visibleIfField = visibleIfField.substr(1);
-                        visibleIfFieldNegate = true;
+                    let visibleIf = propertyDescriptor['visibleIf'];
+                    if (visibleIf.startsWith('!')) {
+                        visibleIfField = visibleIf.substr(1);
+                        visibleIfValue = false;
+                    } else {
+                        let opIdx = visibleIf.indexOf('==');
+                        if (opIdx !== -1) {
+                            visibleIfField = visibleIf.substr(0, opIdx);
+                            visibleIfValue = visibleIf.substr(opIdx + 2);
+                        } else {
+                            visibleIfField = visibleIf;
+                            visibleIfValue = true;
+                        }
                     }
                 }
-                if (field === null || property === field || visibleIfField === field) {
+                if (field === null || property === field || (visibleIfField !== null && visibleIfField === field)) {
                     let show = false;
                     if (property in sharedProperties) {
                         if (sharedProperties[property] === selectedObjects.length) {
@@ -2160,9 +2170,8 @@ export default class DocElementPanel extends PanelBase {
 
                     if (show && visibleIfField) {
                         for (let obj of selectedObjects) {
-                            let visibleIfValue = obj.getValue(visibleIfField);
-                            if ((!visibleIfFieldNegate && !visibleIfValue) ||
-                                (visibleIfFieldNegate && visibleIfValue)) {
+                            if ((!visibleIfFieldNegate && obj.getValue(visibleIfField) !== visibleIfValue) ||
+                                (visibleIfFieldNegate && obj.getValue(visibleIfField) === visibleIfValue)) {
                                 show = false;
                                 delete sharedProperties[property];
                                 break;
