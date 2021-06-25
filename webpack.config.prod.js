@@ -52,13 +52,7 @@ module.exports = {
     new MiniCssExtractPlugin({filename: "reportbro.css"}),
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'node_modules/jquery/dist/jquery.js', to: 'ext/jquery.js' },
-        { from: 'node_modules/autosize/dist/autosize.js', to: 'ext/autosize.js' },
-        { from: 'node_modules/jsbarcode/dist/JsBarcode.all.min.js', to: 'ext/JsBarcode.all.min.js' },
-        { from: 'node_modules/spectrum-colorpicker/spectrum.css', to: 'ext/spectrum.css'},
-        { from: 'node_modules/spectrum-colorpicker/spectrum.js', to: 'ext/spectrum.js' },
-        { from: 'node_modules/quill/dist/quill.snow.css', to: 'ext/quill.snow.css'},
-        { from: 'node_modules/quill/dist/quill.js', to: 'ext/quill.js' }
+        { from: 'node_modules/jquery/dist/jquery.js', to: 'ext/jquery.js' }
       ]
     }),
   ]
