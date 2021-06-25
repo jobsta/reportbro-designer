@@ -3,13 +3,18 @@
 ## Upcoming Release
 
 ### Features
+* Rich Text (PLUS version)
 * QR Code
 * option to set basic auth for report preview request
 * option to set custom headers for report preview request
+* option to repeat table group on each page
+* option to set colors for color palette
+* option to set available font sizes
 
 ### Changes
 * update all package dependencies and adapt webpack configuration for webpack 5
   to remove build warnings (upgrade to npm v7)
+* remove external dependencies for autosize, JsBarcode and spectrum
 
 ## [1.6.0] - 2021-03-19
 
