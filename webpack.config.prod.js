@@ -1,9 +1,9 @@
-var path = require('path');
+const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-var banner =
+const banner =
 `Copyright (C) 2021 jobsta
 
 This file is part of ReportBro, a library to generate PDF and Excel reports.
