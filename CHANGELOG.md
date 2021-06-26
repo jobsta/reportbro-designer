@@ -15,6 +15,8 @@
 * update all package dependencies and adapt webpack configuration for webpack 5
   to remove build warnings (upgrade to npm v7)
 * remove external dependencies for autosize, JsBarcode and spectrum
+* add processErrors API method to display report errors
+* add clearErrors API method to clear existing report errors
 
 ## [1.6.0] - 2021-03-19
 

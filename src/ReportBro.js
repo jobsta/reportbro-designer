@@ -1254,23 +1254,6 @@ export default class ReportBro {
         return ret;
     }
 
-    processErrors(errors) {
-        for (let error of errors) {
-            if (error.object_id) {
-                $(`#rbro_menu_item${error.object_id}`).addClass('rbroError');
-                let obj = this.getDataObject(error.object_id);
-                if (obj !== null) {
-                    obj.addError(error);
-                }
-            }
-        }
-        if (errors.length > 0) {
-            this.deselectAll(false);
-            this.selectObject(errors[0].object_id, false);
-            this.detailPanels[this.activeDetailPanel].scrollToFirstError();
-        }
-    }
-
     /**
      * Performs ajax request to upload the report and either update displayed errors or
      * display report pdf in case report is valid.
@@ -1279,13 +1262,9 @@ export default class ReportBro {
      */
     previewInternal(data, isTestData) {
         let self = this;
-        // clear all error classes and texts
-        $('.rbroMenuItem').removeClass('rbroError');
-        $('.rbroFormRow').removeClass('rbroError');
-        $('.rbroErrorMessage').text('');
-        for (let objId in this.objectMap) {
-            this.objectMap[objId].clearErrors();
-        }
+
+        // clear all previous errors
+        this.clearErrors();
 
         // use headers from properties and set basic auth header if basic auth info is available
         let headers = this.properties.reportServerHeaders;
@@ -1317,7 +1296,7 @@ export default class ReportBro {
                     try {
                         let obj = JSON.parse(data);
                         if (obj.errors.length > 0) {
-                            self.processErrors(obj.errors);
+                            self.processErrors(obj.errors, false);
                         }
                     } catch (e) {
                         alert('preview failed');
@@ -1537,6 +1516,47 @@ export default class ReportBro {
     downloadSpreadsheet() {
         if (this.reportKey !== null) {
             window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
+        }
+    }
+
+    /**
+     * Displays the given errors.
+     *
+     * The errors are returned from reportbro-lib during report creation.
+     * @param {Object[]} errors - list of errors where each item is a map which contains
+     * object_id (Number), field (String), msg_key (String) and optional info (String).
+     * @param {Boolean} [clear] - if true or undefined then already existing errors will be cleared.
+     */
+    processErrors(errors, clear) {
+        if ((clear === undefined) || clear) {
+            this.clearErrors();
+        }
+
+        for (let error of errors) {
+            if (error.object_id) {
+                $(`#rbro_menu_item${error.object_id}`).addClass('rbroError');
+                let obj = this.getDataObject(error.object_id);
+                if (obj !== null) {
+                    obj.addError(error);
+                }
+            }
+        }
+        if (errors.length > 0) {
+            this.deselectAll(false);
+            this.selectObject(errors[0].object_id, false);
+            this.detailPanels[this.activeDetailPanel].scrollToFirstError();
+        }
+    }
+
+    /**
+     * Clears all error classes (which highlight elements with errors) and all error messages.
+     */
+    clearErrors() {
+        $('.rbroMenuItem').removeClass('rbroError');
+        $('.rbroFormRow').removeClass('rbroError');
+        $('.rbroErrorMessage').text('');
+        for (let objId in this.objectMap) {
+            this.objectMap[objId].clearErrors();
         }
     }
 
