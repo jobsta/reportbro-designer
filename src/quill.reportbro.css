@@ -649,8 +649,8 @@
 /* Clear color option */
 .ql-color .ql-picker-options [data-value=clear-color], .ql-background .ql-picker-options [data-value=clear-color] {
   background: none !important;
-  width: 100% !important;
-  height: 20px !important;
+  width: 100%;
+  height: 24px;
   text-align: center;
 }
 .ql-color .ql-picker-options [data-value=clear-color]:before, .ql-background .ql-picker-options [data-value=clear-color]:before {
