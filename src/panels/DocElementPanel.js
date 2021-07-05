@@ -156,8 +156,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'style_id',
                 'section': 'style',
-                'allowEmpty': true,
-                'visibleIf': '!richText'
+                'allowEmpty': true
             },
             'bold': {
                 'type': SetValueCmd.type.button,
