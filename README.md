@@ -25,15 +25,11 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 Go to the [docs](https://www.reportbro.com/doc/api) for more information. There are demos for different use cases available at: https://www.reportbro.com/demo/invoice.
 
-Include the ReportBro, jQuery, Autosize, JsBarcode, Spectrum JavaScript files as well as the ReportBro and Spectrum stylesheets in the `<head>` of your page. Make sure to load jQuery before ReportBro's JavaScript. 
+Include the ReportBro and jQuery JavaScript files as well as the ReportBro stylesheet in the `<head>` of your page. Make sure to load jQuery before ReportBro's JavaScript.
 
 ```html
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.css"/>
 <link rel="stylesheet" href="reportbro/reportbro.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.8.1/spectrum.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/autosize.js/5.0.0/autosize.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.4/JsBarcode.all.min.js"></script>
 <script src="reportbro/reportbro.js"></script>
 ```
 
@@ -90,7 +86,7 @@ which are referenced in the demos.
 
 ### Running demos from local filesystem with Firefox
 
-Because of Firefox's strict origin policy the icon fonts cannot be loaded (from ../dist/iconfonts)
+Due to Firefox's strict origin policy the icon fonts cannot be loaded (from ../dist/iconfonts)
 with default settings. Go to `about:config` and make sure
 `security.fileuri.strict_origin_policy` is set to false.
 
