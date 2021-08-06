@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [2.0.0] - 2021-08-06
 
 ### Features
 * Rich Text (PLUS version)
