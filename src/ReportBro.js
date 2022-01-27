@@ -65,11 +65,6 @@ export default class ReportBro {
             menuShowButtonLabels: false,
             menuShowDebug: false,
             menuSidebar: false,
-            saveCallback: null,
-            selectCallback: null,
-            showGrid: true,
-            showPlusFeatures: true,
-            showPlusFeaturesInfo: true,
             patternAdditionalDates: [],
             patternAdditionalNumbers: [],
             patternCurrencySymbol: '$',
@@ -87,11 +82,17 @@ export default class ReportBro {
                 { name: '#,##0.00', description: this.locale['patternNumber4'] },
                 { name: '$ #,##0.00', description: this.locale['patternNumber5'] }
             ],
+            previewCallback: null,
             reportServerBasicAuth: null,
             reportServerHeaders: {},
             reportServerTimeout: 20000,
             reportServerUrl: 'https://www.reportbro.com/report/run',
             reportServerUrlCrossDomain: false,
+            saveCallback: null,
+            selectCallback: null,
+            showGrid: true,
+            showPlusFeatures: true,
+            showPlusFeaturesInfo: true,
             theme: ''
         };
         if (properties) {
@@ -519,6 +520,11 @@ export default class ReportBro {
         return key;
     }
 
+    /**
+     * Get ReportBro property.
+     * @param {String} key - property name
+     * @returns {*}
+     */
     getProperty(key) {
         return this.properties[key];
     }
@@ -1261,20 +1267,32 @@ export default class ReportBro {
      * @param {Boolean} isTestData - true if data contains test data from parameters.
      */
     previewInternal(data, isTestData) {
-        let self = this;
+        const self = this;
+        const requestProps = {
+            reportServerUrl: this.properties.reportServerUrl,
+            reportServerTimeout: this.properties.reportServerTimeout,
+            reportServerUrlCrossDomain: this.properties.reportServerUrlCrossDomain,
+            reportServerBasicAuth: this.properties.reportServerBasicAuth,
+            reportServerHeaders: this.properties.reportServerHeaders
+        };
 
         // clear all previous errors
         this.clearErrors();
 
+        // callback function which can also be used to change request properties
+        if (this.properties.previewCallback) {
+            this.properties.previewCallback(requestProps);
+        }
+
         // use headers from properties and set basic auth header if basic auth info is available
-        let headers = this.properties.reportServerHeaders;
-        if (this.properties.reportServerBasicAuth) {
+        let headers = requestProps.reportServerHeaders;
+        if (requestProps.reportServerBasicAuth) {
             headers['Authorization'] = 'Basic ' + btoa(
-                this.properties.reportServerBasicAuth.username + ':' + this.properties.reportServerBasicAuth.password);
+                requestProps.reportServerBasicAuth.username + ':' + requestProps.reportServerBasicAuth.password);
         }
 
         this.showLoading();
-        $.ajax(this.properties.reportServerUrl, {
+        $.ajax(requestProps.reportServerUrl, {
             data: JSON.stringify({
                 report: this.getReport(),
                 outputFormat: DocumentProperties.outputFormat.pdf,
@@ -1283,14 +1301,15 @@ export default class ReportBro {
             }),
             type: "PUT", contentType: "application/json",
             headers: headers,
-            timeout: this.properties.reportServerTimeout,
-            crossDomain: this.properties.reportServerUrlCrossDomain,
+            timeout: requestProps.reportServerTimeout,
+            crossDomain: requestProps.reportServerUrlCrossDomain,
             success: function(data) {
                 self.hideLoading();
                 let pdfPrefix = 'data:application/pdf';
                 if (data.substr(0, 4) === 'key:') {
                     self.reportKey = data.substr(4);
-                    self.getDocument().openPdfPreviewTab(self.properties.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf');
+                    self.getDocument().openPdfPreviewTab(
+                        requestProps.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf');
                 } else {
                     self.reportKey = null;
                     try {

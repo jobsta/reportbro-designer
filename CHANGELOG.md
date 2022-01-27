@@ -3,6 +3,8 @@
 ## Upcoming Release
 
 ### Changes
+* add previewCallback which is called when preview is started
+  (can be used to change request parameters)
 * upgrade dependencies to fix potential security vulnerabilities
 
 ## [2.0.0] - 2021-08-06
