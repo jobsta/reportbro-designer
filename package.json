@@ -48,7 +48,7 @@
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
     "copy-webpack-plugin": "^9.0.0",
-    "css-loader": "^5.2.6",
+    "css-loader": "^6.5.1",
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^1.6.0",
     "style-loader": "^2.0.0",

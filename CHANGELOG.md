@@ -1,5 +1,10 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* upgrade dependencies to fix potential security vulnerabilities
+
 ## [2.0.0] - 2021-08-06
 
 ### Features

@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const banner =
-`Copyright (C) 2021 jobsta
+`Copyright (C) 2022 jobsta
 
 This file is part of ReportBro, a library to generate PDF and Excel reports.
 Demos can be found at https://www.reportbro.com
@@ -34,8 +34,20 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], },
-      { test: /\.(png|gif)([\?]?.*)$/,  loader: 'file-loader', options: { name: '[path][name].[ext]', },},
-      { test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/, loader: 'file-loader', options: {name: '[path][name].[ext]?[hash]'}},
+      {
+        test: /\.(png|gif)([\?]?.*)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]'
+        }
+      },
+      {
+        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]?[hash]'
+        }
+      },
       {
         test: /\.js$/,
         include: [path.resolve(__dirname, "src")],

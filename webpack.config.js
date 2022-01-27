@@ -14,11 +14,26 @@ module.exports = {
     hints : false // disable warning for asset size limit (generated js file)
   },
   module: {
-	  rules: [
-		  { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], },
-		  { test: /\.(png|gif)([\?]?.*)$/,  loader: 'file-loader', options: { name: '[path][name].[ext]', },},
-		  { test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/, loader: 'file-loader', options: {name: '[path][name].[ext]?[hash]'}},
-	  ]
+	rules: [
+	  {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
+      },
+      {
+        test: /\.(png|gif)([\?]?.*)$/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]'
+        }
+      },
+      {
+        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
+        type: 'asset/resource',
+        generator: {
+          filename: '[path][name][ext]?[hash]'
+        }
+      },
+    ]
   },
   plugins: [
     new MiniCssExtractPlugin({filename: "reportbro.css"})
