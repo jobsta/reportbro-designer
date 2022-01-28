@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [2.0.1] - 2022-01-28
 
 ### Changes
 * add requestCallback which is called before a preview request (pdf/xlsx) and
