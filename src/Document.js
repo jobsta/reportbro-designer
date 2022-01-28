@@ -25,6 +25,7 @@ export default class Document {
         this.zoom = 100;  // zoom level in percent
         this.zoomLevels = [25, 50, 75, 100, 150, 200, 400];
         this.pdfPreviewExists = false;
+        this.pdfPreviewObjectURL = null;
 
         // moving/resizing of element
         this.dragging = false;
@@ -364,11 +365,53 @@ export default class Document {
         }
     }
 
-    openPdfPreviewTab(reportUrl) {
-        let pdfObj = '<object data="' + reportUrl + '" type="application/pdf" width="100%" height="100%"></object>';
-        this.pdfPreviewExists = true;
+    openPdfPreviewTab(reportUrl, headers) {
         $('#rbro_document_pdf_preview').empty();
-        $('#rbro_document_pdf_preview').append(pdfObj);
+        if (this.pdfPreviewObjectURL) {
+            // release resource of previous object data url
+            URL.revokeObjectURL(this.pdfPreviewObjectURL);
+            this.pdfPreviewObjectURL = null;
+        }
+
+        if (headers && Object.keys(headers).length > 0) {
+            // use ajax request so we can set custom headers
+            // we do not use this solution per default because it is not possible to set a filename
+            // for the preview pdf (which is displayed in Chrome and used for downloading the pdf), e.g.
+            // https://stackoverflow.com/questions/53548182/can-i-set-the-filename-of-a-pdf-object-displayed-in-chrome
+            const self = this;
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        const obj = document.createElement('object');
+                        obj.type = 'application/pdf';
+                        obj.width = '100%';
+                        obj.height = '100%';
+                        self.pdfPreviewObjectURL = URL.createObjectURL(xhr.response);
+                        obj.data = self.pdfPreviewObjectURL;
+                        $('#rbro_document_pdf_preview').append($(obj));
+                    } else {
+                        alert('preview failed');
+                    }
+                }
+            };
+
+            xhr.open('GET', reportUrl, true);
+            for (const headerName in headers) {
+                if (headers.hasOwnProperty(headerName)) {
+                    xhr.setRequestHeader(headerName, headers[headerName]);
+                }
+            }
+            xhr.send();
+        } else {
+            // easy way (no custom headers), set data url for pdf object tag
+            const pdfObj =
+                '<object data="' + reportUrl + '" type="application/pdf" width="100%" height="100%"></object>';
+            $('#rbro_document_pdf_preview').append(pdfObj);
+        }
+
+        this.pdfPreviewExists = true;
         this.setDocumentTab(Document.tab.pdfPreview);
         this.updateDocumentTabs();
     }

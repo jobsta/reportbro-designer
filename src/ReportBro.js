@@ -82,12 +82,12 @@ export default class ReportBro {
                 { name: '#,##0.00', description: this.locale['patternNumber4'] },
                 { name: '$ #,##0.00', description: this.locale['patternNumber5'] }
             ],
-            previewCallback: null,
             reportServerBasicAuth: null,
             reportServerHeaders: {},
             reportServerTimeout: 20000,
             reportServerUrl: 'https://www.reportbro.com/report/run',
             reportServerUrlCrossDomain: false,
+            requestCallback: null,
             saveCallback: null,
             selectCallback: null,
             showGrid: true,
@@ -1268,31 +1268,20 @@ export default class ReportBro {
      */
     previewInternal(data, isTestData) {
         const self = this;
-        const requestProps = {
-            reportServerUrl: this.properties.reportServerUrl,
-            reportServerTimeout: this.properties.reportServerTimeout,
-            reportServerUrlCrossDomain: this.properties.reportServerUrlCrossDomain,
-            reportServerBasicAuth: this.properties.reportServerBasicAuth,
-            reportServerHeaders: this.properties.reportServerHeaders
-        };
+        const requestParams = this.getRequestParameters();
 
         // clear all previous errors
         this.clearErrors();
 
-        // callback function which can also be used to change request properties
-        if (this.properties.previewCallback) {
-            this.properties.previewCallback(requestProps);
-        }
-
         // use headers from properties and set basic auth header if basic auth info is available
-        let headers = requestProps.reportServerHeaders;
-        if (requestProps.reportServerBasicAuth) {
+        let headers = requestParams.reportServerHeaders;
+        if (requestParams.reportServerBasicAuth) {
             headers['Authorization'] = 'Basic ' + btoa(
-                requestProps.reportServerBasicAuth.username + ':' + requestProps.reportServerBasicAuth.password);
+                requestParams.reportServerBasicAuth.username + ':' + requestParams.reportServerBasicAuth.password);
         }
 
         this.showLoading();
-        $.ajax(requestProps.reportServerUrl, {
+        $.ajax(requestParams.reportServerUrl, {
             data: JSON.stringify({
                 report: this.getReport(),
                 outputFormat: DocumentProperties.outputFormat.pdf,
@@ -1301,15 +1290,14 @@ export default class ReportBro {
             }),
             type: "PUT", contentType: "application/json",
             headers: headers,
-            timeout: requestProps.reportServerTimeout,
-            crossDomain: requestProps.reportServerUrlCrossDomain,
+            timeout: requestParams.reportServerTimeout,
+            crossDomain: requestParams.reportServerUrlCrossDomain,
             success: function(data) {
                 self.hideLoading();
-                let pdfPrefix = 'data:application/pdf';
                 if (data.substr(0, 4) === 'key:') {
                     self.reportKey = data.substr(4);
                     self.getDocument().openPdfPreviewTab(
-                        requestProps.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf');
+                        requestParams.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf', headers);
                 } else {
                     self.reportKey = null;
                     try {
@@ -1331,6 +1319,21 @@ export default class ReportBro {
                 }
             }
         });
+    }
+
+    getRequestParameters() {
+        const params = {
+            reportServerUrl: this.properties.reportServerUrl,
+            reportServerTimeout: this.properties.reportServerTimeout,
+            reportServerUrlCrossDomain: this.properties.reportServerUrlCrossDomain,
+            reportServerBasicAuth: this.properties.reportServerBasicAuth,
+            reportServerHeaders: this.properties.reportServerHeaders
+        };
+        // callback function which can be used to change request parameters
+        if (this.properties.requestCallback) {
+            this.properties.requestCallback(params);
+        }
+        return params;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -1533,8 +1536,37 @@ export default class ReportBro {
      * Downloads spreadsheet file for a report where a preview was executed before.
      */
     downloadSpreadsheet() {
+        const requestParams = this.getRequestParameters();
+        const url = requestParams.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx';
+        const headers = requestParams.reportServerHeaders;
         if (this.reportKey !== null) {
-            window.open(this.properties.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx', '_blank');
+            if (headers && Object.keys(headers).length > 0) {
+                // use ajax request so we can set custom headers
+                const xhr = new XMLHttpRequest();
+                xhr.responseType = 'blob';
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            const url = URL.createObjectURL(xhr.response);
+                            // popup blocker will block window because of async download
+                            window.open(url, '_blank');
+                        } else {
+                            alert('download failed');
+                        }
+                    }
+                };
+
+                xhr.open('GET', url, true);
+                for (const headerName in headers) {
+                    if (headers.hasOwnProperty(headerName)) {
+                        xhr.setRequestHeader(headerName, headers[headerName]);
+                    }
+                }
+                xhr.send();
+            } else {
+                // easy way (no custom headers), open a new window with the file url
+                window.open(url, '_blank');
+            }
         }
     }
 

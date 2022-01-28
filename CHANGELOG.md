@@ -3,8 +3,9 @@
 ## Upcoming Release
 
 ### Changes
-* add previewCallback which is called when preview is started
-  (can be used to change request parameters)
+* add requestCallback which is called before a preview request (pdf/xlsx) and
+  can be used to change request parameters
+* support request headers for preview request (pdf/xlsx)
 * upgrade dependencies to fix potential security vulnerabilities
 
 ## [2.0.0] - 2021-08-06
