@@ -26,7 +26,7 @@ export default class PageBreakElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['y'];
+        return ['y', 'printIf'];
     }
 
     getElementType() {
