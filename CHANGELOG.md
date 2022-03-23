@@ -1,5 +1,10 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* add printIf for page break
+
 ## [2.0.1] - 2022-01-28
 
 ### Changes
