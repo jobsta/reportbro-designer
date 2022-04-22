@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [2.1.0] - 2022-04-22
 
 ### Changes
 * add printIf for page break
