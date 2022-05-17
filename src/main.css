@@ -66,10 +66,6 @@
     height: 100%;
     top: auto;
     left: auto;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
 }
 
 /* Main content container - general styles */
