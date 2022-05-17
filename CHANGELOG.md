@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.1] - 2022-05-17
+
+### Changes
+* update dependenices
+* non functional change generate zip and tgz with pack
+
 ## [2.1.0] - 2022-04-22
 
 ### Changes
