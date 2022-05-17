@@ -34,8 +34,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm install
-    - run: npm run build-prod --if-present
+    - run: npm ci
+    - run: npm run build-prod
     - run: npm pack
   
     - name: Upload Release Assets
@@ -43,7 +43,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        asset_paths: '["reportbro-designer-*.tgz"]'
+        asset_paths: '["reportbro-designer-*.tgz", "reportbro-designer-*.zip"]'
 
     - uses: JS-DevTools/npm-publish@v1
       with:
