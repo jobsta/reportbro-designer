@@ -32,7 +32,7 @@
     "build-prod": "webpack --config webpack.config.prod.js && uglifyjs ./dist/reportbro.js --comments '/Copyright/' -c -m -o ./dist/reportbro.min.js --source-map filename=\"'./dist/reportbro.min.js.map'\""
   },
   "dependencies": {
-    "@babel/preset-env": "^7.17.10",
+    "@babel/preset-env": "^7.17.12",
     "@babel/runtime": "^7.17.9",
     "autosize": "^5.0.1",
     "jsbarcode": "^3.11.5",
@@ -41,8 +41,8 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.17.10",
-    "@babel/core": "^7.17.10",
-    "@babel/plugin-transform-runtime": "^7.17.10",
+    "@babel/core": "^7.17.12",
+    "@babel/plugin-transform-runtime": "^7.17.12",
     "babel-loader": "^8.2.5",
     "babelify": "^10.0.0",
     "browserify": "^17.0.0",
@@ -51,8 +51,11 @@
     "file-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.6.0",
     "style-loader": "^3.1.1",
-    "uglify-js": "^3.15.4",
-    "webpack": "^5.72.0",
+    "uglify-js": "^3.15.5",
+    "webpack": "^5.72.1",
     "webpack-cli": "^4.9.2"
+  },
+  "optionalDependencies": {
+    "tar-to-zip": "^3.0.0"
   }
 }
