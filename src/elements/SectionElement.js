@@ -3,6 +3,7 @@ import SectionBandElement from './SectionBandElement';
 import Band from '../container/Band';
 import Parameter from '../data/Parameter';
 import MainPanelItem from '../menu/MainPanelItem';
+import * as utils from '../utils';
 
 /**
  * Section element. Sections can be added to the content band and contain a content band and optional
@@ -13,6 +14,9 @@ export default class SectionElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementSection'), id, -1, 60, rb);
         this.setupComplete = false;
+        this.elDividerHeader = null;
+        this.elDividerFooter = null;
+        this.elDividerBottom = null;
         this.dataSource = '';
         this.label = '';
         this.header = false;
@@ -78,12 +82,14 @@ export default class SectionElement extends DocElement {
             }
             data.y = '' + y;
         }
-        if ((bandType === Band.bandType.header && !this.header) || (bandType === Band.bandType.footer && !this.footer)) {
+        if ((bandType === Band.bandType.header && !this.header) ||
+            (bandType === Band.bandType.footer && !this.footer)) {
             panelItemProperties.visible = false;
         }
         let bandElement = new SectionBandElement(dataId, data, bandType, this.rb);
         this.rb.addDataObject(bandElement);
-        let panelItemBand = new MainPanelItem('section_band', this.panelItem, bandElement, panelItemProperties, this.rb);
+        let panelItemBand = new MainPanelItem(
+            'section_band', this.panelItem, bandElement, panelItemProperties, this.rb);
         bandElement.setPanelItem(panelItemBand);
         this.panelItem.appendChild(panelItemBand);
         bandElement.setup();
@@ -159,8 +165,9 @@ export default class SectionElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { top: this.rb.toPixel(y), width: '100%', height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = '100%';
+            this.el.style.height = this.rb.toPixel(height);
         }
     }
 
@@ -181,7 +188,8 @@ export default class SectionElement extends DocElement {
         let elSizerContainer = this.getSizerContainerElement();
         // create sizers (to indicate selection) which do not support resizing
         for (let sizer of ['N', 'S']) {
-            elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerMove"></div>`));
+            elSizerContainer.append(
+                utils.createElement('div', { class: `rbroSizer rbroSizer${sizer} rbroSizerMove` }));
         }
     }
 
@@ -202,11 +210,32 @@ export default class SectionElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroSectionElement"></div>`);
-        this.el.append($(`<div id="rbro_divider_section_top${this.id}" class="rbroDivider rbroDividerSection" style="top: 0px"></div>`));
-        this.el.append($(`<div id="rbro_divider_section_header${this.id}" class="rbroDivider rbroDividerSectionBand rbroHidden"></div>`));
-        this.el.append($(`<div id="rbro_divider_section_footer${this.id}" class="rbroDivider rbroDividerSectionBand rbroHidden"></div>`));
-        this.el.append($(`<div id="rbro_divider_section_bottom${this.id}" class="rbroDivider rbroDividerSection"></div>`));
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroSectionElement' });
+        this.el.append(
+            utils.createElement('div', {
+                id: `rbro_divider_section_top${this.id}`,
+                class: 'rbroDivider rbroDividerSection',
+                style: 'top: 0px'
+            })
+        );
+        this.elDividerHeader = utils.createElement(
+            'div', {
+                id: `rbro_divider_section_header${this.id}`,
+                class: 'rbroDivider rbroDividerSectionBand rbroHidden'
+            });
+        this.el.append(this.elDividerHeader);
+        this.elDividerFooter = utils.createElement(
+            'div', {
+                id: `rbro_divider_section_footer${this.id}`,
+                class: 'rbroDivider rbroDividerSectionBand rbroHidden'
+            });
+        this.el.append(this.elDividerFooter);
+        this.elDividerBottom = utils.createElement(
+            'div', {
+                id: `rbro_divider_section_bottom${this.id}`,
+                class: 'rbroDivider rbroDividerSection'
+            });
+        this.el.append(this.elDividerBottom);
         this.appendToContainer();
         this.registerEventHandlers();
     }
@@ -234,7 +263,7 @@ export default class SectionElement extends DocElement {
                 this.name += ' ' + this.dataSource;
             }
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
+        document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }
 
     /**
@@ -273,9 +302,10 @@ export default class SectionElement extends DocElement {
             } else {
                 height += this.headerData.getValue('heightVal');
             }
-            $(`#rbro_divider_section_header${this.id}`).css({ top: this.rb.toPixel(height) }).removeClass('rbroHidden');
+            this.elDividerHeader.style.top = this.rb.toPixel(height);
+            this.elDividerHeader.classList.remove('rbroHidden');
         } else {
-            $(`#rbro_divider_section_header${this.id}`).addClass('rbroHidden');
+            this.elDividerHeader.classList.add('rbroHidden');
         }
         if (this.contentData !== null) {
             if (band === this.contentData) {
@@ -285,16 +315,17 @@ export default class SectionElement extends DocElement {
             }
         }
         if (this.footer && this.footerData !== null) {
-            $(`#rbro_divider_section_footer${this.id}`).css({ top: this.rb.toPixel(height) }).removeClass('rbroHidden');
+            this.elDividerFooter.style.top = this.rb.toPixel(height);
+            this.elDividerFooter.classList.remove('rbroHidden');
             if (band === this.footerData) {
                 height += bandHeight;
             } else {
                 height += this.footerData.getValue('heightVal');
             }
         } else {
-            $(`#rbro_divider_section_footer${this.id}`).addClass('rbroHidden');
+            document.getElementById(`rbro_divider_section_footer${this.id}`).classList.add('rbroHidden');
         }
-        $(`#rbro_divider_section_bottom${this.id}`).css({ top: this.rb.toPixel(height) });
+        this.elDividerBottom.style.top = this.rb.toPixel(height);
         this.height = '' + height;
         this.heightVal = height;
         this.updateDisplay();

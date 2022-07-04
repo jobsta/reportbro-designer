@@ -2,7 +2,8 @@ import Command from './Command';
 import SetValueCmd from './SetValueCmd';
 
 /**
- * Command container for multiple commands. All commands of this container will be executed in a single do/undo operation.
+ * Command container for multiple commands. All commands of this container will be executed
+ * in a single do/undo operation.
  * @class
  */
 export default class CommandGroupCmd extends Command {

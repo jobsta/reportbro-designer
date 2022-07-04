@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2021 jobsta
+// Copyright (C) 2022 jobsta
 //
 // This file is part of ReportBro, a library to generate PDF and Excel reports.
 // Demos can be found at https://www.reportbro.com
@@ -14,41 +14,9 @@
 // https://www.reportbro.com/license/agreement
 //
 
-
 import ReportBro from './ReportBro';
 
-$.fn.reportBro = function(options) {
-    var args = Array.prototype.slice.call(arguments, 1); // arguments for method call
-    var rv = null;
-
-    this.each(function(i, _element) {
-        var element = $(_element);
-        var reportBro = element.data('reportBro');
-        var currentResult;
-
-        // method call
-        if (typeof options === 'string') {
-            if (reportBro && $.isFunction(reportBro[options])) {
-                currentResult = reportBro[options].apply(reportBro, args);
-                if (i === 0) {
-                    rv = currentResult;
-                }
-                if (options === 'destroy') {
-                    element.removeData('reportBro');
-                }
-            }
-        } else {
-            // new ReportBro instance
-            if (!reportBro) {
-                reportBro = new ReportBro(element, options);
-                element.data('reportBro', reportBro);
-                reportBro.render();
-                reportBro.setup();
-            }
-            // return ReportBro instance
-            rv = reportBro;
-        }
-    });
-    
-    return rv;
-};
+(function(){
+    if (typeof exports !== 'undefined') exports.ReportBro = ReportBro;
+    else window.ReportBro = ReportBro;
+})();

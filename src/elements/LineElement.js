@@ -1,4 +1,5 @@
 import DocElement from './DocElement';
+import * as utils from '../utils'
 
 /**
  * Line doc element. Currently only horizontal lines are supported.
@@ -38,9 +39,7 @@ export default class LineElement extends DocElement {
     }
 
     updateStyle() {
-        let styleProperties = {};
-        styleProperties['background-color'] = this.getValue('color');
-        this.el.css(styleProperties);
+        this.el.style.backgroundColor = this.getValue('color');
     }
 
     /**
@@ -52,7 +51,7 @@ export default class LineElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroLineElement"></div>`);
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroLineElement' });
         this.appendToContainer();
         super.registerEventHandlers();
     }

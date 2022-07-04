@@ -1,9 +1,7 @@
 import AddDeleteDocElementCmd from './commands/AddDeleteDocElementCmd';
 import Band from './container/Band';
-import DocumentProperties from './data/DocumentProperties';
 import DocElement from './elements/DocElement';
 import * as utils from './utils';
-import {getEventAbsPos} from "./utils";
 
 /**
  * Area to display all bands and its doc elements.
@@ -14,12 +12,22 @@ export default class Document {
     constructor(rootElement, showGrid, rb) {
         this.rootElement = rootElement;
         this.rb = rb;
+        this.elPanel = null;
+        this.elTabPdfLayout = null;
+        this.elTabPdfPreview = null;
         this.elDoc = null;
         this.elDocContent = null;
         this.elHeader = null;
         this.elContent = null;
         this.elFooter = null;
         this.elSelectionArea = null;
+        this.elDividerMarginLeft = null;
+        this.elDividerMarginTop = null;
+        this.elDividerMarginRight = null;
+        this.elDividerMarginBottom = null;
+        this.elDividerHeader = null;
+        this.elDividerFooter = null;
+        this.elPdfPreview = null;
         this.gridVisible = showGrid;
         this.gridSize = 10;
         this.zoom = 100;  // zoom level in percent
@@ -49,78 +57,128 @@ export default class Document {
     }
 
     render() {
-        let panel = $('#rbro_document_panel')
-            .mousedown(event => {
-                if (this.rb.isDocElementSelected() && !event.shiftKey) {
-                    this.rb.deselectAll(true);
-                }
-                let offset = this.elDocContent.offset();
-                this.startSelectionArea(
-                    this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
-                    this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top));
-            });
+        this.elPanel = document.getElementById('rbro_document_panel');
+        this.elPanel.addEventListener('mousedown', (event) => {
+            if (this.rb.isDocElementSelected() && !event.shiftKey) {
+                this.rb.deselectAll(true);
+            }
+            let offset = utils.getElementOffset(this.elDocContent);
+            this.startSelectionArea(
+                this.getCoordWithoutZoom(event.pageX - offset.left),
+                this.getCoordWithoutZoom(event.pageY - offset.top));
+        });
 
-        let elDocTabs = $('<div id="rbro_document_tabs" class="rbroDocumentTabs"></div>')
-            .mousedown(event => {
-                // avoid deselection of doc elements when clicking document tab
-                event.stopPropagation();
-            });
+        let elDocTabs = utils.createElement('div', { id: 'rbro_document_tabs', class: 'rbroDocumentTabs' });
+        elDocTabs.addEventListener('mousedown', (event) => {
+            // avoid deselection of doc elements when clicking document tab
+            event.stopPropagation();
+        });
 
-        elDocTabs.append(
-            $(`<div id="rbro_document_tab_pdf_layout" class="rbroDocumentTab rbroButton rbroTabButton">
-               ${this.rb.getLabel('documentTabPdfLayout')}</div>`)
-            .click(event => {
-                this.setDocumentTab(Document.tab.pdfLayout);
-            }));
-        let btnPdfPreview = $(
-            `<div id="rbro_document_tab_pdf_preview" class="rbroDocumentTab rbroButton rbroTabButton rbroHidden rbroPdfPreview 
-                ${this.rb.getProperty('enableSpreadsheet') ? 'rbroXlsxDownload' : ''}">
-                ${this.rb.getLabel('documentTabPdfPreview')}</div>`)
-            .click(event => {
-                this.setDocumentTab(Document.tab.pdfPreview);
-            });
+        this.elTabPdfLayout = utils.createElement(
+            'div', { id: 'rbro_document_tab_pdf_layout', class: 'rbroDocumentTab rbroButton rbroTabButton' },
+            this.rb.getLabel('documentTabPdfLayout'));
+        this.elTabPdfLayout.addEventListener('click', (event) => {
+            this.setDocumentTab(Document.tab.pdfLayout);
+        });
+        elDocTabs.append(this.elTabPdfLayout);
+        this.elTabPdfPreview = utils.createElement(
+            'div', {
+                id: 'rbro_document_tab_pdf_preview',
+                class: 'rbroDocumentTab rbroButton rbroTabButton rbroHidden rbroPdfPreview' +
+                    (this.rb.getProperty('enableSpreadsheet') ? ' rbroXlsxDownload' : '')
+            },
+            this.rb.getLabel('documentTabPdfPreview'));
+        this.elTabPdfPreview.addEventListener('click', (event) => {
+            this.setDocumentTab(Document.tab.pdfPreview);
+        });
         if (this.rb.getProperty('enableSpreadsheet')) {
-            btnPdfPreview.append($(
-                `<span class="rbroIcon-xlsx rbroXlsxDownlaodButton" title="${this.rb.getLabel('documentTabXlsxDownload')}"></span>`)
-                .click(event => { this.rb.downloadSpreadsheet(); }));
+            const elButtonXlsxDownload = utils.createElement(
+                'span', {
+                    class: 'rbroIcon-xlsx rbroXlsxDownloadButton',
+                    title: this.rb.getLabel('documentTabXlsxDownload')
+                });
+            elButtonXlsxDownload.addEventListener('click', (event) => {
+                this.rb.downloadSpreadsheet();
+            });
+            this.elTabPdfPreview.append(elButtonXlsxDownload);
         }
-        btnPdfPreview.append($(
-            `<span class="rbroIcon-cancel" title="${this.rb.getLabel('documentTabClose')}"></span>`)
-            .click(event => { this.closePdfPreviewTab(); }));
-        elDocTabs.append(btnPdfPreview);
-        panel.append(elDocTabs);
+        const elClosePdfPreview = utils.createElement(
+            'span', {
+                class: 'rbroIcon-cancel',
+                title: this.rb.getLabel('documentTabClose')
+            });
+        elClosePdfPreview.addEventListener('click', (event) => {
+            this.closePdfPreviewTab();
+        });
+        this.elTabPdfPreview.append(elClosePdfPreview);
+        elDocTabs.append(this.elTabPdfPreview);
+        this.elPanel.append(elDocTabs);
 
         let docProperties = this.rb.getDocumentProperties();
-        this.elDoc = $('<div id="rbro_document_pdf" class="rbroDocument rbroDragTarget rbroHidden"></div>');
-        this.elDocContent = $(`<div id="rbro_document_content"
-            class="rbroDocumentContent ${this.gridVisible ? 'rbroDocumentGrid' : ''}"></div>`);
-        this.elHeader = $(`<div id="rbro_header" class="rbroDocumentBand rbroElementContainer"
-            style="top: 0px; left: 0px;"></div>`);
-        this.elHeader.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandHeader')}</div>`));
+        this.elDoc = utils.createElement(
+            'div', { id: 'rbro_document_pdf', class: 'rbroDocument rbroDragTarget rbroHidden' });
+        this.elDocContent = utils.createElement(
+            'div', {
+                id: 'rbro_document_content',
+                class: 'rbroDocumentContent' + (this.gridVisible ? ' rbroDocumentGrid' : '')
+            });
+        this.elHeader = utils.createElement(
+            'div', {
+                id: 'rbro_header',
+                class: 'rbroDocumentBand rbroElementContainer',
+                style: 'top: 0px; left: 0px;'
+            });
+        this.elHeader.append(
+            utils.createElement('div', { class: 'rbroDocumentBandDescription' }, this.rb.getLabel('bandHeader')));
         this.elDocContent.append(this.elHeader);
-        this.elContent = $('<div id="rbro_content" class="rbroDocumentBand rbroElementContainer"></div>');
-        this.elContent.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandContent')}</div>`));
+        this.elContent = utils.createElement(
+            'div', {
+                id: 'rbro_content',
+                class: 'rbroDocumentBand rbroElementContainer'
+            });
+        this.elContent.append(
+            utils.createElement('div', { class: 'rbroDocumentBandDescription' }, this.rb.getLabel('bandContent')));
         this.elDocContent.append(this.elContent);
-        this.elFooter = $(`<div id="rbro_footer" class="rbroDocumentBand rbroElementContainer"
-            style="bottom: 0px; left 0px;"></div>`);
-        this.elFooter.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('bandFooter')}</div>`));
+        this.elFooter = utils.createElement(
+            'div', {
+                id: 'rbro_footer',
+                class: 'rbroDocumentBand rbroElementContainer',
+                style: 'bottom: 0px; left 0px;'
+            });
+        this.elFooter.append(
+            utils.createElement('div', { class: 'rbroDocumentBandDescription' }, this.rb.getLabel('bandFooter')));
         this.elDocContent.append(this.elFooter);
         this.elDoc.append(this.elDocContent);
 
-        this.elSelectionArea = $('<div id="rbro_selection_area" class="rbroHidden rbroSelectionArea"></div>');
+        this.elSelectionArea = utils.createElement(
+            'div', { id: 'rbro_selection_area', class: 'rbroHidden rbroSelectionArea' });
         this.elDocContent.append(this.elSelectionArea);
 
         this.initializeEventHandlers();
 
-        this.elDoc.append('<div id="rbro_divider_margin_left" class="rbroDivider rbroDividerMarginLeft"></div>');
-        this.elDoc.append('<div id="rbro_divider_margin_top" class="rbroDivider rbroDividerMarginTop"></div>');
-        this.elDoc.append('<div id="rbro_divider_margin_right" class="rbroDivider rbroDividerMarginRight"></div>');
-        this.elDoc.append('<div id="rbro_divider_margin_bottom" class="rbroDivider rbroDividerMarginBottom"></div>');
-        this.elDoc.append('<div id="rbro_divider_header" class="rbroDivider rbroDividerHeader"></div>');
-        this.elDoc.append('<div id="rbro_divider_footer" class="rbroDivider rbroDividerFooter"></div>');
-        panel.append(this.elDoc);
+        this.elDividerMarginLeft = utils.createElement(
+            'div', { id: 'rbro_divider_margin_left', class: 'rbroDivider rbroDividerMarginLeft' });
+        this.elDoc.append(this.elDividerMarginLeft);
+        this.elDividerMarginTop = utils.createElement(
+            'div', { id: 'rbro_divider_margin_top', class: 'rbroDivider rbroDividerMarginTop' });
+        this.elDoc.append(this.elDividerMarginTop);
+        this.elDividerMarginRight = utils.createElement(
+            'div', { id: 'rbro_divider_margin_right', class: 'rbroDivider rbroDividerMarginRight' });
+        this.elDoc.append(this.elDividerMarginRight);
+        this.elDividerMarginBottom = utils.createElement(
+            'div', { id: 'rbro_divider_margin_bottom', class: 'rbroDivider rbroDividerMarginBottom' });
+        this.elDoc.append(this.elDividerMarginBottom);
+        this.elDividerHeader = utils.createElement(
+            'div', { id: 'rbro_divider_header', class: 'rbroDivider rbroDividerHeader' });
+        this.elDoc.append(this.elDividerHeader);
+        this.elDividerFooter = utils.createElement(
+            'div', { id: 'rbro_divider_footer', class: 'rbroDivider rbroDividerFooter' });
+        this.elDoc.append(this.elDividerFooter);
+        this.elPanel.append(this.elDoc);
 
-        panel.append($('<div id="rbro_document_pdf_preview" class="rbroDocumentPreview"></div>'));
+        this.elPdfPreview = utils.createElement(
+            'div', { id: 'rbro_document_pdf_preview', class: 'rbroDocumentPreview' });
+        this.elPanel.append(this.elPdfPreview);
 
         let size = docProperties.getPageSize();
         this.updatePageSize(size.width, size.height);
@@ -133,25 +191,28 @@ export default class Document {
     }
 
     initializeEventHandlers() {
-        this.elDocContent.on('dragover', event => {
+        this.elDocContent.addEventListener('dragover', (event) => {
             this.processDragover(event);
-        })
-        .on('dragenter', event => {
+        });
+        this.elDocContent.addEventListener('dragenter', (event) => {
             if (this.rb.isBrowserDragActive('docElement')) {
                 this.dragEnterCount++;
                 event.preventDefault(); // needed for IE
             }
-        })
-        .on('dragleave', event => {
+        });
+        this.elDocContent.addEventListener('dragleave', (event) => {
             if (this.rb.isBrowserDragActive('docElement')) {
                 this.dragEnterCount--;
                 if (this.dragEnterCount === 0) {
-                    $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                    const elContainers = document.querySelectorAll('.rbroElementContainer');
+                    for (const elContainer of elContainers) {
+                        elContainer.classList.remove('rbroElementDragOver');
+                    }
                     this.dragContainerId = null;
                 }
             }
-        })
-        .on('drop', event => {
+        });
+        this.elDocContent.addEventListener('drop', (event) => {
             this.processDrop(event);
             return false;
         });
@@ -161,24 +222,24 @@ export default class Document {
         if (this.dragging) {
             this.processDrag(event);
         } else if (this.selectionAreaStarted) {
-            let offset = this.elDocContent.offset();
+            let offset = utils.getElementOffset(this.elDocContent);
             let area = this.getSelectionArea(
-                this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
-                this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top));
-            let props = {
-                left: this.rb.toPixel(area.left), top: this.rb.toPixel(area.top),
-                width: this.rb.toPixel(area.width), height: this.rb.toPixel(area.height)};
-            this.elSelectionArea.css(props);
-            if (this.elSelectionArea.hasClass('rbroHidden')) {
+                this.getCoordWithoutZoom(event.pageX - offset.left),
+                this.getCoordWithoutZoom(event.pageY - offset.top));
+            this.elSelectionArea.style.left = this.rb.toPixel(area.left);
+            this.elSelectionArea.style.top = this.rb.toPixel(area.top);
+            this.elSelectionArea.style.width = this.rb.toPixel(area.width);
+            this.elSelectionArea.style.height = this.rb.toPixel(area.height);
+            if (this.elSelectionArea.classList.contains('rbroHidden')) {
                 // show element after css properties are set
-                this.elSelectionArea.removeClass('rbroHidden');
+                this.elSelectionArea.classList.remove('rbroHidden');
             }
         }
     }
 
     processDragover(event) {
         if (this.rb.isBrowserDragActive('docElement')) {
-            let absPos = getEventAbsPos(event);
+            let absPos = utils.getEventAbsPos(event);
             let container = null;
             if (absPos !== null) {
                 container = this.getContainer(absPos.x, absPos.y, this.dragElementType);
@@ -187,7 +248,10 @@ export default class Document {
             }
             let containerId = (container !== null) ? container.getId() : null;
             if (containerId !== this.dragContainerId) {
-                $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                const elContainers = document.querySelectorAll('.rbroElementContainer');
+                for (const elContainer of elContainers) {
+                    elContainer.classList.remove('rbroElementDragOver');
+                }
                 if (container !== null) {
                     container.dragOver();
                 }
@@ -201,19 +265,22 @@ export default class Document {
 
     processDrop(event) {
         if (this.rb.isBrowserDragActive('docElement')) {
-            let absPos = getEventAbsPos(event);
+            let absPos = utils.getEventAbsPos(event);
             if (absPos !== null) {
                 this.dragCurrentX = absPos.x;
                 this.dragCurrentY = absPos.y;
             }
-            $('.rbroElementContainer').removeClass('rbroElementDragOver');
+            const elContainers = document.querySelectorAll('.rbroElementContainer');
+            for (const elContainer of elContainers) {
+                elContainer.classList.remove('rbroElementDragOver');
+            }
             let container = this.getContainer(
                 this.dragCurrentX, this.dragCurrentY, this.dragElementType);
             while (container !== null && !container.isElementAllowed(this.dragElementType)) {
                 container = container.getParent();
             }
             if (container !== null && container.isElementAllowed(this.dragElementType)) {
-                let offset = this.elDocContent.offset();
+                let offset = utils.getElementOffset(this.elDocContent);
                 let x = this.getCoordWithoutZoom(this.dragCurrentX - offset.left);
                 let y = this.getCoordWithoutZoom(this.dragCurrentY - offset.top);
                 let containerOffset = container.getOffset();
@@ -230,12 +297,11 @@ export default class Document {
                 this.rb.executeCommand(cmd);
             }
             event.preventDefault();
-            $('#rbro_menu_element_drag_item').addClass('rbroHidden');
         }
     }
 
     processDrag(event) {
-        let absPos = getEventAbsPos(event);
+        let absPos = utils.getEventAbsPos(event);
         if (this.dragType === DocElement.dragType.element) {
             let container = this.getContainer(
                 absPos.x, absPos.y, this.dragElementType);
@@ -250,7 +316,10 @@ export default class Document {
                 }
             }
             if (containerId !== this.dragCurrentContainerId) {
-                $('.rbroElementContainer').removeClass('rbroElementDragOver');
+                const elContainers = document.querySelectorAll('.rbroElementContainer');
+                for (const elContainer of elContainers) {
+                    elContainer.classList.remove('rbroElementDragOver');
+                }
                 if (container !== null && containerId !== this.dragContainerId) {
                     container.dragOver();
                 }
@@ -272,7 +341,8 @@ export default class Document {
     }
 
     updatePageSize(width, height) {
-        this.elDoc.css({ width: this.rb.toPixel(width), height: this.rb.toPixel(height) });
+        this.elDoc.style.width = this.rb.toPixel(width);
+        this.elDoc.style.height = this.rb.toPixel(height);
     }
 
     updatePageMargins() {
@@ -285,47 +355,54 @@ export default class Document {
         let top = this.rb.toPixel(marginTop - 1);
         let right = this.rb.toPixel(marginRight);
         let bottom = this.rb.toPixel(marginBottom);
-        $('#rbro_divider_margin_left').css('left', left);
-        $('#rbro_divider_margin_top').css('top', top);
+        this.elDividerMarginLeft.style.left = left;
+        this.elDividerMarginTop.style.top = top;
         // hide divider in case margin is 0, otherwise divider is still visible
         if (marginLeft !== 0) {
-            $('#rbro_divider_margin_left').css('left', left).show();
+            this.elDividerMarginLeft.style.left = left;
+            this.elDividerMarginLeft.style.display = 'block';
         } else {
-            $('#rbro_divider_margin_left').hide();
+            this.elDividerMarginLeft.style.display = 'none';
         }
         if (marginTop !== 0) {
-            $('#rbro_divider_margin_top').css('top', top).show();
+            this.elDividerMarginTop.style.top = top;
+            this.elDividerMarginTop.style.display = 'block';
         } else {
-            $('#rbro_divider_margin_top').hide();
+            this.elDividerMarginTop.style.display = 'none';
         }
         if (marginRight !== 0) {
-            $('#rbro_divider_margin_right').css('right', right).show();
+            this.elDividerMarginRight.style.right = right;
+            this.elDividerMarginRight.style.display = 'block';
         } else {
-            $('#rbro_divider_margin_right').hide();
+            this.elDividerMarginRight.style.display = 'none';
         }
         if (marginBottom !== 0) {
-            $('#rbro_divider_margin_bottom').css('bottom', bottom).show();
+            this.elDividerMarginBottom.style.bottom = bottom;
+            this.elDividerMarginBottom.style.display = 'block';
         } else {
-            $('#rbro_divider_margin_bottom').hide();
+            this.elDividerMarginBottom.style.display = 'none';
         }
-        this.elDocContent.css({ left: left, top: top, right: right, bottom: bottom });
+        this.elDocContent.style.left = left;
+        this.elDocContent.style.top = top;
+        this.elDocContent.style.right = right;
+        this.elDocContent.style.bottom = bottom;
     }
 
     updateHeader() {
         let docProperties = this.rb.getDocumentProperties();
         if (docProperties.getValue('header')) {
             let headerSize = this.rb.toPixel(docProperties.getValue('headerSize'));
-            this.elHeader.css('height', headerSize);
-            this.elHeader.show();
-            $('#rbro_divider_header').css('top', this.rb.toPixel(
+            this.elHeader.style.height = headerSize;
+            this.elHeader.style.display = 'block';
+            this.elDividerHeader.style.top = this.rb.toPixel(
                 utils.convertInputToNumber(docProperties.getValue('marginTop')) +
-                utils.convertInputToNumber(docProperties.getValue('headerSize')) - 1));
-            $('#rbro_divider_header').show();
-            this.elContent.css('top', headerSize);
+                utils.convertInputToNumber(docProperties.getValue('headerSize')) - 1);
+            this.elDividerHeader.style.display = 'block';
+            this.elContent.style.top = headerSize;
         } else {
-            this.elHeader.hide();
-            $('#rbro_divider_header').hide();
-            this.elContent.css('top', this.rb.toPixel(0));
+            this.elHeader.style.display = 'none';
+            this.elDividerHeader.style.display = 'none';
+            this.elContent.style.top = this.rb.toPixel(0);
         }
     }
 
@@ -333,40 +410,58 @@ export default class Document {
         let docProperties = this.rb.getDocumentProperties();
         if (docProperties.getValue('footer')) {
             let footerSize = this.rb.toPixel(docProperties.getValue('footerSize'));
-            this.elFooter.css('height', footerSize);
-            this.elFooter.show();
-            $('#rbro_divider_footer').css('bottom', this.rb.toPixel(
+            this.elFooter.style.height = footerSize;
+            this.elFooter.style.display = 'block';
+            this.elDividerFooter.style.bottom = this.rb.toPixel(
                 utils.convertInputToNumber(docProperties.getValue('marginBottom')) +
-                utils.convertInputToNumber(docProperties.getValue('footerSize'))));
-            $('#rbro_divider_footer').show();
-            this.elContent.css('bottom', footerSize);
+                utils.convertInputToNumber(docProperties.getValue('footerSize')));
+            this.elDividerFooter.style.display = 'block';
+            this.elContent.style.bottom = footerSize;
         } else {
-            this.elFooter.hide();
-            $('#rbro_divider_footer').hide();
-            this.elContent.css('bottom', this.rb.toPixel(0));
+            this.elFooter.style.display = 'none';
+            this.elDividerFooter.style.display = 'none';
+            this.elContent.style.bottom = this.rb.toPixel(0);
         }
     }
 
     setDocumentTab(tab) {
-        $('#rbro_document_tabs .rbroDocumentTab').removeClass('rbroActive');
-        // use z-index to show pdf preview instead of show/hide of div because otherwise pdf is reloaded (and generated) again
+        const elTabs = document.querySelectorAll('#rbro_document_tabs .rbroDocumentTab');
+        const elMenuButtons = document.querySelectorAll('.rbroElementButtons .rbroMenuButton');
+        const elActionButtons = document.querySelectorAll('.rbroActionButtons .rbroActionButton');
+        for (const elTab of elTabs) {
+            elTab.classList.remove('rbroActive');
+        }
+        // use z-index to show pdf preview instead of show/hide of div because otherwise pdf
+        // is reloaded (and generated) again
         if (tab === Document.tab.pdfLayout) {
-            $('#rbro_document_tab_pdf_layout').addClass('rbroActive');
-            this.elDoc.removeClass('rbroHidden');
-            $('#rbro_document_pdf_preview').css({ 'z-index': '', 'height': '0' });
-            $('.rbroElementButtons .rbroMenuButton').removeClass('rbroDisabled').prop('draggable', true);
-            $('.rbroActionButtons .rbroActionButton').prop('disabled', false);
+            this.elTabPdfLayout.classList.add('rbroActive');
+            this.elDoc.classList.remove('rbroHidden');
+            this.elPdfPreview.style.zIndex = '';
+            this.elPdfPreview.style.height = '0';
+            for (const elMenuButton of elMenuButtons) {
+                elMenuButton.classList.remove('rbroDisabled');
+                elMenuButton.draggable = true;
+            }
+            for (const elActionButton of elActionButtons) {
+                elActionButton.disabled = false;
+            }
         } else if (this.pdfPreviewExists && tab === Document.tab.pdfPreview) {
-            $('#rbro_document_tab_pdf_preview').addClass('rbroActive');
-            this.elDoc.addClass('rbroHidden');
-            $('#rbro_document_pdf_preview').css({ 'z-index': '1', 'height': '' });
-            $('.rbroElementButtons .rbroMenuButton').addClass('rbroDisabled').prop('draggable', false);
-            $('.rbroActionButtons .rbroActionButton').prop('disabled', true);
+            this.elTabPdfPreview.classList.add('rbroActive');
+            this.elDoc.classList.add('rbroHidden');
+            this.elPdfPreview.style.zIndex = '1';
+            this.elPdfPreview.style.height = '';
+            for (const elMenuButton of elMenuButtons) {
+                elMenuButton.classList.add('rbroDisabled');
+                elMenuButton.draggable = false;
+            }
+            for (const elActionButton of elActionButtons) {
+                elActionButton.disabled = true;
+            }
         }
     }
 
     openPdfPreviewTab(reportUrl, headers) {
-        $('#rbro_document_pdf_preview').empty();
+        utils.emptyElement(this.elPdfPreview);
         if (this.pdfPreviewObjectURL) {
             // release resource of previous object data url
             URL.revokeObjectURL(this.pdfPreviewObjectURL);
@@ -390,7 +485,7 @@ export default class Document {
                         obj.height = '100%';
                         self.pdfPreviewObjectURL = URL.createObjectURL(xhr.response);
                         obj.data = self.pdfPreviewObjectURL;
-                        $('#rbro_document_pdf_preview').append($(obj));
+                        self.elPdfPreview.append(obj);
                     } else {
                         alert('preview failed');
                     }
@@ -406,9 +501,9 @@ export default class Document {
             xhr.send();
         } else {
             // easy way (no custom headers), set data url for pdf object tag
-            const pdfObj =
-                '<object data="' + reportUrl + '" type="application/pdf" width="100%" height="100%"></object>';
-            $('#rbro_document_pdf_preview').append(pdfObj);
+            const pdfObj = utils.createElement(
+                'object', { data: reportUrl, type: 'application/pdf', width: '100%', height: '100%' })
+            this.elPdfPreview.append(pdfObj);
         }
 
         this.pdfPreviewExists = true;
@@ -418,7 +513,7 @@ export default class Document {
 
     closePdfPreviewTab() {
         this.pdfPreviewExists = false;
-        $('#rbro_document_pdf_preview').empty();
+        utils.emptyElement(this.elPdfPreview);
         this.setDocumentTab(Document.tab.pdfLayout);
         this.updateDocumentTabs();
     }
@@ -426,17 +521,17 @@ export default class Document {
     updateDocumentTabs() {
         let tabCount = 1;
         if (this.pdfPreviewExists) {
-            $('#rbro_document_tab_pdf_preview').removeClass('rbroHidden');
+            this.elTabPdfPreview.classList.remove('rbroHidden');
             tabCount++;
         } else {
-            $('#rbro_document_tab_pdf_preview').addClass('rbroHidden');
+            this.elTabPdfPreview.classList.add('rbroHidden');
         }
         if (tabCount > 1) {
-            $('#rbro_document_tabs').show();
-            $('#rbro_document_panel').addClass('rbroHasTabs');
+            document.getElementById('rbro_document_tabs').style.display = 'block';
+            this.elPanel.classList.add('rbroHasTabs');
         } else {
-            $('#rbro_document_tabs').hide();
-            $('#rbro_document_panel').removeClass('rbroHasTabs');
+            document.getElementById('rbro_document_tabs').style.display = 'none';
+            this.elPanel.classList.remove('rbroHasTabs');
         }
     }
 
@@ -449,7 +544,7 @@ export default class Document {
      * @returns {[Container]} Container or null in case no container was found for given position.
      */
     getContainer(absPosX, absPosY, elementType) {
-        let offset = this.elDocContent.offset();
+        let offset = utils.getElementOffset(this.elDocContent);
         return this.rb.getContainer(
             this.getCoordWithoutZoom(absPosX - offset.left),
             this.getCoordWithoutZoom(absPosY - offset.top), elementType);
@@ -460,8 +555,8 @@ export default class Document {
      * @returns {Number} scroll y position.
      */
     getContentScrollPosY() {
-        let contentOffset = this.elDocContent.offset();
-        let panelOffset = $('#rbro_document_panel').offset();
+        let contentOffset = utils.getElementOffset(this.elDocContent);
+        let panelOffset = utils.getElementOffset(this.elPanel);
         return panelOffset.top - contentOffset.top;
     }
 
@@ -472,9 +567,9 @@ export default class Document {
     toggleGrid() {
         this.gridVisible = !this.gridVisible;
         if (this.gridVisible) {
-            this.elDocContent.addClass('rbroDocumentGrid');
+            this.elDocContent.classList.add('rbroDocumentGrid');
         } else {
-            this.elDocContent.removeClass('rbroDocumentGrid');
+            this.elDocContent.classList.remove('rbroDocumentGrid');
         }
     }
 
@@ -514,54 +609,56 @@ export default class Document {
 
     updateZoomLevel(zoom) {
         this.zoom = zoom;
-        let panel = $('#rbro_document_panel');
         let size = this.rb.getDocumentProperties().getPageSize();
         let scaledWidth = size.width * (zoom / 100);
         let scaledHeight = size.height * (zoom / 100);
         let rbWidth = this.rb.getWidth();
-        let docPanelWidth = rbWidth - this.rb.getMainPanel().getTotalPanelWidth();
-        let docPanelHeight = panel.height();
+        const docPanelWidth = rbWidth - this.rb.getMainPanel().getTotalPanelWidth();
+        const computedStyle = getComputedStyle(this.elPanel);
+        const paddingTop = parseInt(computedStyle.paddingTop) || 0;
+        const paddingBottom = parseInt(computedStyle.paddingBottom) || 0;
+        const docPanelHeight = this.elPanel.clientHeight - paddingTop - paddingBottom;
         let translateX = 0;
         if (zoom !== 100) {
             if (size.width > docPanelWidth) {
                 // if there is not enough space in the document panel initially and we zoom out we keep the content
                 // in default (top left) position and move it to the center manually
-                this.elDoc.css('transform-origin', '');
+                this.elDoc.style.transformOrigin = '';
                 if ((zoom < 100) && (scaledWidth < docPanelWidth)) {
                     translateX = Math.round(((docPanelWidth - scaledWidth) / 2));
                 }
             } else if (scaledWidth > docPanelWidth) {
                 // if there is not enough space in the document panel with zoom level applied
                 // we remove any margin and apply the default transformation (top left)
-                this.elDoc.css('margin', '0');
-                this.elDoc.css('transform-origin', '');
+                this.elDoc.style.margin = '0';
+                this.elDoc.style.transformOrigin = '';
             } else {
                 // if there is enough space in the document panel we use the default margin (auto)
                 // and apply the transformation from top center
                 // so the content is automatically centered in the available horizontal space
-                this.elDoc.css('margin', '');
-                this.elDoc.css('transform-origin', 'top center');
+                this.elDoc.style.margin = '';
+                this.elDoc.style.transformOrigin = 'top center';
             }
-            this.elDoc.css('transform', `translateX(${translateX}px) scale(${this.zoom / 100})`);
+            this.elDoc.style.transform = `translateX(${translateX}px) scale(${this.zoom / 100})`;
         } else {
             // use default values if no zoom is applied
-            this.elDoc.css('margin', '');
-            this.elDoc.css('transform', '');
-            this.elDoc.css('transform-origin', '');
+            this.elDoc.style.margin = '';
+            this.elDoc.style.transform = '';
+            this.elDoc.style.transformOrigin = '';
         }
-        $('#rbro_menu_zoom_level').text(zoom + ' %');
+        document.getElementById('rbro_menu_zoom_level').textContent = zoom + ' %';
         this.rb.getMenuPanel().updateZoomButtons(this.isZoomInPossible(), this.isZoomOutPossible());
 
         // if there is enough space in the document panel don't show scrollbar
         if (scaledWidth < docPanelWidth) {
-            panel.css('overflow-x', 'hidden');
+            this.elPanel.style.overflowX = 'hidden';
         }  else {
-            panel.css('overflow-x', '');
+            this.elPanel.style.overflowX = '';
         }
         if (scaledHeight < docPanelHeight) {
-            panel.css('overflow-y', 'hidden');
+            this.elPanel.style.overflowY = 'hidden';
         } else {
-            panel.css('overflow-y', '');
+            this.elPanel.style.overflowY = '';
         }
     }
 
@@ -574,7 +671,7 @@ export default class Document {
     }
 
     getHeight() {
-        return this.elDocContent.height();
+        return this.elDocContent.clientHeight;
     }
 
     getElement(band) {
@@ -642,7 +739,10 @@ export default class Document {
         this.dragObjectId = null;
         this.dragContainerId = null;
         this.dragCurrentContainerId = null;
-        $('.rbroElementContainer').removeClass('rbroElementDragOver');
+        const elContainers = document.querySelectorAll('.rbroElementContainer');
+        for (const elContainer of elContainers) {
+            elContainer.classList.remove('rbroElementDragOver');
+        }
     }
 
     startBrowserDrag(dragElementType) {
@@ -696,7 +796,7 @@ export default class Document {
         this.selectionAreaStarted = false;
         this.selectionAreaStartX = 0;
         this.selectionAreaStartY = 0;
-        this.elSelectionArea.addClass('rbroHidden');
+        this.elSelectionArea.classList.add('rbroHidden');
     }
 
     getSelectionArea(x, y) {
@@ -723,10 +823,10 @@ export default class Document {
             this.stopDrag();
         }
         if (this.selectionAreaStarted) {
-            let offset = this.elDocContent.offset();
+            let offset = utils.getElementOffset(this.elDocContent);
             this.stopSelectionArea(
-                this.getCoordWithoutZoom(event.originalEvent.pageX - offset.left),
-                this.getCoordWithoutZoom(event.originalEvent.pageY - offset.top),
+                this.getCoordWithoutZoom(event.pageX - offset.left),
+                this.getCoordWithoutZoom(event.pageY - offset.top),
                 !event.shiftKey);
         }
     }

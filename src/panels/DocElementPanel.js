@@ -616,649 +616,696 @@ export default class DocElementPanel extends PanelBase {
 
     render() {
         let elDiv, elFormField, elParameterButton;
-        let panel = $('<div id="rbro_doc_element_panel" class="rbroHidden"></div>');
+        let panel = utils.createElement('div', { id: 'rbro_doc_element_panel', class: 'rbroHidden' });
 
-        elDiv = $('<div id="rbro_doc_element_label_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_label">${this.rb.getLabel('docElementLabel')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elLabel = $('<input id="rbro_doc_element_label">')
-            .on('input', event => {
-                let val = elLabel.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'label', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_label_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementLabel'), 'rbro_doc_element_label');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elLabel = utils.createElement('input', { id: 'rbro_doc_element_label' });
+        elLabel.addEventListener('input', (event) => {
+            let val = elLabel.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'label', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elLabel);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_data_source_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_data_source">
-                      ${this.rb.getLabel('docElementDataSource')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elDataSource = $('<textarea id="rbro_doc_element_data_source" rows="1"></textarea>')
-            .on('input', event => {
-                let val = elDataSource.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'dataSource', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_data_source_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementDataSource'), 'rbro_doc_element_data_source');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elDataSource = utils.createElement('textarea', { id: 'rbro_doc_element_data_source', rows: 1 });
+        elDataSource.addEventListener('input', (event) => {
+            let val = elDataSource.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'dataSource', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         autosize(elDataSource);
         elFormField.append(elDataSource);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject, [Parameter.type.array]),
-                    null, 'rbro_doc_element_data_source', 'dataSource', PopupWindow.type.parameterSet);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject, [Parameter.type.array]),
+                null, 'rbro_doc_element_data_source', 'dataSource', PopupWindow.type.parameterSet);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_data_source_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_data_source_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_content_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label for="rbro_doc_element_content">${this.rb.getLabel('docElementContent')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elContent = $(`<textarea id="rbro_doc_element_content" rows="1"></textarea>`)
-            .on('input', event => {
-                let val = elContent.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'content', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_content_row', class: 'rbroFormRow rbroHidden' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementContent'), 'rbro_doc_element_content');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elContent = utils.createElement('textarea', { id: 'rbro_doc_element_content', rows: 1 });
+        elContent.addEventListener('input', (event) => {
+            let val = elContent.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'content', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elContent.addEventListener('blur', (event) => {
+            this.rb.getPopupWindow().hide();
+        });
         autosize(elContent);
         elFormField.append(elContent);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
-                    'rbro_doc_element_content', 'content', PopupWindow.type.parameterAppend);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_content', 'content', PopupWindow.type.parameterAppend);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_content_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_content_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         panel.append(elDiv);
 
         // Rich-Text-Editor
         if (this.rb.getProperty('showPlusFeatures')) {
-            elDiv = $('<div id="rbro_doc_element_rich_text_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_rich_text">${this.rb.getLabel('docElementRichText')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elRichTextLabel = $('<label class="switch-light switch-material"></label>');
-            let elRichText = $('<input id="rbro_doc_element_rich_text" type="checkbox">')
-                .change(event => {
-                    let richTextChecked = elRichText.is(":checked");
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'richText', richTextChecked, SetValueCmd.type.checkbox, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                });
+            elDiv = utils.createElement('div', { id: 'rbro_doc_element_rich_text_row', class: 'rbroFormRow' });
+            utils.appendLabel(elDiv, this.rb.getLabel('docElementRichText'), 'rbro_doc_element_rich_text');
+            elFormField = utils.createElement('div', { class: 'rbroFormField' });
+            let elRichTextLabel = utils.createElement('label', { class: 'switch-light switch-material' });
+            let elRichText = utils.createElement('input', { id: 'rbro_doc_element_rich_text', type: 'checkbox' });
+            elRichText.addEventListener('change', (event) => {
+                let richTextChecked = elRichText.checked;
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'richText', richTextChecked, SetValueCmd.type.checkbox, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
             elRichTextLabel.append(elRichText);
-            let elRichTextSpan = $('<span></span>');
-            elRichTextSpan.append($('<span></span>'));
-            elRichTextSpan.append($('<span></span>'));
-            elRichTextSpan.append($('<a></a>'));
+            let elRichTextSpan = utils.createElement('span');
+            elRichTextSpan.append(utils.createElement('span'));
+            elRichTextSpan.append(utils.createElement('span'));
+            elRichTextSpan.append(utils.createElement('a'));
             elRichTextLabel.append(elRichTextSpan);
             elFormField.append(elRichTextLabel);
-            elFormField.append('<div id="rbro_doc_element_rich_text_error" class="rbroErrorMessage"></div>');
+            elFormField.append(
+                utils.createElement('div', { id: 'rbro_doc_element_rich_text_error', class: 'rbroErrorMessage' })
+            );
             if (this.rb.getProperty('showPlusFeaturesInfo')) {
-                elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('plusFeatureInfo')}</div>`);
+                const elInfoText = utils.createElement('div', { class: 'rbroInfo' });
+                elInfoText.innerHTML = this.rb.getLabel('plusFeatureInfo');
+                elFormField.append(elInfoText);
             }
             elDiv.append(elFormField);
             panel.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_rich_text_content_row" class="rbroFormRow rbroRichTextEditor rbroHidden"></div>');
+            elDiv = utils.createElement(
+                'div', {
+                    id: 'rbro_doc_element_rich_text_content_row',
+                    class: 'rbroFormRow rbroRichTextEditor rbroHidden'
+                });
 
             let colors = this.rb.getProperty('colors');
-            let strRichTextColor = `<select class="ql-color" title="${this.rb.getLabel('styleTextColor')}">`;
-            let strRichTextBackgroundColor = `<select class="ql-background" title="${this.rb.getLabel('styleBackgroundColor')}">`;
+            const elRichTextColor = utils.createElement(
+                'select', { class: 'ql-color', title: this.rb.getLabel('styleTextColor') });
+            const elRichTextBackgroundColor = utils.createElement(
+                'select', { class: 'ql-background', title: this.rb.getLabel('styleBackgroundColor') });
             for (let color of colors) {
-                strRichTextColor += `<option value="${color}">${color}</option>`;
-                strRichTextBackgroundColor += `<option value="${color}">${color}</option>`;
+                elRichTextColor.append(utils.createElement('option', { value: color }, color));
+                elRichTextBackgroundColor.append(utils.createElement('option', { value: color }, color));
             }
-            strRichTextColor += '<option value="clear-color"></option>';
-            strRichTextColor += '</select>';
-            strRichTextBackgroundColor += '<option value="clear-color"></option>';
-            strRichTextBackgroundColor += '</select>';
+            elRichTextColor.append(utils.createElement('option', { value: 'clear-color' }));
+            elRichTextBackgroundColor.append(utils.createElement('option', { value: 'clear-color' }));
 
-            let strRichTextFont = '<select class="ql-font">';
-            let defaultFont = this.rb.getProperty('defaultFont');
+            const elRichTextFont = utils.createElement('select', { class: 'ql-font' });
+            const defaultFont = this.rb.getProperty('defaultFont');
             for (let font of this.rb.getFonts()) {
-                strRichTextFont += `<option value="${font.value}" ${font.value === defaultFont ? 'selected="selected"' : ''}>${font.name}</option>`;
+                const props = { value: font.value };
+                if (font.value === defaultFont) {
+                    props.selected = 'selected';
+                }
+                elRichTextFont.append(utils.createElement('option', props, font.name));
             }
-            strRichTextFont += '</select>';
-            let strRichTextFontSize = '<select class="ql-size">';
+            const elRichTextFontSize = utils.createElement('select', { class: 'ql-size' });
             for (let size of this.rb.getProperty('fontSizes')) {
-                strRichTextFontSize += `<option value="${size}px" ${size === 12 ? 'selected="selected"' : ''}>${size}pt</option>`;
+                const props = { value: size + 'px' };
+                if (size === 12) {
+                    props.selected = 'selected';
+                }
+                elRichTextFontSize.append(utils.createElement('option', props, size + 'pt'));
             }
-            strRichTextFontSize += '</select>';
 
-            elDiv.append(`
-                <div id="rbro_doc_element_rich_text_content_toolbar">
-                    <span class="ql-formats">
-                        <button class="ql-bold" title="${this.rb.getLabel('styleBold')}"></button>
-                        <button class="ql-italic" title="${this.rb.getLabel('styleItalic')}"></button>
-                        <button class="ql-underline" title="${this.rb.getLabel('styleUnderline')}"></button>
-                        <button class="ql-strike" title="${this.rb.getLabel('styleStrikethrough')}"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <button class="ql-link"></button>
-                    </span>
-                    <span class="ql-formats">
-                        <select class="ql-align" title="${this.rb.getLabel('styleAlignment')}"></select>
-                    </span>                    
-                    <span class="ql-formats">
-                        ${strRichTextColor}
-                        ${strRichTextBackgroundColor}
-                    </span>
-                    ${strRichTextFont}
-                    ${strRichTextFontSize}
-                    <div id="rbro_doc_element_rich_text_content_toolbar_parameter"
-                         class="rbroButton rbroRoundButton rbroIcon-select"></div>
-                </div>
-            `);
+            const elToolbar = utils.createElement('div', { id: 'rbro_doc_element_rich_text_content_toolbar' });
+            let elToolbarBlock = utils.createElement('span', { class: 'ql-formats' });
+            elToolbarBlock.append(
+                utils.createElement('button', { class: 'ql-bold', title: this.rb.getLabel('styleBold') }));
+            elToolbarBlock.append(
+                utils.createElement('button', { class: 'ql-italic', title: this.rb.getLabel('styleItalic') }));
+            elToolbarBlock.append(
+                utils.createElement('button', { class: 'ql-underline', title: this.rb.getLabel('styleUnderline') }));
+            elToolbarBlock.append(
+                utils.createElement('button', { class: 'ql-strike', title: this.rb.getLabel('styleStrikethrough') }));
+            elToolbar.append(elToolbarBlock);
 
-            let elRichTextContent = $('<div id="rbro_doc_element_rich_text_content"></div>');
+            elToolbarBlock = utils.createElement('span', { class: 'ql-formats' });
+            elToolbarBlock.append(utils.createElement('button', { class: 'ql-link' }));
+            elToolbar.append(elToolbarBlock);
+
+            elToolbarBlock = utils.createElement('span', { class: 'ql-formats' });
+            elToolbarBlock.append(
+                utils.createElement('select', { class: 'ql-align', title: this.rb.getLabel('styleAlignment') }));
+            elToolbar.append(elToolbarBlock);
+
+            elToolbarBlock = utils.createElement('span', { class: 'ql-formats' });
+            elToolbarBlock.append(elRichTextColor);
+            elToolbarBlock.append(elRichTextBackgroundColor);
+            elToolbar.append(elToolbarBlock);
+
+            elToolbar.append(elRichTextFont);
+            elToolbar.append(elRichTextFontSize);
+
+            elToolbar.append(utils.createElement(
+                'div', {
+                    id: 'rbro_doc_element_rich_text_content_toolbar_parameter',
+                    class: 'rbroButton rbroRoundButton rbroIcon-select'
+                })
+            );
+            elDiv.append(elToolbar);
+
+            let elRichTextContent = utils.createElement('div', { id: 'rbro_doc_element_rich_text_content' });
             elDiv.append(elRichTextContent);
-            elDiv.append('<div id="rbro_doc_element_rich_text_content_error" class="rbroErrorMessage"></div>');
+            elFormField.append(
+                utils.createElement(
+                    'div', { id: 'rbro_doc_element_rich_text_content_error', class: 'rbroErrorMessage' })
+            );
             panel.append(elDiv);
         }
 
-        elDiv = $('<div id="rbro_doc_element_eval_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label for="rbro_doc_element_eval">${this.rb.getLabel('docElementEval')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elEval = $('<input id="rbro_doc_element_eval" type="checkbox">')
-            .change(event => {
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                let evalChecked = elEval.is(":checked");
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'eval', evalChecked, SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_eval_row', class: 'rbroFormRow rbroHidden' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementEval'), 'rbro_doc_element_eval');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elEval = utils.createElement('input', { id: 'rbro_doc_element_eval', type: 'checkbox' });
+        elEval.addEventListener('change', (event) => {
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            let evalChecked = elEval.checked;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'eval', evalChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elEval);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_format_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_format">${this.rb.getLabel('docElementFormat')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elFormat = $(`<select id="rbro_doc_element_format">
-                <option value="CODE128">CODE128</option>
-                <option value="QRCode">QR Code</option>
-            </select>`)
-            .change(event => {
-                let val = elFormat.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'format', val, SetValueCmd.type.select, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_format_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementFormat'), 'rbro_doc_element_format');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elFormat = utils.createElement('select', { id: 'rbro_doc_element_format' });
+        elFormat.append(utils.createElement('option', { value: 'CODE128' }, 'CODE128'));
+        elFormat.append(utils.createElement('option', { value: 'QRCode' }, 'QR Code'));
+        elFormat.addEventListener('change', (event) => {
+            let val = elFormat.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'format', val, SetValueCmd.type.select, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elFormat);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_display_value_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_display_value">${this.rb.getLabel('docElementDisplayValue')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elDisplayValue = $('<input id="rbro_doc_element_display_value" type="checkbox">')
-            .change(event => {
-                let displayValueChecked = elDisplayValue.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(),'displayValue', displayValueChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_display_value_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementDisplayValue'), 'rbro_doc_element_display_value');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elDisplayValue = utils.createElement('input', { id: 'rbro_doc_element_display_value', type: 'checkbox' });
+        elDisplayValue.addEventListener('change', (event) => {
+            let displayValueChecked = elDisplayValue.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(),'displayValue', displayValueChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elDisplayValue);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_error_correction_level_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_error_correction_level">
-                      ${this.rb.getLabel('docElementErrorCorrectionLevel')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elErrorCorrectionLevel = $(`<select id="rbro_doc_element_error_correction_level">
-                <option value="L">${this.rb.getLabel('docElementErrorCorrectionLevelLow')}</option>
-                <option value="M">${this.rb.getLabel('docElementErrorCorrectionLevelMedium')}</option>
-                <option value="Q">${this.rb.getLabel('docElementErrorCorrectionLevelQuartile')}</option>
-                <option value="H">${this.rb.getLabel('docElementErrorCorrectionLevelHigh')}</option>
-            </select>`)
-            .change(event => {
-                let val = elErrorCorrectionLevel.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'errorCorrectionLevel', val, SetValueCmd.type.select, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_error_correction_level_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementErrorCorrectionLevel'), 'rbro_doc_element_error_correction_level');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elErrorCorrectionLevel = utils.createElement('select', { id: 'rbro_doc_element_error_correction_level' });
+        elErrorCorrectionLevel.append(
+            utils.createElement('option', { value: 'L' }, this.rb.getLabel('docElementErrorCorrectionLevelLow')));
+        elErrorCorrectionLevel.append(
+            utils.createElement('option', { value: 'M' }, this.rb.getLabel('docElementErrorCorrectionLevelMedium')));
+        elErrorCorrectionLevel.append(
+            utils.createElement('option', { value: 'Q' }, this.rb.getLabel('docElementErrorCorrectionLevelQuartile')));
+        elErrorCorrectionLevel.append(
+            utils.createElement('option', { value: 'H' }, this.rb.getLabel('docElementErrorCorrectionLevelHigh')));
+        elErrorCorrectionLevel.addEventListener('change', (event) => {
+            let val = elErrorCorrectionLevel.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'errorCorrectionLevel', val, SetValueCmd.type.select, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elErrorCorrectionLevel);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_source_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_source">${this.rb.getLabel('docElementSource')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elSource = $('<textarea id="rbro_doc_element_source" rows="1"></textarea>')
-            .on('input', event => {
-                let val = elSource.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'source', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_source_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementSource'), 'rbro_doc_element_source');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elSource = utils.createElement('textarea', { id: 'rbro_doc_element_source', rows: 1 });
+        elSource.addEventListener('input', (event) => {
+            let val = elSource.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'source', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         autosize(elSource);
         elFormField.append(elSource);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject, [Parameter.type.image, Parameter.type.string]),
-                    null, 'rbro_doc_element_source', 'source', PopupWindow.type.parameterSet);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject, [Parameter.type.image, Parameter.type.string]),
+                null, 'rbro_doc_element_source', 'source', PopupWindow.type.parameterSet);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_source_error" class="rbroErrorMessage"></div>');
-        elDiv.append(elFormField);
-        panel.append(elDiv);
-
-        elDiv = $('<div id="rbro_doc_element_image_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_image">${this.rb.getLabel('docElementImageFile')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elImage = $('<input id="rbro_doc_element_image" type="file">')
-            .change(event => {
-                let files = event.target.files;
-                if (files && files[0]) {
-                    let fileReader = new FileReader();
-                    let rb = this.rb;
-                    let fileName = files[0].name;
-                    fileReader.onload = function(e) {
-                        let cmdGroup = new CommandGroupCmd('Load image', rb);
-                        let selectedObjects = rb.getSelectedObjects();
-                        for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                            let obj = selectedObjects[i];
-                            cmdGroup.addSelection(obj.getId());
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'image', e.target.result, SetValueCmd.type.file, rb));
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'imageFilename', fileName, SetValueCmd.type.filename, rb));
-                        }
-                        if (!cmdGroup.isEmpty()) {
-                            rb.executeCommand(cmdGroup);
-                        }
-                    };
-                    fileReader.onerror = function(e) {
-                        alert(rb.getLabel('docElementLoadImageErrorMsg'));
-                    };
-                    fileReader.readAsDataURL(files[0]);
-                }
-            });
-        elFormField.append(elImage);
-        let elFilenameDiv = $(
-            '<div id="rbro_doc_element_image_filename_container" class="rbroSplit rbroHidden"></div>');
-        elFilenameDiv.append($('<div id="rbro_doc_element_image_filename"></div>'));
-        elFilenameDiv.append($('<div id="rbro_doc_element_image_filename_clear"' +
-            '                   class="rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton"></div>')
-            .click(event => {
-                elImage.val('');
-                let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'image', '', SetValueCmd.type.file, this.rb));
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'imageFilename', '', SetValueCmd.type.filename, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            })
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_source_error', class: 'rbroErrorMessage' })
         );
-        elFormField.append(elFilenameDiv);
-        elFormField.append('<div id="rbro_doc_element_image_error" class="rbroErrorMessage"></div>');
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_x_read_only_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_x_read_only" class="rbroDisabled">
-                      ${this.rb.getLabel('docElementPositionX')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elXReadOnly = $('<input id="rbro_doc_element_x_read_only" disabled="true">');
-        elFormField.append(elXReadOnly);
-        elDiv.append(elFormField);
-        panel.append(elDiv);
-
-        elDiv = $('<div id="rbro_doc_element_position_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label id="rbro_doc_element_position_label" for="rbro_doc_element_x">
-                      ${this.rb.getLabel('docElementPosition')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
-        let elPosX = $('<input id="rbro_doc_element_x" type="number">')
-            .on('input', event => {
-                let val = elPosX.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'x', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
-        elFormField.append(elPosX);
-        let elPosY = $('<input id="rbro_doc_element_y" type="number">')
-            .on('input', event => {
-                let val = elPosY.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'y', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
-        elFormField.append(elPosY);
-        elFormField.append('<div id="rbro_doc_element_position_error" class="rbroErrorMessage"></div>');
-        elDiv.append(elFormField);
-        panel.append(elDiv);
-
-        elDiv = $('<div id="rbro_doc_element_size_row" class="rbroFormRow rbroHidden"></div>');
-        elDiv.append(`<label id="rbro_doc_element_size_label" for="rbro_doc_element_size">
-                      ${this.rb.getLabel('docElementSize')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit"></div>');
-        let elWidth = $('<input id="rbro_doc_element_width" type="number">')
-            .on('input', event => {
-                let val = elWidth.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'width', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
-        elFormField.append(elWidth);
-        let elHeight = $('<input id="rbro_doc_element_height" type="number">')
-            .on('input', event => {
-                let val = elHeight.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'height', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
-        elFormField.append(elHeight);
-        elFormField.append('<div id="rbro_doc_element_size_error" class="rbroErrorMessage"></div>');
-        elDiv.append(elFormField);
-        panel.append(elDiv);
-
-        elDiv = $('<div id="rbro_doc_element_colspan_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_colspan">${this.rb.getLabel('docElementColspan')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elColspan = $('<input id="rbro_doc_element_colspan" type="number">')
-            .change(event => {
-                let val = elColspan.val().trim();
-                if (val !== '') {
-                    val = utils.checkInputDecimal(val, 1, 9);
-                }
-                if (val !== elColspan.val()) {
-                    elColspan.val(val);
-                }
-                let selectedObjects = this.rb.getSelectedObjects();
-                let valueChanged = false;
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    if (selectedObjects[i].getValue('colspan') !== val) {
-                        valueChanged = true;
-                        break;
-                    }
-                }
-
-                if (valueChanged) {
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_image_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementImageFile'), 'rbro_doc_element_image');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elImage = utils.createElement('input', { id: 'rbro_doc_element_image', type: 'file' });
+        elImage.addEventListener('change', (event) => {
+            let files = event.target.files;
+            if (files && files[0]) {
+                let fileReader = new FileReader();
+                let rb = this.rb;
+                let fileName = files[0].name;
+                fileReader.onload = function(e) {
+                    let cmdGroup = new CommandGroupCmd('Load image', rb);
+                    let selectedObjects = rb.getSelectedObjects();
                     for (let i=selectedObjects.length - 1; i >= 0; i--) {
                         let obj = selectedObjects[i];
                         cmdGroup.addSelection(obj.getId());
                         cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'colspan', val, SetValueCmd.type.text, this.rb));
+                            obj.getId(), 'image', e.target.result, SetValueCmd.type.file, rb));
+                        cmdGroup.addCommand(new SetValueCmd(
+                            obj.getId(), 'imageFilename', fileName, SetValueCmd.type.filename, rb));
                     }
                     if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
+                        rb.executeCommand(cmdGroup);
                     }
-                }
-            });
-        elFormField.append(elColspan);
-        elFormField.append('<div id="rbro_doc_element_colspan_error" class="rbroErrorMessage"></div>');
+                };
+                fileReader.onerror = function(e) {
+                    alert(rb.getLabel('docElementLoadImageErrorMsg'));
+                };
+                fileReader.readAsDataURL(files[0]);
+            }
+        });
+        elFormField.append(elImage);
+        let elFilenameDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_image_filename_container', class: 'rbroSplit rbroHidden' });
+        elFilenameDiv.append(utils.createElement('div', { id: 'rbro_doc_element_image_filename' }));
+        elFilenameDiv.append(utils.createElement(
+            'div', {
+                id: 'rbro_doc_element_image_filename_clear',
+                class: 'rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton'
+            })
+        );
+        elFilenameDiv.addEventListener('click', (event) => {
+            elImage.value = '';
+            let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'image', '', SetValueCmd.type.file, this.rb));
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'imageFilename', '', SetValueCmd.type.filename, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elFilenameDiv);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_image_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_columns_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_columns">${this.rb.getLabel('docElementColumns')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elColumns = $('<input id="rbro_doc_element_columns" type="number">')
-            .change(event => {
-                let val = utils.checkInputDecimal(elColumns.val(), 1, 99);
-                if (val !== elColumns.val()) {
-                    elColumns.val(val);
-                }
-                let columns = utils.convertInputToNumber(val);
-                let selectedObjects = this.rb.getSelectedObjects();
-                let valueChanged = false;
-                let enoughSpaceAvailable = true;
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    if (obj.getValue('columns') !== val) {
-                        valueChanged = true;
-                    }
-                    if (!obj.hasEnoughAvailableSpace(columns)) {
-                        enoughSpaceAvailable = false;
-                    }
-                }
-
-                if (!enoughSpaceAvailable && selectedObjects.length === 1) {
-                    // reset input to current column count
-                    elColumns.val(selectedObjects[0].getValue('columns'));
-                }
-
-                if (valueChanged && enoughSpaceAvailable) {
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        obj.addCommandsForChangedColumns(columns, cmdGroup);
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                }
-            });
-        elFormField.append(elColumns);
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_x_read_only_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementPositionX'), 'rbro_doc_element_x_read_only', { class: 'rbroDisabled' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elXReadOnly = utils.createElement('input', { id: 'rbro_doc_element_x_read_only', disabled: 'disabled' });
+        elFormField.append(elXReadOnly);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_header_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_header">${this.rb.getLabel('header')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elHeaderLabel = $('<label class="switch-light switch-material"></label>');
-        let elHeader = $('<input id="rbro_doc_element_header" type="checkbox">')
-            .change(event => {
-                let headerChecked = elHeader.is(":checked");
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_position_row', class: 'rbroFormRow rbroHidden' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementPosition'), 'rbro_doc_element_x',
+            { id: 'rbro_doc_element_position_label' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit' });
+        let elPosX = utils.createElement('input', { id: 'rbro_doc_element_x', type: 'number' });
+        elPosX.addEventListener('input', (event) => {
+            let val = elPosX.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'x', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elPosX);
+        let elPosY = utils.createElement('input', { id: 'rbro_doc_element_y', type: 'number' });
+        elPosY.addEventListener('input', (event) => {
+            let val = elPosY.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'y', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elPosY);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_position_error', class: 'rbroErrorMessage' })
+        );
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_size_row', class: 'rbroFormRow rbroHidden' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSize'), 'rbro_doc_element_size', { id: 'rbro_doc_element_size_label' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit' });
+        let elWidth = utils.createElement('input', { id: 'rbro_doc_element_width', type: 'number' });
+        elWidth.addEventListener('input', (event) => {
+            let val = elWidth.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'width', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elWidth);
+        let elHeight = utils.createElement('input', { id: 'rbro_doc_element_height', type: 'number' });
+        elHeight.addEventListener('input', (event) => {
+            let val = elHeight.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'height', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elHeight);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_size_error', class: 'rbroErrorMessage' })
+        );
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_colspan_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementColspan'), 'rbro_doc_element_colspan');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elColspan = utils.createElement('input', { id: 'rbro_doc_element_colspan', type: 'number' });
+        elColspan.addEventListener('change', (event) => {
+            let val = elColspan.value.trim();
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 1, 9);
+            }
+            if (val !== elColspan.value) {
+                elColspan.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('colspan') !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
+
+            if (valueChanged) {
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
                     cmdGroup.addSelection(obj.getId());
                     cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'header', headerChecked, SetValueCmd.type.checkbox, this.rb));
+                        obj.getId(), 'colspan', val, SetValueCmd.type.text, this.rb));
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
                 }
-            });
+            }
+        });
+        elFormField.append(elColspan);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_colspan_error', class: 'rbroErrorMessage' })
+        );
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_columns_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementColumns'), 'rbro_doc_element_columns');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elColumns = utils.createElement('input', { id: 'rbro_doc_element_columns', type: 'number' });
+        elColumns.addEventListener('change', (event) => {
+            let val = utils.checkInputDecimal(elColumns.value, 1, 99);
+            if (val !== elColumns.value) {
+                elColumns.value = val;
+            }
+            let columns = utils.convertInputToNumber(val);
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            let enoughSpaceAvailable = true;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                if (obj.getValue('columns') !== val) {
+                    valueChanged = true;
+                }
+                if (!obj.hasEnoughAvailableSpace(columns)) {
+                    enoughSpaceAvailable = false;
+                }
+            }
+
+            if (!enoughSpaceAvailable && selectedObjects.length === 1) {
+                // reset input to current column count
+                elColumns.value = selectedObjects[0].getValue('columns');
+            }
+
+            if (valueChanged && enoughSpaceAvailable) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    obj.addCommandsForChangedColumns(columns, cmdGroup);
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
+        elFormField.append(elColumns);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_header_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('header'), 'rbro_doc_element_header');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elHeaderLabel = utils.createElement('label', { class: 'switch-light switch-material' });
+        let elHeader = utils.createElement('input', { id: 'rbro_doc_element_header', type: 'checkbox' });
+        elHeader.addEventListener('change', (event) => {
+            let headerChecked = elHeader.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'header', headerChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elHeaderLabel.append(elHeader);
-        let elHeaderSpan = $('<span></span>');
-        elHeaderSpan.append($('<span></span>'));
-        elHeaderSpan.append($('<span></span>'));
-        elHeaderSpan.append($('<a></a>'));
+        let elHeaderSpan = utils.createElement('span');
+        elHeaderSpan.append(utils.createElement('span'));
+        elHeaderSpan.append(utils.createElement('span'));
+        elHeaderSpan.append(utils.createElement('a'));
         elHeaderLabel.append(elHeaderSpan);
         elFormField.append(elHeaderLabel);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_content_rows_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_content_rows">
-                      ${this.rb.getLabel('docElementContentRows')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elContentRows = $('<input id="rbro_doc_element_content_rows" type="number">')
-            .change(event => {
-                let val = utils.checkInputDecimal(elContentRows.val(), 1, 99);
-                let contentRows = utils.convertInputToNumber(val);
-                if (val !== elContentRows.val()) {
-                    elContentRows.val(val);
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_content_rows_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementContentRows'), 'rbro_doc_element_content_rows');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elContentRows = utils.createElement('input', { id: 'rbro_doc_element_content_rows', type: 'number' });
+        elContentRows.addEventListener('change', (event) => {
+            let val = utils.checkInputDecimal(elContentRows.value, 1, 99);
+            let contentRows = utils.convertInputToNumber(val);
+            if (val !== elContentRows.value) {
+                elContentRows.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('contentRows') !== val) {
+                    valueChanged = true;
+                    break;
                 }
-                let selectedObjects = this.rb.getSelectedObjects();
-                let valueChanged = false;
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    if (selectedObjects[i].getValue('contentRows') !== val) {
-                        valueChanged = true;
-                        break;
-                    }
-                }
+            }
 
-                if (valueChanged) {
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        obj.addCommandsForChangedContentRows(contentRows, cmdGroup);
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                }
-            });
-        elFormField.append(elContentRows);
-        elDiv.append(elFormField);
-        panel.append(elDiv);
-
-        elDiv = $('<div id="rbro_doc_element_footer_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_footer">${this.rb.getLabel('footer')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elFooterLabel = $('<label class="switch-light switch-material"></label>');
-        let elFooter = $('<input id="rbro_doc_element_footer" type="checkbox">')
-            .change(event => {
-                let footerChecked = elFooter.is(":checked");
+            if (valueChanged) {
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
                 for (let i=selectedObjects.length - 1; i >= 0; i--) {
                     let obj = selectedObjects[i];
                     cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'footer', footerChecked, SetValueCmd.type.checkbox, this.rb));
+                    obj.addCommandsForChangedContentRows(contentRows, cmdGroup);
                 }
                 if (!cmdGroup.isEmpty()) {
                     this.rb.executeCommand(cmdGroup);
                 }
-            });
+            }
+        });
+        elFormField.append(elContentRows);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_footer_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('footer'), 'rbro_doc_element_footer');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elFooterLabel = utils.createElement('label', { class: 'switch-light switch-material' });
+        let elFooter = utils.createElement('input', { id: 'rbro_doc_element_footer', type: 'checkbox' });
+        elFooter.addEventListener('change', (event) => {
+            let footerChecked = elFooter.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'footer', footerChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFooterLabel.append(elFooter);
-        let elFooterSpan = $('<span></span>');
-        elFooterSpan.append($('<span></span>'));
-        elFooterSpan.append($('<span></span>'));
-        elFooterSpan.append($('<a></a>'));
+        let elFooterSpan = utils.createElement('span')
+        elFooterSpan.append(utils.createElement('span'));
+        elFooterSpan.append(utils.createElement('span'));
+        elFooterSpan.append(utils.createElement('a'));
         elFooterLabel.append(elFooterSpan);
         elFormField.append(elFooterLabel);
         elDiv.append(elFormField);
@@ -1267,80 +1314,81 @@ export default class DocElementPanel extends PanelBase {
         // ---------------------------
         // --- Style Section Begin ---
         // ---------------------------
-        let elStyleSectionContainer = $('<div id="rbro_doc_element_style_section_container"></div>');
-        let elStyleHeader = $('<div class="rbroPanelSectionHeader"></div>');
-        let elStyleHeaderIcon = $(
-            '<span id="rbro_doc_element_style_header_icon" class="rbroIcon-minus"></span>');
-        elDiv = $(
-            `<div id="rbro_doc_element_style_header"
-             class="rbroFormRow rbroPanelSection rbroPanelSectionHeaderOpen"></div>`)
-            .click(event => {
-                $('#rbro_doc_element_style_header').toggleClass('rbroPanelSectionHeaderOpen');
-                $('#rbro_doc_element_style_section').toggleClass('rbroHidden');
-                elStyleHeaderIcon.toggleClass('rbroIcon-plus');
-                elStyleHeaderIcon.toggleClass('rbroIcon-minus');
-                if (elStyleHeaderIcon.hasClass('rbroIcon-minus')) {
-                    let sectionOffset = document.getElementById(
-                        'rbro_doc_element_style_section_container').offsetTop;
-                    $('#rbro_detail_panel').scrollTop(sectionOffset);
-                }
+        let elStyleSectionContainer = utils.createElement('div', { id: 'rbro_doc_element_style_section_container' });
+        let elStyleHeader = utils.createElement('div', { class: 'rbroPanelSectionHeader' });
+        let elStyleHeaderIcon = utils.createElement(
+            'span', { id: 'rbro_doc_element_style_header_icon', class: 'rbroIcon-minus' });
+        elDiv = utils.createElement(
+            'div', {
+                id: 'rbro_doc_element_style_header',
+                class: 'rbroFormRow rbroPanelSection rbroPanelSectionHeaderOpen'
             });
+        elDiv.addEventListener('click', (event) => {
+            document.getElementById('rbro_doc_element_style_header').classList.toggle('rbroPanelSectionHeaderOpen');
+            document.getElementById('rbro_doc_element_style_section').classList.toggle('rbroHidden');
+            elStyleHeaderIcon.classList.toggle('rbroIcon-plus');
+            elStyleHeaderIcon.classList.toggle('rbroIcon-minus');
+            if (elStyleHeaderIcon.classList.contains('rbroIcon-minus')) {
+                const sectionOffset = document.getElementById('rbro_doc_element_style_section_container').offsetTop;
+                document.getElementById('rbro_detail_panel').scrollTop = sectionOffset;
+            }
+        });
         elStyleHeader.append(elStyleHeaderIcon);
-        elStyleHeader.append(`<span>${this.rb.getLabel('docElementStyle')}</span>`);
+        elStyleHeader.append(utils.createElement('span', {}, this.rb.getLabel('docElementStyle')));
         elDiv.append(elStyleHeader);
         elStyleSectionContainer.append(elDiv);
 
-        let elStyleSectionDiv = $('<div id="rbro_doc_element_style_section"></div>');
+        let elStyleSectionDiv = utils.createElement('div', { id: 'rbro_doc_element_style_section' });
 
-        elDiv = $('<div id="rbro_doc_element_color_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_color">${this.rb.getLabel('docElementColor')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elColorContainer = $('<div class="rbroColorPickerContainer"></div>');
-        let elColor = $('<input id="rbro_doc_element_color">')
-            .change(event => {
-                let val = elColor.val();
-                if (utils.isValidColor(val)) {
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'color', val, SetValueCmd.type.color, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_color_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementColor'), 'rbro_doc_element_color');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
+        let elColor = utils.createElement('input', { id: 'rbro_doc_element_color' });
+        elColor.addEventListener('change', (event) => {
+            let val = elColor.value;
+            if (utils.isValidColor(val)) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'color', val, SetValueCmd.type.color, this.rb));
                 }
-            });
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
         elColorContainer.append(elColor);
         this.controls['color'] = utils.createColorPicker(elColorContainer, elColor, false, this.rb);
         elFormField.append(elColorContainer);
         elDiv.append(elFormField);
         elStyleSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_style_id_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        this.elStyle = $('<select id="rbro_doc_element_style_id"></select>')
-            .change(event => {
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    obj.addCommandsForChangedStyle(
-                        this.elStyle.val(), '', this.propertyDescriptors, cmdGroup);
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_style_id_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementStyle'), 'rbro_doc_element_style_id');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        this.elStyle = utils.createElement('select', { id: 'rbro_doc_element_style_id' });
+        this.elStyle.addEventListener('change', (event) => {
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                obj.addCommandsForChangedStyle(
+                    this.elStyle.value, '', this.propertyDescriptors, cmdGroup);
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(this.elStyle);
         elDiv.append(elFormField);
         elStyleSectionDiv.append(elDiv);
 
-        let elStyleDiv = $('<div id="rbro_doc_element_style_settings"></div>');
+        let elStyleDiv = utils.createElement('div', { id: 'rbro_doc_element_style_settings' });
         StylePanel.renderStyle(elStyleDiv, 'doc_element_', '', true, this.controls, this.rb);
         elStyleSectionDiv.append(elStyleDiv);
         elStyleSectionContainer.append(elStyleSectionDiv);
@@ -1352,338 +1400,357 @@ export default class DocElementPanel extends PanelBase {
         // ---------------------------
         // --- Print Section Begin ---
         // ---------------------------
-        let elPrintSectionContainer = $('<div id="rbro_doc_element_print_section_container"></div>');
-        let elPrintHeader = $('<div class="rbroPanelSectionHeader"></div>');
-        let elPrintHeaderIcon = $('<span id="rbro_doc_element_print_header_icon" class="rbroIcon-plus"></span>');
-        elDiv = $('<div id="rbro_doc_element_print_header" class="rbroFormRow rbroPanelSection"></div>')
-            .click(event => {
-                $('#rbro_doc_element_print_header').toggleClass('rbroPanelSectionHeaderOpen');
-                $('#rbro_doc_element_print_section').toggleClass('rbroHidden');
-                elPrintHeaderIcon.toggleClass('rbroIcon-plus');
-                elPrintHeaderIcon.toggleClass('rbroIcon-minus');
-                if (elPrintHeaderIcon.hasClass('rbroIcon-minus')) {
-                    let sectionOffset = document.getElementById(
-                        'rbro_doc_element_print_section_container').offsetTop;
-                    $('#rbro_detail_panel').scrollTop(sectionOffset);
-                }
-                autosize.update($('#rbro_doc_element_print_if'));
-            });
+        let elPrintSectionContainer = utils.createElement('div', { id: 'rbro_doc_element_print_section_container' });
+        let elPrintHeader = utils.createElement('div', { class: 'rbroPanelSectionHeader' });
+        let elPrintHeaderIcon = utils.createElement(
+            'span', { id: 'rbro_doc_element_print_header_icon', class: 'rbroIcon-plus' });
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_print_header', class: 'rbroFormRow rbroPanelSection' });
+        elDiv.addEventListener('click', (event) => {
+            document.getElementById('rbro_doc_element_print_header').classList.toggle('rbroPanelSectionHeaderOpen');
+            document.getElementById('rbro_doc_element_print_section').classList.toggle('rbroHidden');
+            elPrintHeaderIcon.classList.toggle('rbroIcon-plus');
+            elPrintHeaderIcon.classList.toggle('rbroIcon-minus');
+            if (elPrintHeaderIcon.classList.contains('rbroIcon-minus')) {
+                const sectionOffset = document.getElementById('rbro_doc_element_print_section_container').offsetTop;
+                document.getElementById('rbro_detail_panel').scrollTop = sectionOffset;
+            }
+            autosize.update(document.getElementById('rbro_doc_element_print_if'));
+        });
         elPrintHeader.append(elPrintHeaderIcon);
-        elPrintHeader.append(`<span>${this.rb.getLabel('docElementPrintSettings')}</span>`);
+        elPrintHeader.append(utils.createElement('span', {}, this.rb.getLabel('docElementPrintSettings')));
         elDiv.append(elPrintHeader);
         elPrintSectionContainer.append(elDiv);
 
-        let elPrintSectionDiv = $('<div id="rbro_doc_element_print_section" class="rbroHidden"></div>');
+        let elPrintSectionDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_print_section', class: 'rbroHidden' });
 
-        elDiv = $('<div id="rbro_doc_element_group_expression_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_group_expression">
-                      ${this.rb.getLabel('docElementGroupExpression')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elGroupExpression = $('<textarea id="rbro_doc_element_group_expression" rows="1"></textarea>')
-            .on('input', event => {
-                let val = elGroupExpression.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'groupExpression', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            })
-            .blur(event => {
-                this.rb.getPopupWindow().hide();
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_group_expression_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementGroupExpression'), 'rbro_doc_element_group_expression');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elGroupExpression = utils.createElement('textarea', { id: 'rbro_doc_element_group_expression', rows: 1 });
+        elGroupExpression.addEventListener('input', (event) => {
+            let val = elGroupExpression.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'groupExpression', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elGroupExpression.addEventListener('blur', (event) => {
+            this.rb.getPopupWindow().hide();
+        });
         autosize(elGroupExpression);
         elFormField.append(elGroupExpression);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
-                    'rbro_doc_element_group_expression', 'groupExpression', PopupWindow.type.parameterSet);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_group_expression', 'groupExpression', PopupWindow.type.parameterSet);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_group_expression_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_group_expression_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_page_break_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_page_break">
-                      ${this.rb.getLabel('docElementTableBandPageBreak')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elPageBreak = $('<input id="rbro_doc_element_page_break" type="checkbox">')
-            .change(event => {
-                let pageBreakChecked = elPageBreak.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'pageBreak', pageBreakChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_page_break_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementTableBandPageBreak'), 'rbro_doc_element_page_break');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elPageBreak = utils.createElement('input', { id: 'rbro_doc_element_page_break', type: 'checkbox' });
+        elPageBreak.addEventListener('change', (event) => {
+            let pageBreakChecked = elPageBreak.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'pageBreak', pageBreakChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elPageBreak);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_repeat_group_header_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_repeat_group_header">
-                      ${this.rb.getLabel('docElementRepeatGroupHeader')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elRepeatGroupHeader = $('<input id="rbro_doc_element_repeat_group_header" type="checkbox">')
-            .change(event => {
-                let repeatGroupHeaderChecked = elRepeatGroupHeader.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'repeatGroupHeader', repeatGroupHeaderChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_repeat_group_header_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementRepeatGroupHeader'), 'rbro_doc_element_repeat_group_header');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRepeatGroupHeader = utils.createElement(
+            'input', { id: 'rbro_doc_element_repeat_group_header', type: 'checkbox' });
+        elRepeatGroupHeader.addEventListener('change', (event) => {
+            let repeatGroupHeaderChecked = elRepeatGroupHeader.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'repeatGroupHeader', repeatGroupHeaderChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elRepeatGroupHeader);
-        elFormField.append('<div id="rbro_doc_element_repeat_group_header_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_repeat_group_header_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_print_if_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_print_if">${this.rb.getLabel('docElementPrintIf')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elPrintIf = $('<textarea id="rbro_doc_element_print_if" rows="1"></textarea>')
-            .on('input', event => {
-                let val = elPrintIf.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'printIf', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_print_if_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementPrintIf'), 'rbro_doc_element_print_if');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elPrintIf = utils.createElement('textarea', { id: 'rbro_doc_element_print_if', rows: 1 });
+        elPrintIf.addEventListener('input', (event) => {
+            let val = elPrintIf.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'printIf', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         autosize(elPrintIf);
         elFormField.append(elPrintIf);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
-                    'rbro_doc_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_print_if_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_print_if_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_repeat_header_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_repeat_header">
-                      ${this.rb.getLabel('docElementRepeatHeader')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elRepeatHeader = $('<input id="rbro_doc_element_repeat_header" type="checkbox">')
-            .change(event => {
-                let repeatHeaderChecked = elRepeatHeader.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'repeatHeader', repeatHeaderChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_repeat_header_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementRepeatHeader'), 'rbro_doc_element_repeat_header');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRepeatHeader = utils.createElement('input', { id: 'rbro_doc_element_repeat_header', type: 'checkbox' });
+        elRepeatHeader.addEventListener('change', (event) => {
+            let repeatHeaderChecked = elRepeatHeader.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'repeatHeader', repeatHeaderChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elRepeatHeader);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_remove_empty_element_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_remove_empty_element">
-                      ${this.rb.getLabel('docElementRemoveEmptyElement')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elRemoveEmptyElement = $('<input id="rbro_doc_element_remove_empty_element" type="checkbox">')
-            .change(event => {
-                let removeEmptyElementChecked = elRemoveEmptyElement.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'removeEmptyElement', removeEmptyElementChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_remove_empty_element_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementRemoveEmptyElement'), 'rbro_doc_element_remove_empty_element');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRemoveEmptyElement = utils.createElement(
+            'input', { id: 'rbro_doc_element_remove_empty_element', type: 'checkbox' });
+        elRemoveEmptyElement.addEventListener('change', (event) => {
+            let removeEmptyElementChecked = elRemoveEmptyElement.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'removeEmptyElement', removeEmptyElementChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elRemoveEmptyElement);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_always_print_on_same_page_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_always_print_on_same_page">
-                      ${this.rb.getLabel('docElementAlwaysPrintOnSamePage')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elAlwaysPrintOnSamePage = $('<input id="rbro_doc_element_always_print_on_same_page" type="checkbox">')
-            .change(event => {
-                let alwaysPrintOnSamePageChecked = elAlwaysPrintOnSamePage.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'alwaysPrintOnSamePage', alwaysPrintOnSamePageChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_always_print_on_same_page_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementAlwaysPrintOnSamePage'), 'rbro_doc_element_always_print_on_same_page');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elAlwaysPrintOnSamePage = utils.createElement(
+            'input', { id: 'rbro_doc_element_always_print_on_same_page', type: 'checkbox' });
+        elAlwaysPrintOnSamePage.addEventListener('change', (event) => {
+            let alwaysPrintOnSamePageChecked = elAlwaysPrintOnSamePage.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'alwaysPrintOnSamePage', alwaysPrintOnSamePageChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elAlwaysPrintOnSamePage);
-        elFormField.append('<div id="rbro_doc_element_always_print_on_same_page_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement(
+                'div', { id: 'rbro_doc_element_always_print_on_same_page_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_shrink_to_content_height_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_shrink_to_content_height">
-                      ${this.rb.getLabel('docElementShrinkToContentHeight')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elShrinkToContentHeight = $('<input id="rbro_doc_element_shrink_to_content_height" type="checkbox">')
-            .change(event => {
-                let shrinkToContentHeightChecked = elShrinkToContentHeight.is(":checked");
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'shrinkToContentHeight', shrinkToContentHeightChecked,
-                        SetValueCmd.type.checkbox, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_shrink_to_content_height_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementShrinkToContentHeight'), 'rbro_doc_element_shrink_to_content_height');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elShrinkToContentHeight = utils.createElement(
+            'input', { id: 'rbro_doc_element_shrink_to_content_height', type: 'checkbox' });
+        elShrinkToContentHeight.addEventListener('change', (event) => {
+            let shrinkToContentHeightChecked = elShrinkToContentHeight.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'shrinkToContentHeight', shrinkToContentHeightChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elShrinkToContentHeight);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_pattern_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_pattern">${this.rb.getLabel('docElementPattern')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elPattern = $('<input id="rbro_doc_element_pattern">')
-            .on('input', event => {
-                let val = elPattern.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'pattern', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_pattern_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementPattern'), 'rbro_doc_element_pattern');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elPattern = utils.createElement('input', { id: 'rbro_doc_element_pattern' });
+        elPattern.addEventListener('input', (event) => {
+            let val = elPattern.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'pattern', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elPattern);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                this.rb.getPopupWindow().show(
-                    this.rb.getPatterns(), null, 'rbro_doc_element_pattern', 'pattern', PopupWindow.type.pattern);
-            });
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            this.rb.getPopupWindow().show(
+                this.rb.getPatterns(), null, 'rbro_doc_element_pattern', 'pattern', PopupWindow.type.pattern);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_pattern_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_pattern_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_link_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_link">${this.rb.getLabel('docElementLink')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elLink = $('<input id="rbro_doc_element_link">')
-            .on('input', event => {
-                let val = elLink.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'link', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_link_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementLink'), 'rbro_doc_element_link');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elLink = utils.createElement('input', { id: 'rbro_doc_element_link' });
+        elLink.addEventListener('input', (event) => {
+            let val = elLink.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'link', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elLink);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
-                    'rbro_doc_element_link', 'link', PopupWindow.type.parameterSet);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_link', 'link', PopupWindow.type.parameterSet);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_link_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_link_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_grow_weight_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_grow_weight">
-                      ${this.rb.getLabel('docElementGrowWeight')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        let elGrowWeight = $(`<select id="rbro_doc_element_grow_weight">
-                <option value="0">-</option>
-                <option value="1">1 (${this.rb.getLabel('docElementGrowWeightLow')})</option>
-                <option value="2">2</option>
-                <option value="3">3 (${this.rb.getLabel('docElementGrowWeightHigh')})</option>
-            </select>`)
-            .change(event => {
-                let val = elGrowWeight.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'growWeight', val, SetValueCmd.type.select, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_grow_weight_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementGrowWeight'), 'rbro_doc_element_grow_weight');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elGrowWeight = utils.createElement('select', { id: 'rbro_doc_element_grow_weight' });
+        elGrowWeight.append(utils.createElement('option', { value: '0' }, '-'));
+        elGrowWeight.append(utils.createElement(
+            'option', { value: '1' }, `1 (${this.rb.getLabel('docElementGrowWeightLow')})`));
+        elGrowWeight.append(utils.createElement('option', { value: '2' }, '2'));
+        elGrowWeight.append(utils.createElement(
+            'option', { value: '3' }, `3 (${this.rb.getLabel('docElementGrowWeightHigh')})`));
+        elGrowWeight.addEventListener('change', (event) => {
+            let val = elGrowWeight.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'growWeight', val, SetValueCmd.type.select, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(elGrowWeight);
-        elFormField.append(`<div class="rbroInfo">${this.rb.getLabel('docElementGrowWeightInfo')}</div>`);
+        elFormField.append(
+            utils.createElement('div', { class: 'rbroInfo'}, this.rb.getLabel('docElementGrowWeightInfo')));
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
@@ -1696,89 +1763,92 @@ export default class DocElementPanel extends PanelBase {
         // ---------------------------------------
         // --- Conditional Style Section Begin ---
         // ---------------------------------------
-        let elCsStyleSectionContainer = $('<div id="rbro_doc_element_cs_style_section_container"></div>');
-        let elCsStyleHeader = $('<div class="rbroPanelSectionHeader"></div>');
-        let elCsStyleHeaderIcon = $(
-            '<span id="rbro_doc_element_cs_style_header_icon" class="rbroIcon-plus"></span>');
-        elDiv = $(
-            '<div id="rbro_doc_element_cs_style_header" class="rbroFormRow rbroPanelSection"></div>')
-            .click(event => {
-                $('#rbro_doc_element_cs_style_header').toggleClass('rbroPanelSectionHeaderOpen');
-                $('#rbro_doc_element_cs_style_section').toggleClass('rbroHidden');
-                elCsStyleHeaderIcon.toggleClass('rbroIcon-plus');
-                elCsStyleHeaderIcon.toggleClass('rbroIcon-minus');
-                if (elCsStyleHeaderIcon.hasClass('rbroIcon-minus')) {
-                    let sectionOffset = document.getElementById(
-                        'rbro_doc_element_cs_style_section_container').offsetTop;
-                    $('#rbro_detail_panel').scrollTop(sectionOffset);
-                }
-            });
+        let elCsStyleSectionContainer = utils.createElement(
+            'div', { id: 'rbro_doc_element_cs_style_section_container' });
+        let elCsStyleHeader = utils.createElement('div', { class: 'rbroPanelSectionHeader' });
+        let elCsStyleHeaderIcon = utils.createElement(
+            'span', { id: 'rbro_doc_element_cs_style_header_icon', class: 'rbroIcon-plus' });
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_cs_style_header', class: 'rbroFormRow rbroPanelSection' });
+        elDiv.addEventListener('click', (event) => {
+            document.getElementById('rbro_doc_element_cs_style_header').classList.toggle('rbroPanelSectionHeaderOpen');
+            document.getElementById('rbro_doc_element_cs_style_section').classList.toggle('rbroHidden');
+            elCsStyleHeaderIcon.classList.toggle('rbroIcon-plus');
+            elCsStyleHeaderIcon.classList.toggle('rbroIcon-minus');
+            if (elCsStyleHeaderIcon.classList.contains('rbroIcon-minus')) {
+                const sectionOffset = document.getElementById('rbro_doc_element_cs_style_section_container').offsetTop;
+                document.getElementById('rbro_detail_panel').scrollTop = sectionOffset;
+            }
+        });
         elCsStyleHeader.append(elCsStyleHeaderIcon);
-        elCsStyleHeader.append(`<span>${this.rb.getLabel('docElementConditionalStyle')}</span>`);
+        elCsStyleHeader.append(utils.createElement('span', {}, this.rb.getLabel('docElementConditionalStyle')));
         elDiv.append(elCsStyleHeader);
         elCsStyleSectionContainer.append(elDiv);
 
-        let elCsStyleSectionDiv = $('<div id="rbro_doc_element_cs_style_section" class="rbroHidden"></div>');
+        let elCsStyleSectionDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_cs_style_section', class: 'rbroHidden' });
 
-        elDiv = $('<div id="rbro_doc_element_cs_condition_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_cs_condition">
-                      ${this.rb.getLabel('docElementConditionalStyleCondition')}:</label>`);
-        elFormField = $('<div class="rbroFormField rbroSplit rbroSelector"></div>');
-        let elCondStyleCondition = $('<textarea id="rbro_doc_element_cs_condition" rows="1"></textarea>')
-            .on('input', event => {
-                let val = elCondStyleCondition.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'cs_condition', val, SetValueCmd.type.text, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_cs_condition_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementConditionalStyleCondition'), 'rbro_doc_element_cs_condition');
+        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        let elCondStyleCondition = utils.createElement('textarea', { id: 'rbro_doc_element_cs_condition', rows: 1 });
+        elCondStyleCondition.addEventListener('input', (event) => {
+            let val = elCondStyleCondition.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'cs_condition', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         autosize(elCondStyleCondition);
         elFormField.append(elCondStyleCondition);
-        elParameterButton = $('<div class="rbroButton rbroRoundButton rbroIcon-select"></div>')
-            .click(event => {
-                let selectedObjects = this.rb.getSelectedObjects();
-                // data source parameters are not shown in case multiple objects are selected
-                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let selectedObjects = this.rb.getSelectedObjects();
+            // data source parameters are not shown in case multiple objects are selected
+            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-                this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
-                    'rbro_doc_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
-            });
+            this.rb.getPopupWindow().show(
+                this.rb.getParameterItems(selectedObject), null,
+                'rbro_doc_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
+        });
         elFormField.append(elParameterButton);
-        elFormField.append('<div id="rbro_doc_element_cs_condition_error" class="rbroErrorMessage"></div>');
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_cs_condition_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elCsStyleSectionDiv.append(elDiv);
 
-        elDiv = $('<div id="rbro_doc_element_cs_style_id_row" class="rbroFormRow"></div>');
-        elDiv.append(`<label for="rbro_doc_element_cs_style_id">${this.rb.getLabel('docElementStyle')}:</label>`);
-        elFormField = $('<div class="rbroFormField"></div>');
-        this.elCsStyle = $('<select id="rbro_doc_element_cs_style_id"></select>')
-            .change(event => {
-                let val = this.elCsStyle.val();
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    obj.addCommandsForChangedStyle(
-                        val, 'cs_', this.propertyDescriptors, cmdGroup);
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_cs_style_id_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementStyle'), 'rbro_doc_element_cs_style_id');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        this.elCsStyle = utils.createElement('select', { id: 'rbro_doc_element_cs_style_id' });
+        this.elCsStyle.addEventListener('change', (event) => {
+            let val = this.elCsStyle.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                obj.addCommandsForChangedStyle(
+                    val, 'cs_', this.propertyDescriptors, cmdGroup);
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
         elFormField.append(this.elCsStyle);
         elDiv.append(elFormField);
         elCsStyleSectionDiv.append(elDiv);
 
-        let elCsStyleDiv = $('<div id="rbro_doc_element_cs_style_settings"></div>');
+        let elCsStyleDiv = utils.createElement('div', { id: 'rbro_doc_element_cs_style_settings' });
         StylePanel.renderStyle(elCsStyleDiv, 'doc_element_cs_', 'cs_', false, this.controls, this.rb);
         elCsStyleSectionDiv.append(elCsStyleDiv);
         elCsStyleSectionContainer.append(elCsStyleSectionDiv);
@@ -1787,191 +1857,211 @@ export default class DocElementPanel extends PanelBase {
         // --- Conditional Style Section End ---
         // -------------------------------------
 
-        if (this.rb.getProperty('enableSpreadsheet')) {
-            // ---------------------------------
-            // --- Spreadsheet Section Begin ---
-            // ---------------------------------
-            let elSpreadsheetSectionContainer = $('<div id="rbro_doc_element_spreadsheet_section_container"></div>');
-            let elSpreadsheetHeader = $('<div class="rbroPanelSectionHeader"></div>');
-            let elSpreadsheetHeaderIcon = $(
-                '<span id="rbro_doc_element_spreadsheet_header_icon" class="rbroIcon-plus"></span>');
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_header" class="rbroFormRow rbroPanelSection"></div>')
-                .click(event => {
-                    $('#rbro_doc_element_spreadsheet_header').toggleClass('rbroPanelSectionHeaderOpen');
-                    $('#rbro_doc_element_spreadsheet_section').toggleClass('rbroHidden');
-                    elSpreadsheetHeaderIcon.toggleClass('rbroIcon-plus');
-                    elSpreadsheetHeaderIcon.toggleClass('rbroIcon-minus');
-                    if (elSpreadsheetHeaderIcon.hasClass('rbroIcon-minus')) {
-                        let sectionOffset = document.getElementById(
-                            'rbro_doc_element_spreadsheet_section_container').offsetTop;
-                        $('#rbro_detail_panel').scrollTop(sectionOffset);
-                    }
-                });
-            elSpreadsheetHeader.append(elSpreadsheetHeaderIcon);
-            elSpreadsheetHeader.append(`<span>${this.rb.getLabel('docElementSpreadsheet')}</span>`);
-            elDiv.append(elSpreadsheetHeader);
-            elSpreadsheetSectionContainer.append(elDiv);
+        // ---------------------------------
+        // --- Spreadsheet Section Begin ---
+        // ---------------------------------
+        let elSpreadsheetSectionContainer = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_section_container' });
+        let elSpreadsheetHeader = utils.createElement('div', { class: 'rbroPanelSectionHeader' });
+        let elSpreadsheetHeaderIcon = utils.createElement(
+            'span', { id: 'rbro_doc_element_spreadsheet_header_icon', class: 'rbroIcon-plus' });
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_header', class: 'rbroFormRow rbroPanelSection' });
+        elDiv.addEventListener('click', (event) => {
+            document.getElementById('rbro_doc_element_spreadsheet_header').classList.toggle(
+                'rbroPanelSectionHeaderOpen');
+            document.getElementById('rbro_doc_element_spreadsheet_section').classList.toggle('rbroHidden');
+            elSpreadsheetHeaderIcon.classList.toggle('rbroIcon-plus');
+            elSpreadsheetHeaderIcon.classList.toggle('rbroIcon-minus');
+            if (elSpreadsheetHeaderIcon.classList.contains('rbroIcon-minus')) {
+                const sectionOffset =
+                    document.getElementById('rbro_doc_element_spreadsheet_section_container').offsetTop;
+                document.getElementById('rbro_detail_panel').scrollTop = sectionOffset;
+            }
+        });
+        elSpreadsheetHeader.append(elSpreadsheetHeaderIcon);
+        elSpreadsheetHeader.append(utils.createElement('span', {}, this.rb.getLabel('docElementSpreadsheet')));
+        elDiv.append(elSpreadsheetHeader);
+        elSpreadsheetSectionContainer.append(elDiv);
 
-            let elSpreadsheetSectionDiv = $('<div id="rbro_doc_element_spreadsheet_section" class="rbroHidden"></div>');
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_hide_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_hide">
-                          ${this.rb.getLabel('docElementSpreadsheetHide')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elSpreadsheetHide = $(`<input id="rbro_doc_element_spreadsheet_hide" type="checkbox">`)
-                .change(event => {
-                    let spreadsheetHideChecked = elSpreadsheetHide.is(":checked");
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'spreadsheet_hide', spreadsheetHideChecked,
-                            SetValueCmd.type.checkbox, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                });
-            elFormField.append(elSpreadsheetHide);
-            elDiv.append(elFormField);
-            elSpreadsheetSectionDiv.append(elDiv);
+        let elSpreadsheetSectionDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_section', class: 'rbroHidden' });
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_spreadsheet_hide_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSpreadsheetHide'), 'rbro_doc_element_spreadsheet_hide');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetHide = utils.createElement(
+            'input', { id: 'rbro_doc_element_spreadsheet_hide', type: 'checkbox' });
+        elSpreadsheetHide.addEventListener('change', (event) => {
+            let spreadsheetHideChecked = elSpreadsheetHide.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'spreadsheet_hide', spreadsheetHideChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elSpreadsheetHide);
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_column_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_column">
-                          ${this.rb.getLabel('docElementSpreadsheetColumn')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elSpreadsheetColumn = $('<input id="rbro_doc_element_spreadsheet_column" type="number">')
-                .on('input', event => {
-                    let val = elSpreadsheetColumn.val();
-                    if (val !== '') {
-                        val = utils.checkInputDecimal(val, 1, 99);
-                    }
-                    if (val !== elSpreadsheetColumn.val()) {
-                        elSpreadsheetColumn.val(val);
-                    }
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    let valueChanged = false;
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        if (selectedObjects[i].getValue('spreadsheet_column') !== val) {
-                            valueChanged = true;
-                            break;
-                        }
-                    }
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_spreadsheet_column_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSpreadsheetColumn'), 'rbro_doc_element_spreadsheet_column');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetColumn = utils.createElement(
+            'input', { id: 'rbro_doc_element_spreadsheet_column', type: 'number' });
+        elSpreadsheetColumn.addEventListener('input', (event) => {
+            let val = elSpreadsheetColumn.value;
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 1, 99);
+            }
+            if (val !== elSpreadsheetColumn.value) {
+                elSpreadsheetColumn.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('spreadsheet_column') !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
 
-                    if (valueChanged) {
-                        let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                        for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                            let obj = selectedObjects[i];
-                            cmdGroup.addSelection(obj.getId());
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), 'spreadsheet_column', val,
-                                SetValueCmd.type.text, this.rb));
-                        }
-                        if (!cmdGroup.isEmpty()) {
-                            this.rb.executeCommand(cmdGroup);
-                        }
-                    }
-                });
-            elFormField.append(elSpreadsheetColumn);
-            elFormField.append('<div id="rbro_doc_element_spreadsheet_column_error" class="rbroErrorMessage"></div>');
-            elDiv.append(elFormField);
-            elSpreadsheetSectionDiv.append(elDiv);
+            if (valueChanged) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'spreadsheet_column', val,
+                        SetValueCmd.type.text, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
+        elFormField.append(elSpreadsheetColumn);
+        elFormField.append(
+            utils.createElement(
+                'div', { id: 'rbro_doc_element_spreadsheet_column_error', class: 'rbroErrorMessage' })
+        );
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_colspan_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_colspan">
-                          ${this.rb.getLabel('docElementSpreadsheetColspan')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elSpreadsheetColspan = $('<input id="rbro_doc_element_spreadsheet_colspan" type="number">')
-                .on('input', event => {
-                    let val = elSpreadsheetColspan.val();
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'spreadsheet_colspan', val,
-                            SetValueCmd.type.text, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                });
-            elFormField.append(elSpreadsheetColspan);
-            elFormField.append('<div id="rbro_doc_element_spreadsheet_colspan_error" class="rbroErrorMessage"></div>');
-            elDiv.append(elFormField);
-            elSpreadsheetSectionDiv.append(elDiv);
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_colspan_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSpreadsheetColspan'), 'rbro_doc_element_spreadsheet_colspan');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetColspan = utils.createElement(
+            'input', { id: 'rbro_doc_element_spreadsheet_colspan', type: 'number' });
+        elSpreadsheetColspan.addEventListener('input', (event) => {
+                let val = elSpreadsheetColspan.value;
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                let selectedObjects = this.rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'spreadsheet_colspan', val,
+                        SetValueCmd.type.text, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            });
+        elFormField.append(elSpreadsheetColspan);
+        elFormField.append(
+            utils.createElement(
+                'div', { id: 'rbro_doc_element_spreadsheet_colspan_error', class: 'rbroErrorMessage' })
+        );
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_add_empty_row_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_add_empty_row">
-                          ${this.rb.getLabel('docElementSpreadsheetAddEmptyRow')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elSpreadsheetAddEmptyRow = $('<input id="rbro_doc_element_spreadsheet_add_empty_row" type="checkbox">')
-                .change(event => {
-                    let spreadsheetAddEmptyRowChecked = elSpreadsheetAddEmptyRow.is(":checked");
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'spreadsheet_addEmptyRow',
-                            spreadsheetAddEmptyRowChecked, SetValueCmd.type.checkbox, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                });
-            elFormField.append(elSpreadsheetAddEmptyRow);
-            elDiv.append(elFormField);
-            elSpreadsheetSectionDiv.append(elDiv);
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_add_empty_row_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSpreadsheetAddEmptyRow'),
+            'rbro_doc_element_spreadsheet_add_empty_row');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetAddEmptyRow = utils.createElement(
+            'input', { id: 'rbro_doc_element_spreadsheet_add_empty_row', type: 'checkbox' });
+        elSpreadsheetAddEmptyRow.addEventListener('change', (event) => {
+            let spreadsheetAddEmptyRowChecked = elSpreadsheetAddEmptyRow.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'spreadsheet_addEmptyRow',
+                    spreadsheetAddEmptyRowChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elSpreadsheetAddEmptyRow);
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
 
-            elDiv = $('<div id="rbro_doc_element_spreadsheet_text_wrap_row" class="rbroFormRow"></div>');
-            elDiv.append(`<label for="rbro_doc_element_spreadsheet_text_wrap">
-                          ${this.rb.getLabel('docElementSpreadsheetTextWrap')}:</label>`);
-            elFormField = $('<div class="rbroFormField"></div>');
-            let elSpreadsheetTextWrap = $('<input id="rbro_doc_element_spreadsheet_text_wrap" type="checkbox">')
-                .change(event => {
-                    let spreadsheetTextWrapChecked = elSpreadsheetTextWrap.is(":checked");
-                    let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                    let selectedObjects = this.rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'spreadsheet_textWrap',
-                            spreadsheetTextWrapChecked, SetValueCmd.type.checkbox, this.rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        this.rb.executeCommand(cmdGroup);
-                    }
-                });
-            elFormField.append(elSpreadsheetTextWrap);
-            elDiv.append(elFormField);
-            elSpreadsheetSectionDiv.append(elDiv);
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_spreadsheet_text_wrap_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementSpreadsheetTextWrap'), 'rbro_doc_element_spreadsheet_text_wrap');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetTextWrap = utils.createElement(
+            'input', { id: 'rbro_doc_element_spreadsheet_text_wrap', type: 'checkbox' });
+        elSpreadsheetTextWrap.addEventListener('change', (event) => {
+            let spreadsheetTextWrapChecked = elSpreadsheetTextWrap.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'spreadsheet_textWrap',
+                    spreadsheetTextWrapChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elSpreadsheetTextWrap);
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
 
-            elSpreadsheetSectionContainer.append(elSpreadsheetSectionDiv);
-            panel.append(elSpreadsheetSectionContainer);
-            // -------------------------------
-            // --- Spreadsheet Section End ---
-            // -------------------------------
+        elSpreadsheetSectionContainer.append(elSpreadsheetSectionDiv);
+        if (!this.rb.getProperty('enableSpreadsheet')) {
+            elSpreadsheetSectionContainer.style.display = 'none';
         }
+        panel.append(elSpreadsheetSectionContainer);
+        // -------------------------------
+        // --- Spreadsheet Section End ---
+        // -------------------------------
 
-        $('#rbro_detail_panel').append(panel);
+        document.getElementById('rbro_detail_panel').append(panel);
 
         this.setupRichText();
     }
 
     renderStyleSelect() {
-        this.elStyle.empty();
-        this.elCsStyle.empty();
-        this.elStyle.append(`<option value="">${this.rb.getLabel('styleNone')}</option>`);
-        this.elCsStyle.append(`<option value="">${this.rb.getLabel('styleNone')}</option>`);
+        utils.emptyElement(this.elStyle);
+        utils.emptyElement(this.elCsStyle);
+        this.elStyle.append(utils.createElement('option', { value: '' }, this.rb.getLabel('styleNone')));
+        this.elCsStyle.append(utils.createElement('option', { value: '' }, this.rb.getLabel('styleNone')));
         let styles = this.rb.getStyles();
         for (let style of styles) {
-            this.elStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
-            this.elCsStyle.append(`<option value="${style.getId()}">${style.getName()}</option>`);
+            this.elStyle.append(utils.createElement('option', { value: style.getId() }, style.getName()));
+            this.elCsStyle.append(utils.createElement('option', { value: style.getId() }, style.getName()));
         }
     }
 
@@ -1995,16 +2085,17 @@ export default class DocElementPanel extends PanelBase {
             return sanitizeLinkSuper.call(this, val);
         };
 
-        $('#rbro_doc_element_rich_text_content_toolbar_parameter').click(event => {
-            let selectedObjects = this.rb.getSelectedObjects();
-            // data source parameters are not shown in case multiple objects are selected
-            let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
+        document.getElementById('rbro_doc_element_rich_text_content_toolbar_parameter')
+            .addEventListener('click', (event) => {
+                let selectedObjects = this.rb.getSelectedObjects();
+                // data source parameters are not shown in case multiple objects are selected
+                let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
-            this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
-                'rbro_doc_element_rich_text_content', 'richTextContent',
-                PopupWindow.type.parameterAppend, this.quill);
-        });
+                this.rb.getPopupWindow().show(
+                    this.rb.getParameterItems(selectedObject), null,
+                    'rbro_doc_element_rich_text_content', 'richTextContent',
+                    PopupWindow.type.parameterAppend, this.quill);
+            });
 
         let fontFormat = Quill.import('formats/font');
         let richTextFonts = [];
@@ -2188,18 +2279,18 @@ export default class DocElementPanel extends PanelBase {
                         !propertyDescriptor['singleRowProperty']) {
                         // only handle visibility of control and not of whole row.
                         // row visibility will be handled below, e.g. for button groups
-                        let propertyId = `#rbro_doc_element_${propertyDescriptor['fieldId']}`;
+                        let propertyId = `rbro_doc_element_${propertyDescriptor['fieldId']}`;
                         if (show) {
-                            $(propertyId).removeClass('rbroHidden');
+                            document.getElementById(propertyId).classList.remove('rbroHidden');
                         } else {
-                            $(propertyId).addClass('rbroHidden');
+                            document.getElementById(propertyId).classList.add('rbroHidden');
                         }
                     } else {
                         let rowId = this.getRowId(propertyDescriptor);
                         if (show) {
-                            $('#' + rowId).removeClass('rbroHidden');
+                            document.getElementById(rowId).classList.remove('rbroHidden');
                         } else {
-                            $('#' + rowId).addClass('rbroHidden');
+                            document.getElementById(rowId).classList.add('rbroHidden');
                         }
                     }
                 }
@@ -2236,12 +2327,13 @@ export default class DocElementPanel extends PanelBase {
                                     }
                                 }
                             }
-                            $('#' + propertyDescriptor['labelId']).text(this.rb.getLabel(label) + ':');
+                            document.getElementById(propertyDescriptor['labelId']).textContent =
+                                this.rb.getLabel(label) + ':';
                         }
                         if (shownPropertyCount > 0) {
-                            $('#' + propertyDescriptor['rowId']).removeClass('rbroHidden');
+                            document.getElementById(propertyDescriptor['rowId']).classList.remove('rbroHidden');
                         } else {
-                            $('#' + propertyDescriptor['rowId']).addClass('rbroHidden');
+                            document.getElementById(propertyDescriptor['rowId']).classList.add('rbroHidden');
                         }
                     }
                 }
@@ -2250,9 +2342,11 @@ export default class DocElementPanel extends PanelBase {
             // show section if there is at least one property shown in section
             for (let section of ['style', 'print', 'cs_style', 'spreadsheet']) {
                 if (section in sectionPropertyCount) {
-                    $(`#rbro_doc_element_${section}_section_container`).removeClass('rbroHidden');
+                    document.getElementById(`rbro_doc_element_${section}_section_container`)
+                        .classList.remove('rbroHidden');
                 } else {
-                    $(`#rbro_doc_element_${section}_section_container`).addClass('rbroHidden');
+                    document.getElementById(`rbro_doc_element_${section}_section_container`)
+                        .classList.add('rbroHidden');
                 }
             }
         }
@@ -2262,19 +2356,19 @@ export default class DocElementPanel extends PanelBase {
 
     static updateAutosizeInputs(field) {
         if (field === null || field === 'dataSource') {
-            autosize.update($('#rbro_doc_element_data_source'));
+            autosize.update(document.getElementById('rbro_doc_element_data_source'));
         }
         if (field === null || field === 'content') {
-            autosize.update($('#rbro_doc_element_content'));
+            autosize.update(document.getElementById('rbro_doc_element_content'));
         }
         if (field === null || field === 'source') {
-            autosize.update($('#rbro_doc_element_source'));
+            autosize.update(document.getElementById('rbro_doc_element_source'));
         }
         if (field === null || field === 'expression') {
-            autosize.update($('#rbro_doc_element_group_expression'));
+            autosize.update(document.getElementById('rbro_doc_element_group_expression'));
         }
         if (field === null || field === 'printIf') {
-            autosize.update($('#rbro_doc_element_print_if'));
+            autosize.update(document.getElementById('rbro_doc_element_print_if'));
         }
     }
 

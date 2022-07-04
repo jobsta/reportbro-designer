@@ -1,6 +1,5 @@
 import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import Command from '../commands/Command';
-import CommandGroupCmd from '../commands/CommandGroupCmd';
 import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
@@ -43,9 +42,9 @@ export default class Parameter {
 
     setHighlightUnused(highlightUnused) {
         if (highlightUnused) {
-            $(`#rbro_menu_item${this.panelItem.getId()}`).addClass('rbroUnusedParameter');
+            document.getElementById(`rbro_menu_item${this.panelItem.getId()}`).classList.add('rbroUnusedParameter');
         } else {
-            $(`#rbro_menu_item${this.panelItem.getId()}`).removeClass('rbroUnusedParameter');
+            document.getElementById(`rbro_menu_item${this.panelItem.getId()}`).classList.remove('rbroUnusedParameter');
         }
     }
 
@@ -57,9 +56,11 @@ export default class Parameter {
             for (let child of this.children) {
                 let parameter = new Parameter(child.id || this.rb.getUniqueId(), child, this.rb);
                 this.rb.addParameter(parameter);
+                // set hasChildren and showAdd to true because parameters can have children depending on their
+                // type (for map and list) -> children and add button are shown/hidden dynamically
                 let panelItem = new MainPanelItem(
                     'parameter', this.panelItem, parameter,
-                    { hasChildren: true, showAdd: parameter.editable, showDelete: parameter.editable, draggable: true }, this.rb);
+                    { hasChildren: true, showAdd: true, showDelete: true, draggable: true }, this.rb);
                 parameter.setPanelItem(panelItem);
                 this.panelItem.appendChild(panelItem);
                 parameter.setup();
@@ -74,8 +75,10 @@ export default class Parameter {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern',
-            'expression', 'showOnlyNameType', 'testData'];
+        return [
+            'id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression',
+            'showOnlyNameType', 'testData'
+        ];
     }
 
     getId() {
@@ -128,13 +131,13 @@ export default class Parameter {
      */
     updateMenuItemDisplay() {
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
-            $(`#rbro_menu_item_add${this.getId()}`).show();
-            $(`#rbro_menu_item_children${this.getId()}`).show();
-            $(`#rbro_menu_item_children_toggle${this.getId()}`).show();
+            document.getElementById(`rbro_menu_item_add${this.getId()}`).removeAttribute('style');
+            document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'block';
+            document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).removeAttribute('style');
         } else {
-            $(`#rbro_menu_item_add${this.getId()}`).hide();
-            $(`#rbro_menu_item_children${this.getId()}`).hide();
-            $(`#rbro_menu_item_children_toggle${this.getId()}`).hide();
+            document.getElementById(`rbro_menu_item_add${this.getId()}`).style.display = 'none';
+            document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'none';
+            document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).style.display = 'none';
         }
     }
 
@@ -313,8 +316,10 @@ export default class Parameter {
      * In case of map parameter all child parameters are appended,
      * for other parameter types the parameter itself is appended.
      * Parameters with type array are only added if explicitly specified
-     * in allowedTypes parameter. Used for parameter popup window.
-
+     * in allowedTypes parameter.
+     *
+     * Used for parameter popup window.
+     *
      * @param {Object[]} parameters - list where parameter items will be appended to.
      * @param {String[]} allowedTypes - specify allowed parameter types which will be
      * added to the parameter list. If not set all parameter types are allowed.

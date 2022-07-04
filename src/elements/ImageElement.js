@@ -17,6 +17,7 @@ export default class ImageElement extends DocElement {
         this.imageRatio = 0;
         this.imageFilename = '';
         this.elImg = null;
+        this.elContent = null;
         this.horizontalAlignment = Style.alignment.left;
         this.verticalAlignment = Style.alignment.top;
         this.backgroundColor = '';
@@ -52,10 +53,12 @@ export default class ImageElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
+        return [
+            'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
             'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
             'printIf', 'removeEmptyElement', 'link',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
+        ];
     }
 
     getElementType() {
@@ -64,9 +67,10 @@ export default class ImageElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(x), top: this.rb.toPixel(y),
-                width: this.rb.toPixel(width), height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(x);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = this.rb.toPixel(width);
+            this.el.style.height = this.rb.toPixel(height);
 
             let imgWidth = 0;
             let imgHeight = 0;
@@ -82,42 +86,46 @@ export default class ImageElement extends DocElement {
                     }
                 }
             }
-            this.elImg.css({ width: this.rb.toPixel(imgWidth), height: this.rb.toPixel(imgHeight) });
+            this.elImg.style.width = this.rb.toPixel(imgWidth);
+            this.elImg.style.height = this.rb.toPixel(imgHeight);
         }
     }
 
     updateStyle() {
-        let styleProperties = {};
         let horizontalAlignment = this.getValue('horizontalAlignment');
         let verticalAlignment = this.getValue('verticalAlignment');
-        let alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() + horizontalAlignment.slice(1);
-        let valignClass = 'rbroDocElementVAlign' + verticalAlignment.charAt(0).toUpperCase() + verticalAlignment.slice(1);
-        styleProperties['text-align'] = horizontalAlignment;
-        styleProperties['vertical-align'] = verticalAlignment;
-        styleProperties['background-color'] = this.getValue('backgroundColor');
-        $(`#rbro_el_content${this.id}`).css(styleProperties);
-        $(`#rbro_el_content${this.id}`).removeClass().addClass('rbroContentContainerHelper').addClass(alignClass).addClass(valignClass);
+        let alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() +
+            horizontalAlignment.slice(1);
+        let valignClass = 'rbroDocElementVAlign' + verticalAlignment.charAt(0).toUpperCase() +
+            verticalAlignment.slice(1);
+        this.elContent.style.textAlign = horizontalAlignment;
+        this.elContent.style.verticalAlign = verticalAlignment;
+        this.elContent.style.backgroundColor = this.getValue('backgroundColor');
+        this.elContent.className = '';
+        this.elContent.classList.add('rbroContentContainerHelper');
+        this.elContent.classList.add(alignClass);
+        this.elContent.classList.add(valignClass);
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroImageElement"></div>`);
-        this.elImg = $('<img src="">')
-            .on('load', event => {
-                // get image width and height in load event, because width/height are not
-                // directly available in some browsers after setting src
-                this.imageWidth = this.elImg.get(0).naturalWidth;
-                this.imageHeight = this.elImg.get(0).naturalHeight;
-                if (this.imageHeight !== 0) {
-                    this.imageRatio = this.imageWidth / this.imageHeight;
-                } else {
-                    this.imageRatio = 0;
-                }
-                this.updateDisplay();
-            });
-        this.el
-            .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append(this.elImg)
-            );
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroImageElement' });
+        this.elImg = utils.createElement('img', { src: '' });
+        this.elImg.addEventListener('load', (event) => {
+            // get image width and height in load event, because width/height are not
+            // directly available in some browsers after setting src
+            this.imageWidth = this.elImg.naturalWidth;
+            this.imageHeight = this.elImg.naturalHeight;
+            if (this.imageHeight !== 0) {
+                this.imageRatio = this.imageWidth / this.imageHeight;
+            } else {
+                this.imageRatio = 0;
+            }
+            this.updateDisplay();
+        });
+        this.elContent = utils.createElement(
+            'div', { id: `rbro_el_content${this.id}`, class: 'rbroContentContainerHelper' });
+        this.elContent.append(this.elImg);
+        this.el.append(this.elContent);
         this.appendToContainer();
         super.registerEventHandlers();
     }
@@ -128,13 +136,13 @@ export default class ImageElement extends DocElement {
     }
 
     setImage() {
-        this.elImg.attr('src', '');
+        this.elImg.setAttribute('src', '');
         if (this.source.startsWith('https://') || this.source.startsWith('http://')) {
             // image specified by url
-            this.elImg.attr('src', this.source);
+            this.elImg.setAttribute('src', this.source);
         } else if (this.image !== '') {
             // image base64 encoded
-            this.elImg.attr('src', this.image);
+            this.elImg.setAttribute('src', this.image);
         } else {
             // no image preview
             this.imageWidth = 0;
@@ -152,8 +160,9 @@ export default class ImageElement extends DocElement {
         } else {
             this.name = this.rb.getLabel('docElementImage');
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
-        $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
+        const elMenuItem = document.getElementById(`rbro_menu_item_name${this.id}`);
+        elMenuItem.textContent = this.name;
+        elMenuItem.setAttribute('title', this.name);
     }
 
     /**

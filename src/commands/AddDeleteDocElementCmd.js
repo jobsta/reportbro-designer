@@ -55,7 +55,8 @@ export default class AddDeleteDocElementCmd extends Command {
     addElement() {
         let parent = this.rb.getDataObject(this.parentId);
         if (parent !== null) {
-            let element = AddDeleteDocElementCmd.createElement(this.id, this.initialData, this.elementType, this.position, true, this.rb);
+            let element = AddDeleteDocElementCmd.createElement(
+                this.id, this.initialData, this.elementType, this.position, true, this.rb);
 
             this.rb.notifyEvent(element, Command.operation.add);
             this.rb.selectObject(this.id, true);

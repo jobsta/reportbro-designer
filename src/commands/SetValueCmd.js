@@ -48,8 +48,9 @@ export default class SetValueCmd extends Command {
         obj.setValue(this.field, value);
 
         if (this.field === 'name') {
-            $(`#rbro_menu_item_name${this.objId}`).text(value);
-            $(`#rbro_menu_item_name${this.objId}`).attr('title', value);
+            const elMenuItemName = document.getElementById(`rbro_menu_item_name${this.objId}`);
+            elMenuItemName.textContent = value;
+            elMenuItemName.setAttribute('title', value);
             this.rb.notifyEvent(obj, Command.operation.rename);
         }
         // do not send event notification for setting richText value the first time because

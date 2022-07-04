@@ -1,6 +1,5 @@
 import MainPanelItem from './MainPanelItem';
 import Container from '../container/Container';
-import Document from '../Document';
 
 /**
  * Main panel which contains all report elements like doc elements, parameters and styles.
@@ -12,27 +11,52 @@ export default class MainPanel {
         this.rootElement = rootElement;
         this.rb = rb;
         this.headerItem = new MainPanelItem(
-            'band', null, headerBand,
-            { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false, visible: this.rb.getDocumentProperties().getValue('header') }, rb);
+            'band', null, headerBand, {
+                hasChildren: true,
+                showAdd: false,
+                showDelete: false,
+                hasDetails: false,
+                visible: this.rb.getDocumentProperties().getValue('header')
+            }, rb);
 
         this.documentItem = new MainPanelItem(
-            'band', null, contentBand,
-            { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false }, rb);
+            'band', null, contentBand, {
+                hasChildren: true,
+                showAdd: false,
+                showDelete: false,
+                hasDetails: false
+            }, rb);
 
         this.footerItem = new MainPanelItem(
-            'band', null, footerBand,
-            { hasChildren: true, showAdd: false, showDelete: false, hasDetails: false, visible: this.rb.getDocumentProperties().getValue('footer') }, rb);
+            'band', null, footerBand, {
+                hasChildren: true,
+                showAdd: false,
+                showDelete: false,
+                hasDetails: false,
+                visible: this.rb.getDocumentProperties().getValue('footer')
+            }, rb);
 
         this.parametersItem = new MainPanelItem(
-            'parameter', null, parameterContainer,
-            { hasChildren: true, showAdd: rb.getProperty('adminMode'), showDelete: false, hasDetails: false }, rb);
+            'parameter', null, parameterContainer, {
+                hasChildren: true,
+                showAdd: rb.getProperty('adminMode'),
+                showDelete: false,
+                hasDetails: false
+            }, rb);
 
         this.stylesItem = new MainPanelItem(
-            'style', null, styleContainer,
-            { hasChildren: true, showAdd: true, showDelete: false, hasDetails: false }, rb);
+            'style', null, styleContainer, {
+                hasChildren: true,
+                showAdd: true,
+                showDelete: false,
+                hasDetails: false
+            }, rb);
 
         this.documentPropertiesItem = new MainPanelItem(
-            'documentProperties', null, rb.getDocumentProperties(), { showDelete: false, hasDetails: true }, rb);
+            'documentProperties', null, rb.getDocumentProperties(), {
+                showDelete: false,
+                hasDetails: true
+            }, rb);
 
         this.items = [
             this.headerItem,
@@ -90,10 +114,10 @@ export default class MainPanel {
     }
 
     render() {
-        let panel = $('#rbro_main_panel_list');
+        let panel = document.getElementById('rbro_main_panel_list');
         this.appendChildren(panel, this.items);
 
-        $('#rbro_main_panel_sizer').mousedown(event => {
+        document.getElementById('rbro_main_panel_sizer').addEventListener('mousedown', (event) => {
             this.dragMainPanelSizer =  true;
             this.dragMainPanelSizerStartX = event.pageX;
         });
@@ -106,7 +130,6 @@ export default class MainPanel {
             el.append(item.getElement());
             let children = item.getChildren();
             if (children.length > 0) {
-                let elChildren = $(`#${item.getId()}_children`);
                 this.appendChildren(el, children);
             }
         }
@@ -145,16 +168,16 @@ export default class MainPanel {
     }
 
     updateMainPanelWidth(mainPanelWidth) {
-        $('#rbro_main_panel').css({ width: mainPanelWidth });
-        $('#rbro_main_panel_sizer').css({ left: mainPanelWidth });
-        $('#rbro_detail_panel').css({ left: mainPanelWidth + this.mainPanelSizerWidth });
+        document.getElementById('rbro_main_panel').style.width = mainPanelWidth + 'px';
+        document.getElementById('rbro_main_panel_sizer').style.left = mainPanelWidth + 'px';
+        document.getElementById('rbro_detail_panel').style.left = (mainPanelWidth + this.mainPanelSizerWidth)  + 'px';
         // calculate width of main panel, detail panel and sidebar (if available)
         let totalPanelWidth = mainPanelWidth + this.mainPanelSizerWidth + 390;
         if (this.rb.getProperty('menuSidebar')) {
             totalPanelWidth += 92;
-            $('#reportbro .rbroLogo').css({ width: mainPanelWidth });
+            document.getElementById('reportbro').querySelector('.rbroLogo').style.width = mainPanelWidth + 'px';
         }
-        $('#rbro_document_panel').css({ width: `calc(100% - ${totalPanelWidth}px)` });
+        document.getElementById('rbro_document_panel').style.width = `calc(100% - ${totalPanelWidth}px)`;
     }
 
     checkMainPanelWidth(mainPanelWidth) {

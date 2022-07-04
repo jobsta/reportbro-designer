@@ -58,11 +58,13 @@ export default class Style {
      * @returns {String[]}
      */
     getFields() {
-        return ['id', 'name', 'bold', 'italic', 'underline', 'strikethrough',
+        return [
+            'id', 'name', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment',
             'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
-            'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'];
+            'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'
+        ];
     }
 
     getId() {
@@ -225,7 +227,9 @@ export default class Style {
 }
 
 // Verdana, Arial
-// ['Courier', 'Courier-Bold', 'Courier-BoldOblique', 'Courier-Oblique', 'Helvetica', 'Helvetica-Bold', 'Helvetica-BoldOblique', 'Helvetica-Oblique', 'Symbol', 'Times-Bold', 'Times-BoldItalic', 'Times-Italic', 'Times-Roman', 'ZapfDingbats']
+// ['Courier', 'Courier-Bold', 'Courier-BoldOblique', 'Courier-Oblique', 'Helvetica', 'Helvetica-Bold',
+// 'Helvetica-BoldOblique', 'Helvetica-Oblique', 'Symbol', 'Times-Bold', 'Times-BoldItalic', 'Times-Italic',
+// 'Times-Roman', 'ZapfDingbats']
 Style.font = {
     courier: 'courier',
     helvetica: 'helvetica',

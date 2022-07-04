@@ -77,10 +77,12 @@ export default class DocumentProperties {
      * @returns {String[]}
      */
     getFields() {
-        return ['pageFormat', 'pageWidth', 'pageHeight', 'unit', 'orientation',
+        return [
+            'pageFormat', 'pageWidth', 'pageHeight', 'unit', 'orientation',
             'contentHeight', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom',
             'header', 'headerSize', 'headerDisplay', 'footer', 'footerSize', 'footerDisplay',
-            'patternLocale', 'patternCurrencySymbol'];
+            'patternLocale', 'patternCurrencySymbol'
+        ];
     }
 
     getId() {
