@@ -156,58 +156,77 @@ export default class TableElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(x), top: this.rb.toPixel(y) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(x);
+            this.el.style.top = this.rb.toPixel(y);
         }
     }
 
     updateStyle() {
-        let elTable = this.el.find('table');
+        let elTable = this.el.querySelector('table');
         let i;
         if (this.border === TableElement.border.grid || this.border === TableElement.border.frameRow ||
                 this.border === TableElement.border.frame) {
-            elTable.css({
-                'border-style': 'solid',
-                'border-width': this.borderWidthVal + 'px',
-                'border-color': this.borderColor
-            });
+            elTable.style.borderStyle = 'solid';
+            elTable.style.borderWidth = this.borderWidthVal + 'px';
+            elTable.style.borderColor = this.borderColor;
         } else {
-            elTable.css({ 'border-style': 'none' });
+            elTable.style.borderStyle = 'none';
         }
-        let styleProperties;
+        let borderStyle = '', borderWidth = '', borderColor = '';
         if (this.border === TableElement.border.grid || this.border === TableElement.border.frameRow ||
                 this.border === TableElement.border.row) {
-            styleProperties = {
-                'border-style': 'solid none solid none',
-                'border-width': this.borderWidthVal + 'px',
-                'border-color': this.borderColor
-            };
+            borderStyle = 'solid none solid none';
+            borderWidth = this.borderWidthVal + 'px';
+            borderColor = this.borderColor;
         } else {
-            styleProperties = { 'border-style': 'none' };
+            borderStyle = 'none';
         }
-        this.headerData.getElement().css(styleProperties);
+        const elHeader = this.headerData.getElement();
+        elHeader.style.borderStyle = borderStyle;
+        elHeader.style.borderWidth = borderWidth;
+        elHeader.style.borderColor = borderColor;
         for (i=0; i < this.contentDataRows.length; i++) {
-            this.contentDataRows[i].getElement().css(styleProperties);
+            const elRow = this.contentDataRows[i].getElement();
+            elRow.style.borderStyle = borderStyle;
+            elRow.style.borderWidth = borderWidth;
+            elRow.style.borderColor = borderColor;
         }
-        this.footerData.getElement().css(styleProperties);
+        const elFooter = this.footerData.getElement();
+        elFooter.style.borderStyle = borderStyle;
+        elFooter.style.borderWidth = borderWidth;
+        elFooter.style.borderColor = borderColor;
 
         if (this.border === TableElement.border.grid) {
-            styleProperties = {
-                'border-style': 'none solid none solid',
-                'border-width': this.borderWidthVal + 'px',
-                'border-color': this.borderColor
-            };
+            borderStyle = 'none solid none solid';
+            borderWidth = this.borderWidthVal + 'px';
+            borderColor = this.borderColor;
         } else {
-            styleProperties = { 'border-style': 'none' };
+            borderStyle = 'none';
         }
-        this.headerData.getElement().find('td').css(styleProperties);
+        for (const elTd of this.headerData.getElement().querySelectorAll('td')) {
+            elTd.style.borderStyle = borderStyle;
+            elTd.style.borderWidth = borderWidth;
+            elTd.style.borderColor = borderColor;
+        }
         for (i=0; i < this.contentDataRows.length; i++) {
-            this.contentDataRows[i].getElement().find('td').css(styleProperties);
+            for (const elTd of this.contentDataRows[i].getElement().querySelectorAll('td')) {
+                elTd.style.borderStyle = borderStyle;
+                elTd.style.borderWidth = borderWidth;
+                elTd.style.borderColor = borderColor;
+            }
         }
-        this.footerData.getElement().find('td').css(styleProperties);
+        for (const elTd of this.footerData.getElement().querySelectorAll('td')) {
+            elTd.style.borderStyle = borderStyle;
+            elTd.style.borderWidth = borderWidth;
+            elTd.style.borderColor = borderColor;
+        }
 
-        this.el.removeClass('rbroBorderTableGrid rbroBorderTableFrameRow rbroBorderTableFrame rbroBorderTableRow rbroBorderTableNone');
-        this.el.addClass('rbroBorderTable' + this.border.charAt(0).toUpperCase() + this.border.slice(1));
+        for (const tableClass of [
+                'rbroBorderTableGrid', 'rbroBorderTableFrameRow', 'rbroBorderTableFrame',
+                'rbroBorderTableRow', 'rbroBorderTableNone']) {
+            this.el.classList.remove(tableClass);
+        }
+        this.el.classList.add('rbroBorderTable' + this.border.charAt(0).toUpperCase() + this.border.slice(1));
     }
 
     /**
@@ -225,10 +244,12 @@ export default class TableElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
+        return [
+            'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
+        ];
     }
 
     getElementType() {
@@ -240,7 +261,8 @@ export default class TableElement extends DocElement {
         let elSizerContainer = this.getSizerContainerElement();
         // create sizers (to indicate selection) which do not support resizing
         for (let sizer of ['NE', 'SE', 'SW', 'NW']) {
-            elSizerContainer.append($(`<div class="rbroSizer rbroSizer${sizer} rbroSizerMove"></div>`));
+            elSizerContainer.append(
+                utils.createElement('div', { class: `rbroSizer rbroSizer${sizer} rbroSizerMove` }));
         }
     }
 
@@ -257,23 +279,18 @@ export default class TableElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div class="rbroDocElement rbroTableElement">
-                <table id="rbro_el_table${this.id}">
-                    <thead id="rbro_el_table_header${this.id}">
-                    </thead>
-                    <tbody id="rbro_el_table_content${this.id}">
-                    </tbody>
-                    <tfoot id="rbro_el_table_footer${this.id}">
-                    </tfoot>
-                </table>
-            </div>`);
+        this.el = utils.createElement('div', { class: 'rbroDocElement rbroTableElement' });
+        const elTable = utils.createElement('table', { id: `rbro_el_table${this.id}` });
+        elTable.append(utils.createElement('thead', { id: `rbro_el_table_header${this.id}` }));
+        elTable.append(utils.createElement('tbody', { id: `rbro_el_table_content${this.id}` }));
+        elTable.append(utils.createElement('tfoot', { id: `rbro_el_table_footer${this.id}` }));
+        this.el.append(elTable);
         this.appendToContainer();
         this.registerEventHandlers();
-        $(`#rbro_el_table${this.id}`).css('width', (this.widthVal + 1) + 'px');
+        elTable.style.width = (this.widthVal + 1) + 'px';
     }
 
     remove() {
-        super.remove();
         this.rb.deleteDataObject(this.headerData);
         this.headerData.remove();
         this.headerData = null;
@@ -285,6 +302,8 @@ export default class TableElement extends DocElement {
         this.rb.deleteDataObject(this.footerData);
         this.footerData.remove();
         this.footerData = null;
+
+        super.remove();
     }
 
     /**
@@ -360,7 +379,7 @@ export default class TableElement extends DocElement {
         }
         this.width = '' + newTableWidth;
         this.widthVal = newTableWidth;
-        $(`#rbro_el_table${this.id}`).css('width', (newTableWidth + 1) + 'px');
+        document.getElementById(`rbro_el_table${this.id}`).style.width = (newTableWidth + 1) + 'px';
     }
 
     updateName() {
@@ -368,7 +387,7 @@ export default class TableElement extends DocElement {
         if (this.dataSource.trim() !== '') {
             this.name += ' ' + this.dataSource;
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
+        document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }
 
     /**
@@ -485,7 +504,8 @@ export default class TableElement extends DocElement {
         let existingColumns = utils.convertInputToNumber(this.columns);
 
         // delete table with current settings and restore below with new columns, necessary for undo/redo
-        let cmd = new AddDeleteDocElementCmd(false, this.getPanelItem().getPanelName(),
+        let cmd = new AddDeleteDocElementCmd(
+            false, this.getPanelItem().getPanelName(),
             this.toJS(), this.id, this.getContainerId(), -1, this.rb);
         cmdGroup.addCommand(cmd);
 

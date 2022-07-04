@@ -10,6 +10,10 @@ import * as utils from '../utils';
 export default class TextElement extends DocElement {
     constructor(id, initialData, rb) {
         super(rb.getLabel('docElementText'), id, 100, 20, rb);
+        this.elContent = null;
+        this.elContentText = null;
+        this.elContentTextData = null;
+
         this.content = '';
         this.richText = false;
         this.richTextContent = null;
@@ -74,7 +78,6 @@ export default class TextElement extends DocElement {
         this.spreadsheet_colspan = '';
         this.spreadsheet_addEmptyRow = false;
         this.spreadsheet_textWrap = false;
-
         this.setInitialData(initialData);
 
         this.borderWidthVal = utils.convertInputToNumber(this.borderWidth);
@@ -96,7 +99,7 @@ export default class TextElement extends DocElement {
     handleDoubleClick(event) {
         super.handleDoubleClick(event);
         // focus text content input element and set caret at end of content
-        let el = $('#rbro_doc_element_content').get(0);
+        let el = document.getElementById('rbro_doc_element_content');
         el.focus();
         if (typeof el.selectionStart === 'number') {
             el.selectionStart = el.selectionEnd = el.value.length;
@@ -137,7 +140,7 @@ export default class TextElement extends DocElement {
         } else if (field === 'richTextContent') {
             this.updateRichTextContent(value);
         } else if (field === 'richTextHtml') {
-            $(`#rbro_el_content_text_data${this.id}`).html(value);
+            document.getElementById(`rbro_el_content_text_data${this.id}`).innerHTML = value;
         }
     }
 
@@ -146,7 +149,8 @@ export default class TextElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'width', 'height', 'content', 'richText', 'richTextContent', 'richTextHtml', 'eval',
+        return [
+            'x', 'y', 'width', 'height', 'content', 'richText', 'richTextContent', 'richTextHtml', 'eval',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',
@@ -160,7 +164,8 @@ export default class TextElement extends DocElement {
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan',
-            'spreadsheet_addEmptyRow', 'spreadsheet_textWrap'];
+            'spreadsheet_addEmptyRow', 'spreadsheet_textWrap'
+        ];
     }
 
     getElementType() {
@@ -169,16 +174,15 @@ export default class TextElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(x), top: this.rb.toPixel(y),
-                width: this.rb.toPixel(width), height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(x);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = this.rb.toPixel(width);
+            this.el.style.height = this.rb.toPixel(height);
         }
         // update inner text element size
         let contentSize = this.getContentSize(width, height, this.getStyle());
-        let styleProperties = {};
-        styleProperties['width'] = this.rb.toPixel(contentSize.width);
-        styleProperties['height'] = this.rb.toPixel(contentSize.height);
-        $(`#rbro_el_content_text${this.id}`).css(styleProperties);
+        this.elContentText.style.width = this.rb.toPixel(contentSize.width);
+        this.elContentText.style.height = this.rb.toPixel(contentSize.height);
     }
 
     getStyle() {
@@ -247,15 +251,17 @@ export default class TextElement extends DocElement {
 
     updateStyle() {
         let styleProperties = {};
-        let borderStyleProperties = {};
         let style = this.getStyle();
+        let borderStyle, borderWidth = '', borderColor = '';
         let contentSize = this.getContentSize(this.getDisplayWidth(), this.getDisplayHeight(), style);
         styleProperties['width'] = this.rb.toPixel(contentSize.width);
         styleProperties['height'] = this.rb.toPixel(contentSize.height);
         let horizontalAlignment = style.getValue('horizontalAlignment');
         let verticalAlignment = style.getValue('verticalAlignment');
-        let alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() + horizontalAlignment.slice(1);
-        let valignClass = 'rbroDocElementVAlign' + verticalAlignment.charAt(0).toUpperCase() + verticalAlignment.slice(1);
+        let alignClass = 'rbroDocElementAlign' +
+            horizontalAlignment.charAt(0).toUpperCase() + horizontalAlignment.slice(1);
+        let valignClass = 'rbroDocElementVAlign' +
+            verticalAlignment.charAt(0).toUpperCase() + verticalAlignment.slice(1);
         styleProperties['vertical-align'] = verticalAlignment;
         styleProperties['background-color'] = style.getValue('backgroundColor');
         if (!this.richText) {
@@ -287,14 +293,14 @@ export default class TextElement extends DocElement {
         styleProperties['line-height'] = style.getValue('lineSpacing');
         if (style.getValue('borderLeft') || style.getValue('borderTop') ||
                 style.getValue('borderRight') || style.getValue('borderBottom')) {
-            borderStyleProperties['border-style'] = style.getValue('borderTop') ? 'solid' : 'none';
-            borderStyleProperties['border-style'] += style.getValue('borderRight') ? ' solid' : ' none';
-            borderStyleProperties['border-style'] += style.getValue('borderBottom') ? ' solid' : ' none';
-            borderStyleProperties['border-style'] += style.getValue('borderLeft') ? ' solid' : ' none';
-            borderStyleProperties['border-width'] = style.getValue('borderWidthVal') + 'px';
-            borderStyleProperties['border-color'] = style.getValue('borderColor');
+            borderStyle = style.getValue('borderTop') ? 'solid' : 'none';
+            borderStyle += style.getValue('borderRight') ? ' solid' : ' none';
+            borderStyle += style.getValue('borderBottom') ? ' solid' : ' none';
+            borderStyle += style.getValue('borderLeft') ? ' solid' : ' none';
+            borderWidth = style.getValue('borderWidthVal') + 'px';
+            borderColor = style.getValue('borderColor');
         } else {
-            borderStyleProperties['border-style'] = 'none';
+            borderStyle = 'none';
         }
         if (style.getValue('paddingLeft') !== '' || style.getValue('paddingTop') !== '' ||
                 style.getValue('paddingRight') !== '' || style.getValue('paddingBottom') !== '') {
@@ -305,9 +311,18 @@ export default class TextElement extends DocElement {
         } else {
             styleProperties['padding'] = '';
         }
-        $(`#rbro_el_content${this.id}`).css(borderStyleProperties);
-        $(`#rbro_el_content${this.id}`).removeClass().addClass('rbroContentContainerHelper').addClass(alignClass).addClass(valignClass);
-        $(`#rbro_el_content_text${this.id}`).css(styleProperties);
+        this.elContent.style.borderStyle = borderStyle;
+        this.elContent.style.borderWidth = borderWidth;
+        this.elContent.style.borderColor = borderColor;
+        this.elContent.className = '';
+        this.elContent.classList.add('rbroContentContainerHelper');
+        this.elContent.classList.add(alignClass);
+        this.elContent.classList.add(valignClass);
+        let cssText = '';
+        for (const styleName in styleProperties) {
+            cssText += styleName + ': ' + styleProperties[styleName] + ';';
+        }
+        this.elContentText.style.cssText = cssText;
     }
 
     hasBorderSettings() {
@@ -315,17 +330,22 @@ export default class TextElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroTextElement"></div>`);
+        this.el = utils.createElement('td', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroTextElement' });
+        this.elContent = utils.createElement(
+            'div', { id: `rbro_el_content${this.id}`, class: 'rbroContentContainerHelper' });
+        this.elContentText = utils.createElement(
+            'div', { id: `rbro_el_content_text${this.id}`, class: 'rbroDocElementContentText' });
+        this.elContentTextData = utils.createElement('span', { id: `rbro_el_content_text_data${this.id}` });
+
         // rbroContentContainerHelper contains border styles and alignment classes
         // rbroDocElementContentText contains specific styles
         // span is needed to preserve whitespaces and word-wrap of actual text content
-        this.el
-            .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`)
-                    .append($(`<span id="rbro_el_content_text_data${this.id}"></span>`))
-            ));
+        this.elContentText.append(this.elContentTextData);
+        this.elContent.append(this.elContentText);
+        this.el.append(this.elContent);
+
         this.appendToContainer();
-        $(`#rbro_el_content_text_data${this.id}`).text(this.content);
+        this.elContentTextData.textContent =  this.content;
         super.registerEventHandlers();
     }
 
@@ -335,9 +355,10 @@ export default class TextElement extends DocElement {
         } else {
             this.name = value;
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
-        $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
-        $(`#rbro_el_content_text_data${this.id}`).text(value);
+        const elMenuItemName = document.getElementById(`rbro_menu_item_name${this.id}`);
+        elMenuItemName.textContent = this.name;
+        elMenuItemName.setAttribute('title', this.name);
+        this.elContentTextData.textContent = value;
     }
 
     updateRichTextContent(delta) {
@@ -361,8 +382,9 @@ export default class TextElement extends DocElement {
         } else {
             this.name = text;
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
-        $(`#rbro_menu_item_name${this.id}`).attr('title', this.name);
+        const elMenuItemName = document.getElementById(`rbro_menu_item_name${this.id}`);
+        elMenuItemName.textContent = this.name;
+        elMenuItemName.setAttribute('title', this.name);
     }
 
     /**
@@ -371,7 +393,7 @@ export default class TextElement extends DocElement {
      */
     setupRichText() {
         this.updateRichTextContent(this.richTextContent);
-        $(`#rbro_el_content_text_data${this.id}`).html(this.richTextHtml);
+        this.elContentTextData.innerHTML = this.richTextHtml;
     }
 
     /**

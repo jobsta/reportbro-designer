@@ -5,7 +5,6 @@
     <meta charset="utf-8"/>
     <link href="base.css" rel="stylesheet" type="text/css"/>
     <link href="../dist/reportbro.css" rel="stylesheet" type="text/css"/>
-    <script src="../dist/ext/jquery.js"></script>
     <script src="../dist/reportbro.js"></script>
 
     <style type="text/css">
@@ -18,20 +17,19 @@
             src: url("fonts/lobster.ttf");
         }
     </style>
-
-
-    <script type="text/javascript">
-$(document).ready(function() {
-    var rb = $('#reportbro').reportBro({
-        localStorageReportKey: 'reportBroDemoDefault',
-        //remove reportServerUrl if you want to use the default report server for a quick start
-        reportServerUrl: 'http://localhost:5000/report/run',
-        additionalFonts: [ { name: 'Tangerine', value: 'tangerine'}, { name: 'Lobster', value: 'lobster'} ] });
-    $('#reportbro').reportBro('loadLocalReport');
-});
-    </script>
 </head>
 <body>
     <div id="reportbro"></div>
+
+    <script type="text/javascript">
+
+const rb = new ReportBro(document.getElementById('reportbro'), {
+    localStorageReportKey: 'reportBroDemoDefault',
+    //remove reportServerUrl if you want to use the default report server for a quick start
+    reportServerUrl: 'http://localhost:5000/report/run',
+    additionalFonts: [ { name: 'Tangerine', value: 'tangerine'}, { name: 'Lobster', value: 'lobster'} ] });
+rb.loadLocalReport();
+
+    </script>
 </body>
 </html>

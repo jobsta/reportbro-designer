@@ -3,8 +3,8 @@ import DocElement from '../elements/DocElement';
 import Document from '../Document';
 
 /**
- * Command to move a menu panel item. In case the item is moved to a different container (e.g. from content to header band)
- * the corresponding doc element is moved to the new container as well.
+ * Command to move a menu panel item. In case the item is moved to a different container
+ * (e.g. from content to header band) the corresponding doc element is moved to the new container as well.
  * @class
  */
 export default class MovePanelItemCmd extends Command {
@@ -37,11 +37,15 @@ export default class MovePanelItemCmd extends Command {
         if (this.moveToParentId === this.oldParentId && this.oldPosition < pos) {
             pos--;
         }
-        this.moveTo(this.moveToParentId, pos, (this.moveToContainerId !== this.oldContainerId) ? this.moveToContainerId : null);
+        this.moveTo(
+            this.moveToParentId, pos,
+            (this.moveToContainerId !== this.oldContainerId) ? this.moveToContainerId : null);
     }
 
     undo() {
-        this.moveTo(this.oldParentId, this.oldPosition, (this.moveToContainerId !== this.oldContainerId) ? this.oldContainerId : null);
+        this.moveTo(
+            this.oldParentId, this.oldPosition,
+            (this.moveToContainerId !== this.oldContainerId) ? this.oldContainerId : null);
     }
 
     moveTo(toParentId, toPosition, toContainerId) {

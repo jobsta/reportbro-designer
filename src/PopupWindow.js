@@ -22,19 +22,20 @@ export default class PopupWindow {
     }
 
     render() {
-        this.elWindow = $('<div class="rbroPopupWindow rbroHidden"></div>');
-        this.elContent = $('<div class="rbroPopupWindowContent"></div>')
-            .mouseup(event => {
-                // stop propagation so popup window is not closed
-                event.stopPropagation();
-            });
+        this.elWindow = utils.createElement('div', { class: 'rbroPopupWindow rbroHidden' });
+        this.elContent = utils.createElement('div', { class: 'rbroPopupWindowContent' });
+        this.elContent.addEventListener('mouseup', (event) => {
+            // stop propagation so popup window is not closed
+            event.stopPropagation();
+        });
         this.elWindow.append(this.elContent);
-        let btn = $('<div class="rbroButton rbroRoundButton rbroPopupWindowCancel rbroIcon-cancel"></div>')
-            .click(event => {
-                this.hide();
-            });
+        let btn = utils.createElement(
+            'div', { class: 'rbroButton rbroRoundButton rbroPopupWindowCancel rbroIcon-cancel' });
+        btn.addEventListener('click', (event) => {
+            this.hide();
+        });
         this.elWindow.append(btn);
-        $('body').append(this.elWindow);
+        document.body.append(this.elWindow);
     }
 
     /**
@@ -59,16 +60,16 @@ export default class PopupWindow {
      * otherwise the text input of element with tagId will be used (default).
      */
     show(items, objId, tagId, field, type, quill) {
-        let winWidth = $(window).width();
-        let winHeight = $(window).height();
+        let winWidth = window.innerWidth;
+        let winHeight = window.innerHeight;
         let elSearch = null;
         let quillSelectionRange = null;
-        this.input = (tagId !== '') ? $('#' + tagId) : null;
+        this.input = (tagId !== '') ? document.getElementById(tagId) : null;
         this.objId = objId;
         this.type = type;
         this.items = items;
-        this.elContent.empty();
-        $('#rbro_background_overlay').remove();
+        utils.emptyElement(this.elContent);
+        //document.getElementById('rbro_background_overlay').remove();
 
         if (quill) {
             // save selection of rich text editor because selection is lost when editor looses focus
@@ -81,51 +82,56 @@ export default class PopupWindow {
             this.createTestDataTable(items);
             let width = Math.round(winWidth * 0.8);
             let height = Math.round(winHeight * 0.8);
-            this.elWindow.css({ left: Math.round((winWidth - width) / 2) + 'px', top: Math.round((winHeight - height) / 2) + $(window).scrollTop() + 'px',
-                    width: width + 'px', height: height + 'px' });
-            $('body').append($('<div id="rbro_background_overlay" class="rbroBackgroundOverlay"></div>'));
-            $('body').addClass('rbroFixedBackground'); // no scroll bars for background while popup is shown
+            const windowScrollPos = document.querySelector('html').scrollTop;
+            this.elWindow.style.left = Math.round((winWidth - width) / 2) + 'px';
+            this.elWindow.style.top = (Math.round((winHeight - height) / 2) + windowScrollPos) + 'px';
+            this.elWindow.style.width = width + 'px';
+            this.elWindow.style.height = height + 'px';
+            document.body.append(
+                utils.createElement('div', { id: 'rbro_background_overlay', class: 'rbroBackgroundOverlay' }));
+            document.body.classList.add('rbroFixedBackground'); // no scroll bars for background while popup is shown
         } else {
             if (type === PopupWindow.type.parameterSet || type === PopupWindow.type.parameterAppend) {
-                elSearch = $(`<input class="rbroPopupSearch" placeholder="${this.rb.getLabel('parameterSearchPlaceholder')}">`)
-                    .on('input', event => {
-                        this.filterParameters(elSearch.val());
-                    });
+                elSearch = utils.createElement(
+                    'input', { class: 'rbroPopupSearch', placeholder: this.rb.getLabel('parameterSearchPlaceholder') });
+                elSearch.addEventListener('input', (event) => {
+                    this.filterParameters(elSearch.value);
+                });
                 this.elContent.append(elSearch);
             }
-            let ul = $('<ul></ul>')
-                .mousedown(event => {
-                    // prevent default so blur event of input is not triggered,
-                    // otherwise popup window would be closed before click event handler of selected
-                    // item is triggered
-                    event.preventDefault();
-                });
+            let ul = utils.createElement('ul');
+            ul.addEventListener('mousedown', (event) => {
+                // prevent default so blur event of input is not triggered,
+                // otherwise popup window would be closed before click event handler of selected
+                // item is triggered
+                event.preventDefault();
+            });
             for (let item of items) {
-                let li = $('<li></li>');
+                let li = utils.createElement('li');
                 if (item.separator) {
                     if ((type === PopupWindow.type.parameterSet ||
                             type === PopupWindow.type.parameterAppend) && item.id) {
-                        li.attr('id', 'parameter_group_' + item.id);
+                        li.setAttribute('id', 'parameter_group_' + item.id);
                     }
                     let separatorClass = 'rbroPopupItemSeparator';
                     if (item.separatorClass) {
                         separatorClass += ' ' + item.separatorClass;
                     }
-                    li.attr('class', separatorClass);
+                    li.setAttribute('class', separatorClass);
                 } else {
                     if ((type === PopupWindow.type.parameterSet ||
                             type === PopupWindow.type.parameterAppend) && item.id) {
-                        li.attr('id', 'parameter_' + item.id);
+                        li.setAttribute('id', 'parameter_' + item.id);
                     }
-                    li.mousedown(event => {
+                    li.addEventListener('mousedown', (event) => {
                         if (type === PopupWindow.type.pattern) {
-                            this.input.val(item.name);
-                            this.input.trigger('input');
+                            this.input.value = item.name;
+                            this.input.dispatchEvent(new Event('input'));
                             this.hide();
                         } else if (type === PopupWindow.type.parameterSet) {
                             let paramText = '${' + item.name + '}';
-                            this.input.val(paramText);
-                            this.input.trigger('input');
+                            this.input.value = paramText;
+                            this.input.dispatchEvent(new Event('input'));
                             autosize.update(this.input);
                             this.hide();
                         } else if (type === PopupWindow.type.parameterAppend) {
@@ -135,37 +141,40 @@ export default class PopupWindow {
                                     quill.insertText(quillSelectionRange.index, paramText);
                                 }
                             } else {
-                                utils.insertAtCaret(this.input.get(0), paramText);
+                                utils.insertAtCaret(this.input, paramText);
                                 autosize.update(this.input);
-                                this.input.trigger('input');
+                                this.input.dispatchEvent(new Event('input'));
                             }
                             this.hide();
                         }
                         event.preventDefault();
                     });
                 }
-                li.append(`<div class="rbroPopupItemHeader">${item.name}</div>`);
+                li.append(utils.createElement('div', { class: 'rbroPopupItemHeader' }, item.name));
                 if (item.description && item.description !== '') {
-                    li.append(`<div class="rbroPopupItemDescription">${item.description}</div>`);
+                    li.append(utils.createElement('div', { class: 'rbroPopupItemDescription' }, item.description));
                 }
                 ul.append(li);
             }
             this.elContent.append(ul);
-            let offset = this.input.offset();
+            let offset = utils.getElementOffset(this.input);
             let top = offset.top;
             // test if popup window should be shown above or below input field
             if (top < (winHeight / 2) || top < 300) {
                 // make sure there is enough space for popup below input, otherwise just show it over input field
-                if ((top + this.input.height() + 300) < winHeight) {
-                    top += this.input.height();
+                if ((top + this.input.clientHeight + 300) < winHeight) {
+                    top += this.input.clientHeight;
                 }
             } else {
                 top -= 300;
             }
-            this.elWindow.css({ left: offset.left + 'px', top: top + 'px', width: '400px', height: '300px' });
+            this.elWindow.style.left = offset.left + 'px';
+            this.elWindow.style.top = top + 'px';
+            this.elWindow.style.width = '400px';
+            this.elWindow.style.height = '300px';
         }
 
-        this.elWindow.removeClass('rbroHidden');
+        this.elWindow.classList.remove('rbroHidden');
         this.visible = true;
         if (elSearch !== null) {
             elSearch.focus();
@@ -186,23 +195,25 @@ export default class PopupWindow {
                         this.objId, 'testData', testDataStr, SetValueCmd.type.text, this.rb);
                     this.rb.executeCommand(cmd);
                 }
-                $('#rbro_background_overlay').remove();
+                document.getElementById('rbro_background_overlay').remove();
             }
-            this.elWindow.addClass('rbroHidden');
-            this.elContent.empty();
-            $('body').removeClass('rbroFixedBackground');
+            this.elWindow.classList.add('rbroHidden');
+            utils.emptyElement(this.elContent);
+            document.body.classList.remove('rbroFixedBackground');
             this.visible = false;
             this.items = null;
         }
     }
 
     addTestDataRow(tableBody, parameters, testData) {
-        let newRow = $('<tr></tr>');
-        newRow.append($('<td></td>').append($('<div class="rbroButton rbroDeleteButton rbroIcon-cancel"></div>')
-            .click(event => {
-                $(event.target).parent().parent().remove();
-            })
-        ));
+        let newRow = utils.createElement('tr');
+        const elColumn = utils.createElement('td');
+        const elDeleteButton = utils.createElement('div', { class: 'rbroButton rbroDeleteButton rbroIcon-cancel' });
+        elDeleteButton.addEventListener('click', (event) => {
+            event.target.parentElement.parentElement.remove();
+        });
+        elColumn.append(elDeleteButton);
+        newRow.append(elColumn);
         for (let parameter of parameters) {
             if (parameter.allowMultiple && parameter.arraySize > 0) {
                 let values = null;
@@ -211,7 +222,7 @@ export default class PopupWindow {
                 }
                 for (let i=0; i < parameter.arraySize; i++) {
                     let data = '';
-                    if (Array.isArray(values) && i < values.length) {
+                    if (values && Array.isArray(values) && i < values.length) {
                         data = values[i];
                     }
                     this.appendColumn(newRow, parameter, data);
@@ -234,43 +245,45 @@ export default class PopupWindow {
     }
 
     appendColumn(row, parameter, data) {
-        let input = $(`<input type="text" value="${data}">`)
-            .focus(event => {
-                input.parent().addClass('rbroHasFocus');
-            })
-            .blur(event => {
-                input.parent().removeClass('rbroHasFocus');
-            });
+        let input = utils.createElement('input', { type: 'text', value: data });
+        input.addEventListener('focus', (event) => {
+            input.parentElement.classList.add('rbroHasFocus');
+        });
+        input.addEventListener('blur', (event) => {
+            input.parentElement.classList.remove('rbroHasFocus');
+        });
 
         if (parameter.type === Parameter.type.number) {
             utils.setInputDecimal(input);
         } else if (parameter.type === Parameter.type.date) {
-            input.attr('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+            input.setAttribute('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
         }
-        row.append($('<td></td>').append(input));
+        const elTd = utils.createElement('td');
+        elTd.append(input);
+        row.append(elTd);
     }
 
     getTestData(excludeParameter, excludeParameterArrayItemIndex) {
         let testData = [];
-        let rows = this.elContent.find('tbody').find('tr');
+        let rows = this.elContent.querySelector('tbody').querySelectorAll('tr');
         for (let row of rows) {
-            let inputs = $(row).find('input');
+            let inputs = row.querySelectorAll('input');
             let rowData = {};
             let i = 0;
             for (let parameter of this.parameters) {
                 if (parameter.allowMultiple && parameter.arraySize > 0) {
                     let fieldData = [];
                     for (let j=0; j < parameter.arraySize; j++) {
-                        let input = inputs.eq(i);
+                        let input = inputs[i];
                         if (parameter !== excludeParameter || j !== excludeParameterArrayItemIndex) {
-                            fieldData.push(input.val().trim());
+                            fieldData.push(input.value.trim());
                         }
                         i++;
                     }
                     rowData[parameter.name] = fieldData;
                 } else {
-                    let input = inputs.eq(i);
-                    rowData[parameter.name] = input.val().trim();
+                    let input = inputs[i];
+                    rowData[parameter.name] = input.value.trim();
                     i++;
                 }
             }
@@ -280,41 +293,45 @@ export default class PopupWindow {
     }
 
     createTestDataTable(items) {
-        let div = $('<div></div>');
-        let table = $('<table></table>');
-        let tableHeaderRow = $('<tr></tr>');
-        let tableBody = $('<tbody></tbody>');
+        let div = utils.createElement('div');
+        let table = utils.createElement('table');
+        let tableHeaderRow = utils.createElement('tr');
+        let tableBody = utils.createElement('tbody');
         let i;
-        tableHeaderRow.append('<th></th>');
+        tableHeaderRow.append(utils.createElement('th'));
         for (let parameter of this.parameters) {
             if (parameter.allowMultiple) {
                 for (let arrayIndex=0; arrayIndex < parameter.arraySize; arrayIndex++) {
-                    let th = $('<th></th>');
-                    th.append($(`<span>${parameter.name} ${arrayIndex + 1}</span>`));
+                    let th = utils.createElement('th');
+                    th.append(utils.createElement('span', {}, `${parameter.name} ${arrayIndex + 1}`));
                     if (arrayIndex === 0) {
-                        th.append($(`<div class="rbroButton rbroRoundButton rbroIcon-plus"></div>`)
-                            .click(event => {
-                                let testData = this.getTestData(null, -1);
-                                parameter.arraySize++;
-                                this.createTestDataTable(testData);
-                            })
-                        );
+                        const elAddButton = utils.createElement(
+                            'div', { class: 'rbroButton rbroRoundButton rbroIcon-plus' });
+                        elAddButton.addEventListener('click', (event) => {
+                            let testData = this.getTestData(null, -1);
+                            parameter.arraySize++;
+                            this.createTestDataTable(testData);
+                        });
+                        th.append(elAddButton);
                     } else {
-                        th.append($(`<div class="rbroButton rbroRoundButton rbroIcon-minus"></div>`)
-                            .click(event => {
-                                let testData = this.getTestData(parameter, arrayIndex);
-                                parameter.arraySize--;
-                                this.createTestDataTable(testData);
-                            })
-                        );
+                        const elRemoveButton = utils.createElement(
+                            'div', { class: 'rbroButton rbroRoundButton rbroIcon-minus' });
+                        elRemoveButton.addEventListener('click', (event) => {
+                            let testData = this.getTestData(parameter, arrayIndex);
+                            parameter.arraySize--;
+                            this.createTestDataTable(testData);
+                        });
+                        th.append(elRemoveButton);
                     }
                     tableHeaderRow.append(th);
                 }
             } else {
-                tableHeaderRow.append(`<th>${parameter.name}</th>`);
+                tableHeaderRow.append(utils.createElement('th', {}, parameter.name));
             }
         }
-        table.append($('<thead></thead>').append(tableHeaderRow));
+        const elTableHeader = utils.createElement('thead');
+        elTableHeader.append(tableHeaderRow);
+        table.append(elTableHeader);
         if (items.length === 0) {
             this.addTestDataRow(tableBody, this.parameters, null);
         }
@@ -323,12 +340,16 @@ export default class PopupWindow {
         }
         table.append(tableBody);
         div.append(table);
-        div.append($(`<div class="rbroFullWidthButton"><div class="rbroButton rbroPopupWindowButton">${this.rb.getLabel('parameterAddTestData')}</div></div>`)
-            .click(event => {
-                this.addTestDataRow(tableBody, this.parameters, null);
-            })
-        );
-        this.elContent.empty().append(div);
+        const elAddButton = utils.createElement('div', { class: 'rbroButton rbroFullWidthButton' });
+        elAddButton.append(
+            utils.createElement(
+                'div', { class: 'rbroButton rbroPopupWindowButton' }, this.rb.getLabel('parameterAddTestData')));
+        elAddButton.addEventListener('click', (event) => {
+            this.addTestDataRow(tableBody, this.parameters, null);
+        });
+        div.append(elAddButton);
+        utils.emptyElement(this.elContent);
+        this.elContent.append(div);
     }
 
     /**
@@ -344,31 +365,32 @@ export default class PopupWindow {
             for (let item of this.items) {
                 if (item.separator) {
                     if (currentGroupId !== null) {
-                        // hide groups (data source parameters and parameter maps) if they do not contain any visible items
+                        // hide groups (data source parameters and parameter maps) if they do not contain
+                        // any visible items
                         if (groupCount > 0) {
-                            $('#parameter_group_' + currentGroupId).show();
+                            document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
                         } else {
-                            $('#parameter_group_' + currentGroupId).hide();
+                            document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
                         }
                     }
                     currentGroupId = item.id ? item.id : null;
                     groupCount = 0;
                 } else {
                     if (item.nameLowerCase.indexOf(searchVal) !== -1) {
-                        $('#parameter_' + item.id).show();
+                        document.getElementById('parameter_' + item.id).style.display = 'block';
                         if (currentGroupId !== -1) {
                             groupCount++;
                         }
                     } else {
-                        $('#parameter_' + item.id).hide();
+                        document.getElementById('parameter_' + item.id).style.display = 'none';
                     }
                 }
             }
             if (currentGroupId !== null) {
                 if (groupCount > 0) {
-                    $('#parameter_group_' + currentGroupId).show();
+                    document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
                 } else {
-                    $('#parameter_group_' + currentGroupId).hide();
+                    document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
                 }
             }
         }

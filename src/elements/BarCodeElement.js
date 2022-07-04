@@ -1,6 +1,7 @@
 import DocElement from './DocElement';
 import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
+import * as utils from '../utils';
 
 /**
  * Barcode doc element. Currently only Code-128 is supported.
@@ -20,7 +21,6 @@ export default class BarCodeElement extends DocElement {
         this.spreadsheet_addEmptyRow = false;
         this.setInitialData(initialData);
         this.name = this.rb.getLabel('docElementBarCode');
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
     }
 
     setup(openPanelItem) {
@@ -47,9 +47,11 @@ export default class BarCodeElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'height', 'content', 'format', 'displayValue', 'errorCorrectionLevel',
+        return [
+            'x', 'y', 'height', 'content', 'format', 'displayValue', 'errorCorrectionLevel',
             'printIf', 'removeEmptyElement',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'
+        ];
     }
 
     getElementType() {
@@ -58,9 +60,10 @@ export default class BarCodeElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(x), top: this.rb.toPixel(y),
-                width: this.rb.toPixel(width), height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(x);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = this.rb.toPixel(width);
+            this.el.style.height = this.rb.toPixel(height);
         }
     }
 
@@ -73,8 +76,8 @@ export default class BarCodeElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroBarCodeElement"></div>`);
-        this.elBarCode = $('<canvas></canvas>');
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroBarCodeElement' });
+        this.elBarCode = utils.createElement('canvas', { id: `rbro_el_barcode${this.id}` } );
         this.el.append(this.elBarCode);
         this.appendToContainer();
         this.updateBarCode();
@@ -98,7 +101,7 @@ export default class BarCodeElement extends DocElement {
                 margin: 0,
                 errorCorrectionLevel : this.errorCorrectionLevel
             };
-            QRCode.toCanvas(this.elBarCode.get(0), content, options);
+            QRCode.toCanvas(this.elBarCode, content, options);
         } else {
             let valid = false;
             let options = {
@@ -107,7 +110,7 @@ export default class BarCodeElement extends DocElement {
             };
             if (this.content !== '' && this.content.indexOf('${') === -1) {
                 try {
-                    this.elBarCode.JsBarcode(this.content, options);
+                    JsBarcode('#' + this.elBarCode.id, this.content, options);
                     valid = true;
                 } catch (ex) {
                 }
@@ -133,11 +136,11 @@ export default class BarCodeElement extends DocElement {
                     content = '1234';
                 }
                 // clear width and height which is set on canvas element when QR code is generated
-                this.elBarCode.css('width', '');
-                this.elBarCode.css('height', '');
-                this.elBarCode.JsBarcode(content, options);
+                this.elBarCode.style.width = '';
+                this.elBarCode.style.height = '';
+                JsBarcode('#' + this.elBarCode.id, content, options);
             }
-            this.widthVal = this.elBarCode.width();
+            this.widthVal = this.elBarCode.clientWidth;
             this.width = '' + this.widthVal;
         }
     }

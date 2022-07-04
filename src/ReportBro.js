@@ -101,7 +101,7 @@ export default class ReportBro {
                     this.properties[prop] = properties[prop];
                 }
             }
-            $.extend( this.locale, properties['locale'] || {} );
+            Object.assign(this.locale, properties['locale'] || {});
         }
         if (this.properties.additionalFonts.length > 0) {
             this.properties.fonts = this.properties.fonts.concat(this.properties.additionalFonts);
@@ -126,7 +126,8 @@ export default class ReportBro {
             this.properties.patternDates = this.properties.patternDates.concat(this.properties.patternAdditionalDates);
         }
         if (this.properties.patternAdditionalNumbers.length > 0) {
-            this.properties.patternNumbers = this.properties.patternNumbers.concat(this.properties.patternAdditionalNumbers);
+            this.properties.patternNumbers =
+                this.properties.patternNumbers.concat(this.properties.patternAdditionalNumbers);
         }
 
         this.document = new Document(element, this.properties.showGrid, this);
@@ -140,8 +141,9 @@ export default class ReportBro {
         this.documentProperties = new DocumentProperties(this);
         this.clipboardElements = [];
 
-        this.mainPanel = new MainPanel(element, this.headerBand, this.contentBand, this.footerBand,
-                this.parameterContainer, this.styleContainer, this);
+        this.mainPanel = new MainPanel(
+            element, this.headerBand, this.contentBand, this.footerBand,
+            this.parameterContainer, this.styleContainer, this);
         this.menuPanel = new MenuPanel(element, this);
         this.activeDetailPanel = 'none';
         this.detailPanels = {
@@ -167,7 +169,7 @@ export default class ReportBro {
         this.documentProperties.setPanelItem(this.mainPanel.getDocumentPropertiesItem());
         this.initObjectMap();
 
-        $(document).keydown(event => {
+        this.keydownEventListener = (event) => {
             if (this.detailPanels[this.activeDetailPanel].isKeyEventDisabled()) {
                 return;
             }
@@ -177,7 +179,8 @@ export default class ReportBro {
                 switch (event.which) {
                     case 67: {
                         // Ctrl + C: copy
-                        if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
+                        if (!(event.target instanceof HTMLInputElement ||
+                                event.target instanceof HTMLTextAreaElement)) {
                             let cleared = false;
                             let idMap = {};
                             let serializedObj;
@@ -202,8 +205,9 @@ export default class ReportBro {
                                                 obj.appendContainerChildren(nestedElements);
                                                 for (let nestedElement of nestedElements) {
                                                     if (nestedElement.getId() in idMap) {
-                                                        // in case a nested element is also selected we make sure to add it only once to
-                                                        // the clipboard objects and to add it after its parent element
+                                                        // in case a nested element is also selected we make sure
+                                                        // to add it only once to the clipboard objects and to
+                                                        // add it after its parent element
                                                         for (i = 0; i < this.clipboardElements.length; i++) {
                                                             if (nestedElement.getId() === this.clipboardElements[i].id) {
                                                                 this.clipboardElements.splice(i, 1);
@@ -232,7 +236,8 @@ export default class ReportBro {
                     }
                     case 86: {
                         // Ctrl + V: paste
-                        if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement)) {
+                        if (!(event.target instanceof HTMLInputElement ||
+                                event.target instanceof HTMLTextAreaElement)) {
                             let cmd;
                             let cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
                             let mappedContainerIds = {};
@@ -411,7 +416,11 @@ export default class ReportBro {
                     }
                 }
             }
-        });
+        };
+        document.addEventListener('keydown', this.keydownEventListener);
+
+        this.render();
+        this.setup();
     }
 
     /**
@@ -419,12 +428,17 @@ export default class ReportBro {
      */
     addDefaultParameters() {
         for (let parameterData of [
-                { name: 'page_count', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true },
-                { name: 'page_number', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true }]) {
+            { name: 'page_count', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true },
+            { name: 'page_number', type: Parameter.type.number, eval: false, editable: false, showOnlyNameType: true }
+            ]) {
             let parameter = new Parameter(this.getUniqueId(), parameterData, this);
             let parentPanel = this.mainPanel.getParametersItem();
+            // set hasChildren and showAdd to true because parameters can have children depending on their
+            // type (for map and list) -> children and add button are shown/hidden dynamically
             let panelItem = new MainPanelItem(
-                'parameter', parentPanel, parameter, { hasChildren: false, showAdd: false, showDelete: false, draggable: false }, this);
+                'parameter', parentPanel, parameter, {
+                    hasChildren: true, showAdd: true, showDelete: true, draggable: false }, this
+            );
             parameter.setPanelItem(panelItem);
             parentPanel.appendChild(panelItem);
             parameter.setup();
@@ -433,24 +447,25 @@ export default class ReportBro {
     }
 
     render() {
-        this.element.empty();
+        utils.emptyElement(this.element);
         if (this.getProperty('menuSidebar')) {
-            this.element.addClass('rbroMenuPanelSidebar');
+            this.element.classList.add('rbroMenuPanelSidebar');
         }
         if (this.getProperty('theme') === 'classic') {
-            $('body').addClass('rbroClassicTheme');
+            document.body.classList.add('rbroClassicTheme');
         } else {
-            $('body').addClass('rbroDefaultTheme');
+            document.body.classList.add('rbroDefaultTheme');
         }
-        this.element.append('<div class="rbroLogo"></div>');
-        this.element.append('<div class="rbroMenuPanel" id="rbro_menu_panel"></div>');
-        this.element.append(
-            `<div class="rbroContainer">
-                <div class="rbroMainPanel" id="rbro_main_panel"><ul id="rbro_main_panel_list"></ul></div>
-                <div class="rbroMainPanelSizer" id="rbro_main_panel_sizer"></div>
-                <div class="rbroDetailPanel" id="rbro_detail_panel"></div>
-                <div class="rbroDocumentPanel" id="rbro_document_panel"></div>
-            </div>`);
+        this.element.append(utils.createElement('div', { class: 'rbroLogo' }));
+        this.element.append(utils.createElement('div', { id: 'rbro_menu_panel', class: 'rbroMenuPanel' }));
+        const elContainer = utils.createElement('div', { class: 'rbroContainer' });
+        const elMainPanel = utils.createElement('div', { id: 'rbro_main_panel', class: 'rbroMainPanel' });
+        elMainPanel.append(utils.createElement('ul', { id: 'rbro_main_panel_list' }));
+        elContainer.append(elMainPanel);
+        elContainer.append(utils.createElement('div', { id: 'rbro_main_panel_sizer', class: 'rbroMainPanelSizer' }));
+        elContainer.append(utils.createElement('div', { id: 'rbro_detail_panel', class: 'rbroDetailPanel' }));
+        elContainer.append(utils.createElement('div', { id: 'rbro_document_panel', class: 'rbroDocumentPanel' }));
+        this.element.append(elContainer);
         this.mainPanel.render();
         this.menuPanel.render();
         for (let panelName in this.detailPanels) {
@@ -461,26 +476,26 @@ export default class ReportBro {
         this.popupWindow.render();
         this.updateMenuButtons();
 
-        $(document).mouseup(event => {
+        this.mouseupEventListener = (event) => {
             this.mainPanel.mouseUp(event);
             this.document.mouseUp(event);
             this.popupWindow.hide();
-        });
+        };
+        document.addEventListener('mouseup', this.mouseupEventListener);
 
-        $(window).resize(event => {
+        window.addEventListener('resize', (event) => {
             this.document.windowResized();
         });
 
-        this.element
-            .on('dragstart', event => {
-                // disable dragging per default, otherwise e.g. a text selection can be dragged in Chrome
-                event.preventDefault();
-           })
-           .mousemove(event => {
-               if (!this.mainPanel.processMouseMove(event)) {
-                   this.document.processMouseMove(event);
-               }
-           });
+        this.element.addEventListener('dragstart', (event) => {
+            // disable dragging per default, otherwise e.g. a text selection can be dragged in Chrome
+            event.preventDefault();
+        });
+        this.element.addEventListener('mousemove', (event) => {
+           if (!this.mainPanel.processMouseMove(event)) {
+               this.document.processMouseMove(event);
+           }
+       });
     }
 
     /**
@@ -488,7 +503,7 @@ export default class ReportBro {
      * @returns {Number}
      */
     getWidth() {
-        return this.element.width();
+        return this.element.clientWidth;
     }
 
     setup() {
@@ -551,7 +566,8 @@ export default class ReportBro {
 
     /**
      * Returns a list of all number and date patterns.
-     * @returns {Object[]} Each item contains name (String), optional description (String) and optional separator (Boolean).
+     * @returns {Object[]} Each item contains name (String), optional description (String) and
+     * optional separator (Boolean).
      */
     getPatterns() {
         let patterns = [];
@@ -806,9 +822,9 @@ export default class ReportBro {
     }
 
     updateMenuButtons() {
-        $('#rbro_menu_save').prop('disabled', !this.modified);
-        $('#rbro_menu_undo').prop('disabled', (this.lastCommandIndex < 0));
-        $('#rbro_menu_redo').prop('disabled', (this.lastCommandIndex >= (this.commandStack.length - 1)));
+        document.getElementById('rbro_menu_save').disabled = !this.modified;
+        document.getElementById('rbro_menu_undo').disabled = (this.lastCommandIndex < 0);
+        document.getElementById('rbro_menu_redo').disabled = (this.lastCommandIndex >= (this.commandStack.length - 1));
     }
 
     updateMenuActionButtons() {
@@ -834,52 +850,60 @@ export default class ReportBro {
                 }
             }
         }
+
+        const menuButtons = document.getElementById('rbo_menu_elements').querySelectorAll('.rbroMenuButton');
         if (elementCount > 1) {
             // allow alignment of elements if their parent container has the same x/y offset
             if (elementSameContainerOffsetX) {
-                $('#rbro_menu_align').show();
+                document.getElementById('rbro_menu_align').removeAttribute('style');
             } else {
-                $('#rbro_menu_align').hide();
+                document.getElementById('rbro_menu_align').style.display = 'none';
             }
             if (elementSameContainerOffsetY) {
-                $('#rbro_menu_valign').show();
+                document.getElementById('rbro_menu_valign').removeAttribute('style');
             } else {
-                $('#rbro_menu_valign').hide();
+                document.getElementById('rbro_menu_valign').style.display = 'none';
             }
-            $('#rbo_menu_elements .rbroMenuButton').hide();
-            $('#rbro_menu_column_actions').hide();
-            $('#rbro_menu_row_actions').hide();
+            for (const menuButton of menuButtons) {
+                menuButton.style.display = 'none';
+            }
+            document.getElementById('rbro_menu_column_actions').style.display = 'none';
+            document.getElementById('rbro_menu_row_actions').style.display = 'none';
         } else {
             let obj = null;
             if (this.selections.length === 1) {
                 obj = this.getDataObject(this.selections[0]);
             }
-            $('#rbro_menu_align').hide();
-            $('#rbro_menu_valign').hide();
+            document.getElementById('rbro_menu_align').style.display = 'none';
+            document.getElementById('rbro_menu_valign').style.display = 'none';
             if (obj instanceof TableTextElement) {
-                $('#rbo_menu_elements .rbroMenuButton').hide();
-                let table = obj.getTable();
-                let parent = obj.getParent();
-                if (table !== null && utils.convertInputToNumber(table.getValue('columns')) !== 1) {
-                    $('#rbro_menu_column_delete').show();
-                } else {
-                    $('#rbro_menu_column_delete').hide();
+                for (const menuButton of menuButtons) {
+                    menuButton.style.display = 'none';
                 }
-                $('#rbro_menu_column_actions').show();
+                const table = obj.getTable();
+                const parent = obj.getParent();
+                if (table !== null && utils.convertInputToNumber(table.getValue('columns')) !== 1) {
+                    document.getElementById('rbro_menu_column_delete').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_menu_column_delete').style.display = 'none';
+                }
+                document.getElementById('rbro_menu_column_actions').removeAttribute('style');
                 if (table !== null && parent !== null && parent.getValue('bandType') === Band.bandType.content) {
                     if (utils.convertInputToNumber(table.getValue('contentRows')) !== 1) {
-                        $('#rbro_menu_row_delete').show();
+                        document.getElementById('rbro_menu_row_delete').removeAttribute('style');
                     } else {
-                        $('#rbro_menu_row_delete').hide();
+                        document.getElementById('rbro_menu_row_delete').style.display = 'none';
                     }
-                    $('#rbro_menu_row_actions').show();
+                    document.getElementById('rbro_menu_row_actions').removeAttribute('style');
                 } else {
-                    $('#rbro_menu_row_actions').hide();
+                    document.getElementById('rbro_menu_row_actions').style.display = 'none';
                 }
             } else {
-                $('#rbo_menu_elements .rbroMenuButton').show();
-                $('#rbro_menu_column_actions').hide();
-                $('#rbro_menu_row_actions').hide();
+                for (const menuButton of menuButtons) {
+                    menuButton.removeAttribute('style');
+                }
+                document.getElementById('rbro_menu_column_actions').style.display = 'none';
+                document.getElementById('rbro_menu_row_actions').style.display = 'none';
             }
         }
     }
@@ -1093,7 +1117,8 @@ export default class ReportBro {
     updateSelectionDrag(diffX, diffY, dragType, dragContainer, store) {
         let cmdGroup;
         if (store) {
-            cmdGroup = new CommandGroupCmd(dragType === DocElement.dragType.element ? 'Update position' : 'Resize', this);
+            cmdGroup = new CommandGroupCmd(
+                (dragType === DocElement.dragType.element) ? 'Update position' : 'Resize', this);
         }
         for (let selectionId of this.selections) {
             let obj = this.getDataObject(selectionId);
@@ -1113,7 +1138,6 @@ export default class ReportBro {
      * @param {Style.alignment} alignment
      */
     alignSelections(alignment) {
-        let alignVal = NaN;
         let x, y, width, height;
         let minX = Number.MAX_VALUE, maxX = Number.MIN_VALUE, minY = Number.MAX_VALUE, maxY = Number.MIN_VALUE;
         let elementCount = 0;
@@ -1204,7 +1228,7 @@ export default class ReportBro {
         if (val === '') {
             return '0px';
         }
-        if ($.type(val) === 'string') {
+        if (typeof(val) === 'string') {
             val = parseFloat(val.replace(',', '.'));
             if (isNaN(val)) {
                 return '0px';
@@ -1217,8 +1241,9 @@ export default class ReportBro {
      * Shows a global loading image which disables all controls.
      */
     showLoading() {
-        if ($('#rbro_loading_div').length === 0) {
-            $('body').append('<div id="rbro_loading_div" class="rbroLoadingIndicator"></div>');
+        if (!document.getElementById('rbro_loading_div')) {
+            document.body.append(
+                utils.createElement('div', { id: 'rbro_loading_div', class: 'rbroLoadingIndicator' }));
         }
     }
 
@@ -1226,7 +1251,10 @@ export default class ReportBro {
      * Hides global loading image.
      */
     hideLoading() {
-        $('#rbro_loading_div').remove();
+        const elLoadingDiv = document.getElementById('rbro_loading_div');
+        if (elLoadingDiv) {
+            elLoadingDiv.remove();
+        }
     }
 
     getTestData() {
@@ -1275,24 +1303,33 @@ export default class ReportBro {
 
         // use headers from properties and set basic auth header if basic auth info is available
         let headers = requestParams.reportServerHeaders;
+        headers['Content-Type'] = 'application/json';
         if (requestParams.reportServerBasicAuth) {
             headers['Authorization'] = 'Basic ' + btoa(
                 requestParams.reportServerBasicAuth.username + ':' + requestParams.reportServerBasicAuth.password);
         }
 
         this.showLoading();
-        $.ajax(requestParams.reportServerUrl, {
-            data: JSON.stringify({
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), requestParams.reportServerTimeout);
+        fetch(requestParams.reportServerUrl, {
+            signal: controller.signal,
+            method: 'PUT',
+            headers: headers,
+            body: JSON.stringify({
                 report: this.getReport(),
                 outputFormat: DocumentProperties.outputFormat.pdf,
                 data: data,
                 isTestData: isTestData
             }),
-            type: "PUT", contentType: "application/json",
-            headers: headers,
-            timeout: requestParams.reportServerTimeout,
-            crossDomain: requestParams.reportServerUrlCrossDomain,
-            success: function(data) {
+        }).then((response) => {
+            if (!response.ok) {
+              throw Error(response.statusText);
+            }
+            return response;
+        }).then((response) => response.text())
+            .then((data) => {
+                clearTimeout(timeoutId);
                 self.hideLoading();
                 if (data.substr(0, 4) === 'key:') {
                     self.reportKey = data.substr(4);
@@ -1309,16 +1346,11 @@ export default class ReportBro {
                         alert('preview failed');
                     }
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
+            }).catch((error) => {
+                clearTimeout(timeoutId);
                 self.hideLoading();
-                if (textStatus === "timeout") {
-                    alert('preview failed (timeout)');
-                } else {
-                    alert('preview failed');
-                }
-            }
-        });
+                alert('preview failed');
+            });
     }
 
     getRequestParameters() {
@@ -1585,7 +1617,7 @@ export default class ReportBro {
 
         for (let error of errors) {
             if (error.object_id) {
-                $(`#rbro_menu_item${error.object_id}`).addClass('rbroError');
+                document.getElementById(`rbro_menu_item${error.object_id}`).classList.add('rbroError');
                 let obj = this.getDataObject(error.object_id);
                 if (obj !== null) {
                     obj.addError(error);
@@ -1603,9 +1635,18 @@ export default class ReportBro {
      * Clears all error classes (which highlight elements with errors) and all error messages.
      */
     clearErrors() {
-        $('.rbroMenuItem').removeClass('rbroError');
-        $('.rbroFormRow').removeClass('rbroError');
-        $('.rbroErrorMessage').text('');
+        const menuItems = document.querySelectorAll('.rbroMenuItem');
+        for (const menuItem of menuItems) {
+            menuItem.classList.remove('rbroError');
+        }
+        const formRows = document.querySelectorAll('.rbroFormRow');
+        for (const formRow of formRows) {
+            formRow.classList.remove('rbroError');
+        }
+        const errorMessages = document.querySelectorAll('.rbroErrorMessage');
+        for (const errorMessage of errorMessages) {
+            errorMessage.textContent = '';
+        }
         for (let objId in this.objectMap) {
             this.objectMap[objId].clearErrors();
         }
@@ -1620,8 +1661,8 @@ export default class ReportBro {
             this.detailPanels[panelName].destroy();
         }
         this.element.remove();
-        $(document).off('keydown');
-        $(document).off('mouseup');
+        document.removeEventListener('keydown', this.keydownEventListener);
+        document.removeEventListener('mouseup', this.mouseupEventListener);
     }
 
     /**
@@ -1711,16 +1752,18 @@ export default class ReportBro {
     createParameter(parameterData) {
         let parameter = new Parameter(parameterData.id, parameterData, this);
         let parentPanel = this.mainPanel.getParametersItem();
+        // set hasChildren and showAdd to true because parameters can have children depending on their
+        // type (for map and list) -> children and add button are shown/hidden dynamically
         let panelItem = new MainPanelItem(
             'parameter', parentPanel, parameter,
-            { hasChildren: true, showAdd: parameter.getValue('editable'), showDelete: parameter.getValue('editable'), draggable: true }, this);
+            { hasChildren: true, showAdd: true, showDelete: true, draggable: true }, this);
         parameter.setPanelItem(panelItem);
         parentPanel.appendChild(panelItem);
         parameter.setup();
         if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
-            $(`#rbro_menu_item_add${parameter.getId()}`).hide();
-            $(`#rbro_menu_item_children${parameter.getId()}`).hide();
-            $(`#rbro_menu_item_children_toggle${parameter.getId()}`).hide();
+            document.getElementById(`rbro_menu_item_add${parameter.getId()}`).style.display = 'none';
+            document.getElementById(`rbro_menu_item_children${parameter.getId()}`).style.display = 'none';
+            document.getElementById(`rbro_menu_item_children_toggle${parameter.getId()}`).style.display = 'none';
         }
         this.addParameter(parameter);
         let maxId = parameter.getMaxId();

@@ -705,13 +705,13 @@ ul ul .rbroMenuItemText {
     padding-right: 35px;
 }
 
-.rbroXlsxDownlaodButton {
+.rbroXlsxDownloadButton {
     font-size: 26px;
     top: 0;
     right: 30px;
 }
 
-.rbroTabButton .rbroIcon-cancel:hover, .rbroXlsxDownlaodButton:hover {
+.rbroTabButton .rbroIcon-cancel:hover, .rbroXlsxDownloadButton:hover {
     color: var(--rbro-detailPanel-button-color);
 }
 

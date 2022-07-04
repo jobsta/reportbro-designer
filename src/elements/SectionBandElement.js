@@ -11,7 +11,8 @@ import * as utils from '../utils';
 export default class SectionBandElement extends DocElement {
     constructor(id, initialData, bandType, rb) {
         let name = (bandType === Band.bandType.header) ?
-            rb.getLabel('bandHeader') : ((bandType === Band.bandType.footer) ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
+            rb.getLabel('bandHeader') :
+            ((bandType === Band.bandType.footer) ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
         super(name, id, 0, 100, rb);
         this.setupComplete = false;
         this.band = null;
@@ -35,7 +36,9 @@ export default class SectionBandElement extends DocElement {
         if (this.linkedContainerId === null) {
             this.linkedContainerId = this.rb.getUniqueId();
         }
-        this.band = new Band(this.bandType, true, this.linkedContainerId, 'section_' + this.bandType + '_' + this.linkedContainerId, this.rb);
+        this.band = new Band(
+            this.bandType, true, this.linkedContainerId, 'section_' + this.bandType + '_' + this.linkedContainerId,
+            this.rb);
         this.band.init(this);
         this.rb.addContainer(this.band);
         this.setupComplete = true;
@@ -108,8 +111,9 @@ export default class SectionBandElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { top: this.rb.toPixel(y), width: '100%', height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = '100%';
+            this.el.style.height = this.rb.toPixel(height);
             if (this.setupComplete) {
                 // update section element because section band dividers are contained in section
                 let parent = this.getParent();
@@ -141,9 +145,11 @@ export default class SectionBandElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroSectionBandElement rbroElementContainer"></div>`);
-        this.el.append($(`<div class="rbroDocumentBandDescription">${this.rb.getLabel('docElementSection')} ${this.name}</div>`));
-        $(`#rbro_el${this.parentId}`).append(this.el);
+        this.el = utils.createElement(
+            'div', { id: `rbro_el${this.id}`, class: 'rbroSectionBandElement rbroElementContainer' });
+        this.el.append(utils.createElement(
+            'div', { class: 'rbroDocumentBandDescription' }, this.rb.getLabel('docElementSection') + ' ' + this.name));
+        document.getElementById(`rbro_el${this.parentId}`).append(this.el);
     }
 
     getContentElement() {
@@ -157,9 +163,9 @@ export default class SectionBandElement extends DocElement {
     show(visible) {
         this.visible = visible;
         if (visible) {
-            $(`#rbro_el${this.id}`).removeClass('rbroHidden');
+            this.el.classList.remove('rbroHidden');
         } else {
-            $(`#rbro_el${this.id}`).addClass('rbroHidden');
+            this.el.classList.add('rbroHidden');
         }
     }
 

@@ -1,4 +1,5 @@
 import DocElement from './DocElement';
+import * as utils from '../utils'
 
 /**
  * Page break doc element. A page break triggers a new page when the document is printed.
@@ -35,9 +36,10 @@ export default class PageBreakElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(0), top: this.rb.toPixel(y),
-                width: '100%', height: this.rb.toPixel(1) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(0);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = '100%';
+            this.el.style.height = this.rb.toPixel(1);
         }
     }
 
@@ -50,7 +52,7 @@ export default class PageBreakElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroPageBreakElement"></div>`);
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroPageBreakElement' });
         this.appendToContainer();
         super.registerEventHandlers();
     }

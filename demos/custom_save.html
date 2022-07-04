@@ -5,8 +5,10 @@
     <meta charset="utf-8"/>
     <link href="base.css" rel="stylesheet" type="text/css"/>
     <link href="../dist/reportbro.css" rel="stylesheet" type="text/css"/>
-    <script src="../dist/ext/jquery.js"></script>
     <script src="../dist/reportbro.js"></script>
+</head>
+<body>
+    <div id="reportbro"></div>
 
     <script type="text/javascript">
 
@@ -18,38 +20,43 @@
 // up to you.
 ///////////////////////////////////////////////////////////////////////////////
 
+let rb;
+
 function saveReport() {
-    var report = $('#reportbro').reportBro('getReport');
+    const report = rb.getReport();
 
-    $.ajax('<your save controller url>', {
-        data: JSON.stringify(report),
-        type: "PUT", contentType: "application/json",
-        success: function(data) {
-            $('#reportbro').reportBro('setModified', false);
-            alert('report saved');
+    fetch('<your save controller url>', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert('saving report failed');
+        body: JSON.stringify(report),
+    }).then((response) => {
+        if (!response.ok) {
+          throw Error(response.statusText);
         }
-    });
+        return response;
+    }).then((response) => response.json())
+        .then((data) => {
+            rb.setModified(false);
+            alert('report saved');
+        }).catch((error) => {
+            alert('saving report failed');
+        });
 }
-    
-$(document).ready(function() {
-    var rb = $('#reportbro').reportBro({
-        //remove reportServerUrl if you want to use the default report server for a quick start
-        reportServerUrl: 'http://localhost:8000/reportbro/report/run',
-        saveCallback: saveReport
-    });
 
-    // load report saved in your application database
-    var report = null; // TODO: get report from server
-    if (report !== null) {
-        rb.reportBro('load', report);
-    }
+rb = new ReportBro(document.getElementById('reportbro'), {
+    //remove reportServerUrl if you want to use the default report server for a quick start
+    reportServerUrl: 'http://localhost:8000/reportbro/report/run',
+    saveCallback: saveReport
 });
-    </script> 
-</head>
-<body>
-    <div id="reportbro"></div>
+
+// load report saved in your application database
+const report = null; // TODO: get report from server
+if (report !== null) {
+    rb.load(report);
+}
+
+    </script>
 </body>
 </html>

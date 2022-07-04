@@ -97,7 +97,7 @@ export default class Container {
      */
     dragOver() {
         if (this.el !== null) {
-            this.el.addClass('rbroElementDragOver');
+            this.el.classList.add('rbroElementDragOver');
         }
     }
 

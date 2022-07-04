@@ -1,5 +1,6 @@
 import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
+import * as utils from '../utils';
 
 /**
  * Base class for all panels. Contains shared functionality.
@@ -33,22 +34,23 @@ export default class PanelBase {
     }
 
     setValue(propertyDescriptor, value, differentValues) {
-        let propertyId = `#${this.idPrefix}_${propertyDescriptor['fieldId']}`;
+        let propertyId = `${this.idPrefix}_${propertyDescriptor['fieldId']}`;
 
         if (differentValues) {
-            $(propertyId).addClass('rbroDifferentValues');
+            document.getElementById(propertyId).classList.add('rbroDifferentValues');
         } else {
-            $(propertyId).removeClass('rbroDifferentValues');
+            document.getElementById(propertyId).classList.remove('rbroDifferentValues');
         }
 
         // set value for current property
+        const el = document.getElementById(propertyId);
         if (propertyDescriptor['type'] === SetValueCmd.type.text) {
             if (differentValues) {
-                $(propertyId).val('');
-                $(propertyId).attr('placeholder', this.differentValuesLabel);
+                el.value = '';
+                el.setAttribute('placeholder', this.differentValuesLabel);
             } else {
-                $(propertyId).val(value);
-                $(propertyId).attr('placeholder', '');
+                el.value = value;
+                el.setAttribute('placeholder', '');
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.richText) {
             if (this.quill) {
@@ -59,58 +61,62 @@ export default class PanelBase {
                 }
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.select) {
-            $(propertyId).val(value);
+            el.value = value;
         } else if (propertyDescriptor['type'] === SetValueCmd.type.checkbox) {
             if (differentValues) {
-                $(propertyId).prop('checked', false);
+                el.checked = false;
             } else {
-                $(propertyId).prop('checked', value);
+                el.checked = value;
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.button) {
             if (differentValues) {
-                $(propertyId).removeClass('rbroButtonActive');
+                el.classList.remove('rbroButtonActive');
             } else {
                 if (value) {
-                    $(propertyId).addClass('rbroButtonActive');
+                    el.classList.add('rbroButtonActive');
                 } else {
-                    $(propertyId).removeClass('rbroButtonActive');
+                    el.classList.remove('rbroButtonActive');
                 }
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.buttonGroup) {
-            $(propertyId).find('button').removeClass('rbroButtonActive');
+            const elButtons = el.querySelectorAll('button');
+            for (const elButton of elButtons) {
+                elButton.classList.remove('rbroButtonActive');
+            }
             if (!differentValues) {
-                $(propertyId).find(`button[value="${value}"]`).addClass('rbroButtonActive');
+                el.querySelector(`button[value="${value}"]`).classList.add('rbroButtonActive');
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.color) {
+            const elColorSelect = document.getElementById(propertyId + '_select');
             if (differentValues) {
                 if (propertyDescriptor['allowEmpty']) {
-                    $(propertyId).val('');
-                    $(propertyId + '_select').css('color', '');
-                    $(propertyId + '_select').addClass('rbroTransparentColorSelect');
+                    el.value = '';
+                    elColorSelect.style.color = '';
+                    elColorSelect.classList.add('rbroTransparentColorSelect');
                 } else {
-                    $(propertyId).val('#000000');
-                    $(propertyId + '_select').css('color', '#000000');
-                    $(propertyId + '_select').removeClass('rbroTransparentColorSelect');
+                    el.value = '#000000';
+                    elColorSelect.style.color = '#000000';
+                    elColorSelect.classList.remove('rbroTransparentColorSelect');
                 }
             } else {
-                $(propertyId).val(value);
-                $(propertyId + '_select').css('color', value);
+                el.value = value;
+                elColorSelect.style.color = value;
                 if (value) {
-                    $(propertyId + '_select').removeClass('rbroTransparentColorSelect');
+                    elColorSelect.classList.remove('rbroTransparentColorSelect');
                 } else {
-                    $(propertyId + '_select').addClass('rbroTransparentColorSelect');
+                    elColorSelect.classList.add('rbroTransparentColorSelect');
                 }
             }
         } else if (propertyDescriptor['type'] === SetValueCmd.type.filename) {
             if (differentValues) {
-                $(propertyId).text(this.differentFilesLabel);
-                $(propertyId + '_container').removeClass('rbroHidden');
+                el.textContent = this.differentFilesLabel;
+                document.getElementById(propertyId + '_container').classList.remove('rbroHidden');
             } else {
-                $(propertyId).text(value);
+                el.textContent = value;
                 if (value === '') {
-                    $(propertyId + '_container').addClass('rbroHidden');
+                    document.getElementById(propertyId + '_container').classList.add('rbroHidden');
                 } else {
-                    $(propertyId + '_container').removeClass('rbroHidden');
+                    document.getElementById(propertyId + '_container').classList.remove('rbroHidden');
                 }
             }
         }
@@ -125,11 +131,11 @@ export default class PanelBase {
     }
 
     show() {
-        $('#' + this.panelId).removeClass('rbroHidden');
+        document.getElementById(this.panelId).classList.remove('rbroHidden');
     }
 
     hide() {
-        $('#' + this.panelId).addClass('rbroHidden');
+        document.getElementById(this.panelId).classList.add('rbroHidden');
     }
 
     /**
@@ -161,8 +167,15 @@ export default class PanelBase {
      * Updates displayed errors of currently selected data objects.
      */
     updateErrors() {
-        $(`#${this.panelId} .rbroFormRow`).removeClass('rbroError');
-        $(`#${this.panelId} .rbroErrorMessage`).text('');
+        const elPanel = document.getElementById(this.panelId);
+        const elFormRows = elPanel.querySelectorAll('.rbroFormRow');
+        const elErrorMessages = elPanel.querySelectorAll('.rbroErrorMessage');
+        for (const elFormRow of elFormRows) {
+            elFormRow.classList.remove('rbroError');
+        }
+        for (const elErrorMessage of elErrorMessages) {
+            elErrorMessage.textContent = '';
+        }
 
         let obj = this.rb.getSelectedObject();
         if (obj !== null) {
@@ -171,7 +184,7 @@ export default class PanelBase {
                 if (propertyDescriptor) {
                     if ('section' in propertyDescriptor) {
                         let sectionName = propertyDescriptor['section'];
-                        $(`#${this.idPrefix}_${sectionName}_header`).addClass('rbroError');
+                        document.getElementById(`${this.idPrefix}_${sectionName}_header`).classList.add('rbroError');
                     }
 
                     let errorMsg = this.rb.getLabel(error.msg_key);
@@ -182,7 +195,7 @@ export default class PanelBase {
 
                     // highlight row containing error
                     let rowId = this.getRowId(propertyDescriptor);
-                    $('#' + rowId).addClass('rbroError');
+                    document.getElementById(rowId).classList.add('rbroError');
                     // show error message
                     let errorMsgId;
                     if ('errorMsgId' in propertyDescriptor) {
@@ -190,7 +203,7 @@ export default class PanelBase {
                     } else {
                         errorMsgId = `${this.idPrefix}_${propertyDescriptor['fieldId']}_error`;
                     }
-                    $('#' + errorMsgId).html(errorMsg);
+                    document.getElementById(errorMsgId).innerHTML = errorMsg;
                 }
             }
         }
@@ -217,8 +230,9 @@ export default class PanelBase {
                 if (propertyDescriptor) {
                     if ('section' in propertyDescriptor) {
                         let sectionName = propertyDescriptor['section'];
-                        if (!$(`#${this.idPrefix}_${sectionName}_header`).hasClass('rbroPanelSectionHeaderOpen')) {
-                            $(`#${this.idPrefix}_${sectionName}_header`).trigger('click');
+                        const elHeader = document.getElementById(`${this.idPrefix}_${sectionName}_header`);
+                        if (!elHeader.classList.contains('rbroPanelSectionHeaderOpen')) {
+                            elHeader.dispatchEvent(new Event('click'));
                         }
                     }
                 }
@@ -232,7 +246,7 @@ export default class PanelBase {
                 if (propertyDescriptor) {
                     let rowId = this.getRowId(propertyDescriptor);
                     let elRow = document.getElementById(rowId);
-                    let rowOffset = elRow.offsetTop;
+                    let rowOffset = utils.getElementOffset(elRow).top;
                     if (firstErrorRowId === '' || rowOffset < firstErrorRowOffset) {
                         firstErrorRowId = rowId;
                         firstErrorRowOffset = rowOffset;
@@ -240,7 +254,7 @@ export default class PanelBase {
                 }
             }
             if (firstErrorRowId !== '') {
-                $('#rbro_detail_panel').scrollTop(firstErrorRowOffset);
+                document.getElementById('rbro_detail_panel').scrollTop = firstErrorRowOffset;
             }
         }
     }

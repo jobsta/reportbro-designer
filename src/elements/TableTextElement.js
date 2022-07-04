@@ -13,6 +13,9 @@ import * as utils from '../utils';
 export default class TableTextElement extends TextElement {
     constructor(id, initialData, rb) {
         super(id, initialData, rb);
+        this.elContent = null;
+        this.elContentText = null;
+        this.elContentTextData = null;
         this.colspan = initialData.colspan || '';
         this.colspanVal = 1;
         this.columnIndex = initialData.columnIndex;
@@ -29,48 +32,47 @@ export default class TableTextElement extends TextElement {
     }
 
     registerEventHandlers() {
-        this.el
-            .dblclick(event => {
-                if (!this.rb.isSelectedObject(this.id)) {
-                    if (this.rb.isSelectedObject(this.tableId)) {
-                        this.rb.selectObject(this.id, !event.shiftKey);
-                        event.stopPropagation();
-                    }
+        this.el.addEventListener('dblclick', (event) => {
+            if (!this.rb.isSelectedObject(this.id)) {
+                if (this.rb.isSelectedObject(this.tableId)) {
+                    this.rb.selectObject(this.id, !event.shiftKey);
+                    event.stopPropagation();
                 }
-            })
-            .mousedown(event => {
-                if (!this.rb.isSelectedObject(this.id)) {
-                    if (this.rb.isTableElementSelected(this.tableId)) {
-                        this.rb.selectObject(this.id, !event.shiftKey);
+            }
+        });
+        this.el.addEventListener('mousedown', (event) => {
+            if (!this.rb.isSelectedObject(this.id)) {
+                if (this.rb.isTableElementSelected(this.tableId)) {
+                    this.rb.selectObject(this.id, !event.shiftKey);
+                    event.stopPropagation();
+                }
+            } else {
+                if (event.shiftKey) {
+                    this.rb.deselectObject(this.id);
+                }
+                event.stopPropagation();
+            }
+        });
+        this.el.addEventListener('touchstart', (event) => {
+            if (!this.rb.isSelectedObject(this.id)) {
+                let timeSinceLastTouch = new Date().getTime() - this.lastTouchStartTime;
+                // if last touch event was just recently ("double click") we allow
+                // selection of this table text element. Otherwise element can only be
+                // selected if another table text is already selected.
+                if (timeSinceLastTouch < 1000) {
+                    if (this.rb.isSelectedObject(this.tableId)) {
+                        this.rb.selectObject(this.id, true);
                         event.stopPropagation();
                     }
                 } else {
-                    if (event.shiftKey) {
-                        this.rb.deselectObject(this.id);
-                    }
-                    event.stopPropagation();
-                }
-            })
-            .on('touchstart', event => {
-                if (!this.rb.isSelectedObject(this.id)) {
-                    let timeSinceLastTouch = new Date().getTime() - this.lastTouchStartTime;
-                    // if last touch event was just recently ("double click") we allow
-                    // selection of this table text element. Otherwise element can only be
-                    // selected if another table text is already selected.
-                    if (timeSinceLastTouch < 1000) {
-                        if (this.rb.isSelectedObject(this.tableId)) {
-                            this.rb.selectObject(this.id, true);
-                            event.stopPropagation();
-                        }
-                    } else {
-                        if (this.rb.isTableElementSelected(this.tableId)) {
-                            this.rb.selectObject(this.id, true);
-                            event.stopPropagation();
-                        }
+                    if (this.rb.isTableElementSelected(this.tableId)) {
+                        this.rb.selectObject(this.id, true);
+                        event.stopPropagation();
                     }
                 }
-                this.lastTouchStartTime = new Date().getTime();
-            });
+            }
+            this.lastTouchStartTime = new Date().getTime();
+        });
     }
 
     getContainerId() {
@@ -115,8 +117,8 @@ export default class TableTextElement extends TextElement {
      * Needed for cells with colspan > 1 because internal width is only for 1 cell but
      * displayed width in input field is total width for all cells included in colspan.
      *
-     * @param {Number} field - field name.
-     * @param {Number} value - value for update.
+     * @param {String} field - field name.
+     * @param {String} value - value for update.
      */
     getUpdateValue(field, value) {
         if (field === 'width') {
@@ -205,7 +207,7 @@ export default class TableTextElement extends TextElement {
             this.colspanVal = 1;
         }
         if (this.el !== null) {
-            this.el.attr('colspan', this.colspanVal);
+            this.el.setAttribute('colspan', this.colspanVal);
         }
     }
 
@@ -225,7 +227,8 @@ export default class TableTextElement extends TextElement {
      * @returns {String[]}
      */
     getProperties() {
-        let fields = ['xReadOnly', 'width', 'content', 'eval', 'colspan',
+        let fields = [
+            'xReadOnly', 'width', 'content', 'eval', 'colspan',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
             'font', 'fontSize', 'lineSpacing',
@@ -235,7 +238,8 @@ export default class TableTextElement extends TextElement {
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor',
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
-            'spreadsheet_textWrap'];
+            'spreadsheet_textWrap'
+        ];
         let tableBandObj = this.rb.getDataObject(this.parentId);
         if (tableBandObj !== null && tableBandObj.getValue('bandType') === Band.bandType.header) {
             fields.push('printIf');
@@ -259,12 +263,12 @@ export default class TableTextElement extends TextElement {
     updateDisplayInternalNotify(x, y, width, height, notifyTableElement) {
         if (this.el !== null) {
             // set td width to width - 1 because border consumes 1 pixel
-            let props = { width: this.rb.toPixel(width - 1) };
-            this.el.css(props);
+            this.el.style.width = this.rb.toPixel(width - 1);
         }
         // update inner text element width
         let contentSize = this.getContentSize(width, height, this.getStyle());
-        $(`#rbro_el_content_text${this.id}`).css({ width: this.rb.toPixel(contentSize.width), height: this.rb.toPixel(contentSize.height) });
+        this.elContentText.style.width = this.rb.toPixel(contentSize.width);
+        this.elContentText.style.height = this.rb.toPixel(contentSize.height);
 
         if (notifyTableElement) {
             let tableObj = this.rb.getDataObject(this.tableId);
@@ -372,16 +376,21 @@ export default class TableTextElement extends TextElement {
     }
 
     createElement() {
-        this.el = $(`<td id="rbro_el${this.id}" class="rbroTableTextElement"></td>`)
-            .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append($(`<div id="rbro_el_content_text${this.id}" class="rbroDocElementContentText"></div>`)
-                    .append($(`<span id="rbro_el_content_text_data${this.id}"></span>`))
-            ));
+        this.el = utils.createElement('td', { id: `rbro_el${this.id}`, class: 'rbroTableTextElement' });
+        this.elContent = utils.createElement(
+            'div', { id: `rbro_el_content${this.id}`, class: 'rbroContentContainerHelper' });
+        this.elContentText = utils.createElement(
+            'div', { id: `rbro_el_content_text${this.id}`, class: 'rbroDocElementContentText' });
+        this.elContentTextData = utils.createElement('span', { id: `rbro_el_content_text_data${this.id}` });
+        this.elContentText.append(this.elContentTextData);
+        this.elContent.append(this.elContentText);
+        this.el.append(this.elContent);
+
         if (this.colspanVal > 1) {
-            this.el.attr('colspan', this.colspanVal);
+            this.el.setAttribute('colspan', this.colspanVal);
         }
-        $(`#rbro_el_table_band${this.parentId}`).append(this.el);
-        $(`#rbro_el_content_text_data${this.id}`).text(this.content);
+        document.getElementById(`rbro_el_table_band${this.parentId}`).append(this.el);
+        document.getElementById(`rbro_el_content_text_data${this.id}`).textContent = this.content;
         this.registerEventHandlers();
     }
 

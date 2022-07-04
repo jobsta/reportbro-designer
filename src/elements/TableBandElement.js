@@ -13,7 +13,9 @@ import * as utils from '../utils';
  */
 export default class TableBandElement extends DocElement {
     constructor(id, initialData, bandType, rb) {
-        let name = (bandType === 'header') ? rb.getLabel('bandHeader') : ((bandType === 'footer') ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
+        let name = (bandType === 'header') ?
+            rb.getLabel('bandHeader') :
+            ((bandType === 'footer') ? rb.getLabel('bandFooter') : rb.getLabel('bandContent'));
         super(name, id, 0, 20, rb);
         this.bandType = bandType;
         this.repeatHeader = false;
@@ -75,7 +77,10 @@ export default class TableBandElement extends DocElement {
         if (field === 'height') {
             let height = utils.convertInputToNumber(value);
             this[field + 'Val'] = height;
-            this.getElement().find('td').css({ height: this.rb.toPixel(height) });
+            const elCells = this.getElement().querySelectorAll('td');
+            for (const elCell of elCells) {
+                elCell.style.height = this.rb.toPixel(height);
+            }
             for (let col of this.columnData) {
                 col.setValue(field, value);
             }
@@ -121,7 +126,7 @@ export default class TableBandElement extends DocElement {
     }
 
     updateStyle() {
-        this.el.css('background-color', this.backgroundColor);
+        this.el.style.backgroundColor = this.backgroundColor;
     }
 
     /**
@@ -149,15 +154,16 @@ export default class TableBandElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<tr id="rbro_el_table_band${this.id}" class="rbroTableBandElement"></tr>`);
-        $(`#rbro_el_table_${this.bandType}${this.parentId}`).append(this.el);
+        this.el = utils.createElement('tr', { id: `rbro_el_table_band${this.id}`, class: 'rbroTableBandElement' });
+        document.getElementById(`rbro_el_table_${this.bandType}${this.parentId}`).append(this.el);
     }
 
     remove() {
-        super.remove();
         for (let i=0; i < this.columnData.length; i++) {
             this.rb.deleteDataObject(this.columnData[i]);
         }
+
+        super.remove();
     }
 
     getParent() {
@@ -168,9 +174,11 @@ export default class TableBandElement extends DocElement {
      * Create given number of columns for this band.
      * @param {Number} columns - column count, this can be more or less than current number of columns.
      * @param {Boolean} isUpdate - true if this is triggered by a changed value, false if called during initalization.
-     * @param {Number} insertColIndex - column index where a new column will be inserted, either left or right to this index.
+     * @param {Number} insertColIndex - column index where a new column will be inserted,
+     * either left or right to this index.
      * If -1 then no column is inserted at a certain index.
-     * @param {Boolean} insertLeft - if true then the new column is inserted left to param insertColIndex, otherwise it is inserted right to it.
+     * @param {Boolean} insertLeft - if true then the new column is inserted left to param insertColIndex,
+     * otherwise it is inserted right to it.
      * Only used if param insertColIndex is not -1.
      */
     createColumns(columns, isUpdate, insertColIndex, insertLeft) {
@@ -230,7 +238,8 @@ export default class TableBandElement extends DocElement {
             let textElement = new TableTextElement(dataId, data, this.rb);
             newColumnData.push(textElement);
         	this.rb.addDataObject(textElement);
-            let panelItemText = new MainPanelItem(DocElement.type.text, this.panelItem, textElement, { showDelete: false }, this.rb);
+            let panelItemText = new MainPanelItem(
+                DocElement.type.text, this.panelItem, textElement, { showDelete: false }, this.rb);
             textElement.setPanelItem(panelItemText);
             this.panelItem.appendChild(panelItemText);
         }
@@ -240,7 +249,10 @@ export default class TableBandElement extends DocElement {
             col.setup(true);
         }
         this.updateColumnDisplay();
-        this.getElement().find('td').css({ height: this.rb.toPixel(this.heightVal) });
+        const elCells = this.getElement().querySelectorAll('td');
+        for (const elCell of elCells) {
+            elCell.style.height = this.rb.toPixel(this.heightVal);
+        }
     }
 
     deleteColumn(colIndex) {
@@ -253,9 +265,9 @@ export default class TableBandElement extends DocElement {
 
     show(visible) {
         if (visible) {
-            $(`#rbro_el_table_band${this.id}`).removeClass('rbroHidden');
+            this.el.classList.remove('rbroHidden');
         } else {
-            $(`#rbro_el_table_band${this.id}`).addClass('rbroHidden');
+            this.el.classList.add('rbroHidden');
         }
     }
 
@@ -276,14 +288,14 @@ export default class TableBandElement extends DocElement {
             let colData = this.columnData[i];
             let colWidth = colData.getValue('widthVal');
             let colSpan = colData.getValue('colspanVal');
-            colData.getElement().show();
+            colData.getElement().style.display = '';
             if (colSpan > 1) {
                 let colspanEndIndex = ((i + colSpan) < this.columnData.length) ? (i + colSpan) : this.columnData.length;
                 i++;
                 // hide columns within colspan
                 while (i < colspanEndIndex) {
                     colWidth += this.columnData[i].getValue('widthVal');
-                    this.columnData[i].getElement().hide();
+                    this.columnData[i].getElement().style.display = 'none';
                     i++;
                 }
             } else {

@@ -1,9 +1,6 @@
 import DocElement from './DocElement';
-import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import Frame from '../container/Frame';
-import SetValueCmd from '../commands/SetValueCmd';
 import Style from '../data/Style';
-import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
 /**
@@ -16,6 +13,8 @@ export default class FrameElement extends DocElement {
         super(rb.getLabel('docElementFrame'), id, 100, 100, rb);
         this.frame = null;
         this.setupComplete = false;
+        this.elContent = null;
+        this.elContentFrame = null;
         this.label = '';
         this.backgroundColor = '';
         this.borderAll = false;
@@ -95,9 +94,10 @@ export default class FrameElement extends DocElement {
 
     updateDisplayInternal(x, y, width, height) {
         if (this.el !== null) {
-            let props = { left: this.rb.toPixel(x), top: this.rb.toPixel(y),
-                width: this.rb.toPixel(width), height: this.rb.toPixel(height) };
-            this.el.css(props);
+            this.el.style.left = this.rb.toPixel(x);
+            this.el.style.top = this.rb.toPixel(y);
+            this.el.style.width = this.rb.toPixel(width);
+            this.el.style.height = this.rb.toPixel(height);
         }
         // update inner frame element size
         if (this.borderLeft) {
@@ -113,29 +113,26 @@ export default class FrameElement extends DocElement {
             height -= this.borderWidthVal;
         }
 
-        let styleProperties = {};
-        styleProperties['width'] = this.rb.toPixel(width);
-        styleProperties['height'] = this.rb.toPixel(height);
-        $(`#rbro_el_content_frame${this.id}`).css(styleProperties);
+        this.elContentFrame.style.width = this.rb.toPixel(width);
+        this.elContentFrame.style.height = this.rb.toPixel(height);
     }
 
     updateStyle() {
-        let styleProperties = {};
         let borderStyleProperties = {};
-        styleProperties['background-color'] = this.getValue('backgroundColor');
+        let borderStyle;
         if (this.getValue('borderLeft') || this.getValue('borderTop') ||
                 this.getValue('borderRight') || this.getValue('borderBottom')) {
-            borderStyleProperties['border-style'] = this.getValue('borderTop') ? 'solid' : 'none';
-            borderStyleProperties['border-style'] += this.getValue('borderRight') ? ' solid' : ' none';
-            borderStyleProperties['border-style'] += this.getValue('borderBottom') ? ' solid' : ' none';
-            borderStyleProperties['border-style'] += this.getValue('borderLeft') ? ' solid' : ' none';
-            borderStyleProperties['border-width'] = this.getValue('borderWidthVal') + 'px';
-            borderStyleProperties['border-color'] = this.getValue('borderColor');
+            borderStyle = this.getValue('borderTop') ? 'solid' : 'none';
+            borderStyle += this.getValue('borderRight') ? ' solid' : ' none';
+            borderStyle += this.getValue('borderBottom') ? ' solid' : ' none';
+            borderStyle += this.getValue('borderLeft') ? ' solid' : ' none';
+            this.elContent.style.borderWidth = this.getValue('borderWidthVal') + 'px';
+            this.elContent.style.borderColor = this.getValue('borderColor');
         } else {
-            borderStyleProperties['border-style'] = 'none';
+            borderStyle = 'none';
         }
-        $(`#rbro_el_content${this.id}`).css(borderStyleProperties);
-        this.el.css(styleProperties);
+        this.elContent.style.borderStyle = borderStyle;
+        this.el.style.backgroundColor = this.getValue('backgroundColor');
     }
 
     /**
@@ -153,10 +150,12 @@ export default class FrameElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['label', 'x', 'y', 'width', 'height', 'backgroundColor',
+        return [
+            'label', 'x', 'y', 'width', 'height', 'backgroundColor',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement', 'shrinkToContentHeight',
-            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'];
+            'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
+        ];
     }
 
     getElementType() {
@@ -168,19 +167,22 @@ export default class FrameElement extends DocElement {
     }
 
     createElement() {
-        this.el = $(`<div id="rbro_el${this.id}" class="rbroDocElement rbroFrameElement rbroElementContainer"></div>`);
+        this.el = utils.createElement(
+            'div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroFrameElement rbroElementContainer' });
         // rbroContentContainerHelper contains border styles
         // rbroDocElementContentFrame contains width and height
-        this.el
-            .append($(`<div id="rbro_el_content${this.id}" class="rbroContentContainerHelper"></div>`)
-                .append($(`<div id="rbro_el_content_frame${this.id}" class="rbroDocElementContentFrame"></div>`))
-            );
+        this.elContent = utils.createElement(
+            'div', { id: `rbro_el_content${this.id}`, class: 'rbroContentContainerHelper' });
+        this.elContentFrame = utils.createElement(
+            'div', { id: `rbro_el_content_frame${this.id}`, class: 'rbroDocElementContentFrame' });
+        this.elContent.append(this.elContentFrame);
+        this.el.append(this.elContent);
         this.appendToContainer();
         this.registerEventHandlers();
     }
 
     getContentElement() {
-        return $(`#rbro_el_content_frame${this.id}`);
+        return this.elContentFrame;
     }
 
     remove() {
@@ -194,7 +196,7 @@ export default class FrameElement extends DocElement {
         } else {
             this.name = this.rb.getLabel('docElementFrame');
         }
-        $(`#rbro_menu_item_name${this.id}`).text(this.name);
+        document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }
 
     /**
