@@ -130,6 +130,10 @@ export default class ReportBro {
                 this.properties.patternNumbers.concat(this.properties.patternAdditionalNumbers);
         }
 
+        if (!this.validateProperties(this.properties)) {
+            throw 'Invalid properties for ReportBro instance, check console error log for further details';
+        }
+
         this.document = new Document(element, this.properties.showGrid, this);
         this.popupWindow = new PopupWindow(element, this);
         this.docElements = [];
@@ -421,6 +425,45 @@ export default class ReportBro {
 
         this.render();
         this.setup();
+    }
+
+    /**
+     * Validates properties used to initialize ReportBro.
+     * In case of invalid properties additional info will be printed to the JS console.
+     * @param {Object[]} properties - properties to validate
+     * @returns {Boolean} true if all properties are valid, false otherwise.
+     */
+    validateProperties(properties) {
+        if (!Array.isArray(properties.colors)) {
+            console.error('"colors" property must be an array');
+            return false;
+        }
+        let colorBlackExists = false;
+        for (const color of properties.colors) {
+            if (!color || !utils.isValidColor(color)) {
+                console.error('"colors" property contains invalid color value');
+                return false;
+            }
+            if (color === '#000000') {
+                colorBlackExists = true;
+            }
+        }
+        if (!colorBlackExists) {
+            console.error('"colors" property is missing black color "#000000"');
+            return false;
+        }
+
+        if (!Array.isArray(properties.fontSizes)) {
+            console.error('"fontSizes" property must be an array');
+            return false;
+        }
+        for (const fontSize of properties.fontSizes) {
+            if (typeof fontSize !== 'number' || fontSize < 1) {
+                console.error('"fontSizes" property must contain only numbers (> 0)');
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

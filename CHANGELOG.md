@@ -1,5 +1,11 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* remove jquery dependency
+* add validation of ReportBro properties to avoid invalid values
+
 ## [2.1.0] - 2022-04-22
 
 ### Changes
