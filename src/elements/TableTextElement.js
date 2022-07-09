@@ -161,7 +161,7 @@ export default class TableTextElement extends TextElement {
     /**
      * Returns display width split into width for all cells contained in colspan.
      * @param {Number} displayWidth - new display width.
-     * @returns {[Number]} array of width values for each cell contained in colspan.
+     * @returns {?Number} array of width values for each cell contained in colspan.
      */
     getDisplayWidthSplit(displayWidth) {
         if (this.colspanVal === 1) {

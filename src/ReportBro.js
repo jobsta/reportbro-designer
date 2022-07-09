@@ -767,7 +767,7 @@ export default class ReportBro {
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {?String} field - affected field in case of change operation.
      */
     notifyEvent(obj, operation, field) {
         this.detailPanels[this.activeDetailPanel].notifyEvent(obj, operation, field);
@@ -1720,7 +1720,7 @@ export default class ReportBro {
     /**
      * Returns document element for the given id, or null if document element does not exist.
      * @param {Number} id - Id of document element to search for.
-     * @returns {[DocElement]}
+     * @returns {?DocElement}
      */
     getDocElementById(id) {
         let obj = this.getDataObject(id);
@@ -1733,7 +1733,7 @@ export default class ReportBro {
     /**
      * Returns parameter for the given id, or null if parameter does not exist.
      * @param {Number} id - Id of parameter to search for.
-     * @returns {[Parameter]}
+     * @returns {?Parameter}
      */
     getParameterById(id) {
         let obj = this.getDataObject(id);
@@ -1746,7 +1746,7 @@ export default class ReportBro {
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
      * @param {String} parameterName - Name of parameter to search for.
-     * @returns {[Parameter]}
+     * @returns {?Parameter}
      */
     getParameterByName(parameterName) {
         let parameters = this.getParameters();
@@ -1761,7 +1761,7 @@ export default class ReportBro {
     /**
      * Returns style for the given id, or null if style does not exist.
      * @param {Number} id - Id of style to search for.
-     * @returns {[Style]}
+     * @returns {?Style}
      */
     getStyleById(id) {
         let obj = this.getDataObject(id);

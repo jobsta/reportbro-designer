@@ -541,7 +541,7 @@ export default class Document {
      * @param {Number} absPosY - absolute y position.
      * @param {String} elementType - needed for finding container, not all elements are allowed
      * in all containers (e.g. a frame cannot contain another frame).
-     * @returns {[Container]} Container or null in case no container was found for given position.
+     * @returns {?Container} Container or null in case no container was found for given position.
      */
     getContainer(absPosX, absPosY, elementType) {
         let offset = utils.getElementOffset(this.elDocContent);
