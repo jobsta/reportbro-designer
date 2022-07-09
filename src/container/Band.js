@@ -48,8 +48,7 @@ export default class Band extends Container {
         }
         return (this.bandType === Band.bandType.content ||
             (elementType !== DocElement.type.pageBreak && elementType !== DocElement.type.table &&
-                elementType !== DocElement.type.section)) &&
-            (!this.section || elementType !== DocElement.type.section);
+                elementType !== DocElement.type.section));
     }
 
     /**

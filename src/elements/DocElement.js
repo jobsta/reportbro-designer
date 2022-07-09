@@ -771,33 +771,85 @@ export default class DocElement {
     /**
      * Returns dom node where elements will be added if they are inside this element.
      * Is null in case this element is not a container element like a frame or a band.
-     * @returns {[Object]} dom node
+     * @returns {?Object} dom node
      */
     getContentElement() {
         return null;
     }
 
     /**
-     * Returns all parameters of the data source (which must be an array parameter).
+     * Returns true if this element has a data source setting.
+     * This does not necessarily mean that a data source is available.
      * Must be overridden when the element has a data source.
-     * @returns {[Object]} contains the data source name and all parameters of the data source.
-     * Is null in case element does not have a data source.
+     * @return {boolean}
      */
-    getDataSource() {
+    hasDataSource() {
+        return false;
+    }
+
+    /**
+     * Returns the data source parameter name.
+     * @returns {?String} contains the data source parameter name.
+     * Is null in case element does not have a data source or the data source does not contain
+     * a parameter reference.
+     */
+    getDataSourceParameterName() {
+        if (this.hasDataSource()) {
+            const dataSource = this.getValue('dataSource').trim();
+            if (dataSource.length >= 3 && dataSource.substr(0, 2) === '${' &&
+                    dataSource.charAt(dataSource.length - 1) === '}') {
+                return dataSource.substring(2, dataSource.length - 1);
+            }
+        }
         return null;
     }
 
     /**
-     * Returns all data source parameters of this element and any possible parent elements.
-     * @param {Parameter[]} dataSources - array where the data sources will be appended to.
-     * @param {DocElement} child - optional child element where the method was called from.
+     * Returns all data sources of this element and any possible parent elements.
+     * @returns {Object[]} array with all data sources where each item contains the name
+     * of the data source parameter and all data source parameters.
      */
-    getAllDataSources(dataSources, child) {
+    getAllDataSources() {
+        const dataSources = [];
+        const dataSourceNames = [];
+        this.getAllDataSourceParameterNames(dataSourceNames, null);
+        // iterate data sources in reverse order -> start from root, the last data source will
+        // be from this element. this way we can find data sources which are parameters
+        // of a parent data source
+        for (let i = dataSourceNames.length - 1; i >= 0; i--) {
+            const dataSourceName = dataSourceNames[i];
+            let param = null;
+            // test if this data source is a parameter of a parent data source
+            for (const parentDataSource of dataSources) {
+                for (const dataSourceParameter of parentDataSource.parameters) {
+                    if (dataSourceParameter.getName() === dataSourceName) {
+                        param = dataSourceParameter;
+                        break;
+                    }
+                }
+            }
+            if (param === null) {
+                // root data source
+                param = this.rb.getParameterByName(dataSourceName);
+            }
+            if (param !== null && param.getValue('type') === Parameter.type.array) {
+                dataSources.unshift({ name: dataSourceName, parameters: param.getChildren() });
+            }
+        }
+        return dataSources;
+    }
+
+    /**
+     * Returns all data source parameter names of this element and any possible parent elements.
+     * @param {String[]} dataSourceParameterNames - array where the data source names will be appended to.
+     * @param {?DocElement} child - optional child element where the method was called from.
+     */
+    getAllDataSourceParameterNames(dataSourceParameterNames, child) {
         if (this.getElementType() === DocElement.type.table || this.getElementType() === DocElement.type.section) {
             if (child && child.getValue('bandType') === Band.bandType.content) {
-                let dataSource = this.getDataSource();
-                if (dataSource !== null) {
-                    dataSources.push(dataSource);
+                const dataSourceParameterName = this.getDataSourceParameterName();
+                if (dataSourceParameterName !== null) {
+                    dataSourceParameterNames.push(dataSourceParameterName);
                 }
             }
         }
@@ -805,7 +857,7 @@ export default class DocElement {
         if (panelItem !== null) {
             let parentPanelItem = panelItem.getParent();
             if (parentPanelItem !== null && parentPanelItem.getData() instanceof DocElement) {
-                parentPanelItem.getData().getAllDataSources(dataSources, this);
+                parentPanelItem.getData().getAllDataSourceParameterNames(dataSourceParameterNames, this);
             }
         }
     }
@@ -829,15 +881,13 @@ export default class DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
     addCommandForChangedParameterName(parameter, newParameterName, field, cmdGroup) {
-        let paramParent = parameter.getParent();
-        let dataSources = [];
+        const paramParent = parameter.getParent();
+        const dataSources = this.getAllDataSources();
         let paramRef = null;
         let newParamRef = null;
 
-        this.getAllDataSources(dataSources, null);
-
         if (paramParent !== null && paramParent.getValue('type') === Parameter.type.array) {
-            for (let dataSource of dataSources) {
+            for (const dataSource of dataSources) {
                 if (dataSource.parameters.indexOf(parameter) !== -1) {
                     paramRef = '${' + parameter.getName() + '}';
                     newParamRef = '${' + newParameterName + '}';
@@ -853,11 +903,12 @@ export default class DocElement {
                 newParamRef = '${' + newParameterName + '.';
             } else {
                 let isDataSourceParam = false;
-                for (let dataSource of dataSources) {
-                    for (let dataSourceParam of dataSource.parameters) {
+                for (const dataSource of dataSources) {
+                    for (const dataSourceParam of dataSource.parameters) {
                         if (dataSourceParam.getName() === parameter.getName()) {
-                            // the changed parameter has the same name as a used data source parameter, therefor
-                            // we are not going to change the parameter reference because it references the data source parameter
+                            // the changed parameter has the same name as a used data source parameter,
+                            // therefor we are not going to change the parameter reference because it
+                            // references the data source parameter
                             isDataSourceParam = true;
                             break;
                         }

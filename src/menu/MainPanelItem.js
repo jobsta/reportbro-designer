@@ -300,7 +300,7 @@ export default class MainPanelItem {
      * If multiple children have the same name the first child is returned.
      *
      * @param {string} name - name of child to search for.
-     * @returns {[MainPanelItem]} child panel or null if no child with given name exists.
+     * @returns {?MainPanelItem} child panel or null if no child with given name exists.
      */
     getChildByName(name) {
         return this.getChildByNameExclude(name, null);
@@ -312,8 +312,8 @@ export default class MainPanelItem {
      * If multiple children have the same name the first child is returned.
      *
      * @param {string} name - name of child to search for.
-     * @param {[Object]} excludeChild - data object which will be excluded from search.
-     * @returns {[MainPanelItem]} child panel or null if no child with given name exists.
+     * @param {?Object} excludeChild - data object which will be excluded from search.
+     * @returns {?MainPanelItem} child panel or null if no child with given name exists.
      */
     getChildByNameExclude(name, excludeChild) {
         for (let child of this.children) {

@@ -642,22 +642,23 @@ export default class ReportBro {
      * optional separator (Boolean).
      */
     getParameterItems(obj, allowedTypes) {
-        let parameters = [];
-        let parameterItems = this.getMainPanel().getParametersItem().getChildren();
+        const parameters = [];
+        const parameterItems = this.getMainPanel().getParametersItem().getChildren();
         // dataSourceIndex is only needed for separator id which is used to hide the separator
         // when there are no data source parameters available (due to search filter)
         let dataSourceIndex = 0;
-        let dataSources = [];
         if (obj instanceof DocElement) {
-            obj.getAllDataSources(dataSources, null);
-            for (let dataSource of dataSources) {
+            const dataSources = obj.getAllDataSources();
+            for (const dataSource of dataSources) {
                 if (dataSource.parameters.length > 0) {
                     parameters.push({
-                        separator: true, separatorClass: 'rbroParameterDataSourceGroup', id: 'ds' + dataSourceIndex,
+                        separator: true,
+                        separatorClass: 'rbroParameterDataSourceGroup',
+                        id: 'ds' + dataSourceIndex,
                         name: this.getLabel('parametersDataSource')
                     });
                     dataSourceIndex++;
-                    for (let dataSourceParameter of dataSource.parameters) {
+                    for (const dataSourceParameter of dataSource.parameters) {
                         dataSourceParameter.appendParameterItems(parameters, allowedTypes);
                     }
                 }
@@ -668,9 +669,9 @@ export default class ReportBro {
 
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         // add all parameters of collections at end of list with a header containing the collection name
-        let mapParameters = [];
-        for (let parameterItem of parameterItems) {
-            let parameter = parameterItem.getData();
+        const mapParameters = [];
+        for (const parameterItem of parameterItems) {
+            const parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.map) {
                 parameter.appendParameterItems(mapParameters, allowedTypes);
             } else {
@@ -766,7 +767,7 @@ export default class ReportBro {
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.
-     * @param {[String]} field - affected field in case of change operation.
+     * @param {?String} field - affected field in case of change operation.
      */
     notifyEvent(obj, operation, field) {
         this.detailPanels[this.activeDetailPanel].notifyEvent(obj, operation, field);
@@ -1719,7 +1720,7 @@ export default class ReportBro {
     /**
      * Returns document element for the given id, or null if document element does not exist.
      * @param {Number} id - Id of document element to search for.
-     * @returns {[DocElement]}
+     * @returns {?DocElement}
      */
     getDocElementById(id) {
         let obj = this.getDataObject(id);
@@ -1732,7 +1733,7 @@ export default class ReportBro {
     /**
      * Returns parameter for the given id, or null if parameter does not exist.
      * @param {Number} id - Id of parameter to search for.
-     * @returns {[Parameter]}
+     * @returns {?Parameter}
      */
     getParameterById(id) {
         let obj = this.getDataObject(id);
@@ -1745,7 +1746,7 @@ export default class ReportBro {
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
      * @param {String} parameterName - Name of parameter to search for.
-     * @returns {[Parameter]}
+     * @returns {?Parameter}
      */
     getParameterByName(parameterName) {
         let parameters = this.getParameters();
@@ -1760,7 +1761,7 @@ export default class ReportBro {
     /**
      * Returns style for the given id, or null if style does not exist.
      * @param {Number} id - Id of style to search for.
-     * @returns {[Style]}
+     * @returns {?Style}
      */
     getStyleById(id) {
         let obj = this.getDataObject(id);

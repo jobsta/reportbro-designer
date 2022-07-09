@@ -143,7 +143,7 @@ export default class Parameter {
 
     /**
      * Returns parent in case parameter is child of a map/array parameter.
-     * @returns {[Parameter]} parent parameter if available, null otherwise.
+     * @returns {?Parameter} parent parameter if available, null otherwise.
      */
     getParent() {
         if (this.panelItem !== null && this.panelItem.getParent().getData() instanceof Parameter) {
@@ -419,7 +419,7 @@ export default class Parameter {
      * Returns test data of array parameter as array.
      * @param {Boolean} includeFieldInfo - if true a row containing info about the fields will be inserted
      * in the returned rows (first row).
-     * @returns {[Object[]]} rows of test data. Null in case parameter is not an array.
+     * @returns {?Object[]} rows of test data. Null in case parameter is not an array.
      */
     getTestDataRows(includeFieldInfo) {
         if (this.type !== Parameter.type.array && this.type !== Parameter.type.simpleArray) {
