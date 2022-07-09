@@ -407,9 +407,6 @@ export default class ParameterPanel extends PanelBase {
 
         if (field === null) {
             let parameterTypeOptions = [];
-            // do not allow nested array/map (only for top-level parameters)
-            let topLevelParameter = (obj.getPanelItem() !== null &&
-                obj.getPanelItem().getParent() === this.rb.getMainPanel().getParametersItem());
             // do not allow sum/average parameter in list
             let listFieldParameter = (parentParameter !== null &&
                 parentParameter.getValue('type') === Parameter.type.array);
@@ -419,13 +416,9 @@ export default class ParameterPanel extends PanelBase {
             parameterTypeOptions.push({value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean')});
             parameterTypeOptions.push({value: 'date', label: this.rb.getLabel('parameterTypeDate')});
             parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
-            if (topLevelParameter) {
-                parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
-            }
+            parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
             parameterTypeOptions.push({value: 'simple_array', label: this.rb.getLabel('parameterTypeSimpleArray')});
-            if (topLevelParameter) {
-                parameterTypeOptions.push({value: 'map', label: this.rb.getLabel('parameterTypeMap')});
-            }
+            parameterTypeOptions.push({value: 'map', label: this.rb.getLabel('parameterTypeMap')});
             if (!listFieldParameter) {
                 parameterTypeOptions.push({value: 'sum', label: this.rb.getLabel('parameterTypeSum')});
                 parameterTypeOptions.push({value: 'average', label: this.rb.getLabel('parameterTypeAverage')});

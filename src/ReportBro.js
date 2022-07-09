@@ -642,22 +642,23 @@ export default class ReportBro {
      * optional separator (Boolean).
      */
     getParameterItems(obj, allowedTypes) {
-        let parameters = [];
-        let parameterItems = this.getMainPanel().getParametersItem().getChildren();
+        const parameters = [];
+        const parameterItems = this.getMainPanel().getParametersItem().getChildren();
         // dataSourceIndex is only needed for separator id which is used to hide the separator
         // when there are no data source parameters available (due to search filter)
         let dataSourceIndex = 0;
-        let dataSources = [];
         if (obj instanceof DocElement) {
-            obj.getAllDataSources(dataSources, null);
-            for (let dataSource of dataSources) {
+            const dataSources = obj.getAllDataSources();
+            for (const dataSource of dataSources) {
                 if (dataSource.parameters.length > 0) {
                     parameters.push({
-                        separator: true, separatorClass: 'rbroParameterDataSourceGroup', id: 'ds' + dataSourceIndex,
+                        separator: true,
+                        separatorClass: 'rbroParameterDataSourceGroup',
+                        id: 'ds' + dataSourceIndex,
                         name: this.getLabel('parametersDataSource')
                     });
                     dataSourceIndex++;
-                    for (let dataSourceParameter of dataSource.parameters) {
+                    for (const dataSourceParameter of dataSource.parameters) {
                         dataSourceParameter.appendParameterItems(parameters, allowedTypes);
                     }
                 }
@@ -668,9 +669,9 @@ export default class ReportBro {
 
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         // add all parameters of collections at end of list with a header containing the collection name
-        let mapParameters = [];
-        for (let parameterItem of parameterItems) {
-            let parameter = parameterItem.getData();
+        const mapParameters = [];
+        for (const parameterItem of parameterItems) {
+            const parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.map) {
                 parameter.appendParameterItems(mapParameters, allowedTypes);
             } else {

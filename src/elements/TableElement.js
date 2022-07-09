@@ -390,23 +390,8 @@ export default class TableElement extends DocElement {
         document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }
 
-    /**
-     * Returns all parameters of the data source (which must be an array parameter).
-     * @returns {[Object]} contains the data source name and all parameters of the data source.
-     */
-    getDataSource() {
-        let parameters = [];
-        let dataSource = this.dataSource.trim();
-        let dataSourceParameter = '';
-        if (dataSource.length >= 3 && dataSource.substr(0, 2) === '${' &&
-                dataSource.charAt(dataSource.length - 1) === '}') {
-            dataSourceParameter = dataSource.substring(2, dataSource.length - 1);
-            let param = this.rb.getParameterByName(dataSourceParameter);
-            if (param !== null && param.getValue('type') === Parameter.type.array) {
-                parameters = param.getChildren();
-            }
-        }
-        return { name: dataSourceParameter, parameters: parameters };
+    hasDataSource() {
+        return true;
     }
 
     /**
