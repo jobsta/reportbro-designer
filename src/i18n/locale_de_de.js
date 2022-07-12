@@ -1,4 +1,4 @@
-var locale_de = {
+const locale_de = {
     bandContent: 'Inhalt',
     bandFooter: 'Fußzeile',
     bandHeader: 'Kopfzeile',
@@ -182,6 +182,10 @@ var locale_de = {
     parameterSearchPlaceholder: 'Parameter durchsuchen...',
     parameterTestData: 'Testdaten',
     parameterTestDataDatePattern: 'JJJJ-MM-TT',
+    parameterTestDataImageInfo: 'Bilder werden in der Berichtsvorlage gespeichert und können die Größe der Berichtsvorlage erheblich erhöhen',
+    parameterTestDataRowCount: '${count} Zeilen',
+    parameterTestDataRowCountEmpty: 'leer',
+    parameterTestDataRowCountOne: '1 Zeile',
     parameterType: 'Typ',
     parameterTypeArray: 'Liste',
     parameterTypeAverage: 'Durchschnitt',

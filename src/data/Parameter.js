@@ -9,6 +9,9 @@ import * as utils from '../utils';
  * @class
  */
 export default class Parameter {
+
+    static dateRegex = /^(\d{4})-(\d{1,2})-(\d{1,2})( (\d{1,2}):(\d{2})(:(\d{2}))?)?$/;
+
     constructor(id, initialData, rb) {
         this.rb = rb;
         this.id = id;
@@ -23,6 +26,9 @@ export default class Parameter {
         this.pattern = '';
         this.expression = '';
         this.testData = '';
+        this.testDataBoolean = false;
+        this.testDataImage = '';
+        this.testDataImageFilename = '';
         this.children = [];
         this.editable = rb.getProperty('adminMode');
         this.showOnlyNameType = false;
@@ -77,7 +83,7 @@ export default class Parameter {
     getFields() {
         return [
             'id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression',
-            'showOnlyNameType', 'testData'
+            'showOnlyNameType', 'testData', 'testDataBoolean', 'testDataImage', 'testDataImageFilename'
         ];
     }
 
@@ -90,12 +96,26 @@ export default class Parameter {
      * @returns {Number}
      */
     getMaxId() {
+
+    }
+    /**
+     * Returns highest id of this component including all its child components.
+     * @returns {Number}
+     */
+    getMaxId() {
         let maxId = this.id;
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
-            for (let child of this.children) {
+            const children = this.children.slice();
+            let i = 0;
+            while ( i < children.length) {
+                const child = children[i];
                 if (child.id > maxId) {
                     maxId = child.id;
                 }
+                if (child.type === Parameter.type.array || child.type === Parameter.type.map) {
+                    children.push(...child.children);
+                }
+                i++;
             }
         }
         return maxId;
@@ -197,8 +217,8 @@ export default class Parameter {
      */
     addCommandForChangedParameterName(parameter, newParameterName, field, cmdGroup) {
         let paramParent = parameter.getParent();
-        let paramRef = null;
-        let newParamRef = null;
+        let paramRef;
+        let newParamRef;
         if (paramParent !== null && paramParent.getValue('type') === Parameter.type.map) {
             paramRef = '${' + paramParent.getName() + '.' + parameter.getName() + '}';
             newParamRef = '${' + paramParent.getName() + '.' + newParameterName + '}';
@@ -210,7 +230,7 @@ export default class Parameter {
             newParamRef = '${' + newParameterName + '}';
         }
 
-        if (paramRef !== null && newParamRef !== null && this.getValue(field).indexOf(paramRef) !== -1) {
+        if (this.getValue(field).indexOf(paramRef) !== -1) {
             let cmd = new SetValueCmd(
                 this.id, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
                 SetValueCmd.type.text, this.rb);
@@ -219,14 +239,14 @@ export default class Parameter {
     }
 
     /**
-     * Update test data for arrays. Adapt field names of list items so test data is still valid when a
+     * Update test data for arrays and maps. Adapt field names of list items so test data is still valid when a
      * parameter of a list item is renamed.
      * @param {String} oldParameterName
      * @param {String} newParameterName
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
     addUpdateTestDataCmdForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
-        if (this.type === Parameter.type.array) {
+        if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
             let rows = [];
             try {
                 let testData = JSON.parse(this.testData);
@@ -415,69 +435,129 @@ export default class Parameter {
         }
     }
 
+    getParameterFields() {
+        const fields = [];
+        if (this.type === Parameter.type.array || this.type === Parameter.type.simpleArray ||
+                this.type === Parameter.type.map) {
+            if (this.type === Parameter.type.simpleArray) {
+                fields.push({ name: 'data', type: this.arrayItemType, parameter: this });
+            } else {
+                for (let child of this.getChildren()) {
+                    if (!child.showOnlyNameType) {
+                        fields.push({ name: child.getName(), type: child.getValue('type'), parameter: child });
+                    }
+                }
+            }
+        }
+        return fields;
+    }
+
     /**
-     * Returns test data of array parameter as array.
-     * @param {Boolean} includeFieldInfo - if true a row containing info about the fields will be inserted
-     * in the returned rows (first row).
-     * @returns {?Object[]} rows of test data. Null in case parameter is not an array.
+     * Returns test data of parameter as array or map.
+     * The test data is sanitized, i.e. the data value types match the corresponding parameter types.
+     * @returns {?Object|Object[]} test data. Null in case parameter is not an array, simple array or map.
      */
-    getTestDataRows(includeFieldInfo) {
-        if (this.type !== Parameter.type.array && this.type !== Parameter.type.simpleArray) {
-            return null;
+    getTestData() {
+        let testData = null;
+        try {
+            testData = JSON.parse(this.testData);
+        } catch (e) {
         }
-        let fields = [];
-        if (this.type === Parameter.type.simpleArray) {
-            let fieldInfo = { name: 'data', type: this.arrayItemType, allowMultiple: false };
-            fields.push(fieldInfo);
+        if (this.type === Parameter.type.array || this.type === Parameter.type.simpleArray ||
+                this.type === Parameter.type.map) {
+            if (this.testData) {
+                return this.getSanitizedTestData(this, testData);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns test data of parameter as array or map.
+     * The test data is sanitized, i.e. the data value types match the corresponding parameter types.
+     * @returns {Object|Object[]} sanitized test data
+     */
+    getSanitizedTestData(parameter, testData) {
+        let rv;
+        if (parameter.type === Parameter.type.map) {
+            if (!testData || Object.getPrototypeOf(testData) !== Object.prototype) {
+                testData = {};
+            }
+            rv = this.getSanitizedTestDataMap(this, testData);
         } else {
-            for (let child of this.getChildren()) {
-                if (!child.showOnlyNameType) {
-                    let fieldInfo = { name: child.getName() };
-                    if (child.getValue('type') === Parameter.type.simpleArray) {
-                        fieldInfo.type = child.getValue('arrayItemType');
-                        fieldInfo.allowMultiple = true;
-                        fieldInfo.arraySize = 1;
-                    } else {
-                        fieldInfo.type = child.getValue('type');
-                        fieldInfo.allowMultiple = false;
+            if (!Array.isArray(testData)) {
+                testData = [];
+            }
+            rv = [];
+            for (let testDataRow of testData) {
+                if (this.type === Parameter.type.array) {
+                    if (!testDataRow || Object.getPrototypeOf(testDataRow) !== Object.prototype) {
+                        testDataRow = {};
                     }
-                    fields.push(fieldInfo);
+                    rv.push(this.getSanitizedTestDataMap(parameter, testDataRow));
+                } else if (this.type === Parameter.type.simpleArray) {
+                    rv.push(this.getSanitizedTestDataValue(parameter.arrayItemType, testDataRow));
                 }
             }
         }
-        let rows = [];
-        if (fields.length > 0) {
-            if (includeFieldInfo) {
-                rows.push(fields);
+        return rv;
+    }
+
+    getSanitizedTestDataMap(parameter, testData) {
+        const rv = {};
+        for (const field of parameter.getChildren()) {
+            if (field.showOnlyNameType) {
+                continue;
             }
-            try {
-                let testData = JSON.parse(this.testData);
-                if (Array.isArray(testData)) {
-                    for (let row of testData) {
-                        let itemRow = {};
-                        let hasData = false;
-                        for (let field of fields) {
-                            if (field.name in row) {
-                                let fieldData = row[field.name];
-                                if((field.allowMultiple && Array.isArray(fieldData)) ||
-                                        (!field.allowMultiple && !Array.isArray(fieldData))) {
-                                    hasData = true;
-                                    itemRow[field.name] = fieldData;
-                                    if (field.allowMultiple && fieldData.length > 0) {
-                                        field.arraySize = fieldData.length;
-                                    }
-                                }
-                            }
-                        }
-                        if (hasData) {
-                            rows.push(itemRow);
-                        }
-                    }
+            const value = (field.name in testData) ? testData[field.name] : null;
+            if (field.type === Parameter.type.array || field.type === Parameter.type.map) {
+                rv[field.name] = this.getSanitizedTestData(field, value);
+            } else if (field.type === Parameter.type.simpleArray) {
+                if (!Array.isArray(testData)) {
+                    testData = [];
                 }
-            } catch (e) {
+                const arrayValues = [];
+                for (let testDataRow of testData) {
+                    arrayValues.push(this.getSanitizedTestDataValue(field.arrayItemType, testDataRow));
+                }
+                rv[field.name] = arrayValues;
+            } else {
+                rv[field.name] = this.getSanitizedTestDataValue(field.type, value);
             }
         }
-        return rows;
+        return rv;
+    }
+
+    getSanitizedTestDataValue(fieldType, testData) {
+        let rv = null;
+        if (fieldType === Parameter.type.string) {
+            if (typeof testData === 'string') {
+                rv = testData;
+            }
+        } else if (fieldType === Parameter.type.number) {
+            if (typeof testData === 'number') {
+                rv = testData;
+            } else if (typeof testData === 'string') {
+                const num = Number(testData.replaceAll(',', '.'));
+                if (!isNaN(num)) {
+                    rv = num;
+                }
+            }
+        } else if (fieldType === Parameter.type.boolean) {
+            if (typeof testData === 'boolean') {
+                rv = testData;
+            } else {
+                rv = Boolean(testData);
+            }
+        } else if (fieldType === Parameter.type.date) {
+            if (typeof testData === 'string') {
+                // we allow dates in format "YYYY-MM-DD", "YYYY-MM-DD HH:MM" and "YYYY-MM-DD HH:MM:SS" for test data
+                if (Parameter.dateRegex.test(testData)) {
+                    rv = testData;
+                }
+            }
+        }
+        return rv;
     }
 
     /**
