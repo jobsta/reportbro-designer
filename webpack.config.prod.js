@@ -62,10 +62,5 @@ module.exports = {
   plugins: [
     new webpack.BannerPlugin({ banner: banner, test: 'reportbro.js' }),
     new MiniCssExtractPlugin({filename: "reportbro.css"}),
-    new CopyWebpackPlugin({
-      patterns: [
-        { from: 'node_modules/jquery/dist/jquery.js', to: 'ext/jquery.js' }
-      ]
-    }),
   ]
 };
