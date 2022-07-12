@@ -16,9 +16,11 @@ export default class PopupWindow {
         this.input = null;
         this.objId = null;
         this.type = null;
-        this.parameters = null;
         this.visible = false;
         this.items = null;
+        this.rootParameter = null;
+        this.nextRowId = -1;
+        this.rowMap = null;
     }
 
     render() {
@@ -58,8 +60,9 @@ export default class PopupWindow {
      * @param {PopupWindow.type} type
      * @param {Quill} quill - rich text editor instance, must be set if parameter is appended to rich text control,
      * otherwise the text input of element with tagId will be used (default).
+     * @param {Parameter} parameter
      */
-    show(items, objId, tagId, field, type, quill) {
+    show(items, objId, tagId, field, type, quill, parameter) {
         let winWidth = window.innerWidth;
         let winHeight = window.innerHeight;
         let elSearch = null;
@@ -69,7 +72,9 @@ export default class PopupWindow {
         this.type = type;
         this.items = items;
         utils.emptyElement(this.elContent);
-        //document.getElementById('rbro_background_overlay').remove();
+        this.rootParameter = parameter;
+        this.nextRowId = 1;
+        this.rowMap = {};
 
         if (quill) {
             // save selection of rich text editor because selection is lost when editor looses focus
@@ -77,9 +82,8 @@ export default class PopupWindow {
         }
 
         if (type === PopupWindow.type.testData) {
-            this.parameters = items[0];
-            items.splice(0, 1);
-            this.createTestDataTable(items);
+            const testData = parameter.getTestData();
+            this.createTestDataTable(this.elContent, parameter, testData);
             let width = Math.round(winWidth * 0.8);
             let height = Math.round(winHeight * 0.8);
             const windowScrollPos = document.querySelector('html').scrollTop;
@@ -106,8 +110,8 @@ export default class PopupWindow {
                 // item is triggered
                 event.preventDefault();
             });
-            for (let item of items) {
-                let li = utils.createElement('li');
+            for (const item of items) {
+                const li = utils.createElement('li');
                 if (item.separator) {
                     if ((type === PopupWindow.type.parameterSet ||
                             type === PopupWindow.type.parameterAppend) && item.id) {
@@ -129,13 +133,12 @@ export default class PopupWindow {
                             this.input.dispatchEvent(new Event('input'));
                             this.hide();
                         } else if (type === PopupWindow.type.parameterSet) {
-                            let paramText = '${' + item.name + '}';
-                            this.input.value = paramText;
+                            this.input.value = '${' + item.name + '}';
                             this.input.dispatchEvent(new Event('input'));
                             autosize.update(this.input);
                             this.hide();
                         } else if (type === PopupWindow.type.parameterAppend) {
-                            let paramText = '${' + item.name + '}';
+                            const paramText = '${' + item.name + '}';
                             if (quill) {
                                 if (quillSelectionRange) {
                                     quill.insertText(quillSelectionRange.index, paramText);
@@ -157,7 +160,7 @@ export default class PopupWindow {
                 ul.append(li);
             }
             this.elContent.append(ul);
-            let offset = utils.getElementOffset(this.input);
+            const offset = utils.getElementOffset(this.input);
             let top = offset.top;
             // test if popup window should be shown above or below input field
             if (top < (winHeight / 2) || top < 300) {
@@ -187,7 +190,7 @@ export default class PopupWindow {
                 this.input.focus();
             }
             if (this.type === PopupWindow.type.testData) {
-                let testData = this.getTestData(null, -1);
+                let testData = this.getTestData(this.elContent, this.rootParameter);
                 let obj = this.rb.getDataObject(this.objId);
                 let testDataStr = JSON.stringify(testData);
                 if (obj !== null && obj.getValue('testData') !== testDataStr) {
@@ -205,151 +208,278 @@ export default class PopupWindow {
         }
     }
 
-    addTestDataRow(tableBody, parameters, testData) {
-        let newRow = utils.createElement('tr');
-        const elColumn = utils.createElement('td');
-        const elDeleteButton = utils.createElement('div', { class: 'rbroButton rbroDeleteButton rbroIcon-cancel' });
-        elDeleteButton.addEventListener('click', (event) => {
-            event.target.parentElement.parentElement.remove();
-        });
-        elColumn.append(elDeleteButton);
-        newRow.append(elColumn);
-        for (let parameter of parameters) {
-            if (parameter.allowMultiple && parameter.arraySize > 0) {
-                let values = null;
-                if (testData !== null && parameter.name in testData) {
-                    values = testData[parameter.name];
-                }
-                for (let i=0; i < parameter.arraySize; i++) {
-                    let data = '';
-                    if (values && Array.isArray(values) && i < values.length) {
-                        data = values[i];
-                    }
-                    this.appendColumn(newRow, parameter, data);
-                }
-            } else {
-                let data = '';
-                if (testData !== null && parameter.name in testData) {
-                    data = testData[parameter.name];
-                }
-                if (parameter.allowMultiple && parameter.arraySize > 0 && Array.isArray(data)) {
-                    for (let arrayItem of data) {
-                        this.appendColumn(newRow, parameter, arrayItem);
-                    }
-                } else {
-                    this.appendColumn(newRow, parameter, data);
-                }
-            }
-        }
-        tableBody.append(newRow);
-    }
-
-    appendColumn(row, parameter, data) {
-        let input = utils.createElement('input', { type: 'text', value: data });
-        input.addEventListener('focus', (event) => {
-            input.parentElement.classList.add('rbroHasFocus');
-        });
-        input.addEventListener('blur', (event) => {
-            input.parentElement.classList.remove('rbroHasFocus');
-        });
-
-        if (parameter.type === Parameter.type.number) {
-            utils.setInputDecimal(input);
-        } else if (parameter.type === Parameter.type.date) {
-            input.setAttribute('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
-        }
-        const elTd = utils.createElement('td');
-        elTd.append(input);
-        row.append(elTd);
-    }
-
-    getTestData(excludeParameter, excludeParameterArrayItemIndex) {
-        let testData = [];
-        let rows = this.elContent.querySelector('tbody').querySelectorAll('tr');
-        for (let row of rows) {
-            let inputs = row.querySelectorAll('input');
-            let rowData = {};
-            let i = 0;
-            for (let parameter of this.parameters) {
-                if (parameter.allowMultiple && parameter.arraySize > 0) {
-                    let fieldData = [];
-                    for (let j=0; j < parameter.arraySize; j++) {
-                        let input = inputs[i];
-                        if (parameter !== excludeParameter || j !== excludeParameterArrayItemIndex) {
-                            fieldData.push(input.value.trim());
-                        }
-                        i++;
-                    }
-                    rowData[parameter.name] = fieldData;
-                } else {
-                    let input = inputs[i];
-                    rowData[parameter.name] = input.value.trim();
-                    i++;
-                }
-            }
-            testData.push(rowData);
-        }
-        return testData;
-    }
-
-    createTestDataTable(items) {
-        let div = utils.createElement('div');
-        let table = utils.createElement('table');
-        let tableHeaderRow = utils.createElement('tr');
-        let tableBody = utils.createElement('tbody');
+    createTestDataTable(elRoot, parentParameter, testData) {
+        const fields = parentParameter.getParameterFields();
+        const div = utils.createElement('div');
+        const table = utils.createElement('table');
+        const tableHeaderRow = utils.createElement('tr');
+        const tableBody = utils.createElement('tbody');
         let i;
-        tableHeaderRow.append(utils.createElement('th'));
-        for (let parameter of this.parameters) {
-            if (parameter.allowMultiple) {
-                for (let arrayIndex=0; arrayIndex < parameter.arraySize; arrayIndex++) {
-                    let th = utils.createElement('th');
-                    th.append(utils.createElement('span', {}, `${parameter.name} ${arrayIndex + 1}`));
-                    if (arrayIndex === 0) {
-                        const elAddButton = utils.createElement(
-                            'div', { class: 'rbroButton rbroRoundButton rbroIcon-plus' });
-                        elAddButton.addEventListener('click', (event) => {
-                            let testData = this.getTestData(null, -1);
-                            parameter.arraySize++;
-                            this.createTestDataTable(testData);
-                        });
-                        th.append(elAddButton);
-                    } else {
-                        const elRemoveButton = utils.createElement(
-                            'div', { class: 'rbroButton rbroRoundButton rbroIcon-minus' });
-                        elRemoveButton.addEventListener('click', (event) => {
-                            let testData = this.getTestData(parameter, arrayIndex);
-                            parameter.arraySize--;
-                            this.createTestDataTable(testData);
-                        });
-                        th.append(elRemoveButton);
-                    }
-                    tableHeaderRow.append(th);
-                }
-            } else {
-                tableHeaderRow.append(utils.createElement('th', {}, parameter.name));
+
+        // make sure test data is valid, use empty test data according to parent parameter type
+        if (parentParameter.type === Parameter.type.array || parentParameter.type === Parameter.type.simpleArray) {
+            if (!Array.isArray(testData)) {
+                testData = [];
             }
+        } else if (parentParameter.type === Parameter.type.map) {
+            if (!testData || Object.getPrototypeOf(testData) !== Object.prototype) {
+                testData = {};
+            }
+        }
+
+        // create table header
+        // column with button to delete row
+        const elTh = utils.createElement('th');
+        if (parentParameter.type === Parameter.type.map) {
+            // for a map we only show one row with columns for each field, the row cannot be deleted
+            elTh.style.display = 'none';
+        }
+        tableHeaderRow.append(elTh);
+        for (const field of fields) {
+            tableHeaderRow.append(utils.createElement('th', {}, field.name));
         }
         const elTableHeader = utils.createElement('thead');
         elTableHeader.append(tableHeaderRow);
         table.append(elTableHeader);
-        if (items.length === 0) {
-            this.addTestDataRow(tableBody, this.parameters, null);
-        }
-        for (i=0; i < items.length; i++) {
-            this.addTestDataRow(tableBody, this.parameters, items[i]);
+
+        if (parentParameter.type === Parameter.type.map) {
+            // in case of a map we put the map data into an array so the data can be displayed
+            // in a table with one row
+            const items = [testData];
+            this.addTestDataRow(tableBody, parentParameter, fields, items, 0);
+        } else {
+            const items = Array.isArray(testData) ? testData : [];
+            // create content rows for data
+            if (items.length === 0) {
+                this.addEmptyTestDataRow(tableBody, parentParameter, fields); // xxx , items);
+            } else {
+                for (i=0; i < items.length; i++) {
+                    this.addTestDataRow(tableBody, parentParameter, fields, items, i);
+                }
+            }
         }
         table.append(tableBody);
         div.append(table);
-        const elAddButton = utils.createElement('div', { class: 'rbroButton rbroFullWidthButton' });
-        elAddButton.append(
-            utils.createElement(
-                'div', { class: 'rbroButton rbroPopupWindowButton' }, this.rb.getLabel('parameterAddTestData')));
-        elAddButton.addEventListener('click', (event) => {
-            this.addTestDataRow(tableBody, this.parameters, null);
-        });
-        div.append(elAddButton);
-        utils.emptyElement(this.elContent);
-        this.elContent.append(div);
+        // for a map we show exactly one row where each map item is displayed in an own column
+        if (parentParameter.type !== Parameter.type.map) {
+            const elAddButton = utils.createElement('div', { class: 'rbroButton rbroFullWidthButton' });
+            elAddButton.append(
+                utils.createElement(
+                    'div', { class: 'rbroButton rbroPopupWindowButton' }, this.rb.getLabel('parameterAddTestData')));
+            elAddButton.addEventListener('click', (event) => {
+                this.addEmptyTestDataRow(tableBody, parentParameter, fields);
+            });
+            div.append(elAddButton);
+        }
+        utils.emptyElement(elRoot);
+        elRoot.append(div);
+    }
+
+    addEmptyTestDataRow(tableBody, parentParameter, fields) {
+        const emptyRow = {};
+        for (const field of fields) {
+            if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
+                emptyRow[field.name] = [];
+            } else if (field.type === Parameter.type.map) {
+                emptyRow[field.name] = {};
+            } else {
+                emptyRow[field.name] = '';
+            }
+        }
+        const items = [emptyRow];
+        this.addTestDataRow(tableBody, parentParameter, fields, items, 0);
+    }
+
+    addTestDataRow(tableBody, parentParameter, fields, items, rowIndex) {
+        const testData = items[rowIndex];
+        const newRow = utils.createElement('tr');
+        newRow.dataset.rowId = String(this.nextRowId);
+        this.rowMap[String(this.nextRowId)] = { type: 'row', data: testData };
+        this.nextRowId++;
+        const elColumn = utils.createElement('td');
+        if (parentParameter.type !== Parameter.type.map) {
+            const elDeleteButton = utils.createElement('div', { class: 'rbroButton rbroDeleteButton rbroIcon-cancel' });
+            elDeleteButton.addEventListener('click', (event) => {
+                // delete row, therefor we have to remove the parent of the parent: tr > td > div
+                const elRow = event.target.parentElement.parentElement;
+                const rowId = elRow.dataset.rowId;
+                elRow.remove();
+                // now also delete data for row item
+                const rowMapEntry = this.rowMap[rowId];
+                items.splice(items.indexOf(rowMapEntry.data), 1);
+                delete this.rowMap[rowId];
+            });
+            elColumn.append(elDeleteButton);
+        } else {
+            // for a map we only show one row with columns for each field, the row cannot be deleted
+            elColumn.style.display = 'none';
+        }
+        newRow.append(elColumn);
+        const columnCount = fields.length;
+        for (const field of fields) {
+            let data = (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) ? [] : '';
+            if (testData !== null && field.name in testData) {
+                data = testData[field.name];
+            }
+            this.appendColumn(newRow, field, data, testData, columnCount);
+        }
+        tableBody.append(newRow);
+    }
+
+    appendColumn(elRow, field, data, parentData, columnCount) {
+        const elTd = utils.createElement('td');
+        if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray ||
+                field.type === Parameter.type.map) {
+            const div = utils.createElement('div', { class: 'expandableCell rbroIcon-plus' });
+            div.addEventListener('click', (event) => {
+                const expand = !div.classList.contains('rbroExpandedCell');
+                const nextEl = elRow.nextElementSibling;
+                if (nextEl && nextEl.tagName === 'TR') {
+                    const nestedTable = nextEl.querySelector('td table')
+                    if (nestedTable) {
+                        const elExpandableCells = elRow.querySelectorAll('.expandableCell');
+                        for (const elExpandableCell of elExpandableCells) {
+                            if (elExpandableCell.classList.contains('rbroExpandedCell')) {
+                                elExpandableCell.classList.remove('rbroExpandedCell');
+                                elExpandableCell.classList.remove('rbroIcon-minus');
+                                elExpandableCell.classList.add('rbroIcon-plus');
+                                // save test data before table is removed
+                                parentData[field.name] = this.getTestData(nestedTable, field.parameter);
+                                if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
+                                    const arrayLength = (field.name in parentData &&
+                                        Array.isArray(parentData[field.name])) ? parentData[field.name].length : 0;
+                                    this.setTableRowCount(div, arrayLength);
+                                }
+                                break;
+                            }
+                        }
+                        nextEl.remove();
+                    }
+                }
+
+                if (expand) {
+                    const elRowNestedTable = utils.createElement('tr');
+                    elRowNestedTable.dataset.rowId = String(this.nextRowId);
+                    this.rowMap[String(this.nextRowId)] = { type: 'table', field: field, parentData: parentData };
+                    this.nextRowId++;
+                    // add 1 for column containing delete button for row
+                    const elTdNestedTable = utils.createElement('td', { colspan: String(columnCount + 1) });
+                    // get test data from parent data because data could have been updated in the meantime
+                    const testData = parentData[field.name];
+                    this.createTestDataTable(elTdNestedTable, field.parameter, testData);
+                    elRowNestedTable.append(elTdNestedTable);
+                    elRow.insertAdjacentElement('afterend', elRowNestedTable);
+                    div.classList.remove('rbroIcon-plus');
+                    div.classList.add('rbroExpandedCell');
+                    div.classList.add('rbroIcon-minus');
+                    div.textContent = '';
+                }
+            });
+            if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
+                const arrayLength = (field.name in parentData && Array.isArray(parentData[field.name])) ?
+                    parentData[field.name].length : 0;
+                this.setTableRowCount(div, arrayLength);
+            }
+            elTd.append(div);
+        } else {
+            const input = utils.createElement('input');
+            if (field.type === Parameter.type.boolean) {
+                input.setAttribute('type', 'checkbox');
+                if (data) {
+                    input.checked = true;
+                }
+            } else {
+                input.setAttribute('type', 'text');
+                if (data) {
+                    input.setAttribute('value', data);
+                }
+            }
+            input.addEventListener('focus', (event) => {
+                input.parentElement.classList.add('rbroHasFocus');
+            });
+            input.addEventListener('blur', (event) => {
+                input.parentElement.classList.remove('rbroHasFocus');
+            });
+
+            if (field.type === Parameter.type.number) {
+                utils.setInputDecimal(input);
+            } else if (field.type === Parameter.type.date) {
+                input.setAttribute('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+            }
+            elTd.append(input);
+        }
+        elRow.append(elTd);
+    }
+
+    /**
+     * Get test data from html table. Also supports nested table inside cells.
+     * @param {Element} elRoot - the table dom element.
+     * @param {Parameter} parentParameter - parameter to get test data for. this can either be an array,
+     * simple array or map, i.e. a parameter where the test data is edited in the popup dialog.
+     * @return {Object|Object[]} map or array containing test data, depending on parent parameter type.
+     */
+    getTestData(elRoot, parentParameter) {
+        const fields = parentParameter.getParameterFields();
+        let testData = null;
+        if (parentParameter.type === Parameter.type.array || parentParameter.type === Parameter.type.simpleArray) {
+            testData = [];
+        } else if (parentParameter.type === Parameter.type.map) {
+            testData = {};
+        }
+        let rows = elRoot.querySelector('tbody').children;
+        for (let row of rows) {
+            const rowMapEntry = this.rowMap[row.dataset.rowId];
+            if (rowMapEntry.type === 'table') {
+                // get data of nested table
+                rowMapEntry.parentData[rowMapEntry.field.name] = this.getTestData(row, rowMapEntry.field.parameter);
+            } else {
+                const rowData = rowMapEntry.data;
+                let inputs = row.querySelectorAll('input');
+                let i = 0;
+                for (const field of fields) {
+                    // if the field is a nested array/map we ignore it. the nested data could be
+                    // updated in the next row in case the array/map was expanded.
+                    // see code in block for (rowMapEntry.type === 'table') above
+                    if (field.type !== Parameter.type.array && field.type !== Parameter.type.simpleArray &&
+                            field.type !== Parameter.type.map) {
+                        const input = inputs[i];
+                        if (field.type === Parameter.type.boolean) {
+                            rowData[field.name] = input.checked;
+                        } else {
+                            rowData[field.name] = input.value.trim();
+                        }
+                        i++;
+                    }
+                }
+                if (parentParameter.type === Parameter.type.array ||
+                        parentParameter.type === Parameter.type.simpleArray) {
+                    testData.push(rowData);
+                } else if (parentParameter.type === Parameter.type.map) {
+                    // in case of map parameter there is only one row so we only return a map
+                    // containing test data of this row
+                    testData = rowData;
+                }
+            }
+        }
+        return testData;
+    }
+
+    /**
+     * Sets row count for nested table.
+     * A nested table is collapsed per default and can be expanded by click, if the table is collapsed
+     * the row count is displayed.
+     * @param {Element} elDiv - element to toggle displayed nested table.
+     * @param {Number} arrayLength - array length of rows in nested table.
+     */
+    setTableRowCount(elDiv, arrayLength) {
+        if (arrayLength === 0) {
+            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCountEmpty');
+        } else if (arrayLength === 1) {
+            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCountOne');
+        } else {
+            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCount').replace(
+                '${count}', String(arrayLength));
+        }
     }
 
     /**

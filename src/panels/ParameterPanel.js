@@ -47,6 +47,23 @@ export default class ParameterPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'test_data'
             },
+            'testDataBoolean': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'test_data_boolean'
+            },
+            'testDataImage': {
+                'type': SetValueCmd.type.file,
+                'fieldId': 'test_data_image',
+                'rowId': 'rbro_parameter_test_data_image_row',
+                'singleRowProperty': false,
+                'rowProperties': ['testDataImage', 'testDataImageFilename']
+            },
+            'testDataImageFilename': {
+                'type': SetValueCmd.type.filename,
+                'fieldId': 'test_data_image_filename',
+                'rowId': 'rbro_parameter_test_data_image_row',
+                'singleRowProperty': false
+            },
         };
         this.parameterTypeOptions = [];
     }
@@ -66,8 +83,14 @@ export default class ParameterPanel extends PanelBase {
                     selectedObject.getId(), 'name', newParameterName,
                     SetValueCmd.type.text, this.rb);
                 cmdGroup.addCommand(cmd);
-                let parent = selectedObject.getParent();
+                let parent = null;
+                let nextParent = selectedObject.getParent();
+                while (nextParent !== null) {
+                    parent = nextParent;
+                    nextParent = parent.getParent();
+                }
                 if (parent !== null) {
+                    // update test data of root parameter because test data is only set for root parameters
                     parent.addUpdateTestDataCmdForChangedParameter(
                         selectedObject.getName(), newParameterName, cmdGroup);
                 }
@@ -265,6 +288,7 @@ export default class ParameterPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
+        const elTestDataContainer = utils.createElement('div', { id: 'rbro_parameter_test_data_container' });
         elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
@@ -279,21 +303,28 @@ export default class ParameterPanel extends PanelBase {
             }
         });
         elFormField.append(elTestData);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_parameter_test_data_error', class: 'rbroErrorMessage' }));
+        elDiv.append(elFormField);
+        elTestDataContainer.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_parameter_edit_test_data_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_edit_test_data_row');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elEditTestDataButton = utils.createElement(
             'button', {
                 id: 'rbro_parameter_edit_test_data',
-                class: 'rbroButton rbroActionButton',
-                style: 'display: none;'
+                class: 'rbroButton rbroActionButton'
             });
         elEditTestDataButton.append(utils.createElement('span', {}, this.rb.getLabel('parameterEditTestData')));
         elEditTestDataButton.append(utils.createElement('span', { class: 'rbroIcon-edit' }));
         elEditTestDataButton.addEventListener('click', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
-                let rows = selectedObject.getTestDataRows(true);
-                if (rows.length > 0) {
+                const fields = selectedObject.getParameterFields();
+                if (fields.length > 0) {
                     this.rb.getPopupWindow().show(
-                        rows, selectedObject.getId(), '', 'testData', PopupWindow.type.testData);
+                        null, selectedObject.getId(), '', 'testData', PopupWindow.type.testData, null, selectedObject);
                 } else {
                     alert(this.rb.getLabel('parameterEditTestDataNoFields'));
                 }
@@ -301,9 +332,93 @@ export default class ParameterPanel extends PanelBase {
         });
         elFormField.append(elEditTestDataButton);
         elFormField.append(
-            utils.createElement('div', { id: 'rbro_parameter_test_data_error', class: 'rbroErrorMessage' }));
+            utils.createElement('div', { id: 'rbro_parameter_edit_test_data_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
-        panel.append(elDiv);
+        elTestDataContainer.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_boolean_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data_boolean');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        const elTestDataBoolean = utils.createElement(
+            'input', { id: 'rbro_parameter_test_data_boolean', type: 'checkbox' });
+        elTestDataBoolean.addEventListener('change', (event) => {
+            const testDataBooleanChecked = elTestDataBoolean.checked;
+            const selectedObject = rb.getSelectedObject();
+            if (selectedObject !== null) {
+                let cmd = new SetValueCmd(
+                    selectedObject.getId(), 'testDataBoolean', testDataBooleanChecked,
+                    SetValueCmd.type.checkbox, this.rb);
+                this.rb.executeCommand(cmd);
+            }
+        });
+        elFormField.append(elTestDataBoolean);
+        elDiv.append(elFormField);
+        elTestDataContainer.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_image_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data_image');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        const elTestDataImage = utils.createElement('input', { id: 'rbro_parameter_test_data_image', type: 'file' });
+        elTestDataImage.addEventListener('change', (event) => {
+            let files = event.target.files;
+            if (files && files[0]) {
+                let fileReader = new FileReader();
+                let rb = this.rb;
+                let fileName = files[0].name;
+                fileReader.onload = function(e) {
+                    const cmdGroup = new CommandGroupCmd('Load image', rb);
+                    const selectedObject = rb.getSelectedObject();
+                    if (selectedObject !== null) {
+                        cmdGroup.addSelection(selectedObject.getId());
+                        cmdGroup.addCommand(new SetValueCmd(
+                            selectedObject.getId(), 'testDataImage', e.target.result, SetValueCmd.type.file, rb));
+                        cmdGroup.addCommand(new SetValueCmd(
+                            selectedObject.getId(), 'testDataImageFilename', fileName, SetValueCmd.type.filename, rb));
+                    }
+                    if (!cmdGroup.isEmpty()) {
+                        rb.executeCommand(cmdGroup);
+                    }
+                };
+                fileReader.onerror = function(e) {
+                    alert(rb.getLabel('docElementLoadImageErrorMsg'));
+                };
+                fileReader.readAsDataURL(files[0]);
+            }
+        });
+        elFormField.append(elTestDataImage);
+        elFormField.append(
+            utils.createElement(
+                'span', { title: this.rb.getLabel('parameterTestDataImageInfo'), class: 'rbroIcon-check' }));
+        let elTestDataFilenameDiv = utils.createElement(
+            'div', { id: 'rbro_parameter_test_data_image_filename_container', class: 'rbroSplit rbroHidden' });
+        elTestDataFilenameDiv.append(utils.createElement('div', { id: 'rbro_parameter_test_data_image_filename' }));
+        elTestDataFilenameDiv.append(utils.createElement(
+            'div', {
+                id: 'rbro_parameter_test_data_image_filename_clear',
+                class: 'rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton'
+            })
+        );
+        elTestDataFilenameDiv.addEventListener('click', (event) => {
+            elTestDataImage.value = '';
+            let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
+            const selectedObject = rb.getSelectedObject();
+            if (selectedObject !== null) {
+                cmdGroup.addSelection(selectedObject.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    selectedObject.getId(), 'testDataImage', '', SetValueCmd.type.file, this.rb));
+                cmdGroup.addCommand(new SetValueCmd(
+                    selectedObject.getId(), 'testDataImageFilename', '', SetValueCmd.type.filename, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elTestDataFilenameDiv);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_parameter_test_data_image_error', class: 'rbroErrorMessage' }));
+        elDiv.append(elFormField);
+        elTestDataContainer.append(elDiv);
+        panel.append(elTestDataContainer);
 
         document.getElementById('rbro_detail_panel').append(panel);
     }
@@ -366,8 +481,7 @@ export default class ParameterPanel extends PanelBase {
             }
         }
         if (field === null || field === 'type' || field === 'eval') {
-            if (type === Parameter.type.image || type === Parameter.type.sum || type === Parameter.type.average ||
-                showOnlyNameType) {
+            if (type === Parameter.type.sum || type === Parameter.type.average || showOnlyNameType) {
                 document.getElementById('rbro_parameter_eval_row').style.display = 'none';
                 document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
             } else {
@@ -377,23 +491,34 @@ export default class ParameterPanel extends PanelBase {
                 } else {
                     document.getElementById('rbro_parameter_eval_row').removeAttribute('style');
                 }
-                if ((parentParameter !== null && parentParameter.getValue('type') === Parameter.type.array) ||
-                    type === Parameter.type.map) {
-                    document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
+                if (parentParameter !== null ||
+                        (obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||
+                            type === Parameter.type.boolean || type === Parameter.type.date))) {
+                    document.getElementById('rbro_parameter_test_data_container').style.display = 'none';
                 } else {
-                    if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
-                            !obj.getValue('eval')) {
-                        document.getElementById('rbro_parameter_test_data_row').removeAttribute('style');
-                    } else {
-                        document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
-                    }
+                    document.getElementById('rbro_parameter_test_data_container').removeAttribute('style');
                 }
-                if (type === Parameter.type.array || type === Parameter.type.simpleArray) {
-                    document.getElementById('rbro_parameter_test_data').style.display = 'none';
-                    document.getElementById('rbro_parameter_edit_test_data').removeAttribute('style');
+                if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
+                        type === Parameter.type.map) {
+                    document.getElementById('rbro_parameter_edit_test_data_row').removeAttribute('style');
                 } else {
-                    document.getElementById('rbro_parameter_test_data').removeAttribute('style');
-                    document.getElementById('rbro_parameter_edit_test_data').style.display = 'none';
+                    document.getElementById('rbro_parameter_edit_test_data_row').style.display = 'none';
+                }
+                if (type === Parameter.type.string || type === Parameter.type.number ||
+                        type === Parameter.type.date) {
+                    document.getElementById('rbro_parameter_test_data_row').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
+                }
+                if (type === Parameter.type.boolean) {
+                    document.getElementById('rbro_parameter_test_data_boolean_row').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_test_data_boolean_row').style.display = 'none';
+                }
+                if (type === Parameter.type.image) {
+                    document.getElementById('rbro_parameter_test_data_image_row').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_test_data_image_row').style.display = 'none';
                 }
             }
             if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||

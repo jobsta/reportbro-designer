@@ -1302,34 +1302,24 @@ export default class ReportBro {
     }
 
     getTestData() {
-        let ret = {};
+        let rv = {};
         for (let parameter of this.getParameters()) {
             if (!parameter.getValue('showOnlyNameType')) {
                 let type = parameter.getValue('type');
-                if (type === Parameter.type.map) {
-                    let testData = {};
-                    for (let child of parameter.getChildren()) {
-                        testData[child.getName()] = child.getValue('testData');
-                    }
-                    ret[parameter.getName()] = testData;
-                } else if (type === Parameter.type.array) {
-                    ret[parameter.getName()] = parameter.getTestDataRows(false);
-                } else if (type === Parameter.type.simpleArray) {
-                    let testDataRows = [];
-                    // because test data rows are stored as map items we convert the list to a list of simple values
-                    for (let testDataRow of parameter.getTestDataRows(false)) {
-                        if ('data' in testDataRow) {
-                            testDataRows.push(testDataRow['data']);
-                        }
-                    }
-                    ret[parameter.getName()] = testDataRows;
+                if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
+                        type === Parameter.type.map) {
+                    rv[parameter.getName()] = parameter.getTestData();
                 } else if (type === Parameter.type.string || type === Parameter.type.number ||
-                           type === Parameter.type.boolean || type === Parameter.type.date) {
-                    ret[parameter.getName()] = parameter.getValue('testData');
+                        type === Parameter.type.date) {
+                    rv[parameter.getName()] = parameter.getValue('testData');
+                } else if (type === Parameter.type.boolean) {
+                    rv[parameter.getName()] = parameter.getValue('testDataBoolean');
+                } else if (type === Parameter.type.image) {
+                    rv[parameter.getName()] = parameter.getValue('testDataImage');
                 }
             }
         }
-        return ret;
+        return rv;
     }
 
     /**
@@ -1444,18 +1434,18 @@ export default class ReportBro {
      * @returns {Object}
      */
     getReport() {
-        let ret = { docElements: [], parameters: [], styles: [], version: 3 };
+        let rv = { docElements: [], parameters: [], styles: [], version: 4 };
         let i;
-        ret.docElements = this.getDocElements(false);
+        rv.docElements = this.getDocElements(false);
         for (let parameter of this.getParameters()) {
-            ret.parameters.push(parameter.toJS());
+            rv.parameters.push(parameter.toJS());
         }
         for (let style of this.getStyles()) {
-            ret.styles.push(style.toJS());
+            rv.styles.push(style.toJS());
         }
-        ret.documentProperties = this.documentProperties.toJS();
+        rv.documentProperties = this.documentProperties.toJS();
 
-        return ret;
+        return rv;
     }
 
     /**
@@ -1514,7 +1504,7 @@ export default class ReportBro {
         this.getMainPanel().getStylesItem().close();
 
         if (report.version < 2) {
-            for (let docElementData of report.docElements) {
+            for (const docElementData of report.docElements) {
                 if (docElementData.elementType === DocElement.type.table) {
                     docElementData.contentDataRows = [docElementData.contentData];
                     docElementData.contentRows = '1';
@@ -1522,13 +1512,27 @@ export default class ReportBro {
             }
         }
         if (report.version < 3) {
-            for (let docElementData of report.docElements) {
+            for (const docElementData of report.docElements) {
                 if (docElementData.elementType === DocElement.type.table) {
                     let width = 0;
                     for (let i=0; i < docElementData.headerData.columnData.length; i++) {
                         width += docElementData.headerData.columnData[i].width;
                     }
                     docElementData.width = width;
+                }
+            }
+        }
+        if (report.version < 4) {
+            for (let parameterData of report.parameters) {
+                if (parameterData.type === Parameter.type.map) {
+                    const testData = {};
+                    for (const child of parameterData.children) {
+                        testData[child.name] = child.testData;
+                        child.testData = '';
+                    }
+                    parameterData.testData = JSON.stringify(testData);
+                } else if (parameterData.type === Parameter.type.boolean) {
+                    parameterData.testDataBoolean = Boolean(parameterData.testData);
                 }
             }
         }

@@ -1,4 +1,4 @@
-var locale_en = {
+const locale_en = {
     bandContent: 'Content',
     bandFooter: 'Footer',
     bandHeader: 'Header',
@@ -86,7 +86,7 @@ var locale_en = {
     errorMsgInvalidBarCode: 'Invalid bar code content',
     errorMsgInvalidDataSource: 'Invalid data source',
     errorMsgInvalidDataSourceParameter: 'Parameter must be a list',
-    errorMsgInvalidDate: 'Invalid date, expected format is YYYY-MM-DD ( or YYYY-MM-DD hh:mm for date with time)',
+    errorMsgInvalidDate: 'Invalid date, expected format is YYYY-MM-DD (or YYYY-MM-DD hh:mm for date with time)',
     errorMsgInvalidExpression: 'Invalid expression: ${info}',
     errorMsgInvalidExpressionFuncNotDefined: 'Function ${info} not defined',
     errorMsgInvalidExpressionNameNotDefined: 'Name ${info} not defined',
@@ -182,6 +182,10 @@ var locale_en = {
     parameterSearchPlaceholder: 'Search parameters...',
     parameterTestData: 'Test data',
     parameterTestDataDatePattern: 'YYYY-MM-DD',
+    parameterTestDataImageInfo: 'Images are saved in the report template and could significantly increase report template size',
+    parameterTestDataRowCount: '${count} rows',
+    parameterTestDataRowCountEmpty: 'empty',
+    parameterTestDataRowCountOne: '1 row',
     parameterType: 'Type',
     parameterTypeArray: 'List',
     parameterTypeAverage: 'Average',
