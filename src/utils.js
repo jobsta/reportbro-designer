@@ -3,8 +3,8 @@ String.prototype.reverse = function () { return this.split('').reverse().join(''
 /**
  * Creates HTML element specified by tagName.
  * @param {String} tagName - specifies the type of element to be created.
- * @param {?Object} props - optional map containing properties for new element, e.g. id or class name.
- * @param {?String} textContent - optional text content of the new element.
+ * @param {?Object=} props - optional map containing properties for new element, e.g. id or class name.
+ * @param {?String=} textContent - optional text content of the new element.
  * @returns {HTMLElement} the created DOM element.
  */
 export function createElement(tagName, props, textContent) {
@@ -36,8 +36,8 @@ export function emptyElement(el) {
  * Shortcut to create a label and append it to specified element.
  * @param {HTMLElement} el - element where label will be appended to.
  * @param {String} label - label text.
- * @param {?String} forAttr - optional 'for' id of label.
- * @param {?Object} props - optional map containing properties for new label, e.g. id or class name.
+ * @param {?String=} forAttr - optional 'for' id of label.
+ * @param {?Object=} props - optional map containing properties for new label, e.g. id or class name.
  */
 export function appendLabel(el, label, forAttr, props) {
     const properties = props || {};
