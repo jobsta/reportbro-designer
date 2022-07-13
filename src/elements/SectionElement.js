@@ -191,6 +191,27 @@ export default class SectionElement extends DocElement {
             elSizerContainer.append(
                 utils.createElement('div', { class: `rbroSizer rbroSizer${sizer} rbroSizerMove` }));
         }
+
+        if (this.headerData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.headerData.getId()}`)
+                .classList.add('rbroHighlightBandDescription');
+        }
+        if (this.contentData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.contentData.getId()}`)
+                .classList.add('rbroHighlightBandDescription');
+        }
+        if (this.footerData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.footerData.getId()}`)
+                .classList.add('rbroHighlightBandDescription');
+        }
+    }
+
+    deselect() {
+        super.deselect();
+        const elBandDescriptions = this.el.querySelectorAll('.rbroDocumentBandDescription');
+        for (const elBandDescription of elBandDescriptions) {
+            elBandDescription.classList.remove('rbroHighlightBandDescription');
+        }
     }
 
     /**
@@ -262,6 +283,18 @@ export default class SectionElement extends DocElement {
             if (this.dataSource.trim() !== '') {
                 this.name += ' ' + this.dataSource;
             }
+        }
+        if (this.headerData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.headerData.getId()}`).textContent =
+                this.name + ' ' + this.headerData.getName();
+        }
+        if (this.contentData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.contentData.getId()}`).textContent =
+                this.name + ' ' + this.contentData.getName();
+        }
+        if (this.footerData !== null) {
+            document.getElementById(`rbro_el$_band_description${this.footerData.getId()}`).textContent =
+                this.name + ' ' + this.footerData.getName();
         }
         document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }
