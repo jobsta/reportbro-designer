@@ -1308,7 +1308,7 @@ export default class ReportBro {
                 let type = parameter.getValue('type');
                 if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
                         type === Parameter.type.map) {
-                    rv[parameter.getName()] = parameter.getTestData();
+                    rv[parameter.getName()] = parameter.getTestData(false);
                 } else if (type === Parameter.type.string || type === Parameter.type.number ||
                         type === Parameter.type.date) {
                     rv[parameter.getName()] = parameter.getValue('testData');

@@ -82,7 +82,7 @@ export default class PopupWindow {
         }
 
         if (type === PopupWindow.type.testData) {
-            const testData = parameter.getTestData();
+            const testData = parameter.getTestData(true);
             this.createTestDataTable(this.elContent, parameter, testData);
             let width = Math.round(winWidth * 0.8);
             let height = Math.round(winHeight * 0.8);
@@ -236,7 +236,14 @@ export default class PopupWindow {
         }
         tableHeaderRow.append(elTh);
         for (const field of fields) {
-            tableHeaderRow.append(utils.createElement('th', {}, field.name));
+            const elTh = utils.createElement('th', {}, field.name);
+            if (field.type === Parameter.type.image) {
+                elTh.append(
+                    utils.createElement(
+                        'span', { title: this.rb.getLabel('parameterTestDataImageInfo'), class: 'rbroIcon-check' }));
+
+            }
+            tableHeaderRow.append(elTh);
         }
         const elTableHeader = utils.createElement('thead');
         elTableHeader.append(tableHeaderRow);
@@ -382,31 +389,74 @@ export default class PopupWindow {
             }
             elTd.append(div);
         } else {
-            const input = utils.createElement('input');
-            if (field.type === Parameter.type.boolean) {
-                input.setAttribute('type', 'checkbox');
-                if (data) {
-                    input.checked = true;
+            if (field.type === Parameter.type.image) {
+                const elTestDataImageContainer = utils.createElement('div');
+                const elTestDataImage = utils.createElement('input', { type: 'file' });
+                elTestDataImage.addEventListener('change', (event) => {
+                    let files = event.target.files;
+                    if (files && files[0]) {
+                        let fileReader = new FileReader();
+                        let rb = this.rb;
+                        let fileName = files[0].name;
+                        fileReader.onload = function(e) {
+                            parentData[field.name] = { data: e.target.result, filename: fileName };
+                            elTestDataFilenameDiv.classList.remove('rbroHidden');
+                            elTestDataFilename.textContent = fileName;
+                        };
+                        fileReader.onerror = function(e) {
+                            alert(rb.getLabel('docElementLoadImageErrorMsg'));
+                        };
+                        fileReader.readAsDataURL(files[0]);
+                    }
+                });
+                elTestDataImageContainer.append(elTestDataImage);
+                const elTestDataFilenameDiv = utils.createElement('div', { class: 'rbroSplit rbroHidden' });
+                const elTestDataFilename = utils.createElement('div');
+                elTestDataFilenameDiv.append(elTestDataFilename);
+                const elTestDataImageFilenameClear = utils.createElement(
+                    'div', { class: 'rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton' });
+                elTestDataImageFilenameClear.addEventListener('click', (event) => {
+                    elTestDataImage.value = '';
+                    parentData[field.name] = { data: '', filename: '' };
+                    elTestDataFilenameDiv.classList.add('rbroHidden');
+                    elTestDataFilename.textContent = '';
+                });
+                elTestDataFilenameDiv.append(elTestDataImageFilenameClear);
+                elTestDataImageContainer.append(elTestDataFilenameDiv);
+                if (data.filename) {
+                    elTestDataFilename.textContent = data.filename;
+                    elTestDataFilenameDiv.classList.remove('rbroHidden');
                 }
-            } else {
-                input.setAttribute('type', 'text');
-                if (data) {
-                    input.setAttribute('value', data);
-                }
-            }
-            input.addEventListener('focus', (event) => {
-                input.parentElement.classList.add('rbroHasFocus');
-            });
-            input.addEventListener('blur', (event) => {
-                input.parentElement.classList.remove('rbroHasFocus');
-            });
+                elTd.append(elTestDataImageContainer);
 
-            if (field.type === Parameter.type.number) {
-                utils.setInputDecimal(input);
-            } else if (field.type === Parameter.type.date) {
-                input.setAttribute('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+            } else {
+                // "simple" test data which can be displayed with an input control
+                const input = utils.createElement('input');
+                if (field.type === Parameter.type.boolean) {
+                    input.setAttribute('type', 'checkbox');
+                    if (data) {
+                        input.checked = true;
+                    }
+                } else {
+                    input.setAttribute('type', 'text');
+                    if (data) {
+                        input.setAttribute('value', data);
+                    }
+                }
+                input.addEventListener('focus', (event) => {
+                    input.parentElement.classList.add('rbroHasFocus');
+                });
+                input.addEventListener('blur', (event) => {
+                    input.parentElement.classList.remove('rbroHasFocus');
+                });
+
+                if (field.type === Parameter.type.number) {
+                    utils.setInputDecimal(input);
+                } else if (field.type === Parameter.type.date) {
+                    input.setAttribute('placeholder', this.rb.getLabel('parameterTestDataDatePattern'));
+                }
+                elTd.append(input);
             }
-            elTd.append(input);
         }
         elRow.append(elTd);
     }
@@ -445,7 +495,8 @@ export default class PopupWindow {
                         const input = inputs[i];
                         if (field.type === Parameter.type.boolean) {
                             rowData[field.name] = input.checked;
-                        } else {
+                        } else if (field.type !== Parameter.type.image) {
+                            // for images the data is immediately set when a file is selected
                             rowData[field.name] = input.value.trim();
                         }
                         i++;
