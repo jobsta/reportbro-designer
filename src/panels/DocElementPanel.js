@@ -1010,13 +1010,12 @@ export default class DocElementPanel extends PanelBase {
         let elFilenameDiv = utils.createElement(
             'div', { id: 'rbro_doc_element_image_filename_container', class: 'rbroSplit rbroHidden' });
         elFilenameDiv.append(utils.createElement('div', { id: 'rbro_doc_element_image_filename' }));
-        elFilenameDiv.append(utils.createElement(
+        const elImageFilenameClear = utils.createElement(
             'div', {
                 id: 'rbro_doc_element_image_filename_clear',
                 class: 'rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton'
-            })
-        );
-        elFilenameDiv.addEventListener('click', (event) => {
+            });
+        elImageFilenameClear.addEventListener('click', (event) => {
             elImage.value = '';
             let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1032,6 +1031,7 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
+        elFilenameDiv.append(elImageFilenameClear);
         elFormField.append(elFilenameDiv);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_image_error', class: 'rbroErrorMessage' })

@@ -78,46 +78,48 @@ export default class ParameterPanel extends PanelBase {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
                 let newParameterName = elParameterName.value;
-                let cmdGroup = new CommandGroupCmd('Rename parameter');
-                let cmd = new SetValueCmd(
-                    selectedObject.getId(), 'name', newParameterName,
-                    SetValueCmd.type.text, this.rb);
-                cmdGroup.addCommand(cmd);
-                let parent = null;
-                let nextParent = selectedObject.getParent();
-                while (nextParent !== null) {
-                    parent = nextParent;
-                    nextParent = parent.getParent();
-                }
-                if (parent !== null) {
-                    // update test data of root parameter because test data is only set for root parameters
-                    parent.addUpdateTestDataCmdForChangedParameter(
-                        selectedObject.getName(), newParameterName, cmdGroup);
-                }
+                if (newParameterName !== selectedObject.getName()) {
+                    let cmdGroup = new CommandGroupCmd('Rename parameter');
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'name', newParameterName,
+                        SetValueCmd.type.text, this.rb);
+                    cmdGroup.addCommand(cmd);
 
-                let parentPanelItem = null;
-                if (parent !== null) {
-                    parentPanelItem = parent.getPanelItem();
-                } else {
-                    parentPanelItem = this.rb.getMainPanel().getParametersItem();
-                }
+                    const parents = [];
+                    let parent = null;
+                    let nextParent = selectedObject.getParent();
+                    while (nextParent !== null) {
+                        parent = nextParent;
+                        parents.unshift(parent);
+                        nextParent = parent.getParent();
+                    }
 
-                // only update parameter references on name change if the parameter name is unique
-                if (parentPanelItem !== null &&
-                        parentPanelItem.getChildByNameExclude(selectedObject.getName(), selectedObject) === null &&
-                        parentPanelItem.getChildByNameExclude(newParameterName, selectedObject) === null) {
-                    // add commands to convert all values containing the currently changed parameter
-                    let docElements = this.rb.getDocElements(true);
-                    for (let docElement of docElements) {
-                        docElement.addCommandsForChangedParameterName(
-                            selectedObject, newParameterName, cmdGroup);
+                    selectedObject.addUpdateTestDataCmdForChangedParameterName(newParameterName, parents, cmdGroup);
+
+                    let parentPanelItem = null;
+                    if (parent !== null) {
+                        parentPanelItem = parent.getPanelItem();
+                    } else {
+                        parentPanelItem = this.rb.getMainPanel().getParametersItem();
                     }
-                    for (let parameter of this.rb.getParameters()) {
-                        parameter.addCommandsForChangedParameterName(
-                            selectedObject, newParameterName, cmdGroup);
+
+                    // only update parameter references on name change if the parameter name is unique
+                    if (parentPanelItem !== null &&
+                            parentPanelItem.getChildByNameExclude(selectedObject.getName(), selectedObject) === null &&
+                            parentPanelItem.getChildByNameExclude(newParameterName, selectedObject) === null) {
+                        // add commands to convert all values containing the currently changed parameter
+                        let docElements = this.rb.getDocElements(true);
+                        for (let docElement of docElements) {
+                            docElement.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
+                        }
+                        for (let parameter of this.rb.getParameters()) {
+                            parameter.addCommandsForChangedParameterName(
+                                selectedObject, newParameterName, cmdGroup);
+                        }
                     }
+                    this.rb.executeCommand(cmdGroup);
                 }
-                this.rb.executeCommand(cmdGroup);
             }
         });
         elFormField.append(elParameterName);
@@ -386,19 +388,15 @@ export default class ParameterPanel extends PanelBase {
             }
         });
         elFormField.append(elTestDataImage);
-        elFormField.append(
-            utils.createElement(
-                'span', { title: this.rb.getLabel('parameterTestDataImageInfo'), class: 'rbroIcon-check' }));
         let elTestDataFilenameDiv = utils.createElement(
             'div', { id: 'rbro_parameter_test_data_image_filename_container', class: 'rbroSplit rbroHidden' });
         elTestDataFilenameDiv.append(utils.createElement('div', { id: 'rbro_parameter_test_data_image_filename' }));
-        elTestDataFilenameDiv.append(utils.createElement(
+        const elTestDataImageFilenameClear = utils.createElement(
             'div', {
                 id: 'rbro_parameter_test_data_image_filename_clear',
                 class: 'rbroIcon-cancel rbroButton rbroDeleteButton rbroRoundButton'
-            })
-        );
-        elTestDataFilenameDiv.addEventListener('click', (event) => {
+            });
+        elTestDataImageFilenameClear.addEventListener('click', (event) => {
             elTestDataImage.value = '';
             let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
             const selectedObject = rb.getSelectedObject();
@@ -413,7 +411,10 @@ export default class ParameterPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
+        elTestDataFilenameDiv.append(elTestDataImageFilenameClear);
         elFormField.append(elTestDataFilenameDiv);
+        elFormField.append(
+            utils.createElement('div', { class: 'rbroInfo' }, this.rb.getLabel('parameterTestDataImageInfo')));
         elFormField.append(
             utils.createElement('div', { id: 'rbro_parameter_test_data_image_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
