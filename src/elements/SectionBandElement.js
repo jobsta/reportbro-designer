@@ -148,7 +148,9 @@ export default class SectionBandElement extends DocElement {
         this.el = utils.createElement(
             'div', { id: `rbro_el${this.id}`, class: 'rbroSectionBandElement rbroElementContainer' });
         this.el.append(utils.createElement(
-            'div', { class: 'rbroDocumentBandDescription' }, this.rb.getLabel('docElementSection') + ' ' + this.name));
+            'div', {
+                id: `rbro_el$_band_description${this.id}`, class: 'rbroDocumentBandDescription'
+            }));
         document.getElementById(`rbro_el${this.parentId}`).append(this.el);
     }
 
