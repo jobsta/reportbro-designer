@@ -241,37 +241,42 @@ export default class Parameter {
     /**
      * Update test data for arrays and maps. Adapt field names of list items so test data is still valid when a
      * parameter of a list item is renamed.
-     * @param {String} oldParameterName
      * @param {String} newParameterName
+     * @param {Parameter[]} parents
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
-    addUpdateTestDataCmdForChangedParameter(oldParameterName, newParameterName, cmdGroup) {
-        if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
-            let rows = [];
+    addUpdateTestDataCmdForChangedParameterName(newParameterName, parents, cmdGroup) {
+        const rootParent = (parents.length > 0) ? parents[0] : null;
+        if (rootParent !== null &&
+                (rootParent.type === Parameter.type.array || rootParent.type === Parameter.type.map)) {
+            // update test data of root parameter because test data is only set for root parameters
             try {
-                let testData = JSON.parse(this.testData);
-                if (Array.isArray(testData)) {
-                    for (let row of testData) {
-                        let itemRow = {};
-                        for (let val in row) {
-                            if (row.hasOwnProperty(val)) {
-                                if (val === oldParameterName) {
-                                    itemRow[newParameterName] = row[val];
-                                } else {
-                                    itemRow[val] = row[val];
-                                }
-                            }
-                        }
-                        rows.push(itemRow);
-                    }
-                }
-                let testDataStr = JSON.stringify(rows);
-                if (this.testData !== testDataStr) {
+                const testData = rootParent.getTestData(true);
+                this.renameTestDataParameter(testData, this.getName(), newParameterName, parents, 0);
+                let updatedTestData = JSON.stringify(testData);
+                if (this.testData !== updatedTestData) {
                     let cmd = new SetValueCmd(
-                        this.id, 'testData', testDataStr, SetValueCmd.type.text, this.rb);
+                        rootParent.getId(), 'testData', updatedTestData, SetValueCmd.type.text, this.rb);
                     cmdGroup.addCommand(cmd);
                 }
             } catch (e) {
+            }
+        }
+    }
+
+    renameTestDataParameter(testData, oldParameterName, newParameterName, parents, parentLevel) {
+        const nextParentLevel = parentLevel + 1;
+        const hasNextParent = (nextParentLevel < parents.length);
+        const compareName = hasNextParent ? parents[nextParentLevel].getName() : oldParameterName;
+        for (const testDataRow of testData) {
+            if (compareName in testDataRow) {
+                if (hasNextParent) {
+                    this.renameTestDataParameter(
+                        testDataRow[compareName], oldParameterName, newParameterName, parents, nextParentLevel);
+                } else {
+                    testDataRow[newParameterName] = testDataRow[compareName];
+                    delete testDataRow[compareName];
+                }
             }
         }
     }
@@ -455,9 +460,11 @@ export default class Parameter {
     /**
      * Returns test data of parameter as array or map.
      * The test data is sanitized, i.e. the data value types match the corresponding parameter types.
+     * @param {Boolean} editFormat - if true the data will be returned in edit format (containing additional info),
+     * i.e. the data is used in the popup window to edit test data.
      * @returns {?Object|Object[]} test data. Null in case parameter is not an array, simple array or map.
      */
-    getTestData() {
+    getTestData(editFormat) {
         let testData = null;
         try {
             testData = JSON.parse(this.testData);
@@ -465,8 +472,8 @@ export default class Parameter {
         }
         if (this.type === Parameter.type.array || this.type === Parameter.type.simpleArray ||
                 this.type === Parameter.type.map) {
-            if (this.testData) {
-                return this.getSanitizedTestData(this, testData);
+            if (testData) {
+                return this.getSanitizedTestData(this, testData, editFormat);
             }
         }
         return null;
@@ -477,13 +484,13 @@ export default class Parameter {
      * The test data is sanitized, i.e. the data value types match the corresponding parameter types.
      * @returns {Object|Object[]} sanitized test data
      */
-    getSanitizedTestData(parameter, testData) {
+    getSanitizedTestData(parameter, testData, editFormat) {
         let rv;
         if (parameter.type === Parameter.type.map) {
             if (!testData || Object.getPrototypeOf(testData) !== Object.prototype) {
                 testData = {};
             }
-            rv = this.getSanitizedTestDataMap(this, testData);
+            rv = this.getSanitizedTestDataMap(this, testData, editFormat);
         } else {
             if (!Array.isArray(testData)) {
                 testData = [];
@@ -494,16 +501,16 @@ export default class Parameter {
                     if (!testDataRow || Object.getPrototypeOf(testDataRow) !== Object.prototype) {
                         testDataRow = {};
                     }
-                    rv.push(this.getSanitizedTestDataMap(parameter, testDataRow));
+                    rv.push(this.getSanitizedTestDataMap(parameter, testDataRow, editFormat));
                 } else if (this.type === Parameter.type.simpleArray) {
-                    rv.push(this.getSanitizedTestDataValue(parameter.arrayItemType, testDataRow));
+                    rv.push(this.getSanitizedTestDataValue(parameter.arrayItemType, testDataRow, editFormat));
                 }
             }
         }
         return rv;
     }
 
-    getSanitizedTestDataMap(parameter, testData) {
+    getSanitizedTestDataMap(parameter, testData, editFormat) {
         const rv = {};
         for (const field of parameter.getChildren()) {
             if (field.showOnlyNameType) {
@@ -511,24 +518,25 @@ export default class Parameter {
             }
             const value = (field.name in testData) ? testData[field.name] : null;
             if (field.type === Parameter.type.array || field.type === Parameter.type.map) {
-                rv[field.name] = this.getSanitizedTestData(field, value);
+                rv[field.name] = this.getSanitizedTestData(field, value, editFormat);
             } else if (field.type === Parameter.type.simpleArray) {
-                if (!Array.isArray(testData)) {
-                    testData = [];
+                let testDataRows = testData;
+                if (!Array.isArray(testDataRows)) {
+                    testDataRows = [];
                 }
                 const arrayValues = [];
-                for (let testDataRow of testData) {
-                    arrayValues.push(this.getSanitizedTestDataValue(field.arrayItemType, testDataRow));
+                for (let testDataRow of testDataRows) {
+                    arrayValues.push(this.getSanitizedTestDataValue(field.arrayItemType, testDataRow, editFormat));
                 }
                 rv[field.name] = arrayValues;
             } else {
-                rv[field.name] = this.getSanitizedTestDataValue(field.type, value);
+                rv[field.name] = this.getSanitizedTestDataValue(field.type, value, editFormat);
             }
         }
         return rv;
     }
 
-    getSanitizedTestDataValue(fieldType, testData) {
+    getSanitizedTestDataValue(fieldType, testData, editFormat) {
         let rv = null;
         if (fieldType === Parameter.type.string) {
             if (typeof testData === 'string') {
@@ -554,6 +562,21 @@ export default class Parameter {
                 // we allow dates in format "YYYY-MM-DD", "YYYY-MM-DD HH:MM" and "YYYY-MM-DD HH:MM:SS" for test data
                 if (Parameter.dateRegex.test(testData)) {
                     rv = testData;
+                }
+            }
+        } else if (fieldType === Parameter.type.image) {
+            if (!testData || Object.getPrototypeOf(testData) !== Object.prototype ||
+                    !('data' in testData) || !('filename' in testData)) {
+                if (editFormat) {
+                    rv = { data: '', filename: '' };
+                } else {
+                    rv = '';
+                }
+            } else {
+                if (editFormat) {
+                    rv = testData;
+                } else {
+                    rv = testData.data;
                 }
             }
         }
