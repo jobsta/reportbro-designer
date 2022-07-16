@@ -149,7 +149,7 @@ export default class SectionBandElement extends DocElement {
             'div', { id: `rbro_el${this.id}`, class: 'rbroSectionBandElement rbroElementContainer' });
         this.el.append(utils.createElement(
             'div', {
-                id: `rbro_el$_band_description${this.id}`, class: 'rbroDocumentBandDescription'
+                id: `rbro_el_band_description${this.id}`, class: 'rbroDocumentBandDescription'
             }));
         document.getElementById(`rbro_el${this.parentId}`).append(this.el);
     }
