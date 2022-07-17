@@ -520,13 +520,21 @@ export default class Parameter {
             if (field.type === Parameter.type.array || field.type === Parameter.type.map) {
                 rv[field.name] = this.getSanitizedTestData(field, value, editFormat);
             } else if (field.type === Parameter.type.simpleArray) {
-                let testDataRows = testData;
+                let testDataRows = value;
                 if (!Array.isArray(testDataRows)) {
                     testDataRows = [];
                 }
                 const arrayValues = [];
                 for (let testDataRow of testDataRows) {
-                    arrayValues.push(this.getSanitizedTestDataValue(field.arrayItemType, testDataRow, editFormat));
+                    if (Object.getPrototypeOf(testDataRow) === Object.prototype) {
+                        const val = this.getSanitizedTestDataValue(
+                            field.arrayItemType, testDataRow['data'], editFormat);
+                        if (editFormat) {
+                            arrayValues.push({ data: val });
+                        } else {
+                            arrayValues.push(val);
+                        }
+                    }
                 }
                 rv[field.name] = arrayValues;
             } else {
