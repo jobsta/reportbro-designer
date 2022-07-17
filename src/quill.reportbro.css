@@ -343,7 +343,6 @@
     align-items: center;
     padding: 3px 5px;
     background-color: #E4E7EA;
-    margin: 0 2px 0 0;
     border: 2px solid transparent;
     border-radius: 4px;
     height: 30px;
@@ -541,7 +540,6 @@
     font-size: 12px;
     width: 60px;
     background-color: #E4E7EA;
-    margin: 2px 2px 0 10px;
     border-radius: 4px;
     height: 28px;
     cursor: pointer;
@@ -549,7 +547,6 @@
 
 .ql-snow .ql-picker.ql-font {
     width: 145px;
-    margin: 2px 2px 0 0;
 }
 
 .ql-toolbar.ql-snow {
@@ -559,10 +556,13 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
+    gap: 5px;
 }
 .ql-toolbar.ql-snow .ql-formats {
     display: flex;
+    gap: 2px;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label {

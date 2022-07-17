@@ -21,6 +21,7 @@
     --rbro-popup-item-text-color: #FFFFFF;
     --rbro-popup-description-color: #8C8C8C;
     --rbro-popup-content-border-color: #191919;
+    --rbro-error-text-color: #ff3b30;
 }
 
 .rbroClassicTheme {
@@ -66,6 +67,8 @@
     height: 100%;
     top: auto;
     left: auto;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* Main content container - general styles */
@@ -112,7 +115,8 @@
     transition: none;
 }
 
-.rbroContainer input[type=checkbox] {
+.rbroContainer input[type=checkbox],
+.rbroPopupWindow input[type=checkbox] {
     height: auto;
     width: auto;
     margin: 0;
@@ -121,12 +125,14 @@
     opacity: inherit;
 }
 
-.rbroContainer input[type=file] {
+.rbroContainer input[type=file],
+.rbroPopupWindow input[type=file] {
     color: transparent;
     padding: 0;
     border: none;
     background-color: transparent;
     height: auto;
+    max-width: 120px;
 }
 
 .rbroContainer textarea {
@@ -346,6 +352,7 @@
     padding: 10px 5px;
     cursor: pointer;
     text-transform: uppercase;
+    gap: 5px;
 }
 
 .rbroMenuItem.rbroUnusedParameter {
@@ -386,7 +393,7 @@
 
 .rbroMenuItem.rbroMenuItemActive.rbroError {
     background-color: #FFFFFF;
-    color: #FF3B30;
+    color: var(--rbro-error-text-color);
 }
 
 .rbroMenuItem.rbroMenuItemDragOver {
@@ -513,7 +520,6 @@ ul ul .rbroMenuItemText {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
 }
 
 .rbroSplit .rbroErrorMessage {
@@ -537,6 +543,10 @@ ul ul .rbroMenuItemText {
     width: 70px;
 }
 
+.rbroInfo {
+    font-size: 85%;
+}
+
 .rbroInfo a, .rbroInfo a:hover, .rbroInfo a:visited, .rbroInfo a:focus, .rbroInfo a:active {
     color: var(--rbro-detailPanel-button-color);
     text-decoration: none;
@@ -546,16 +556,21 @@ ul ul .rbroMenuItemText {
     color: var(--rbro-detailPanel-button-hover-color);
 }
 
+.rbroImageFile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+}
+
+
 /* Rich Text Editor */
 
 .rbroFormRow.rbroRichTextEditor {
     flex-direction: column;
+    -webkit-user-select: auto;
+    user-select: auto;
 }
-
-.rbroRichTextEditor .rbroButton {
-    margin: 5px 2px 0 0;
-}
-
 
 /* For styling font selection only */
 .rbroSelectFont select:first-child {
@@ -646,7 +661,7 @@ ul ul .rbroMenuItemText {
     background-color: rgba(204,204,204,0.2);
 }
 
-.rbroElementDragOver > .rbroDocumentBandDescription {
+.rbroElementDragOver > .rbroDocumentBandDescription, .rbroHighlightBandDescription > .rbroDocumentBandDescription {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -654,6 +669,13 @@ ul ul .rbroMenuItemText {
     font-size: 32px;
     font-weight: 600;
     color: rgba(0,72,100,0.4);
+}
+
+.rbroHighlightBandDescription > .rbroDocumentBandDescription {
+    justify-content: flex-end;
+    align-items: flex-start;
+    font-size: 18px;
+    background-color: rgba(204,204,204,0.2);
 }
 
 /* Document Panel - Tabs to switch between layout and preview */
@@ -967,11 +989,9 @@ ul ul .rbroMenuItemText {
     display: inline-block;
     box-sizing: border-box;
     border: inherit;
-    margin: 0;
 }
 
 .rbroMenuItem .rbroButton {
-    margin-left: 5px;
     min-width: 18px;
 }
 
@@ -1032,7 +1052,7 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
 }
 
 .rbroDeleteButton:hover, .rbroMenuItem.rbroError .rbroDeleteButton:hover {
-    color: var(--rbro-mainPanel-button-hover-color);
+    color: var(--rbro-error-text-color);
 }
 
 .rbroRoundButton {
@@ -1065,7 +1085,7 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
 }
 
 .rbroErrorMessage {
-    color: #FF3B30;
+    color: var(--rbro-error-text-color);
 }
 
 .rbroErrorMessage:empty {
@@ -1202,6 +1222,20 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     margin: 10px auto 0;
 }
 
+.rbroPopupWindowContent table table {
+    /* nested table */
+    margin: 0 0 0 auto;
+}
+
+.rbroPopupWindowContent table .rbroFullWidthButton {
+     /* align button with nested table */
+    margin: 0 0 10px 50px;
+}
+
+.rbroPopupWindowContent table th span {
+    margin: 0 5px;
+}
+
 .rbroPopupWindowContent table th:not(:first-child) {
     background-color: var(--rbro-popup-item-bg-color);
     color: var(--rbro-popup-item-text-color);
@@ -1209,6 +1243,10 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     padding: 5px 2px;
     font-weight: 600;
     text-align: center;
+}
+
+.rbroPopupWindowContent table table th:not(:first-child) {
+    background-color: var(--rbro-popup-item-alt-bg-color);
 }
 
 .rbroPopupWindowContent table th:first-child {
@@ -1223,7 +1261,8 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     border: 1px solid #8C8C8C;
 }
 
-.rbroPopupWindowContent table input, .rbroPopupWindowContent table input:focus {
+.rbroPopupWindowContent table input[type=text], .rbroPopupWindowContent table input[type=text]:focus,
+.rbroPopupWindowContent table td .expandableCell {
     color: var(--rbro-primary-text-color);
     width: 100%;
     box-sizing: border-box;
@@ -1234,19 +1273,28 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     border-radius: 0;
     font-size: 12px;
     font-weight: 400;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     opacity: 1;
     background-color: transparent;
     box-shadow: none;
+    outline: none;
 }
 
-.rbroPopupWindowContent table td.rbroHasFocus {
-    border: 1px solid #009EE2;
-}
-
-.rbroPopupWindowContent table td.rbroHasFocus input {
+.rbroPopupWindowContent table td.rbroHasFocus input[type=text] {
     border: 2px solid #009EE2;
     padding: 2px;
+}
+
+.rbroPopupWindowContent table td .expandableCell {
+    cursor: pointer;
+    transition: all 0.2s linear;
+}
+
+.rbroPopupWindowContent table td .expandableCell:hover,
+.rbroPopupWindowContent table td .expandableCell.rbroExpandedCell {
+    background-color: #F1F3F4;
 }
 
 .rbroPopupWindowContent table .rbroButton {
@@ -1288,6 +1336,17 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     font-size: 12px;
     border-radius: 4px 4px 0 0 ;
     box-shadow: none;
+}
+
+.rbroPopupWindow .rbroImageFileContainer {
+    display: flex;
+    font-size: 12px;
+    gap: 5px;
+    padding: 0 4px;
+}
+
+.rbroPopupWindowContent .rbroTestDataCheckbox {
+    text-align: center;
 }
 
 /* ReportBro color picker */

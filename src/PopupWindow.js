@@ -240,7 +240,7 @@ export default class PopupWindow {
             if (field.type === Parameter.type.image) {
                 elTh.append(
                     utils.createElement(
-                        'span', { title: this.rb.getLabel('parameterTestDataImageInfo'), class: 'rbroIcon-check' }));
+                        'span', { title: this.rb.getLabel('parameterTestDataImageInfo'), class: 'rbroIcon-info' }));
 
             }
             tableHeaderRow.append(elTh);
@@ -405,7 +405,7 @@ export default class PopupWindow {
             elTd.append(elExpandableCell);
         } else {
             if (field.type === Parameter.type.image) {
-                const elTestDataImageContainer = utils.createElement('div');
+                const elTestDataImageContainer = utils.createElement('div', { class: 'rbroImageFileContainer' });
                 const elTestDataImage = utils.createElement('input', { type: 'file' });
                 elTestDataImage.addEventListener('change', (event) => {
                     let files = event.target.files;
@@ -425,7 +425,7 @@ export default class PopupWindow {
                     }
                 });
                 elTestDataImageContainer.append(elTestDataImage);
-                const elTestDataFilenameDiv = utils.createElement('div', { class: 'rbroSplit rbroHidden' });
+                const elTestDataFilenameDiv = utils.createElement('div', { class: 'rbroImageFile rbroHidden' });
                 const elTestDataFilename = utils.createElement('div');
                 elTestDataFilenameDiv.append(elTestDataFilename);
                 const elTestDataImageFilenameClear = utils.createElement(
@@ -452,6 +452,7 @@ export default class PopupWindow {
                     if (data) {
                         input.checked = true;
                     }
+                    elTd.classList.add('rbroTestDataCheckbox');
                 } else {
                     input.setAttribute('type', 'text');
                     if (data) {
