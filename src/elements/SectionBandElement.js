@@ -124,6 +124,16 @@ export default class SectionBandElement extends DocElement {
         }
     }
 
+    select() {
+        super.select();
+        this.el.classList.add('rbroHighlightBandDescription');
+    }
+
+    deselect() {
+        super.deselect();
+        this.el.classList.remove('rbroHighlightBandDescription');
+    }
+
     /**
      * Returns allowed sizers when element is selected.
      * @returns {String[]}
