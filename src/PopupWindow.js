@@ -337,9 +337,11 @@ export default class PopupWindow {
         const elTd = utils.createElement('td');
         if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray ||
                 field.type === Parameter.type.map) {
-            const div = utils.createElement('div', { class: 'expandableCell rbroIcon-plus' });
-            div.addEventListener('click', (event) => {
-                const expand = !div.classList.contains('rbroExpandedCell');
+            const elExpandableCell = utils.createElement('div', { class: 'expandableCell' });
+            const elNestedTableInfo = utils.createElement('span', { class: 'rbroIcon-plus' });
+            elExpandableCell.append(elNestedTableInfo);
+            elExpandableCell.addEventListener('click', (event) => {
+                const expand = !elExpandableCell.classList.contains('rbroExpandedCell');
                 const nextEl = elRow.nextElementSibling;
                 if (nextEl && nextEl.tagName === 'TR') {
                     const nestedTable = nextEl.querySelector('td table')
@@ -348,14 +350,24 @@ export default class PopupWindow {
                         for (const elExpandableCell of elExpandableCells) {
                             if (elExpandableCell.classList.contains('rbroExpandedCell')) {
                                 elExpandableCell.classList.remove('rbroExpandedCell');
-                                elExpandableCell.classList.remove('rbroIcon-minus');
-                                elExpandableCell.classList.add('rbroIcon-plus');
-                                // save test data before table is removed
-                                parentData[field.name] = this.getTestData(nestedTable, field.parameter);
-                                if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
-                                    const arrayLength = (field.name in parentData &&
-                                        Array.isArray(parentData[field.name])) ? parentData[field.name].length : 0;
-                                    this.setTableRowCount(div, arrayLength);
+                                const elCellNestedTableInfo = elExpandableCell.getElementsByTagName('span')[0];
+                                elCellNestedTableInfo.classList.remove('rbroIcon-minus');
+                                elCellNestedTableInfo.classList.add('rbroIcon-plus');
+
+                                const rowMapEntry = this.rowMap[nextEl.dataset.rowId];
+                                if (rowMapEntry.type === 'table') {
+                                    // save test data before table is removed
+                                    rowMapEntry.parentData[rowMapEntry.field.name] = this.getTestData(
+                                        nestedTable, rowMapEntry.field.parameter);
+
+                                    if (rowMapEntry.field.type === Parameter.type.array ||
+                                            rowMapEntry.field.type === Parameter.type.simpleArray) {
+                                        // update nested table info for collapsed cell
+                                        const arrayLength = (rowMapEntry.field.name in parentData &&
+                                            Array.isArray(parentData[rowMapEntry.field.name])) ?
+                                            parentData[rowMapEntry.field.name].length : 0;
+                                        this.setTableRowCount(elCellNestedTableInfo, arrayLength);
+                                    }
                                 }
                                 break;
                             }
@@ -376,18 +388,18 @@ export default class PopupWindow {
                     this.createTestDataTable(elTdNestedTable, field.parameter, testData);
                     elRowNestedTable.append(elTdNestedTable);
                     elRow.insertAdjacentElement('afterend', elRowNestedTable);
-                    div.classList.remove('rbroIcon-plus');
-                    div.classList.add('rbroExpandedCell');
-                    div.classList.add('rbroIcon-minus');
-                    div.textContent = '';
+                    elExpandableCell.classList.add('rbroExpandedCell');
+                    elNestedTableInfo.classList.remove('rbroIcon-plus');
+                    elNestedTableInfo.classList.add('rbroIcon-minus');
+                    elNestedTableInfo.textContent = '';
                 }
             });
             if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
                 const arrayLength = (field.name in parentData && Array.isArray(parentData[field.name])) ?
                     parentData[field.name].length : 0;
-                this.setTableRowCount(div, arrayLength);
+                this.setTableRowCount(elNestedTableInfo, arrayLength);
             }
-            elTd.append(div);
+            elTd.append(elExpandableCell);
         } else {
             if (field.type === Parameter.type.image) {
                 const elTestDataImageContainer = utils.createElement('div');
@@ -519,17 +531,16 @@ export default class PopupWindow {
      * Sets row count for nested table.
      * A nested table is collapsed per default and can be expanded by click, if the table is collapsed
      * the row count is displayed.
-     * @param {Element} elDiv - element to toggle displayed nested table.
+     * @param {Element} el - element to display nested table info.
      * @param {Number} arrayLength - array length of rows in nested table.
      */
-    setTableRowCount(elDiv, arrayLength) {
+    setTableRowCount(el, arrayLength) {
         if (arrayLength === 0) {
-            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCountEmpty');
+            el.textContent = this.rb.getLabel('parameterTestDataRowCountEmpty');
         } else if (arrayLength === 1) {
-            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCountOne');
+            el.textContent = this.rb.getLabel('parameterTestDataRowCountOne');
         } else {
-            elDiv.textContent = this.rb.getLabel('parameterTestDataRowCount').replace(
-                '${count}', String(arrayLength));
+            el.textContent = this.rb.getLabel('parameterTestDataRowCount').replace('${count}', String(arrayLength));
         }
     }
 
