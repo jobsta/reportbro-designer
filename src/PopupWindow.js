@@ -338,7 +338,9 @@ export default class PopupWindow {
         if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray ||
                 field.type === Parameter.type.map) {
             const elExpandableCell = utils.createElement('div', { class: 'expandableCell' });
-            const elNestedTableInfo = utils.createElement('span', { class: 'rbroIcon-plus' });
+            const elExpandableCellIcon = utils.createElement('span', { class: 'rbroIcon-plus' });
+            elExpandableCell.append(elExpandableCellIcon);
+            const elNestedTableInfo = utils.createElement('span');
             elExpandableCell.append(elNestedTableInfo);
             elExpandableCell.addEventListener('click', (event) => {
                 const expand = !elExpandableCell.classList.contains('rbroExpandedCell');
@@ -350,9 +352,10 @@ export default class PopupWindow {
                         for (const elExpandableCell of elExpandableCells) {
                             if (elExpandableCell.classList.contains('rbroExpandedCell')) {
                                 elExpandableCell.classList.remove('rbroExpandedCell');
-                                const elCellNestedTableInfo = elExpandableCell.getElementsByTagName('span')[0];
-                                elCellNestedTableInfo.classList.remove('rbroIcon-minus');
-                                elCellNestedTableInfo.classList.add('rbroIcon-plus');
+                                const elCellIcon = elExpandableCell.children[0];
+                                const elCellNestedTableInfo = elExpandableCell.children[1];
+                                elCellIcon.classList.remove('rbroIcon-minus');
+                                elCellIcon.classList.add('rbroIcon-plus');
 
                                 const rowMapEntry = this.rowMap[nextEl.dataset.rowId];
                                 if (rowMapEntry.type === 'table') {
@@ -389,8 +392,8 @@ export default class PopupWindow {
                     elRowNestedTable.append(elTdNestedTable);
                     elRow.insertAdjacentElement('afterend', elRowNestedTable);
                     elExpandableCell.classList.add('rbroExpandedCell');
-                    elNestedTableInfo.classList.remove('rbroIcon-plus');
-                    elNestedTableInfo.classList.add('rbroIcon-minus');
+                    elExpandableCellIcon.classList.remove('rbroIcon-plus');
+                    elExpandableCellIcon.classList.add('rbroIcon-minus');
                     elNestedTableInfo.textContent = '';
                 }
             });
