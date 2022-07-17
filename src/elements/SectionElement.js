@@ -205,7 +205,7 @@ export default class SectionElement extends DocElement {
 
     deselect() {
         super.deselect();
-        const elBandDescriptions = this.el.querySelectorAll('.rbroDocumentBandDescription');
+        const elBandDescriptions = this.el.querySelectorAll('.rbroSectionBandElement');
         for (const elBandDescription of elBandDescriptions) {
             elBandDescription.classList.remove('rbroHighlightBandDescription');
         }

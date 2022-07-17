@@ -1008,7 +1008,7 @@ export default class DocElementPanel extends PanelBase {
         });
         elFormField.append(elImage);
         let elFilenameDiv = utils.createElement(
-            'div', { id: 'rbro_doc_element_image_filename_container', class: 'rbroSplit rbroHidden' });
+            'div', { id: 'rbro_doc_element_image_filename_container', class: 'rbroImageFile rbroHidden' });
         elFilenameDiv.append(utils.createElement('div', { id: 'rbro_doc_element_image_filename' }));
         const elImageFilenameClear = utils.createElement(
             'div', {
