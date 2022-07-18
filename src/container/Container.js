@@ -21,6 +21,14 @@ export default class Container {
         this.elContent = owner.getContentElement();
         this.panelItem = owner.getPanelItem();
         this.parent = owner.getContainer();
+        this.initLevel();
+    }
+
+    /**
+     * Set nested level of container.
+     * Should be alled after initialization and whenever the container is moved to a new parent.
+     */
+    initLevel() {
         this.level = 0;
         let parent = this.parent;
         while (parent !== null) {
@@ -68,13 +76,15 @@ export default class Container {
         return this.parent;
     }
 
+    /**
+     * Must be called when the container is moved to a new parent
+     * (i.e. element of container is moved into another container).
+     * @param {DocElement} parent
+     */
     setParent(parent) {
         this.parent = parent;
-        this.level = 0;
-        while (parent !== null) {
-            this.level++;
-            parent = parent.getParent();
-        }
+        // because the parent was changed the container can now have a different container level
+        this.initLevel();
     }
 
     isSelected() {
@@ -115,9 +125,9 @@ export default class Container {
      * @returns {Object} x and y offset coordinates.
      */
     getOffsetTo(otherContainer) {
-        if (otherContainer !== null && otherContainer != this) {
-            let offset = this.getOffset();
-            let otherOffset = otherContainer.getOffset();
+        if (otherContainer !== null && otherContainer !== this) {
+            const offset = this.getOffset();
+            const otherOffset = otherContainer.getOffset();
             return { x: offset.x - otherOffset.x, y: offset.y - otherOffset.y };
         }
         return { x: 0, y: 0 };
@@ -145,14 +155,11 @@ export default class Container {
      * @param {Number} posY - absolute y coordinate.
      */
     isInside(posX, posY) {
-        let offset = this.getOffset();
-        let size = this.getSize();
+        const offset = this.getOffset();
+        const size = this.getSize();
         posX -= offset.x;
         posY -= offset.y;
-        if (posX >= 0 && posY >= 0 && posX < size.width && posY < size.height) {
-            return true;
-        }
-        return false;
+        return (posX >= 0 && posY >= 0 && posX < size.width && posY < size.height);
     }
 
     clearErrors() {
