@@ -1,6 +1,5 @@
 import Command from './Command';
 import DocElement from '../elements/DocElement';
-import Document from '../Document';
 
 /**
  * Command to move a menu panel item. In case the item is moved to a different container

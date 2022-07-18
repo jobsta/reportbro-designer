@@ -1125,6 +1125,10 @@ export default class ReportBro {
         return bestMatch;
     }
 
+    getContainers() {
+        return this.containers;
+    }
+
     addContainer(container) {
         this.containers.push(container);
         this.addDataObject(container);

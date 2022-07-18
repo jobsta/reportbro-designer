@@ -240,6 +240,18 @@ export default class DocElement {
         return null;
     }
 
+    /**
+     * Return array with linked container(s) of this element.
+     * @return {Container[]}
+     */
+    getLinkedContainers() {
+        const linkedContainer = this.getLinkedContainer();
+        if (linkedContainer) {
+            return [linkedContainer];
+        }
+        return [];
+    }
+
     getContainerContentSize() {
         let container = this.getContainer();
         return (container !== null) ? container.getContentSize() : { width: 0, height: 0 };
@@ -372,11 +384,18 @@ export default class DocElement {
                 this.el.parentElement.removeChild(this.el);
                 this.appendToContainer();
             }
-            if (this.linkedContainerId !== null) {
-                let linkedContainer = this.getLinkedContainer();
-                if (linkedContainer !== null) {
-                    linkedContainer.setParent(this.getContainer());
+            // set new parent for linked containers
+            const linkedContainers = this.getLinkedContainers();
+            if (linkedContainers.length > 0) {
+                const container = this.getContainer();
+                for (const linkedContainer of linkedContainers) {
+                    linkedContainer.setParent(container);
                 }
+            }
+            // update level of all containers as the level could have changed in case container
+            // belongs to this element
+            for (const container of this.rb.getContainers()) {
+                container.initLevel();
             }
         } else if (['styleId', 'bold', 'italic', 'underline', 'strikethrough',
                 'horizontalAlignment', 'verticalAlignment',

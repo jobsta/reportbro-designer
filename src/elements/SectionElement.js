@@ -1,7 +1,6 @@
 import DocElement from './DocElement';
 import SectionBandElement from './SectionBandElement';
 import Band from '../container/Band';
-import Parameter from '../data/Parameter';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
 
