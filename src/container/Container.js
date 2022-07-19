@@ -87,6 +87,22 @@ export default class Container {
         this.initLevel();
     }
 
+    /**
+     * Return true if this container is a child of the given container.
+     * @param {Container} container
+     * @return {Boolean}
+     */
+    isChildOf(container) {
+        let parent = this.getParent();
+        while (parent !== null) {
+            if (parent === container) {
+                return true;
+            }
+            parent = parent.getParent();
+        }
+        return false;
+    }
+
     isSelected() {
         if (this.owner !== null && this.rb.isSelectedObject(this.owner.getId())) {
             return true;

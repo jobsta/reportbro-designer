@@ -1111,15 +1111,24 @@ export default class ReportBro {
         this.updateMenuActionButtons();
     }
 
-    getContainer(posX, posY, elementType) {
+    getContainer(posX, posY, elementType, ignoreContainers) {
         let bestMatch = null;
         let bestMatchLevel = -1;
         for (let i = 0; i < this.containers.length; i++) {
-            let container = this.containers[i];
+            const container = this.containers[i];
             if (container.getLevel() > bestMatchLevel && container.isElementAllowed(elementType) &&
                     container.isInside(posX, posY)) {
-                bestMatch = container;
-                bestMatchLevel = container.getLevel();
+                let isIgnoredContainer = false;
+                for (const ignoreContainer of ignoreContainers) {
+                    if (container === ignoreContainer || container.isChildOf(ignoreContainer)) {
+                        isIgnoredContainer = true;
+                        break;
+                    }
+                }
+                if (!isIgnoredContainer) {
+                    bestMatch = container;
+                    bestMatchLevel = container.getLevel();
+                }
             }
         }
         return bestMatch;
