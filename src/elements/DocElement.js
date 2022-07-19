@@ -98,9 +98,8 @@ export default class DocElement {
             } else {
                 if (this.rb.isSelectedObject(this.id)) {
                     this.rb.getDocument().startDrag(
-                        event.pageX, event.pageY,
-                        this.id, this.containerId, this.linkedContainerId,
-                        this.getElementType(), DocElement.dragType.element);
+                        event.pageX, event.pageY, this.id, this.containerId, this.getElementType(),
+                        DocElement.dragType.element);
                     event.stopPropagation();
                 } else {
                     this.rb.deselectAll(true);
@@ -109,10 +108,9 @@ export default class DocElement {
         });
         this.el.addEventListener('touchstart', (event) => {
             if (this.rb.isSelectedObject(this.id)) {
-                let absPos = utils.getEventAbsPos(event);
-                this.rb.getDocument().startDrag(absPos.x, absPos.y,
-                    this.id, this.containerId, this.linkedContainerId,
-                    this.getElementType(), DocElement.dragType.element);
+                const absPos = utils.getEventAbsPos(event);
+                this.rb.getDocument().startDrag(
+                    absPos.x, absPos.y, this.id, this.containerId, this.getElementType(), DocElement.dragType.element);
             }
             event.preventDefault();
         });
@@ -138,10 +136,9 @@ export default class DocElement {
             if (!this.rb.isSelectedObject(this.id)) {
                 this.handleClick(event, true);
             } else {
-                let absPos = utils.getEventAbsPos(event);
-                this.rb.getDocument().startDrag(absPos.x, absPos.y,
-                    this.id, this.containerId, this.linkedContainerId,
-                    this.getElementType(), DocElement.dragType.element);
+                const absPos = utils.getEventAbsPos(event);
+                this.rb.getDocument().startDrag(
+                    absPos.x, absPos.y, this.id, this.containerId, this.getElementType(), DocElement.dragType.element);
                 event.preventDefault();
             }
         });
@@ -193,9 +190,8 @@ export default class DocElement {
                 this.rb.deselectObject(this.id);
             } else if (!ignoreSelectedContainer) {
                 this.rb.getDocument().startDrag(
-                    event.pageX, event.pageY,
-                    this.id, this.containerId, this.linkedContainerId,
-                    this.getElementType(), DocElement.dragType.element);
+                    event.pageX, event.pageY, this.id, this.containerId, this.getElementType(),
+                    DocElement.dragType.element);
             }
             event.stopPropagation();
         }
@@ -397,6 +393,10 @@ export default class DocElement {
             for (const container of this.rb.getContainers()) {
                 container.initLevel();
             }
+            // update display because element is now inside another container, necessary when
+            // updateDisplay is not called due to other changed field (e.g. element is moved to
+            // other container but x, y, width, height and so on stay unchanged)
+            this.updateDisplay();
         } else if (['styleId', 'bold', 'italic', 'underline', 'strikethrough',
                 'horizontalAlignment', 'verticalAlignment',
                 'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
@@ -676,17 +676,17 @@ export default class DocElement {
                 let sizerVal = sizer;
                 let elSizer = utils.createElement('div', { class: `rbroSizer rbroSizer${sizer}` });
                 elSizer.addEventListener('mousedown', (event) => {
-                    this.rb.getDocument().startDrag(event.pageX, event.pageY,
-                        this.id, this.containerId, this.linkedContainerId,
-                        this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
+                    this.rb.getDocument().startDrag(
+                        event.pageX, event.pageY, this.id, this.containerId, this.getElementType(),
+                        DocElement.dragType['sizer' + sizerVal]);
                     event.stopPropagation();
                 });
                 elSizer.addEventListener('touchstart', (event) => {
                     if (this.rb.isSelectedObject(this.id)) {
-                        let absPos = utils.getEventAbsPos(event);
-                        this.rb.getDocument().startDrag(absPos.x, absPos.y,
-                            this.id, this.containerId, this.linkedContainerId,
-                            this.getElementType(), DocElement.dragType['sizer' + sizerVal]);
+                        const absPos = utils.getEventAbsPos(event);
+                        this.rb.getDocument().startDrag(
+                            absPos.x, absPos.y, this.id, this.containerId, this.getElementType(),
+                            DocElement.dragType['sizer' + sizerVal]);
                     }
                     event.preventDefault();
                     event.stopPropagation();

@@ -406,6 +406,14 @@ export default class MainPanelItem {
                 }
                 if (rv.container !== null && rv.container.isElementAllowed(draggedObj.getElementType())) {
                     rv.allowDrop = true;
+                    // if the dragged object has linked containers (section or frame) then we make sure
+                    // we cannot drag the object into one of its container children
+                    for (const linkedContainer of draggedObj.getLinkedContainers()) {
+                        if (linkedContainer === rv.container || rv.container.isChildOf(linkedContainer)) {
+                            rv.allowDrop = false;
+                            break;
+                        }
+                    }
                 }
             } else if (draggedObj instanceof Parameter) {
                 if (this.data instanceof Parameter) {
