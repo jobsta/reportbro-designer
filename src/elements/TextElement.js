@@ -330,7 +330,7 @@ export default class TextElement extends DocElement {
     }
 
     createElement() {
-        this.el = utils.createElement('td', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroTextElement' });
+        this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroTextElement' });
         this.elContent = utils.createElement(
             'div', { id: `rbro_el_content${this.id}`, class: 'rbroContentContainerHelper' });
         this.elContentText = utils.createElement(
