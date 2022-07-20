@@ -490,7 +490,7 @@ export default class Parameter {
             if (!testData || Object.getPrototypeOf(testData) !== Object.prototype) {
                 testData = {};
             }
-            rv = this.getSanitizedTestDataMap(this, testData, editFormat);
+            rv = this.getSanitizedTestDataMap(parameter, testData, editFormat);
         } else {
             if (!Array.isArray(testData)) {
                 testData = [];
