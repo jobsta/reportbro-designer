@@ -25,11 +25,10 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 Go to the [docs](https://www.reportbro.com/doc/api) for more information. There are demos for different use cases available at: https://www.reportbro.com/demo/invoice.
 
-Include the ReportBro and jQuery JavaScript files as well as the ReportBro stylesheet in the `<head>` of your page. Make sure to load jQuery before ReportBro's JavaScript.
+Include the ReportBro JavaScript file as well as the ReportBro stylesheet in the `<head>` of your page.
 
 ```html
 <link rel="stylesheet" href="reportbro/reportbro.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="reportbro/reportbro.js"></script>
 ```
 
@@ -41,9 +40,7 @@ Place an empty div within the `<body>` of a web page:
 Initialize ReportBro:
 ```html
     <script type="text/javascript">
-       $(document).ready(function() {
-          $("#reportbro").reportBro();
-       });
+        const rb = new ReportBro(document.getElementById('reportbro'));
     </script>
 ````
 
