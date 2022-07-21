@@ -87,6 +87,7 @@ const locale_en = {
     errorMsgInvalidDataSource: 'Invalid data source',
     errorMsgInvalidDataSourceParameter: 'Parameter must be a list',
     errorMsgInvalidDate: 'Invalid date, expected format is YYYY-MM-DD (or YYYY-MM-DD hh:mm for date with time)',
+    errorMsgInvalidStringData: 'Invalid data for text parameter ${info}',
     errorMsgInvalidExpression: 'Invalid expression: ${info}',
     errorMsgInvalidExpressionFuncNotDefined: 'Function ${info} not defined',
     errorMsgInvalidExpressionNameNotDefined: 'Name ${info} not defined',
