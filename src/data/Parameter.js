@@ -341,48 +341,66 @@ export default class Parameter {
      * In case of map parameter all child parameters are appended,
      * for other parameter types the parameter itself is appended.
      * Parameters with type array are only added if explicitly specified
-     * in allowedTypes parameter.
+     * in allowedTypes parameter. Nested map parameters (map parameter inside map) are
+     * also possible.
      *
      * Used for parameter popup window.
      *
      * @param {Object[]} parameters - list where parameter items will be appended to.
-     * @param {String[]} allowedTypes - specify allowed parameter types which will be
+     * @param {?String[]} allowedTypes - specify allowed parameter types which will be
      * added to the parameter list. If not set all parameter types are allowed.
      */
     appendParameterItems(parameters, allowedTypes) {
+        this.appendParameterItemsWithPrefix(parameters, allowedTypes, '');
+    }
+
+    appendParameterItemsWithPrefix(parameters, allowedTypes, parameterPrefix) {
         if (this.type === Parameter.type.map) {
-            let parametersToAppend = [];
-            if (Array.isArray(allowedTypes)) {
-                for (let child of this.getChildren()) {
-                    if (allowedTypes.indexOf(child.type) !== -1) {
-                        parametersToAppend.push(child);
-                    }
+            const parametersToAppend = [];
+            const nestedMapParameters = [];
+            for (const child of this.getChildren()) {
+                if (child.type === Parameter.type.map) {
+                    nestedMapParameters.push(child);
+                } else if (child.isAllowed(allowedTypes)) {
+                    parametersToAppend.push(child);
                 }
-            } else {
-                parametersToAppend = this.getChildren();
             }
             if (parametersToAppend.length > 0) {
                 parameters.push({
                     separator: true, id: this.id,
-                    separatorClass: 'rbroParameterGroup', name: this.name });
+                    separatorClass: 'rbroParameterGroup', name: parameterPrefix + this.name });
+                for (const parameter of parametersToAppend) {
+                    const paramName = parameterPrefix + this.name + '.' + parameter.getName();
+                    parameters.push({
+                        name: paramName, nameLowerCase: paramName.toLowerCase(),
+                        id: parameter.getId(), description: '' });
+                }
             }
-            for (let parameter of parametersToAppend) {
-                let paramName = this.name + '.' + parameter.getName();
-                parameters.push({
-                    name: paramName, nameLowerCase: paramName.toLowerCase(),
-                    id: parameter.getId(), description: '' });
+            // append nested map parameters after other parameters of the map
+            for (const nestedMapParameter of nestedMapParameters) {
+                nestedMapParameter.appendParameterItemsWithPrefix(
+                    parameters, allowedTypes, parameterPrefix + this.name + '.');
             }
-        } else if (this.type !== Parameter.type.array) {
-            if (!Array.isArray(allowedTypes) || allowedTypes.indexOf(this.type) !== -1) {
-                parameters.push({
-                    name: this.name, nameLowerCase: this.name.toLowerCase(),
-                    id: this.id, description: '' });
-            }
-        } else if (Array.isArray(allowedTypes) && allowedTypes.indexOf(this.type) !== -1) {
-            // add array parameter only if explicitly specified in allowedTypes
+        } else if (this.isAllowed(allowedTypes)) {
             parameters.push({
-                name: this.name, nameLowerCase: this.name.toLowerCase(),
-                id: this.id, description: '' });
+                name: parameterPrefix + this.name, nameLowerCase: this.name.toLowerCase(),
+                id: this.id, description: ''
+            });
+        }
+    }
+
+    /**
+     * Return true if parameter fulfills requirement of allowed types.
+     * If parameter is an array it is only allowed if array type is contained in allowedTypes,
+     * otherwise it is also allowed if allowedTypes is undefined/null.
+     * @param {?String[]} allowedTypes - can be undefined/null or an array containing allowed parameter types.
+     * @return {Boolean}
+     */
+    isAllowed(allowedTypes) {
+        if (this.type !== Parameter.type.array) {
+            return !Array.isArray(allowedTypes) || allowedTypes.indexOf(this.type) !== -1;
+        } else {
+            return Array.isArray(allowedTypes) && allowedTypes.indexOf(this.type) !== -1;
         }
     }
 
