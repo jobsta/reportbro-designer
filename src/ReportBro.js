@@ -658,8 +658,18 @@ export default class ReportBro {
                         name: this.getLabel('parametersDataSource')
                     });
                     dataSourceIndex++;
+                    // add all parameters of collections at end of data source parameters
+                    // with a header containing the collection name
+                    const mapParameters = [];
                     for (const dataSourceParameter of dataSource.parameters) {
-                        dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                        if (dataSourceParameter.type === Parameter.type.map) {
+                            dataSourceParameter.appendParameterItems(mapParameters, allowedTypes);
+                        } else {
+                            dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                        }
+                    }
+                    for (const mapParameter of mapParameters) {
+                        parameters.push(mapParameter);
                     }
                 }
             }
