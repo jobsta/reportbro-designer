@@ -146,6 +146,12 @@ export default class ParameterPanel extends PanelBase {
         });
         elFormField.append(elType);
         elFormField.append(utils.createElement('div', { id: 'rbro_parameter_type_error', class: 'rbroErrorMessage' }));
+        if (this.rb.getProperty('showPlusFeaturesInfo')) {
+            const elInfoText = utils.createElement(
+                'div', { id: 'rbro_parameter_type_nested_plus_info', class: 'rbroInfo' });
+            elInfoText.innerHTML = this.rb.getLabel('plusFeatureInfoNestedParameter');
+            elFormField.append(elInfoText);
+        }
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -522,6 +528,16 @@ export default class ParameterPanel extends PanelBase {
                     document.getElementById('rbro_parameter_test_data_image_row').style.display = 'none';
                 }
             }
+
+            if (this.rb.getProperty('showPlusFeaturesInfo')) {
+                // show/hide info about nested parameters only available in PLUS version
+                if (parentParameter !== null && (type === Parameter.type.map || type === Parameter.type.array)) {
+                    document.getElementById('rbro_parameter_type_nested_plus_info').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_type_nested_plus_info').style.display = 'none';
+                }
+            }
+
             if (((obj.getValue('eval') && (type === Parameter.type.string || type === Parameter.type.number ||
                   type === Parameter.type.boolean || type === Parameter.type.date)) ||
                     (type === Parameter.type.sum || type === Parameter.type.average)) && !showOnlyNameType) {
@@ -542,9 +558,13 @@ export default class ParameterPanel extends PanelBase {
             parameterTypeOptions.push({value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean')});
             parameterTypeOptions.push({value: 'date', label: this.rb.getLabel('parameterTypeDate')});
             parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
-            parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
+            if (parentParameter === null || this.rb.getProperty('showPlusFeatures')) {
+                parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
+            }
             parameterTypeOptions.push({value: 'simple_array', label: this.rb.getLabel('parameterTypeSimpleArray')});
-            parameterTypeOptions.push({value: 'map', label: this.rb.getLabel('parameterTypeMap')});
+            if (parentParameter === null || this.rb.getProperty('showPlusFeatures')) {
+                parameterTypeOptions.push({value: 'map', label: this.rb.getLabel('parameterTypeMap')});
+            }
             if (!listFieldParameter) {
                 parameterTypeOptions.push({value: 'sum', label: this.rb.getLabel('parameterTypeSum')});
                 parameterTypeOptions.push({value: 'average', label: this.rb.getLabel('parameterTypeAverage')});

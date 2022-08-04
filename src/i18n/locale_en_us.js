@@ -214,6 +214,7 @@ const locale_en = {
     patternSeparatorDates: '--- Date patterns ---',
     patternSeparatorNumbers: '--- Number patterns ---',
     plusFeatureInfo: 'Requires commerical <a href="https://www.reportbro.com/license/index" target="_blank" rel="noreferrer">PLUS version</a>',
+    plusFeatureInfoNestedParameter: 'Nested parameter requires commerical <a href="https://www.reportbro.com/license/index" target="_blank" rel="noreferrer">PLUS version</a>',
     select: 'select...',
     style: 'Style',
     styleAlignment: 'Alignment',

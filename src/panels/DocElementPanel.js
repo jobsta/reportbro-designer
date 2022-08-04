@@ -596,6 +596,12 @@ export default class DocElementPanel extends PanelBase {
             }
         };
 
+        if (!rb.getProperty('showPlusFeatures')) {
+            // remove all properties of PLUS version
+            delete this.propertyDescriptors['richText'];
+            delete this.propertyDescriptors['richTextContent'];
+        }
+
         // collect all fields which are referenced in the visibleIf property
         this.visibleIfFields = [];
         for (let property in this.propertyDescriptors) {
@@ -2050,7 +2056,9 @@ export default class DocElementPanel extends PanelBase {
 
         document.getElementById('rbro_detail_panel').append(panel);
 
-        this.setupRichText();
+        if (this.rb.getProperty('showPlusFeatures')) {
+            this.setupRichText();
+        }
     }
 
     renderStyleSelect() {
