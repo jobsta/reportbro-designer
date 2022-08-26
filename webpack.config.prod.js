@@ -22,7 +22,7 @@ https://www.reportbro.com/license/agreement
 
 module.exports = {
   mode: 'production',
-  entry: ['./src/main.js', './src/main.css', './src/iconfonts/style.css', './src/toggle-switch.css', './src/quill.reportbro.css'],
+  entry: ['./src/main.js', './src/main.css', './src/fonts/font_style.css', './src/iconfonts/style.css', './src/toggle-switch.css', './src/quill.reportbro.css'],
   output: {
     filename: 'reportbro.js',
     path: __dirname + '/dist'
