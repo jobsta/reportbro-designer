@@ -2,6 +2,10 @@
 
 ## [2.1.1] - 2022-05-17
 
+### Features
+* nested parameters (PLUS version)
+* option to specify image file for test data of image parameter
+
 ### Changes
 * update dependenices
 * non functional change generate zip and tgz with pack
