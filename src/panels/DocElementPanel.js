@@ -2201,17 +2201,24 @@ export default class DocElementPanel extends PanelBase {
         // show/hide property depending if it is available in all selected objects
         for (let property in this.propertyDescriptors) {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
-                let propertyDescriptor = this.propertyDescriptors[property];
+                const propertyDescriptor = this.propertyDescriptors[property];
                 let visibleIfField = null;
                 let visibleIfValue = null;
                 let visibleIfFieldNegate = false;
                 if ('visibleIf' in propertyDescriptor) {
-                    let visibleIf = propertyDescriptor['visibleIf'];
+                    const visibleIf = propertyDescriptor['visibleIf'];
                     if (visibleIf.startsWith('!')) {
                         visibleIfField = visibleIf.substr(1);
-                        visibleIfValue = false;
+                        visibleIfValue = true;
+                        visibleIfFieldNegate = true;
                     } else {
                         let opIdx = visibleIf.indexOf('==');
+                        if (opIdx === -1) {
+                            opIdx = visibleIf.indexOf('!=');
+                            if (opIdx !== -1) {
+                                visibleIfFieldNegate = true;
+                            }
+                        }
                         if (opIdx !== -1) {
                             visibleIfField = visibleIf.substr(0, opIdx);
                             visibleIfValue = visibleIf.substr(opIdx + 2);
