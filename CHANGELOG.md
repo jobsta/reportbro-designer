@@ -1,10 +1,21 @@
 # Changelog
 
-## [2.1.1] - 2022-05-17
+## [3.0.0] - 2022-10-10
 
 ### Features
-* nested parameters (PLUS version)
-* option to specify image file for test data of image parameter
+* Nested parameters (PLUS version)
+* Option to specify image file for test data of image parameter
+* Option to set bar width for code128 barcode
+
+### Changes
+* Remove jquery dependency (see README.md for changed initialization)
+* Add validation of ReportBro properties to avoid invalid values
+* Replace reference to external google fonts with local files
+
+### Bug Fixes
+* Fix dragging multiple elements to different container
+
+## [2.1.1] - 2022-05-17
 
 ### Changes
 * update dependenices
