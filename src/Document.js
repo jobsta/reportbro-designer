@@ -730,12 +730,13 @@ export default class Document {
                 container = this.rb.getDataObject(this.dragCurrentContainerId);
             }
 
-            // do not allow to change container of elements when multiple elements are
-            // dragged together as this could lead to unexpected results for the user
+            // do not allow to change container of elements when multiple elements from different containers
+            // are dragged together as this could lead to unexpected results for the user
             let selectedObjects = this.rb.getSelectedObjects();
             if (selectedObjects.length > 1 && container !== null) {
-                for (let selectedObj of selectedObjects) {
-                    if (selectedObj.getContainerId() !== container.getId()) {
+                const firstSelectedObjContainerId = selectedObjects[0].getContainerId();
+                for (let i=1; i < selectedObjects.length; i++) {
+                    if (selectedObjects[i].getContainerId() !== firstSelectedObjContainerId) {
                         container = null;
                         break;
                     }

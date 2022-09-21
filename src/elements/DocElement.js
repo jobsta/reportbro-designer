@@ -645,6 +645,7 @@ export default class DocElement {
                 containerSize = container.getContentSize();
             }
             if (!containerChanged || dragContainer.isElementAllowed(this.getElementType())) {
+                const cmdCountBefore = cmdGroup.getCommands().length;
                 this.checkBounds(posX1, posY1, width, height, containerSize, cmdGroup);
 
                 if (containerChanged) {
@@ -656,7 +657,9 @@ export default class DocElement {
                     cmdGroup.addCommand(cmd);
                 }
 
-                if (cmdGroup.isEmpty()) {
+                // compare command count to check if something was changed (there could be commands
+                // for other elements in the command group in case multiple elements are selected and modified)
+                if (cmdGroup.getCommands().length === cmdCountBefore) {
                     // nothing was changed, make sure displayed element is updated to saved position/size after drag
                     this.updateDisplay();
                 }
