@@ -14,6 +14,7 @@ export default class BarCodeElement extends DocElement {
         this.content = '';
         this.format = 'CODE128';
         this.displayValue = false;
+        this.barWidth = '2';
         this.errorCorrectionLevel = 'M';
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
@@ -35,7 +36,7 @@ export default class BarCodeElement extends DocElement {
 
     setValue(field, value) {
         super.setValue(field, value);
-        if (field === 'content' ||field === 'format' || field === 'displayValue' ||
+        if (field === 'content' ||field === 'format' || field === 'displayValue' || field === 'barWidth' ||
                 field === 'height' || field === 'errorCorrectionLevel') {
             this.updateBarCode();
             this.updateDisplay();
@@ -48,7 +49,7 @@ export default class BarCodeElement extends DocElement {
      */
     getProperties() {
         return [
-            'x', 'y', 'height', 'content', 'format', 'displayValue', 'errorCorrectionLevel',
+            'x', 'y', 'height', 'content', 'format', 'displayValue', 'barWidth', 'errorCorrectionLevel',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'
         ];
@@ -106,8 +107,12 @@ export default class BarCodeElement extends DocElement {
             let valid = false;
             let options = {
                 format: this.format, height: this.displayValue ? (this.heightVal - 22) : this.heightVal,
-                margin: 0, displayValue: this.displayValue
+                margin: 0, displayValue: this.displayValue, width: 2
             };
+            const barWidthVal = utils.convertInputToNumber(this.barWidth);
+            if (barWidthVal) {
+                options.width = barWidthVal;
+            }
             if (this.content !== '' && this.content.indexOf('${') === -1) {
                 try {
                     JsBarcode('#' + this.elBarCode.id, this.content, options);

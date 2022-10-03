@@ -108,6 +108,11 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'display_value',
                 'visibleIf': 'format==CODE128'
             },
+            'barWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'bar_width',
+                'visibleIf': 'format==CODE128'
+            },
             'errorCorrectionLevel': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'error_correction_level',
@@ -902,14 +907,52 @@ export default class DocElementPanel extends PanelBase {
                 let obj = selectedObjects[i];
                 cmdGroup.addSelection(obj.getId());
                 cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(),'displayValue', displayValueChecked,
-                    SetValueCmd.type.checkbox, this.rb));
+                    obj.getId(),'displayValue', displayValueChecked, SetValueCmd.type.checkbox, this.rb));
             }
             if (!cmdGroup.isEmpty()) {
                 this.rb.executeCommand(cmdGroup);
             }
         });
         elFormField.append(elDisplayValue);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_bar_width_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementBarWidth'), 'rbro_doc_element_bar_width');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elBarWidth = utils.createElement(
+            'input', { id: 'rbro_doc_element_bar_width', type: 'number', step: '0.1' });
+        elBarWidth.addEventListener('input', (event) => {
+            let val = elBarWidth.value;
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 1, 3);
+            }
+            if (val !== elBarWidth.value) {
+                elBarWidth.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('barWidth') !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
+
+            if (valueChanged) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'barWidth', val, SetValueCmd.type.text, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
+        elFormField.append(elBarWidth);
         elDiv.append(elFormField);
         panel.append(elDiv);
 

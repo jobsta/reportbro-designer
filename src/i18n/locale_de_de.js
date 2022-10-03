@@ -10,6 +10,7 @@ const locale_de = {
     docElementAlternateBackgroundColor: 'Abwechselnde Hintergrundfarbe',
     docElementAlwaysPrintOnSamePage: 'Immer zusammen auf einer Seite',
     docElementBarCode: 'Barcode',
+    docElementBarWidth: 'Balkenbreite',
     docElementBorderFrame: 'außen',
     docElementBorderFrameRow: 'Rahmen und Zeile',
     docElementBorderGrid: 'Alle Rahmenlinien',
