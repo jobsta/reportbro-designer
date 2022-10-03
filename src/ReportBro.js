@@ -1385,29 +1385,29 @@ export default class ReportBro {
             }
             return response;
         }).then((response) => response.text())
-            .then((data) => {
-                clearTimeout(timeoutId);
-                self.hideLoading();
-                if (data.substr(0, 4) === 'key:') {
-                    self.reportKey = data.substr(4);
-                    self.getDocument().openPdfPreviewTab(
-                        requestParams.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf', headers);
-                } else {
-                    self.reportKey = null;
-                    try {
-                        let obj = JSON.parse(data);
-                        if (obj.errors.length > 0) {
-                            self.processErrors(obj.errors, false);
-                        }
-                    } catch (e) {
-                        alert('preview failed');
+        .then((data) => {
+            clearTimeout(timeoutId);
+            self.hideLoading();
+            if (data.substring(0, 4) === 'key:') {
+                self.reportKey = data.substring(4);
+                self.getDocument().openPdfPreviewTab(
+                    requestParams.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf', headers);
+            } else {
+                self.reportKey = null;
+                try {
+                    let obj = JSON.parse(data);
+                    if (obj.errors.length > 0) {
+                        self.processErrors(obj.errors, false);
                     }
+                } catch (e) {
+                    alert('preview failed');
                 }
-            }).catch((error) => {
-                clearTimeout(timeoutId);
-                self.hideLoading();
-                alert('preview failed');
-            });
+            }
+        }).catch((error) => {
+            clearTimeout(timeoutId);
+            self.hideLoading();
+            alert('preview failed');
+        });
     }
 
     getRequestParameters() {
