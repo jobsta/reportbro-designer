@@ -428,7 +428,7 @@ export default class ReportBro {
     }
 
     /**
-     * Validates properties used to initialize ReportBro.
+     * Validate properties used to initialize ReportBro.
      * In case of invalid properties additional info will be printed to the JS console.
      * @param {Object[]} properties - properties to validate
      * @returns {Boolean} true if all properties are valid, false otherwise.
