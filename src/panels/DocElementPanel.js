@@ -2422,11 +2422,14 @@ export default class DocElementPanel extends PanelBase {
         if (field === null || field === 'source') {
             autosize.update(document.getElementById('rbro_doc_element_source'));
         }
-        if (field === null || field === 'expression') {
+        if (field === null || field === 'groupExpression') {
             autosize.update(document.getElementById('rbro_doc_element_group_expression'));
         }
         if (field === null || field === 'printIf') {
             autosize.update(document.getElementById('rbro_doc_element_print_if'));
+        }
+        if (field === null || field === 'cs_condition') {
+            autosize.update(document.getElementById('rbro_doc_element_cs_condition'));
         }
     }
 
