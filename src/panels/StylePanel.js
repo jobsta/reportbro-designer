@@ -759,7 +759,8 @@ export default class StylePanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: `rbro_${idPrefix}font_row`, class: 'rbroFormRow' });
         utils.appendLabel(elDiv, rb.getLabel('styleFont'), `rbro_${idPrefix}font`);
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelectFont' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelectFont' });
         let elFont = utils.createElement('select', { id: `rbro_${idPrefix}font` });
         for (let font of rb.getFonts()) {
             elFont.append(utils.createElement('option', { value: font.value }, font.name));
@@ -788,7 +789,7 @@ export default class StylePanel extends PanelBase {
                 rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elFont);
+        elSplit.append(elFont);
         let elFontSize = utils.createElement('select', { id: `rbro_${idPrefix}font_size` });
         for (let size of rb.getProperty('fontSizes')) {
             elFontSize.append(utils.createElement('option', { value: size }, String(size)));
@@ -817,8 +818,9 @@ export default class StylePanel extends PanelBase {
                 rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elFontSize);
-        elFormField.append(utils.createElement('span', {}, rb.getLabel('styleFontSizeUnit')));
+        elSplit.append(elFontSize);
+        elSplit.append(utils.createElement('span', {}, rb.getLabel('styleFontSizeUnit')));
+        elFormField.append(elSplit);
         elFormField.append(utils.createElement('div', { id: `rbro_${idPrefix}font_error`, class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
         elPanel.append(elDiv);

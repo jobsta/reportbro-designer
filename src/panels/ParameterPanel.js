@@ -220,7 +220,8 @@ export default class ParameterPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_parameter_pattern_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterPattern'), 'rbro_parameter_pattern');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elPattern = utils.createElement('input', { id: 'rbro_parameter_pattern' });
         elPattern.addEventListener('input', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -230,7 +231,7 @@ export default class ParameterPanel extends PanelBase {
                 this.rb.executeCommand(cmd);
             }
         });
-        elFormField.append(elPattern);
+        elSplit.append(elPattern);
         let elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -248,7 +249,8 @@ export default class ParameterPanel extends PanelBase {
                     'rbro_parameter_pattern', 'pattern', PopupWindow.type.pattern);
             }
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_parameter_pattern_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
@@ -256,7 +258,8 @@ export default class ParameterPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_parameter_expression_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterExpression'), 'rbro_parameter_expression');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elExpression = utils.createElement('textarea', { id: 'rbro_parameter_expression', rows: '1' });
         elExpression.addEventListener('input', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -268,7 +271,7 @@ export default class ParameterPanel extends PanelBase {
             }
         });
         autosize(elExpression);
-        elFormField.append(elExpression);
+        elSplit.append(elExpression);
         elParameterButton = utils.createElement(
             'div', {
                 id: 'rbro_parameter_expression_param_button',
@@ -290,7 +293,8 @@ export default class ParameterPanel extends PanelBase {
                     items, selectedObject.getId(), 'rbro_parameter_expression', 'expression', popupType);
             }
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_parameter_expression_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
@@ -420,9 +424,9 @@ export default class ParameterPanel extends PanelBase {
         elTestDataFilenameDiv.append(elTestDataImageFilenameClear);
         elFormField.append(elTestDataFilenameDiv);
         elFormField.append(
-            utils.createElement('div', { class: 'rbroInfo' }, this.rb.getLabel('parameterTestDataImageInfo')));
-        elFormField.append(
             utils.createElement('div', { id: 'rbro_parameter_test_data_image_error', class: 'rbroErrorMessage' }));
+        elFormField.append(
+            utils.createElement('div', { class: 'rbroInfo' }, this.rb.getLabel('parameterTestDataImageInfo')));
         elDiv.append(elFormField);
         elTestDataContainer.append(elDiv);
         panel.append(elTestDataContainer);

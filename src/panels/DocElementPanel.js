@@ -653,7 +653,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_data_source_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementDataSource'), 'rbro_doc_element_data_source');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elDataSource = utils.createElement('textarea', { id: 'rbro_doc_element_data_source', rows: 1 });
         elDataSource.addEventListener('input', (event) => {
             let val = elDataSource.value;
@@ -670,7 +671,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         autosize(elDataSource);
-        elFormField.append(elDataSource);
+        elSplit.append(elDataSource);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -681,7 +682,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject, [Parameter.type.array]),
                 null, 'rbro_doc_element_data_source', 'dataSource', PopupWindow.type.parameterSet);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_data_source_error', class: 'rbroErrorMessage' })
         );
@@ -690,7 +692,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_content_row', class: 'rbroFormRow rbroHidden' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementContent'), 'rbro_doc_element_content');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elContent = utils.createElement('textarea', { id: 'rbro_doc_element_content', rows: 1 });
         elContent.addEventListener('input', (event) => {
             let val = elContent.value;
@@ -710,7 +713,7 @@ export default class DocElementPanel extends PanelBase {
             this.rb.getPopupWindow().hide();
         });
         autosize(elContent);
-        elFormField.append(elContent);
+        elSplit.append(elContent);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -721,7 +724,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject), null,
                 'rbro_doc_element_content', 'content', PopupWindow.type.parameterAppend);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_content_error', class: 'rbroErrorMessage' })
         );
@@ -989,7 +993,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_source_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementSource'), 'rbro_doc_element_source');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elSource = utils.createElement('textarea', { id: 'rbro_doc_element_source', rows: 1 });
         elSource.addEventListener('input', (event) => {
             let val = elSource.value;
@@ -1006,7 +1011,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         autosize(elSource);
-        elFormField.append(elSource);
+        elSplit.append(elSource);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1017,7 +1022,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject, [Parameter.type.image, Parameter.type.string]),
                 null, 'rbro_doc_element_source', 'source', PopupWindow.type.parameterSet);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_source_error', class: 'rbroErrorMessage' })
         );
@@ -1101,7 +1107,8 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(
             elDiv, this.rb.getLabel('docElementPosition'), 'rbro_doc_element_x',
             { id: 'rbro_doc_element_position_label' });
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit' });
         let elPosX = utils.createElement('input', { id: 'rbro_doc_element_x', type: 'number' });
         elPosX.addEventListener('input', (event) => {
             let val = elPosX.value;
@@ -1117,7 +1124,7 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elPosX);
+        elSplit.append(elPosX);
         let elPosY = utils.createElement('input', { id: 'rbro_doc_element_y', type: 'number' });
         elPosY.addEventListener('input', (event) => {
             let val = elPosY.value;
@@ -1133,7 +1140,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elPosY);
+        elSplit.append(elPosY);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_position_error', class: 'rbroErrorMessage' })
         );
@@ -1143,7 +1151,8 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_size_row', class: 'rbroFormRow rbroHidden' });
         utils.appendLabel(
             elDiv, this.rb.getLabel('docElementSize'), 'rbro_doc_element_size', { id: 'rbro_doc_element_size_label' });
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit' });
         let elWidth = utils.createElement('input', { id: 'rbro_doc_element_width', type: 'number' });
         elWidth.addEventListener('input', (event) => {
             let val = elWidth.value;
@@ -1159,7 +1168,7 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elWidth);
+        elSplit.append(elWidth);
         let elHeight = utils.createElement('input', { id: 'rbro_doc_element_height', type: 'number' });
         elHeight.addEventListener('input', (event) => {
             let val = elHeight.value;
@@ -1175,7 +1184,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elHeight);
+        elSplit.append(elHeight);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_size_error', class: 'rbroErrorMessage' })
         );
@@ -1476,7 +1486,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_group_expression_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementGroupExpression'), 'rbro_doc_element_group_expression');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elGroupExpression = utils.createElement('textarea', { id: 'rbro_doc_element_group_expression', rows: 1 });
         elGroupExpression.addEventListener('input', (event) => {
             let val = elGroupExpression.value;
@@ -1496,7 +1507,7 @@ export default class DocElementPanel extends PanelBase {
             this.rb.getPopupWindow().hide();
         });
         autosize(elGroupExpression);
-        elFormField.append(elGroupExpression);
+        elSplit.append(elGroupExpression);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1507,7 +1518,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject), null,
                 'rbro_doc_element_group_expression', 'groupExpression', PopupWindow.type.parameterSet);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_group_expression_error', class: 'rbroErrorMessage' })
         );
@@ -1567,7 +1579,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_print_if_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementPrintIf'), 'rbro_doc_element_print_if');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elPrintIf = utils.createElement('textarea', { id: 'rbro_doc_element_print_if', rows: 1 });
         elPrintIf.addEventListener('input', (event) => {
             let val = elPrintIf.value;
@@ -1584,7 +1597,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         autosize(elPrintIf);
-        elFormField.append(elPrintIf);
+        elSplit.append(elPrintIf);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1595,7 +1608,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject), null,
                 'rbro_doc_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_print_if_error', class: 'rbroErrorMessage' })
         );
@@ -1708,7 +1722,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_pattern_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementPattern'), 'rbro_doc_element_pattern');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elPattern = utils.createElement('input', { id: 'rbro_doc_element_pattern' });
         elPattern.addEventListener('input', (event) => {
             let val = elPattern.value;
@@ -1724,13 +1739,14 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elPattern);
+        elSplit.append(elPattern);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             this.rb.getPopupWindow().show(
                 this.rb.getPatterns(), null, 'rbro_doc_element_pattern', 'pattern', PopupWindow.type.pattern);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_pattern_error', class: 'rbroErrorMessage' })
         );
@@ -1739,7 +1755,8 @@ export default class DocElementPanel extends PanelBase {
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_link_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementLink'), 'rbro_doc_element_link');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elLink = utils.createElement('input', { id: 'rbro_doc_element_link' });
         elLink.addEventListener('input', (event) => {
             let val = elLink.value;
@@ -1755,7 +1772,7 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.executeCommand(cmdGroup);
             }
         });
-        elFormField.append(elLink);
+        elSplit.append(elLink);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1766,7 +1783,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject), null,
                 'rbro_doc_element_link', 'link', PopupWindow.type.parameterSet);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_link_error', class: 'rbroErrorMessage' })
         );
@@ -1840,7 +1858,8 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_cs_condition_row', class: 'rbroFormRow' });
         utils.appendLabel(
             elDiv, this.rb.getLabel('docElementConditionalStyleCondition'), 'rbro_doc_element_cs_condition');
-        elFormField = utils.createElement('div', { class: 'rbroFormField rbroSplit rbroSelector' });
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
         let elCondStyleCondition = utils.createElement('textarea', { id: 'rbro_doc_element_cs_condition', rows: 1 });
         elCondStyleCondition.addEventListener('input', (event) => {
             let val = elCondStyleCondition.value;
@@ -1857,7 +1876,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         autosize(elCondStyleCondition);
-        elFormField.append(elCondStyleCondition);
+        elSplit.append(elCondStyleCondition);
         elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
         elParameterButton.addEventListener('click', (event) => {
             let selectedObjects = this.rb.getSelectedObjects();
@@ -1868,7 +1887,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getParameterItems(selectedObject), null,
                 'rbro_doc_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
         });
-        elFormField.append(elParameterButton);
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
         elFormField.append(
             utils.createElement('div', { id: 'rbro_doc_element_cs_condition_error', class: 'rbroErrorMessage' })
         );
