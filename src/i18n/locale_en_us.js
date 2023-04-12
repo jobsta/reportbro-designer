@@ -212,6 +212,8 @@ const locale_en = {
     patternNumber3: 'Show decimal point followed by minimum of 2 and maximum of 4 decimal places',
     patternNumber4: 'Show thousand separator and decimal point followed by 2 decimal places',
     patternNumber5: 'Show currency symbol in front of number',
+    patternNumberGroupSymbol: 'Thousands separator',
+    patternNumberGroupSymbolInfo: 'Alternative thousands separator for formatting numbers, leave empty for default symbol',
     patternSeparatorDates: '--- Date patterns ---',
     patternSeparatorNumbers: '--- Number patterns ---',
     plusFeatureInfo: 'Requires commerical <a href="https://www.reportbro.com/license/index" target="_blank" rel="noreferrer">PLUS version</a>',

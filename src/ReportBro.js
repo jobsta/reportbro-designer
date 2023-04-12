@@ -75,6 +75,7 @@ export default class ReportBro {
                 { name: 'MM/dd/yyyy', description: this.locale['patternDate4'] }
             ],
             patternLocale: 'en',
+            patternNumberGroupSymbol: '',
             patternNumbers: [
                 { name: '#,##0', description: this.locale['patternNumber1'] },
                 { name: '0.000', description: this.locale['patternNumber2'] },

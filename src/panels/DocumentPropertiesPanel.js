@@ -81,9 +81,13 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 'fieldId': 'pattern_locale'
             },
             'patternCurrencySymbol': {
-                'type': SetValueCmd.type.select,
+                'type': SetValueCmd.type.text,
                 'fieldId': 'pattern_currency_symbol'
-            }
+            },
+            'patternNumberGroupSymbol': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'pattern_number_group_symbol'
+            },
         };
     }
 
@@ -236,6 +240,28 @@ export default class DocumentPropertiesPanel extends PanelBase {
             }
         });
         elFormField.append(elPatternCurrencySymbol);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('patternNumberGroupSymbol'),
+            'rbro_document_properties_pattern_number_group_symbol');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elPatternNumberGroupSymbol = utils.createElement(
+            'input', { id: 'rbro_document_properties_pattern_number_group_symbol', maxlength: '1' });
+        elPatternNumberGroupSymbol.addEventListener('change', (event) => {
+            let selectedObject = this.rb.getSelectedObject();
+            if (selectedObject !== null) {
+                let cmd = new SetValueCmd(
+                    selectedObject.getId(), 'patternNumberGroupSymbol',
+                    elPatternNumberGroupSymbol.value, SetValueCmd.type.text, this.rb);
+                this.rb.executeCommand(cmd);
+            }
+        });
+        elFormField.append(elPatternNumberGroupSymbol);
+        elFormField.append(utils.createElement(
+            'div', { class: 'rbroInfo' }, this.rb.getLabel('patternNumberGroupSymbolInfo')));
         elDiv.append(elFormField);
         panel.append(elDiv);
 

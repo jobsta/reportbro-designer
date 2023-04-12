@@ -39,6 +39,7 @@ export default class DocumentProperties {
 
         this.patternLocale = rb.getProperty('patternLocale');
         this.patternCurrencySymbol = rb.getProperty('patternCurrencySymbol');
+        this.patternNumberGroupSymbol = rb.getProperty('patternNumberGroupSymbol');
 
         // width and height in pixel
         this.width = 0;
@@ -81,7 +82,7 @@ export default class DocumentProperties {
             'pageFormat', 'pageWidth', 'pageHeight', 'unit', 'orientation',
             'contentHeight', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom',
             'header', 'headerSize', 'headerDisplay', 'footer', 'footerSize', 'footerDisplay',
-            'patternLocale', 'patternCurrencySymbol'
+            'patternLocale', 'patternCurrencySymbol', 'patternNumberGroupSymbol',
         ];
     }
 

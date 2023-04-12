@@ -212,6 +212,8 @@ const locale_de = {
     patternNumber3: 'Dezimalpunkt gefolgt von mind. 2 und max. 4 Dezimalstellen',
     patternNumber4: 'Tausender-Trennzeichen und Dezimalpunkt gefolgt von 2 Dezimalstellen',
     patternNumber5: 'Währungssymbol vor Zahl',
+    patternNumberGroupSymbol: 'Tausender-Trennzeichen',
+    patternNumberGroupSymbolInfo: 'Alternatives Tausender-Trennzeichen zum Formatieren von Zahlen, leer lassen für Standardsymbol',
     patternSeparatorDates: '--- Datum Pattern ---',
     patternSeparatorNumbers: '--- Zahlen Pattern ---',
     plusFeatureInfo: 'Benötigt kommerzielle <a href="https://www.reportbro.com/license/index" target="_blank" rel="noreferrer">PLUS Version</a>',
