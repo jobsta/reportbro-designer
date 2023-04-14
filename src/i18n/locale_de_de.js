@@ -7,6 +7,7 @@ const locale_de = {
     contentHeightInfo: 'Höhe des Inhaltsbereichs, um Elemente zu platzieren (betrifft nicht die tatsächliche Seitengröße)',
     differentFiles: 'versch. Dateien...',
     differentValues: 'versch. Werte...',
+    docElementAlignToPageBottom: 'Am unteren Seitenrand ausrichten',
     docElementAlternateBackgroundColor: 'Abwechselnde Hintergrundfarbe',
     docElementAlwaysPrintOnSamePage: 'Immer zusammen auf einer Seite',
     docElementBarCode: 'Barcode',

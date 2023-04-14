@@ -380,6 +380,11 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'shrink_to_content_height',
                 'section': 'print'
             },
+            'alignToPageBottom': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'align_to_page_bottom',
+                'section': 'print'
+            },
             'growWeight': {
                 'type': SetValueCmd.type.select,
                 'allowEmpty': false,
@@ -1717,6 +1722,32 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elShrinkToContentHeight);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
+        elDiv = utils.createElement(
+            'div', { id: 'rbro_doc_element_align_to_page_bottom_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementAlignToPageBottom'), 'rbro_doc_element_align_to_page_bottom');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elAlignToPageBottom = utils.createElement(
+            'input', { id: 'rbro_doc_element_align_to_page_bottom', type: 'checkbox' });
+        elAlignToPageBottom.addEventListener('change', (event) => {
+            let alignToPageBottomChecked = elAlignToPageBottom.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'alignToPageBottom', alignToPageBottomChecked,
+                    SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elAlignToPageBottom);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 

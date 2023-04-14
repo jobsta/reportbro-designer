@@ -7,6 +7,7 @@ const locale_en = {
     contentHeightInfo: 'affects only GUI size to place elements and not the real page size',
     differentFiles: 'different files...',
     differentValues: 'different values...',
+    docElementAlignToPageBottom: 'Align to bottom of page',
     docElementAlternateBackgroundColor: 'Alternate background color',
     docElementAlwaysPrintOnSamePage: 'Always on same page',
     docElementBarCode: 'Bar code',

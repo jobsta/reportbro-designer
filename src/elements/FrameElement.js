@@ -153,7 +153,7 @@ export default class FrameElement extends DocElement {
         return [
             'label', 'x', 'y', 'width', 'height', 'backgroundColor',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
-            'printIf', 'removeEmptyElement', 'shrinkToContentHeight',
+            'printIf', 'removeEmptyElement', 'shrinkToContentHeight', 'alignToPageBottom',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
         ];
     }
