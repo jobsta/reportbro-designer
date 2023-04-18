@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.0] - 2023-04-18
+
+### Features
+* Add frame option to align frame to bottom of page
+* Add option to set thousands separator symbol for number formatting
+
+### Bug Fixes
+* Fix display of error messages
+* Fix deleting existing elements before loading report
+
 ## [3.0.0] - 2022-10-10
 
 ### Features
