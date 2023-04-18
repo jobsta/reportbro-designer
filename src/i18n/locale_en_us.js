@@ -214,7 +214,7 @@ const locale_en = {
     patternNumber4: 'Show thousand separator and decimal point followed by 2 decimal places',
     patternNumber5: 'Show currency symbol in front of number',
     patternNumberGroupSymbol: 'Thousands separator',
-    patternNumberGroupSymbolInfo: 'Alternative thousands separator for formatting numbers, leave empty for default symbol',
+    patternNumberGroupSymbolInfo: 'leave empty for default',
     patternSeparatorDates: '--- Date patterns ---',
     patternSeparatorNumbers: '--- Number patterns ---',
     plusFeatureInfo: 'Requires commerical <a href="https://www.reportbro.com/license/index" target="_blank" rel="noreferrer">PLUS version</a>',
