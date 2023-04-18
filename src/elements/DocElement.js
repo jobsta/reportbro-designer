@@ -160,7 +160,7 @@ export default class DocElement {
 
     /**
      * Handle mouse click on this element so the element can be selected, dragged and resized.
-     * @param {jQuery.Event} event - browser event object.
+     * @param {MouseEvent} event - browser event object.
      * @param {Boolean} ignoreSelectedContainer - if true the element will always be selected in case it
      * was not selected before. Otherwise the element will only be selected if it's container is
      * not selected (e.g. the frame container when this element is inside a frame).
