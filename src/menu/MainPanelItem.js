@@ -337,7 +337,13 @@ export default class MainPanelItem {
                 }
                 if (this.children.length === 0) {
                     const elMenuItem = document.getElementById(`rbro_menu_item${this.getId()}`);
-                    elMenuItem.classList.add('rbroMenuItemNoChildren');
+                    // test if menu item exists, when all document elements are deleted before
+                    // loading a report and the parent element of this child was deleted before (e.g. parent is
+                    // a frame element and the child a text element inside the frame) then the menu item does
+                    // not exist anymore when deleting the child.
+                    if (elMenuItem !== null) {
+                        elMenuItem.classList.add('rbroMenuItemNoChildren');
+                    }
                 }
                 break;
             }
