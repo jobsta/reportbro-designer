@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.1.0] - 2023-04-18
+## [3.1.0] - 2023-04-19
 
 ### Features
 * Add frame option to align frame to bottom of page
