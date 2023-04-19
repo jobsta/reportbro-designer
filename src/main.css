@@ -115,6 +115,7 @@
 .rbroContainer textarea {
     resize: none !important;
     min-height: 34px;
+    height: inherit;
     padding: 5px;
 }
 
