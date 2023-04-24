@@ -82,7 +82,8 @@ export default class DocElementPanel extends PanelBase {
                 'rowProperties': ['width', 'height'],
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
-                'singlePropertyLabel': 'docElementWidth'
+                'singlePropertyLabel': 'docElementWidth',
+                'visibleIf': "type != 'bar_code' || (format != 'QRCode' && rotate)"
             },
             'height': {
                 'type': SetValueCmd.type.text,
@@ -106,17 +107,22 @@ export default class DocElementPanel extends PanelBase {
             'displayValue': {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'display_value',
-                'visibleIf': 'format==CODE128'
+                'visibleIf': "format != 'QRCode'"
+            },
+            'guardBar': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'guard_bar',
+                'visibleIf': "format == 'EAN8' || format == 'EAN13'"
             },
             'barWidth': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'bar_width',
-                'visibleIf': 'format==CODE128'
+                'visibleIf': "format != 'QRCode'"
             },
             'errorCorrectionLevel': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'error_correction_level',
-                'visibleIf': 'format==QRCode'
+                'visibleIf': "format == 'QRCode'"
             },
             'source': {
                 'type': SetValueCmd.type.text,
@@ -385,6 +391,12 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'align_to_page_bottom',
                 'section': 'print'
             },
+            'rotate': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'rotate',
+                'section': 'print',
+                'visibleIf': "format != 'QRCode'"
+            },
             'growWeight': {
                 'type': SetValueCmd.type.select,
                 'allowEmpty': false,
@@ -618,12 +630,20 @@ export default class DocElementPanel extends PanelBase {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
                 let propertyDescriptor = this.propertyDescriptors[property];
                 if ('visibleIf' in propertyDescriptor) {
-                    let visibleIfField = propertyDescriptor['visibleIf'];
-                    if (visibleIfField.substr(0, 1) === '!') {
-                        visibleIfField = visibleIfField.substr(1);
-                    }
-                    if (!this.visibleIfFields.includes(visibleIfField)) {
-                        this.visibleIfFields.push(visibleIfField);
+                    // add all fields used in visibleIf expression to visibileIfFields list of property descriptor
+                    const tokens = utils.tokenize(propertyDescriptor['visibleIf'], null);
+                    for (const token of tokens) {
+                        if (token.type === 'field') {
+                            if (!('visibleIfFields' in propertyDescriptor)) {
+                                propertyDescriptor.visibleIfFields = [token.value];
+                            } else if (!propertyDescriptor.visibleIfFields.includes(token.value)) {
+                                propertyDescriptor.visibleIfFields.push(token.value);
+                            }
+
+                            if (!this.visibleIfFields.includes(token.value)) {
+                                this.visibleIfFields.push(token.value);
+                            }
+                        }
                     }
                 }
             }
@@ -884,7 +904,11 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('docElementFormat'), 'rbro_doc_element_format');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elFormat = utils.createElement('select', { id: 'rbro_doc_element_format' });
+        elFormat.append(utils.createElement('option', { value: 'CODE39' }, 'CODE39'));
         elFormat.append(utils.createElement('option', { value: 'CODE128' }, 'CODE128'));
+        elFormat.append(utils.createElement('option', { value: 'EAN8' }, 'EAN-8'));
+        elFormat.append(utils.createElement('option', { value: 'EAN13' }, 'EAN-13'));
+        elFormat.append(utils.createElement('option', { value: 'UPC' }, 'UPC'));
         elFormat.append(utils.createElement('option', { value: 'QRCode' }, 'QR Code'));
         elFormat.addEventListener('change', (event) => {
             let val = elFormat.value;
@@ -962,6 +986,28 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elBarWidth);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_guard_bar_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementGuardBar'), 'rbro_doc_element_guard_bar');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elGuardBar = utils.createElement('input', { id: 'rbro_doc_element_guard_bar', type: 'checkbox' });
+        elGuardBar.addEventListener('change', (event) => {
+            let guardBarChecked = elGuardBar.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(),'guardBar', guardBarChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elGuardBar);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -1751,6 +1797,29 @@ export default class DocElementPanel extends PanelBase {
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_rotate_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementRotate'), 'rbro_doc_element_rotate');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRotate = utils.createElement('input', { id: 'rbro_doc_element_rotate', type: 'checkbox' });
+        elRotate.addEventListener('change', (event) => {
+            let rotateChecked = elRotate.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'rotate', rotateChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elRotate);
+        elDiv.append(elFormField);
+        elPrintSectionDiv.append(elDiv);
+
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_pattern_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementPattern'), 'rbro_doc_element_pattern');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
@@ -2296,33 +2365,13 @@ export default class DocElementPanel extends PanelBase {
         for (let property in this.propertyDescriptors) {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
                 const propertyDescriptor = this.propertyDescriptors[property];
-                let visibleIfField = null;
-                let visibleIfValue = null;
-                let visibleIfFieldNegate = false;
+                let visibleIf = '';
                 if ('visibleIf' in propertyDescriptor) {
-                    const visibleIf = propertyDescriptor['visibleIf'];
-                    if (visibleIf.startsWith('!')) {
-                        visibleIfField = visibleIf.substr(1);
-                        visibleIfValue = true;
-                        visibleIfFieldNegate = true;
-                    } else {
-                        let opIdx = visibleIf.indexOf('==');
-                        if (opIdx === -1) {
-                            opIdx = visibleIf.indexOf('!=');
-                            if (opIdx !== -1) {
-                                visibleIfFieldNegate = true;
-                            }
-                        }
-                        if (opIdx !== -1) {
-                            visibleIfField = visibleIf.substr(0, opIdx);
-                            visibleIfValue = visibleIf.substr(opIdx + 2);
-                        } else {
-                            visibleIfField = visibleIf;
-                            visibleIfValue = true;
-                        }
-                    }
+                    visibleIf = propertyDescriptor['visibleIf'];
                 }
-                if (field === null || property === field || (visibleIfField !== null && visibleIfField === field)) {
+
+                if (field === null || property === field ||
+                        (visibleIf && propertyDescriptor.visibleIfFields.includes(field))) {
                     let show = false;
                     if (property in sharedProperties) {
                         if (sharedProperties[property] === selectedObjects.length) {
@@ -2368,15 +2417,9 @@ export default class DocElementPanel extends PanelBase {
                         }
                     }
 
-                    if (show && visibleIfField) {
+                    if (show && visibleIf) {
                         for (let obj of selectedObjects) {
-                            let objValue = obj.getValue(visibleIfField);
-                            if (typeof visibleIfValue === 'boolean' && typeof objValue !== 'boolean') {
-                                // convert object value to boolean if compared to a boolean value
-                                objValue = !!objValue;
-                            }
-                            if ((!visibleIfFieldNegate && objValue !== visibleIfValue) ||
-                                (visibleIfFieldNegate && objValue === visibleIfValue)) {
+                            if (!utils.evaluateExpression(visibleIf, obj)) {
                                 show = false;
                                 delete sharedProperties[property];
                                 break;

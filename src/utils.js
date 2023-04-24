@@ -215,13 +215,13 @@ export function isValidColor(color) {
 export function insertAtCaret(element, text) {
     if (document.selection) {
         element.focus();
-        var sel = document.selection.createRange();
+        const sel = document.selection.createRange();
         sel.text = text;
         element.focus();
     } else if (element.selectionStart || element.selectionStart === 0) {
-        var startPos = element.selectionStart;
-        var endPos = element.selectionEnd;
-        var scrollTop = element.scrollTop;
+        const startPos = element.selectionStart;
+        const endPos = element.selectionEnd;
+        const scrollTop = element.scrollTop;
         element.value = element.value.substring(0, startPos) + text + element.value.substring(endPos, element.value.length);
         element.focus();
         element.selectionStart = startPos + text.length;
@@ -251,4 +251,302 @@ export function getEventAbsPos(event) {
         return { x: event.pageX, y: event.pageY };
     }
     return null;
+}
+
+
+class Token {
+    constructor(value, type) {
+        this.value = value;
+        this.type = type;
+    }
+}
+
+Token.type = {
+    operator: 'operator',
+    bracketOpen: 'bracketOpen',
+    bracketClose: 'bracketClose',
+    boolean: 'boolean',
+    number: 'number',
+    string: 'string',
+    undefined: 'undefined',
+    field: 'field',
+};
+
+Token.operator = {
+    and: '&&',
+    or: '||',
+    equal: '==',
+    notEqual: '!=',
+    negate: '!',
+};
+
+/**
+ * Extract token list of input string.
+ *
+ * A token can be value (string, boolean, etc.) or an operator or bracket to group expressions.
+ * If an object field is referenced then the actual value will be set for the token in case the obj parameter
+ * is set, otherwise the value contains the field name.
+ *
+ * @param {string} input - input string containing a logical expression.
+ * @param {?DocElement} obj - object containing values which can be accessed by field reference, if null then
+ * a token with the field name will be added for field reference, otherwise the token contains
+ * the actual field value.
+ * @returns {Token[]} list of tokens
+ */
+export function tokenize(input, obj) {
+    let scanner = 0;
+    const tokens = [];
+
+    while (scanner < input.length) {
+        const char = input[scanner];
+
+        if (/[0-9]/.test(char)) {
+            let digits = '';
+
+            while (scanner < input.length && /[0-9.]/.test(input[scanner])) {
+                digits += input[scanner++];
+            }
+
+            const number = parseFloat(digits);
+            tokens.push(new Token(number, Token.type.number));
+            continue;
+        }
+
+        if (/[a-zA-Z]/.test(char)) {
+            // parse identifier, can be any of those:
+            // * true / false: boolean value
+            // * type: will be replaced by object type
+            // * field: used to reference object field value
+            let word = '';
+
+            while (scanner < input.length && /[a-zA-Z0-9]/.test(input[scanner])) {
+                word += input[scanner++];
+            }
+
+            if (word === 'true') {
+                tokens.push(new Token(true, Token.type.boolean));
+            } else if (word === 'false') {
+                tokens.push(new Token(false, Token.type.boolean));
+            } else if (word === 'type') {
+                if (obj !== null) {
+                    // insert object type as string
+                    tokens.push(new Token(obj.getElementType(), Token.type.string));
+                } else {
+                    // add string placeholder for object type
+                    tokens.push(new Token('type', Token.type.string));
+                }
+            } else {
+                if (obj === null) {
+                    // return token for field with field name as value
+                    tokens.push(new Token(word, Token.type.field));
+                } else {
+                    // get object field value by field name and set value for token
+                    const val = obj.getValue(word);
+                    let tokenType;
+                    if (val instanceof Number) {
+                        tokenType = Token.type.number;
+                    } else if (val instanceof String) {
+                        tokenType = Token.type.string;
+                    } else if (val instanceof Boolean) {
+                        tokenType = Token.type.boolean;
+                    } else {
+                        tokenType = Token.type.undefined;
+                    }
+                    tokens.push(new Token(val, tokenType));
+                }
+            }
+            continue;
+        }
+
+        if (char === "'") {
+            // parse string
+            let str = '';
+            scanner++;
+            while (scanner < input.length && input[scanner] !== "'") {
+                str += input[scanner++];
+            }
+            if (scanner >= input.length) {
+                throw new Error(`Unterminated string token in input ${input}`);
+            }
+
+            tokens.push(new Token(str, Token.type.string));
+            scanner++;
+            continue;
+        }
+
+        if (char === '(' || char === ')') {
+            // parse brackets
+            tokens.push(new Token(char, false, char === '(' ? Token.type.bracketOpen : Token.type.bracketClose));
+            scanner++;
+            continue;
+        }
+
+        if (/[!=|&]/.test(char)) {
+            // parse operator
+            scanner++;
+            if (char === '!' && (scanner >= input.length || input[scanner] !== '=')) {
+                // unary operator, only supported single char operator
+                tokens.push(new Token(Token.operator.negate, Token.type.operator));
+                continue;
+            }
+            if (scanner < input.length) {
+                const nextChar = input[scanner];
+                if (char === '!' && nextChar === '=') {
+                    tokens.push(new Token(Token.operator.notEqual, Token.type.operator));
+                    scanner++;
+                } else if (char === '=' && nextChar === '=') {
+                    tokens.push(new Token(Token.operator.equal, Token.type.operator));
+                    scanner++;
+                } else if (char === '|' && nextChar === '|') {
+                    tokens.push(new Token(Token.operator.or, Token.type.operator));
+                    scanner++;
+                } else if (char === '&' && nextChar === '&') {
+                    tokens.push(new Token(Token.operator.and, Token.type.operator));
+                    scanner++;
+                } else {
+                    throw new Error(`Invalid token ${nextChar} at position ${scanner}`);
+                }
+            } else {
+                throw new Error(`Invalid token ${char} at end of input`);
+            }
+            continue;
+        }
+
+        if (char === ' ') {
+            scanner++;
+            continue;
+        }
+        throw new Error(`Invalid token ${char} at position ${scanner}`);
+    }
+    return tokens;
+}
+
+/**
+ * Convert list of tokens from infix notation to Reverse Polish Notation.
+ * @param {Token[]} tokens - input tokens in infix notation order.
+ * @returns {Token[]} tokens in RPN order
+ */
+function toRPN(tokens) {
+    const operators = [];
+    const out = [];
+
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+
+        if (token.type === Token.type.operator) {
+            while (shouldUnwindOperatorStack(operators, token)) {
+                out.push(operators.pop());
+            }
+            operators.push(token);
+        } else if (token.type === Token.type.bracketOpen) {
+            operators.push(token);
+        } else if (token.type === Token.type.bracketClose) {
+            while (operators.length > 0 && operators[operators.length - 1] !== Token.type.bracketOpen) {
+                out.push(operators.pop());
+            }
+            operators.pop();
+        } else {
+            out.push(token);
+        }
+    }
+
+    for (let i = operators.length - 1; i >= 0; i--) {
+        out.push(operators[i]);
+    }
+    return out;
+}
+
+const precedence = { '!': 4, '!=': 3, '==': 3, '||': 2, '&&': 1 };
+
+function shouldUnwindOperatorStack(operators, nextToken) {
+    if (operators.length === 0) {
+        return false;
+    }
+
+    const lastOperator = operators[operators.length - 1];
+    return precedence[lastOperator.value] >= precedence[nextToken.value];
+}
+
+/**
+ * Evaluate tokens in Revers Polish Notation order.
+ * @param {Token[]} rpn - tokens in RPN order.
+ * @returns {boolean} evaluated expression result as boolean value
+ */
+function evalRPN(rpn) {
+    const stack = [];
+
+    for (let i = 0; i < rpn.length; i++) {
+        const token = rpn[i];
+
+        if (token.type === Token.type.operator) {
+            stack.push(operate(token, stack));
+            continue;
+        }
+
+        // token is an operand (string, boolean, number)
+        stack.push(token);
+    }
+
+    const finalToken = stack.pop();
+    // if result is not of type boolean (e.g. by testing if a field value is set)
+    // then convert result to boolean
+    if (finalToken.type === Token.type.boolean) {
+        return finalToken.value;
+    } else {
+        return !!finalToken.value;
+    }
+}
+
+/**
+ * Perform operation of given operator on stack.
+ * @param {Token} operator
+ * @param {Token[]} stack
+ * @returns {Token} result as token with boolean type.
+ */
+function operate(operator, stack) {
+    const a = stack.pop();
+    const val1 = a.value;
+    let val2;
+    // negate is the only supported unary operator and therefor does not need a second operand
+    if (operator.value !== Token.operator.negate) {
+        const b = stack.pop();
+        val2 = b.value;
+    }
+
+    // the returned token result is always a boolean value
+    switch (operator.value) {
+        case Token.operator.and:
+            return new Token(val2 && val1, Token.type.boolean);
+        case Token.operator.or:
+            return new Token(val2 || val1, Token.type.boolean);
+        case Token.operator.equal:
+            return new Token(val2 === val1, Token.type.boolean);
+        case Token.operator.notEqual:
+            return new Token(val2 !== val1, Token.type.boolean);
+        case Token.operator.negate:
+            return new Token(!val1, Token.type.boolean);
+        default:
+            throw new Error(`Invalid operator: ${operator}`);
+    }
+}
+
+/**
+ * Simple expression evaluator for logical expressions.
+ *
+ * Based on https://github.com/chidiwilliams/expression-evaluator
+ * described in this post: https://chidiwilliams.com/post/evaluator/
+ * Adapted to our needs by evaluating logical instead of mathematical expressions.
+ *
+ * Example: "format == 'EAN8' || format == 'EAN13'"
+ * Quotes are not part of the expression and only show beginning and end of input string.
+ * This example evaluates to true if obj.format contains the string "EAN8" or "EAN13"
+ *
+ * @param {string} input - expression to evaluate, the expression can contain fields (identifier name) of
+ * the given object as well as numbers, true/false, strings (with apostrophe) and the special
+ * identifier *type* which is used to access the element type of the given object.
+ * @param {DocElement} obj - object containing values which can be accessed by field reference.
+ * @returns {boolean} evaluated expression result as boolean value
+ */
+export function evaluateExpression(input, obj) {
+    return evalRPN(toRPN(tokenize(input, obj)));
 }
