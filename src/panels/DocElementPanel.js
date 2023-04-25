@@ -958,7 +958,7 @@ export default class DocElementPanel extends PanelBase {
         elBarWidth.addEventListener('input', (event) => {
             let val = elBarWidth.value;
             if (val !== '') {
-                val = utils.checkInputDecimal(val, 1, 3);
+                val = utils.checkInputDecimal(val, 0.3, 3);
             }
             if (val !== elBarWidth.value) {
                 elBarWidth.value = val;
