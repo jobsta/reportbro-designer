@@ -96,13 +96,6 @@ export default class Parameter {
      * @returns {Number}
      */
     getMaxId() {
-
-    }
-    /**
-     * Returns highest id of this component including all its child components.
-     * @returns {Number}
-     */
-    getMaxId() {
         let maxId = this.id;
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
             const children = this.children.slice();
