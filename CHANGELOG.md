@@ -1,5 +1,14 @@
 # Changelog
 
+## Upcoming Release
+
+### Features
+* Add additional barcodes CODE39, EAN-8, EAN-13 and UPC
+* Option to rotate barcode
+
+### Bug Fixes
+* Fix updating barcode when switching from QR Code
+
 ## [3.1.0] - 2023-04-19
 
 ### Features
