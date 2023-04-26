@@ -2,7 +2,12 @@
 
 ## Upcoming Release
 
+### Features
+* Add additional barcodes CODE39, EAN-8, EAN-13 and UPC
+* Option to rotate barcode
+
 ### Bug Fixes
+* Fix updating barcode when switching from QR Code
 * Clear test data when changing parameter type to/from List, Simple List or Collection
 
 ## [3.1.0] - 2023-04-19
