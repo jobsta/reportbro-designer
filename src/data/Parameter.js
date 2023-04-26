@@ -283,6 +283,16 @@ export default class Parameter {
      * be added to this command group.
      */
     addCommandsForChangedParameterType(newParameterType, cmdGroup) {
+        if (this.type === Parameter.type.array || this.type === Parameter.type.simpleArray ||
+                this.type === Parameter.type.map ||
+                newParameterType === Parameter.type.array || newParameterType === Parameter.type.simpleArray ||
+                newParameterType === Parameter.type.map) {
+            // clear test data if parameter type is changed from or to array / simpleArray / map, the test data
+            // is saved in the same field but the test data format is different depending on the parameter type
+            const cmd = new SetValueCmd(this.getId(), 'testData', '', SetValueCmd.type.text, this.rb);
+            cmdGroup.addCommand(cmd);
+        }
+
         if (this.type !== Parameter.type.array && newParameterType === Parameter.type.array) {
             let initialData = {
                 name: 'row_number', type: Parameter.type.number, eval: false, editable: false,
