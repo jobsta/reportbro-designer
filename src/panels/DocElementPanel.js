@@ -109,14 +109,20 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'display_value',
                 'visibleIf': "format != 'QRCode'"
             },
+            'barWidth': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'bar_width',
+                'visibleIf': "format != 'QRCode'"
+            },
             'guardBar': {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'guard_bar',
                 'visibleIf': "format == 'EAN8' || format == 'EAN13'"
             },
-            'barWidth': {
-                'type': SetValueCmd.type.text,
-                'fieldId': 'bar_width',
+            'rotate': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'rotate',
+                'section': 'print',
                 'visibleIf': "format != 'QRCode'"
             },
             'errorCorrectionLevel': {
@@ -390,12 +396,6 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'align_to_page_bottom',
                 'section': 'print'
-            },
-            'rotate': {
-                'type': SetValueCmd.type.checkbox,
-                'fieldId': 'rotate',
-                'section': 'print',
-                'visibleIf': "format != 'QRCode'"
             },
             'growWeight': {
                 'type': SetValueCmd.type.select,
@@ -1008,6 +1008,29 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elGuardBar);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_rotate_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+            elDiv, this.rb.getLabel('docElementRotate'), 'rbro_doc_element_rotate');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRotate = utils.createElement('input', { id: 'rbro_doc_element_rotate', type: 'checkbox' });
+        elRotate.addEventListener('change', (event) => {
+            let rotateChecked = elRotate.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'rotate', rotateChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elRotate);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
@@ -1794,29 +1817,6 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elAlignToPageBottom);
-        elDiv.append(elFormField);
-        elPrintSectionDiv.append(elDiv);
-
-        elDiv = utils.createElement('div', { id: 'rbro_doc_element_rotate_row', class: 'rbroFormRow' });
-        utils.appendLabel(
-            elDiv, this.rb.getLabel('docElementRotate'), 'rbro_doc_element_rotate');
-        elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elRotate = utils.createElement('input', { id: 'rbro_doc_element_rotate', type: 'checkbox' });
-        elRotate.addEventListener('change', (event) => {
-            let rotateChecked = elRotate.checked;
-            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-            let selectedObjects = this.rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), 'rotate', rotateChecked, SetValueCmd.type.checkbox, this.rb));
-            }
-            if (!cmdGroup.isEmpty()) {
-                this.rb.executeCommand(cmdGroup);
-            }
-        });
-        elFormField.append(elRotate);
         elDiv.append(elFormField);
         elPrintSectionDiv.append(elDiv);
 
