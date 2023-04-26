@@ -1,5 +1,10 @@
 # Changelog
 
+## Upcoming Release
+
+### Bug Fixes
+* Clear test data when changing parameter type to/from List, Simple List or Collection
+
 ## [3.1.0] - 2023-04-19
 
 ### Features
