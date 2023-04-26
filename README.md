@@ -13,8 +13,8 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 ## Installation
 
-+ Download ReportBro Designer from https://www.reportbro.com/download
-+ Extract .zip or .tar.gz and move `dist` folder to your application
++ Download ReportBro Designer (`reportbro-designer-<version>.tgz`) from https://github.com/jobsta/reportbro-designer/releases
++ Extract .tgz file and move `dist` folder to your application
 + In your .html document reference reportbro.js (or reportbro.min.js) and reportbro.css. See basic usage below.
 
 ### Install via npm:
@@ -78,28 +78,15 @@ You need to run
 
 `npm run build-prod`
 
-at least once before starting any local demos. This build step copies the external plugins to the ../dist/ext folder
-which are referenced in the demos.
-
-### Running demos from local filesystem with Firefox
-
-Due to Firefox's strict origin policy the icon fonts cannot be loaded (from ../dist/iconfonts)
-with default settings. Go to `about:config` and make sure
-`security.fileuri.strict_origin_policy` is set to false.
-
-### Testing with MS Edge on localhost
-
-You have to enable loopback first
-
-`CheckNetIsolation LoopbackExempt -a -n=Microsoft.MicrosoftEdge_8wekyb3d8bbwe`
-
-see also https://stackoverflow.com/questions/30334289/cant-open-localhost-in-microsoft-edge-project-spartan-in-windows-10-preview#30334398
+at least once before starting any local demos. This build step creates ReportBro Designer in the `dist` directory which is referenced in the demos.
 
 ## License
 
 ### Commercial license
 
-If you want to use ReportBro to develop commercial applications and projects, the Commercial license is the appropriate license. With this license, your source code is kept proprietary. Purchase a ReportBro Commercial license at https://www.reportbro.com/license/ .
+If you want to use ReportBro to develop commercial applications and projects, the Commercial license is the appropriate license. With this license, your source code is kept proprietary. Purchase a ReportBro Commercial license at https://www.reportbro.com/license/
+
+This license includes ReportBro PLUS with additional features.
 
 ### Open-source license
 
