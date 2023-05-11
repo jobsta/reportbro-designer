@@ -494,7 +494,7 @@ export default class Parameter {
         if (this.type === Parameter.type.array || this.type === Parameter.type.simpleArray ||
                 this.type === Parameter.type.map) {
             if (testData) {
-                return this.getSanitizedTestData(this, testData, editFormat);
+                return Parameter.getSanitizedTestData(this, testData, editFormat);
             }
         }
         return null;
@@ -505,33 +505,31 @@ export default class Parameter {
      * The test data is sanitized, i.e. the data value types match the corresponding parameter types.
      * @returns {Object|Object[]} sanitized test data
      */
-    getSanitizedTestData(parameter, testData, editFormat) {
+    static getSanitizedTestData(parameter, testData, editFormat) {
         let rv;
         if (parameter.type === Parameter.type.map) {
             if (!testData || Object.getPrototypeOf(testData) !== Object.prototype) {
                 testData = {};
             }
-            rv = this.getSanitizedTestDataMap(parameter, testData, editFormat);
-        } else {
+            rv = Parameter.getSanitizedTestDataMap(parameter, testData, editFormat);
+        } else if (parameter.type === Parameter.type.simpleArray) {
+            rv = Parameter.getSanitizedTestDataSimpleArray(parameter, testData, editFormat);
+        } else if (parameter.type === Parameter.type.array) {
             if (!Array.isArray(testData)) {
                 testData = [];
             }
             rv = [];
             for (let testDataRow of testData) {
-                if (this.type === Parameter.type.array) {
-                    if (!testDataRow || Object.getPrototypeOf(testDataRow) !== Object.prototype) {
-                        testDataRow = {};
-                    }
-                    rv.push(this.getSanitizedTestDataMap(parameter, testDataRow, editFormat));
-                } else if (this.type === Parameter.type.simpleArray) {
-                    rv.push(this.getSanitizedTestDataValue(parameter.arrayItemType, testDataRow, editFormat));
+                if (!testDataRow || Object.getPrototypeOf(testDataRow) !== Object.prototype) {
+                    testDataRow = {};
                 }
+                rv.push(Parameter.getSanitizedTestDataMap(parameter, testDataRow, editFormat));
             }
         }
         return rv;
     }
 
-    getSanitizedTestDataMap(parameter, testData, editFormat) {
+    static getSanitizedTestDataMap(parameter, testData, editFormat) {
         const rv = {};
         for (const field of parameter.getChildren()) {
             if (field.showOnlyNameType) {
@@ -539,33 +537,37 @@ export default class Parameter {
             }
             const value = (field.name in testData) ? testData[field.name] : null;
             if (field.type === Parameter.type.array || field.type === Parameter.type.map) {
-                rv[field.name] = this.getSanitizedTestData(field, value, editFormat);
+                rv[field.name] = Parameter.getSanitizedTestData(field, value, editFormat);
             } else if (field.type === Parameter.type.simpleArray) {
-                let testDataRows = value;
-                if (!Array.isArray(testDataRows)) {
-                    testDataRows = [];
-                }
-                const arrayValues = [];
-                for (let testDataRow of testDataRows) {
-                    if (Object.getPrototypeOf(testDataRow) === Object.prototype) {
-                        const val = this.getSanitizedTestDataValue(
-                            field.arrayItemType, testDataRow['data'], editFormat);
-                        if (editFormat) {
-                            arrayValues.push({ data: val });
-                        } else {
-                            arrayValues.push(val);
-                        }
-                    }
-                }
-                rv[field.name] = arrayValues;
+                rv[field.name] = Parameter.getSanitizedTestDataSimpleArray(field, value, editFormat);
             } else {
-                rv[field.name] = this.getSanitizedTestDataValue(field.type, value, editFormat);
+                rv[field.name] = Parameter.getSanitizedTestDataValue(field.type, value, editFormat);
             }
         }
         return rv;
     }
 
-    getSanitizedTestDataValue(fieldType, testData, editFormat) {
+    static getSanitizedTestDataSimpleArray(parameter, testData, editFormat) {
+        let testDataRows = testData;
+        if (!Array.isArray(testDataRows)) {
+            testDataRows = [];
+        }
+        const arrayValues = [];
+        for (let testDataRow of testDataRows) {
+            if (Object.getPrototypeOf(testDataRow) === Object.prototype) {
+                const val = Parameter.getSanitizedTestDataValue(
+                    parameter.arrayItemType, testDataRow['data'], editFormat);
+                if (editFormat) {
+                    arrayValues.push({ data: val });
+                } else {
+                    arrayValues.push(val);
+                }
+            }
+        }
+        return arrayValues;
+    }
+
+    static getSanitizedTestDataValue(fieldType, testData, editFormat) {
         let rv = null;
         if (fieldType === Parameter.type.string) {
             if (typeof testData === 'string') {
