@@ -59,14 +59,16 @@ export default class Parameter {
      */
     setup() {
         if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
+            const adminMode = this.rb.getProperty('adminMode');
             for (let child of this.children) {
                 let parameter = new Parameter(child.id || this.rb.getUniqueId(), child, this.rb);
                 this.rb.addParameter(parameter);
-                // set hasChildren and showAdd to true because parameters can have children depending on their
-                // type (for map and list) -> children and add button are shown/hidden dynamically
+                // set hasChildren and showAdd to true (in case adminMode is enabled) because parameters
+                // can have children depending on their type (for map and list) -> children and add button
+                // are shown/hidden dynamically
                 let panelItem = new MainPanelItem(
                     'parameter', this.panelItem, parameter,
-                    { hasChildren: true, showAdd: true, showDelete: true, draggable: true }, this.rb);
+                    { hasChildren: true, showAdd: adminMode, showDelete: adminMode, draggable: true }, this.rb);
                 parameter.setPanelItem(panelItem);
                 this.panelItem.appendChild(panelItem);
                 parameter.setup();
@@ -143,14 +145,16 @@ export default class Parameter {
      * Must be called initially and when parameter type changes.
      */
     updateMenuItemDisplay() {
-        if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
-            document.getElementById(`rbro_menu_item_add${this.getId()}`).removeAttribute('style');
-            document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'block';
-            document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).removeAttribute('style');
-        } else {
-            document.getElementById(`rbro_menu_item_add${this.getId()}`).style.display = 'none';
-            document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'none';
-            document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).style.display = 'none';
+        if (this.rb.getProperty('adminMode')) {
+            if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
+                document.getElementById(`rbro_menu_item_add${this.getId()}`).removeAttribute('style');
+                document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'block';
+                document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).removeAttribute('style');
+            } else {
+                document.getElementById(`rbro_menu_item_add${this.getId()}`).style.display = 'none';
+                document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'none';
+                document.getElementById(`rbro_menu_item_children_toggle${this.getId()}`).style.display = 'none';
+            }
         }
     }
 

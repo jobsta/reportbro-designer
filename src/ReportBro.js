@@ -1824,16 +1824,20 @@ export default class ReportBro {
     createParameter(parameterData) {
         let parameter = new Parameter(parameterData.id, parameterData, this);
         let parentPanel = this.mainPanel.getParametersItem();
-        // set hasChildren and showAdd to true because parameters can have children depending on their
-        // type (for map and list) -> children and add button are shown/hidden dynamically
+        const adminMode = this.getProperty('adminMode');
+        // set hasChildren and showAdd to true (in case adminMode is enabled) because parameters
+        // can have children depending on their type (for map and list) -> children and add button
+        // are shown/hidden dynamically
         let panelItem = new MainPanelItem(
             'parameter', parentPanel, parameter,
-            { hasChildren: true, showAdd: true, showDelete: true, draggable: true }, this);
+            { hasChildren: true, showAdd: adminMode, showDelete: adminMode, draggable: true }, this);
         parameter.setPanelItem(panelItem);
         parentPanel.appendChild(panelItem);
         parameter.setup();
         if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
-            document.getElementById(`rbro_menu_item_add${parameter.getId()}`).style.display = 'none';
+            if (adminMode) {
+                document.getElementById(`rbro_menu_item_add${parameter.getId()}`).style.display = 'none';
+            }
             document.getElementById(`rbro_menu_item_children${parameter.getId()}`).style.display = 'none';
             document.getElementById(`rbro_menu_item_children_toggle${parameter.getId()}`).style.display = 'none';
         }
