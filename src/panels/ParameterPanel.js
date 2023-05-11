@@ -182,24 +182,28 @@ export default class ParameterPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        if (this.rb.getProperty('adminMode')) {
-            elDiv = utils.createElement('div', { id: 'rbro_parameter_eval_row', class: 'rbroFormRow' });
-            utils.appendLabel(elDiv, this.rb.getLabel('parameterEval'), 'rbro_parameter_eval');
-            elFormField = utils.createElement('div', { class: 'rbroFormField' });
-            let elEval = utils.createElement('input', { id: 'rbro_parameter_eval', type: 'checkbox' });
-            elEval.addEventListener('change', (event) => {
-                let selectedObject = this.rb.getSelectedObject();
-                if (selectedObject !== null) {
-                    let cmd = new SetValueCmd(
-                        selectedObject.getId(), 'eval', elEval.checked,
-                        SetValueCmd.type.checkbox, this.rb);
-                    this.rb.executeCommand(cmd);
-                }
-            });
-            elFormField.append(elEval);
-            elDiv.append(elFormField);
-            panel.append(elDiv);
+        const evalContainerProps = {}
+        if (!this.rb.getProperty('adminMode')) {
+            evalContainerProps.style = 'display: none';
         }
+        const elParameterEvalContainer = utils.createElement('div', evalContainerProps);
+        elDiv = utils.createElement('div', { id: 'rbro_parameter_eval_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterEval'), 'rbro_parameter_eval');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elEval = utils.createElement('input', { id: 'rbro_parameter_eval', type: 'checkbox' });
+        elEval.addEventListener('change', (event) => {
+            let selectedObject = this.rb.getSelectedObject();
+            if (selectedObject !== null) {
+                let cmd = new SetValueCmd(
+                    selectedObject.getId(), 'eval', elEval.checked,
+                    SetValueCmd.type.checkbox, this.rb);
+                this.rb.executeCommand(cmd);
+            }
+        });
+        elFormField.append(elEval);
+        elDiv.append(elFormField);
+        elParameterEvalContainer.append(elDiv);
+        panel.append(elParameterEvalContainer);
 
         elDiv = utils.createElement('div', { id: 'rbro_parameter_nullable_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterNullable'), 'rbro_parameter_nullable');
