@@ -11,6 +11,7 @@
 * Clear test data when changing parameter type to/from List, Simple List or Collection
 * Fix editing test data and preview rendering of "Simple List" parameter when report template
   was saved in ReportBro Designer version < 3.0
+* Fix parameter panel display and hide add/delete buttons for parameter when adminMode is deactivated
 
 ## [3.1.0] - 2023-04-19
 
