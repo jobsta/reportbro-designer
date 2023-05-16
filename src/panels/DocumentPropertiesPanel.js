@@ -490,7 +490,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
     static updateVisibileRows(obj, field) {
         if (field === null || field === 'pageFormat') {
             if (obj.getValue('pageFormat') === DocumentProperties.pageFormat.userDefined) {
-                document.getElementById('rbro_document_properties_page_size_row').style.display = 'block';
+                document.getElementById('rbro_document_properties_page_size_row').style.display = 'flex';
             } else {
                 document.getElementById('rbro_document_properties_page_size_row').style.display = 'none';
             }
