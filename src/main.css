@@ -547,6 +547,7 @@ ul ul .rbroMenuItemText {
 
 .rbroInfo {
     font-size: 85%;
+    line-height: 130%;
 }
 
 .rbroInfo a, .rbroInfo a:hover, .rbroInfo a:visited, .rbroInfo a:focus, .rbroInfo a:active {
