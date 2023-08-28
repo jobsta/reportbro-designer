@@ -42,6 +42,7 @@ export default class ReportBro {
         this.properties = {
             additionalFonts: [],
             adminMode: true,
+            treeMode: false,
             cmdExecutedCallback: null,
             colors: [
                 "#000000","#444444","#666666","#999999","#cccccc","#eeeeee","#f3f3f3","#ffffff",
@@ -656,7 +657,9 @@ export default class ReportBro {
                         separator: true,
                         separatorClass: 'rbroParameterDataSourceGroup',
                         id: 'ds' + dataSourceIndex,
-                        name: this.getLabel('parametersDataSource')
+                        name: this.getLabel('parametersDataSource') +
+                            " /" +
+                            dataSource["name"].replace(/\./g, "/"),
                     });
                     dataSourceIndex++;
                     // add all parameters of collections at end of data source parameters
@@ -1773,14 +1776,47 @@ export default class ReportBro {
 
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
-     * @param {String} parameterName - Name of parameter to search for.
+     * @param {String} parameterName1 - Name of parameter to search for.
      * @returns {?Parameter}
      */
-    getParameterByName(parameterName) {
+    getParameterByName(parameterName1) {
+        const dataArray = parameterName1.split(".");
+        const lastParameterName = dataArray[dataArray.length - 1];
         let parameters = this.getParameters();
-        for (let parameter of parameters) {
-            if (parameter.getValue('name') === parameterName) {
-                return parameter;
+        console.log('i am data array',dataArray);
+        if (dataArray.length < 2) {
+            for (let parameter of parameters) {
+                if (parameter.getValue("name") === parameterName1) {
+                    return parameter;
+                }
+            }
+        } 
+        else {
+            let index = 0;
+            for (let i = 0; i <= dataArray.length; i++) {
+                // for (let parameter of parameters) {
+                for (let j=0;j<parameters.length;j++) {
+                    let parameter = parameters[j];
+                    let parameterName = dataArray[i];
+                    if (parameter.getValue("name") === parameterName) {
+                        if (parameter.getValue("name") === lastParameterName) {
+                            return parameter;
+                        }
+                        parameters = parameter.getChildren();
+                        i++
+                        j=-1;
+                        continue
+                    }
+                    if (index === dataArray.length) {
+                        if (parameter.getValue("name") !== parameterName) {
+                            parameters = this.getParameters();
+                        }
+                        index++;
+                        i = 0;
+                        break;
+                    }
+                }
+                index++;
             }
         }
         return null;

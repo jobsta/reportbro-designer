@@ -25,7 +25,8 @@ export default class PopupWindow {
 
     render() {
         this.elWindow = utils.createElement('div', { class: 'rbroPopupWindow rbroHidden' });
-        this.elContent = utils.createElement('div', { class: 'rbroPopupWindowContent' });
+        const className = this.rb.properties.treeMode ? 'rbroPopupWindowContentTreeMode rbroPopupWindowContent' : 'rbroPopupWindowContent';
+        this.elContent = utils.createElement('div', { class: className });
         this.elContent.addEventListener('mouseup', (event) => {
             // stop propagation so popup window is not closed
             event.stopPropagation();
@@ -75,6 +76,7 @@ export default class PopupWindow {
         this.rootParameter = parameter;
         this.nextRowId = 1;
         this.rowMap = {};
+        this.quill = quill
 
         if (quill) {
             // save selection of rich text editor because selection is lost when editor looses focus
@@ -110,6 +112,11 @@ export default class PopupWindow {
                 // item is triggered
                 event.preventDefault();
             });
+            if (rb.properties.treeMode) {
+                this.createNestedList(ul, items, type, this.quill, this.input);
+            }
+            else
+            {
             for (const item of items) {
                 const li = utils.createElement('li');
                 if (item.separator) {
@@ -159,6 +166,7 @@ export default class PopupWindow {
                 }
                 ul.append(li);
             }
+            }
             this.elContent.append(ul);
             const offset = utils.getElementOffset(this.input);
             let top = offset.top;
@@ -171,16 +179,141 @@ export default class PopupWindow {
             } else {
                 top -= 300;
             }
+            if (!rb.properties.treeMode) {
             this.elWindow.style.left = offset.left + 'px';
             this.elWindow.style.top = top + 'px';
             this.elWindow.style.width = '400px';
             this.elWindow.style.height = '300px';
+            }
+            else {
+                this.elWindow.style.left = 170 + 'px';
+                this.elWindow.style.top = top + 'px';
+                this.elWindow.style.width = '850px';
+                this.elWindow.style.height = '700px';
+            }
+
         }
 
         this.elWindow.classList.remove('rbroHidden');
         this.visible = true;
         if (elSearch !== null) {
             elSearch.focus();
+        }
+    }
+
+    createNestedList(container, data, type, quill, input) {
+        this.type = type;
+        this.input = input;
+        let quillSelectionRange = null;
+
+        if (quill) {
+            quillSelectionRange = quill.getSelection();
+        }
+
+        const ul = utils.createElement('ul');
+        container.appendChild(ul);
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+
+            const li = utils.createElement('li');
+            if (item.separator) {
+                let separatorClass = 'rbroPopupItemSeparator';
+                if (item.separatorClass) {
+                    separatorClass += ' ' + item.separatorClass;
+                }
+                li.setAttribute('class', separatorClass);
+                let nestedItems;
+                const details = utils.createElement('details');
+                li.appendChild(details);
+
+                const summary = utils.createElement('summary');
+                summary.textContent = item.name.split('.').pop();
+
+
+
+                if ((type === PopupWindow.type.parameterSet ||
+                    type === PopupWindow.type.parameterAppend) && item.id) {
+                    summary.setAttribute('id', 'parameter_group_' + item.id);
+                }
+                details.appendChild(summary);
+
+                if (item.name === "Parameters") {
+                    nestedItems = data.slice(i + 1);
+                }
+
+                else if (item.name.startsWith('Data')) {
+                    let idDataSource = item.id
+                    if (item.id.startsWith("ds0")) {
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].name === "Parameters") {
+                                nestedItems = data.slice(1, i);
+                                break;
+                            }
+                        }
+
+                    }
+                    else if (item.id.startsWith(idDataSource)) {
+
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].name.startsWith('Data')) {
+                                nestedItems = data.slice(i + 1);
+                                break;
+                            }
+                        }
+
+                    }
+                }
+                else {
+                    nestedItems = data.slice(i + 1).filter((x) => x.name.startsWith(item.name));
+                }
+                this.createNestedList(details, nestedItems, type, quill, input);
+                i += nestedItems.length;
+
+            }
+            else {
+                const pattern = /^(\$|€|£|¥|0|#)/;
+                if (pattern.test(item.name)) {
+                    li.textContent = item.name;
+                } else {
+                    li.textContent = item.name.split('.').pop();
+
+                }
+                if ((type === PopupWindow.type.parameterSet ||
+                    type === PopupWindow.type.parameterAppend) && item.id) {
+                    li.setAttribute('id', 'parameter_' + item.id);
+                }
+                li.addEventListener('mousedown', (event) => {
+                    if (type === PopupWindow.type.pattern) {
+                        input.value = item.name;
+
+                        input.dispatchEvent(new Event('input'));
+                        this.hide();
+                    } else if (type === PopupWindow.type.parameterSet) {
+                        input.value = '${' + item.name + '}';
+                        input.dispatchEvent(new Event('input'));
+                        autosize.update(input);
+                        this.hide();
+                    } else if (type === PopupWindow.type.parameterAppend) {
+                        const paramText = '${' + item.name + '}';
+                        if (quill) {
+                            if (quillSelectionRange) {
+                                quill.insertText(quillSelectionRange.index, paramText);
+                            }
+                        } else {
+                            utils.insertAtCaret(input, paramText);
+                            autosize.update(input);
+                            input.dispatchEvent(new Event('input'));
+                        }
+                        this.hide();
+                    }
+                    event.preventDefault();
+                });
+            }
+            if (item.description && item.description !== '') {
+                li.append(utils.createElement('div', { class: 'rbroPopupItemDescription' }, item.description));
+            }
+            ul.append(li);
+
         }
     }
 

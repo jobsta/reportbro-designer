@@ -833,8 +833,14 @@ export default class DocElement {
      */
     getAllDataSources() {
         const dataSources = [];
-        const dataSourceNames = [];
+        let dataSourceNames = [];
         this.getAllDataSourceParameterNames(dataSourceNames, null);
+        console.log("DatasourceNameBefore", dataSourceNames)
+        if (dataSourceNames.length > 1) {
+            const lastElementDataSourceNames = dataSourceNames[dataSourceNames.length - 1];
+            dataSourceNames = dataSourceNames.map(item => (item === lastElementDataSourceNames ? item : lastElementDataSourceNames + '.' + item));
+        }
+        console.log("DatasourceNameAfter", dataSourceNames)
         // iterate data sources in reverse order -> start from root, the last data source will
         // be from this element. this way we can find data sources which are parameters
         // of a parent data source
@@ -853,6 +859,7 @@ export default class DocElement {
             if (param === null) {
                 // root data source
                 param = this.rb.getParameterByName(dataSourceName);
+                console.log(param);
             }
             if (param !== null && param.getValue('type') === Parameter.type.array) {
                 dataSources.unshift({ name: dataSourceName, parameters: param.getChildren() });
