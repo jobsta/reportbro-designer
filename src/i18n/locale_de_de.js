@@ -84,6 +84,7 @@ const locale_de = {
     errorMsgDuplicateParameter: 'Parameter existiert bereits',
     errorMsgDuplicateParameterField: 'Feld existiert bereits',
     errorMsgFontNotAvailable: 'Schrift ist am Server nicht vorhanden',
+    errorMsgGroupExpressionWithoutDataSource: 'Gruppen Ausdruck benötigt Tabelle mit Datenquelle',
     errorMsgLoadingImageFailed: 'Bild laden fehlgeschlagen: ${info}',
     errorMsgInvalidArray: 'Ungültige Liste',
     errorMsgInvalidAvgSumExpression: 'Ausdruck muss ein Zahl-Feld einer Liste enthalten',

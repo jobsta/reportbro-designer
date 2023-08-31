@@ -84,6 +84,7 @@ const locale_en = {
     errorMsgDuplicateParameter: 'Parameter already exists',
     errorMsgDuplicateParameterField: 'Field already exists',
     errorMsgFontNotAvailable: 'Font not available on server',
+    errorMsgGroupExpressionWithoutDataSource: 'Group expression requires table with data source',
     errorMsgLoadingImageFailed: 'Loading image failed: ${info}',
     errorMsgInvalidArray: 'Invalid list',
     errorMsgInvalidAvgSumExpression: 'Expression must contain number field of a list parameter',
