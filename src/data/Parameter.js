@@ -229,7 +229,7 @@ export default class Parameter {
 
         if (this.getValue(field).indexOf(paramRef) !== -1) {
             let cmd = new SetValueCmd(
-                this.id, field, utils.replaceAll(this.getValue(field), paramRef, newParamRef),
+                this.id, field, this.getValue(field).replaceAll(paramRef, newParamRef),
                 SetValueCmd.type.text, this.rb);
             cmdGroup.addCommand(cmd);
         }
@@ -356,12 +356,13 @@ export default class Parameter {
      * @param {Object[]} parameters - list where parameter items will be appended to.
      * @param {?String[]} allowedTypes - specify allowed parameter types which will be
      * added to the parameter list. If not set all parameter types are allowed.
+     * @param {?String} dataSourceName - data source name which will be set as prefix for inserted parameter name.
      */
-    appendParameterItems(parameters, allowedTypes) {
-        this.appendParameterItemsWithPrefix(parameters, allowedTypes, '');
+    appendParameterItems(parameters, allowedTypes, dataSourceName) {
+        this.appendParameterItemsWithPrefix(parameters, allowedTypes, dataSourceName, '');
     }
 
-    appendParameterItemsWithPrefix(parameters, allowedTypes, parameterPrefix) {
+    appendParameterItemsWithPrefix(parameters, allowedTypes, dataSourceName, parameterPrefix) {
         if (this.type === Parameter.type.map) {
             const parametersToAppend = [];
             const nestedMapParameters = [];
@@ -380,18 +381,19 @@ export default class Parameter {
                     const paramName = parameterPrefix + this.name + '.' + parameter.getName();
                     parameters.push({
                         name: paramName, nameLowerCase: paramName.toLowerCase(),
-                        id: parameter.getId(), description: '' });
+                        id: parameter.getId(), description: '',
+                        dataSourceName: dataSourceName });
                 }
             }
             // append nested map parameters after other parameters of the map
             for (const nestedMapParameter of nestedMapParameters) {
                 nestedMapParameter.appendParameterItemsWithPrefix(
-                    parameters, allowedTypes, parameterPrefix + this.name + '.');
+                    parameters, allowedTypes, dataSourceName, parameterPrefix + this.name + '.');
             }
         } else if (this.isAllowed(allowedTypes)) {
             parameters.push({
                 name: parameterPrefix + this.name, nameLowerCase: this.name.toLowerCase(),
-                id: this.id, description: ''
+                id: this.id, description: '', dataSourceName: dataSourceName
             });
         }
     }

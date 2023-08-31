@@ -204,6 +204,7 @@ const locale_de = {
     parameterTypeSum: 'Summe',
     parameters: 'Parameter',
     parametersDataSource: 'Datenquelle Parameter',
+    parametersDataSourceName: '{name} Parameter',
     patternCurrencySymbol: 'Währungssymbol',
     patternDate1: 'Tag.Monat.Jahr, z.B. 1.6.1980',
     patternDate2: 'Tag.Monat.Jahr (2-stellig), Stunde(24h):Minute, z.B. 1.6.80, 14:30',

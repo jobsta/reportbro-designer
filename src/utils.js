@@ -133,16 +133,6 @@ export function roundValueToUpperInterval(val, interval) {
     return Math.ceil(val / interval) * interval;
 }
 
-export function replaceAll(str, oldVal, newVal) {
-    // not the fastest solution but works
-    let rv = str;
-    if (oldVal !== newVal) {
-        while (rv.indexOf(oldVal) !== -1) {
-            rv = rv.replace(oldVal, newVal);
-        }
-    }
-    return rv;
-}
 export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     let inputId = elInput.getAttribute('id');
     let instance = {

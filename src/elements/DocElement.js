@@ -903,64 +903,105 @@ export default class DocElement {
      * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
      */
     addCommandForChangedParameterName(parameter, newParameterName, field, cmdGroup) {
-        const paramParent = parameter.getParent();
+        let paramParent = parameter.getParent();
         const dataSources = this.getAllDataSources();
-        let paramRef = null;
-        let newParamRef = null;
-
-        if (paramParent !== null && paramParent.getValue('type') === Parameter.type.array) {
-            for (const dataSource of dataSources) {
-                if (dataSource.parameters.indexOf(parameter) !== -1) {
-                    paramRef = '${' + parameter.getName() + '}';
-                    newParamRef = '${' + newParameterName + '}';
-                    break;
-                }
-            }
-        } else {
-            if (paramParent !== null && paramParent.getValue('type') === Parameter.type.map) {
-                paramRef = '${' + paramParent.getName() + '.' + parameter.getName() + '}';
-                newParamRef = '${' + paramParent.getName() + '.' + newParameterName + '}';
-            } else if (parameter.getValue('type') === Parameter.type.map) {
-                paramRef = '${' + parameter.getName() + '.';
-                newParamRef = '${' + newParameterName + '.';
+        let parameterBelongsToArray = false;
+        let parameterPrefix = '';
+        let arrayName = null, mapName = null;
+        while (paramParent !== null) {
+            if (paramParent.getValue('type') === Parameter.type.map) {
+                parameterPrefix = paramParent.getName() + '.' + parameterPrefix;
+                mapName = paramParent.getName();
+                paramParent = paramParent.getParent();
+            } else if (paramParent.getValue('type') === Parameter.type.array) {
+                parameterBelongsToArray = true;
+                arrayName = paramParent.getName();
+                break;
             } else {
-                let isDataSourceParam = false;
-                for (const dataSource of dataSources) {
-                    for (const dataSourceParam of dataSource.parameters) {
-                        if (dataSourceParam.getName() === parameter.getName()) {
-                            // the changed parameter has the same name as a used data source parameter,
-                            // therefor we are not going to change the parameter reference because it
-                            // references the data source parameter
-                            isDataSourceParam = true;
-                            break;
-                        }
-                    }
-                }
-                if (!isDataSourceParam) {
-                    paramRef = '${' + parameter.getName() + '}';
-                    newParamRef = '${' + newParameterName + '}';
+                // not possible (nested parameter can only belong to map or array)
+                return;
+            }
+        }
+
+        let oldParameterText = '${' + parameterPrefix + parameter.getName();
+        let newParameterText = '${' + parameterPrefix + newParameterName;
+        // add suffix (either "." for a map parameter or closing bracket "}" for parameter reference) to avoid
+        // unintended renaming other parameter where the name starts the same (e.g. "client" and "clientName")
+        if (parameter.getValue('type') === Parameter.type.map) {
+            oldParameterText += '.';
+            newParameterText += '.';
+        } else {
+            oldParameterText += '}';
+            newParameterText += '}';
+        }
+
+        let parameterNameExistsInCurrentScope = false;
+        if (dataSources.length > 0) {
+            let parameterName = mapName ? mapName : parameter.getName();
+            for (const dataSourceParam of dataSources[0].parameters) {
+                if (dataSourceParam.getName() === parameterName) {
+                    parameterNameExistsInCurrentScope = true;
+                    break;
                 }
             }
         }
 
-        if (paramRef !== null && newParamRef !== null) {
-            let value = this.getValue(field);
-            let valueType = SetValueCmd.type.text;
-            if (typeof value === 'object') {
-                // for rich text we have to convert the rich text content to a string to replace all
-                // parameter occurrences and afterwards convert it back to a JS object
-                value = JSON.stringify(value);
-                valueType = SetValueCmd.type.richText;
+        if (parameterBelongsToArray) {
+            let scopeLevel = -1;
+            for (let i = 0; i < dataSources.length; i++) {
+                const dataSource = dataSources[i];
+                if (dataSource.name === arrayName) {
+                    scopeLevel = i;
+                    break;
+                }
             }
 
-            if (value.indexOf(paramRef) !== -1) {
-                let updatedValue = utils.replaceAll(value, paramRef, newParamRef);
-                if (valueType === SetValueCmd.type.richText) {
-                    updatedValue = JSON.parse(updatedValue);
-                }
-                let cmd = new SetValueCmd(this.id, field, updatedValue, valueType, this.rb);
-                cmdGroup.addCommand(cmd);
+            // scopeLevel >= 0: there must be at least one data source for this doc element
+            // because the parameter belongs to an array
+            if (scopeLevel === 0 && parameterNameExistsInCurrentScope && dataSources[0].name === arrayName) {
+                // if the parameter occurs in the current scope the parent array of
+                // the parameter must match the data source because the parameter is
+                // referenced directly (i.e. without specifying the data source)
+                this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
+            } else if (scopeLevel > 0) {
+                // specify data source name when referencing parameter from outer scope
+                oldParameterText = '${' + arrayName + '.' + oldParameterText.substring(2);
+                newParameterText = '${' + arrayName + '.' + newParameterText.substring(2);
+                this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
             }
+        } else {
+            // avoid unintentionally changing name of other parameter in case the name exists in current scope
+            if (!parameterNameExistsInCurrentScope) {
+                this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
+            }
+        }
+    }
+
+    /**
+     * Adds SetValue command to command group parameter in case the given oldText occurs in the
+     * specified object field and replace it with newText.
+     * @param {String} oldText - old text in field content which will be replaced.
+     * @param {String} newText - new text which will be used as replacement for oldText.
+     * @param {String} field
+     * @param {CommandGroupCmd} cmdGroup - possible SetValue command will be added to this command group.
+     */
+    addCommandForChangedText(oldText, newText, field, cmdGroup) {
+        let value = this.getValue(field);
+        let valueType = SetValueCmd.type.text;
+        if (typeof value === 'object') {
+            // for rich text we have to convert the rich text content to a string to replace all
+            // parameter occurrences and afterwards convert it back to a JS object
+            value = JSON.stringify(value);
+            valueType = SetValueCmd.type.richText;
+        }
+
+        if (value.indexOf(oldText) !== -1) {
+            let updatedValue = value.replaceAll(oldText, newText);
+            if (valueType === SetValueCmd.type.richText) {
+                updatedValue = JSON.parse(updatedValue);
+            }
+            let cmd = new SetValueCmd(this.id, field, updatedValue, valueType, this.rb);
+            cmdGroup.addCommand(cmd);
         }
     }
 

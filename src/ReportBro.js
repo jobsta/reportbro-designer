@@ -650,29 +650,41 @@ export default class ReportBro {
         let dataSourceIndex = 0;
         if (obj instanceof DocElement) {
             const dataSources = obj.getAllDataSources();
+            let firstDataSource = true;
             for (const dataSource of dataSources) {
                 if (dataSource.parameters.length > 0) {
+                    let groupName;
+                    if (firstDataSource)  {
+                        groupName = this.getLabel('parametersDataSource');
+                    } else {
+                        // include data source name in group label to better distinguish groups
+                        // of additional data sources
+                        groupName = this.getLabel('parametersDataSourceName').replace('{name}', dataSource.name);
+                    }
                     parameters.push({
                         separator: true,
                         separatorClass: 'rbroParameterDataSourceGroup',
                         id: 'ds' + dataSourceIndex,
-                        name: this.getLabel('parametersDataSource')
+                        name: groupName
                     });
                     dataSourceIndex++;
                     // add all parameters of collections at end of data source parameters
                     // with a header containing the collection name
                     const mapParameters = [];
+                    // do not append data source name for first data source as this is the default data source
+                    const dataSourceName = firstDataSource ? null : dataSource.name;
                     for (const dataSourceParameter of dataSource.parameters) {
                         if (dataSourceParameter.type === Parameter.type.map) {
-                            dataSourceParameter.appendParameterItems(mapParameters, allowedTypes);
+                            dataSourceParameter.appendParameterItems(mapParameters, allowedTypes, dataSourceName);
                         } else {
-                            dataSourceParameter.appendParameterItems(parameters, allowedTypes);
+                            dataSourceParameter.appendParameterItems(parameters, allowedTypes, dataSourceName);
                         }
                     }
                     for (const mapParameter of mapParameters) {
                         parameters.push(mapParameter);
                     }
                 }
+                firstDataSource = false;
             }
         } else if (obj instanceof Parameter) {
             obj.appendFieldParameterItems(parameters, allowedTypes, true);
@@ -684,9 +696,9 @@ export default class ReportBro {
         for (const parameterItem of parameterItems) {
             const parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.map) {
-                parameter.appendParameterItems(mapParameters, allowedTypes);
+                parameter.appendParameterItems(mapParameters, allowedTypes, null);
             } else {
-                parameter.appendParameterItems(parameters, allowedTypes);
+                parameter.appendParameterItems(parameters, allowedTypes, null);
             }
         }
         return parameters.concat(mapParameters);

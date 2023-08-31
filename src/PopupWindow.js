@@ -132,21 +132,24 @@ export default class PopupWindow {
                             this.input.value = item.name;
                             this.input.dispatchEvent(new Event('input'));
                             this.hide();
-                        } else if (type === PopupWindow.type.parameterSet) {
-                            this.input.value = '${' + item.name + '}';
-                            this.input.dispatchEvent(new Event('input'));
-                            autosize.update(this.input);
-                            this.hide();
-                        } else if (type === PopupWindow.type.parameterAppend) {
-                            const paramText = '${' + item.name + '}';
-                            if (quill) {
-                                if (quillSelectionRange) {
-                                    quill.insertText(quillSelectionRange.index, paramText);
-                                }
-                            } else {
-                                utils.insertAtCaret(this.input, paramText);
-                                autosize.update(this.input);
+                        } else if (type === PopupWindow.type.parameterSet ||
+                                type === PopupWindow.type.parameterAppend) {
+                            const paramText = '${' + (item.dataSourceName ? (item.dataSourceName + '.') : '') +
+                                item.name + '}';
+                            if (type === PopupWindow.type.parameterSet) {
+                                this.input.value = paramText;
                                 this.input.dispatchEvent(new Event('input'));
+                                autosize.update(this.input);
+                            } else {
+                                if (quill) {
+                                    if (quillSelectionRange) {
+                                        quill.insertText(quillSelectionRange.index, paramText);
+                                    }
+                                } else {
+                                    utils.insertAtCaret(this.input, paramText);
+                                    autosize.update(this.input);
+                                    this.input.dispatchEvent(new Event('input'));
+                                }
                             }
                             this.hide();
                         }
