@@ -1773,13 +1773,45 @@ export default class ReportBro {
 
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
-     * @param {String} parameterName - Name of parameter to search for.
+     * @param {String} parameterName - Name of parameter to search for, parameter could also
+     * be a parameter inside a map (e.g. "Address.Contacts").
      * @returns {?Parameter}
      */
     getParameterByName(parameterName) {
-        let parameters = this.getParameters();
+        return this.getParameterByNameInternal(parameterName, null);
+    }
+
+    /**
+     * Returns parameter for the given name, or null if parameter does not exist.
+     * @param {String} parameterName - Name of parameter to search for, parameter could also
+     * be a parameter inside a map (e.g. "Address.Contacts").
+     * @param {?Parameter} parentMap - map parameter which is used for recursive search of parameter inside map.
+     * @returns {?Parameter}
+     */
+    getParameterByNameInternal(parameterName, parentMap) {
+        let parameters;
+        let mapName = null, mapFieldName = null;
+        const pos = parameterName.indexOf('.');
+        // if parameter name contains a dot the name references a parameter inside a map
+        if (pos !== -1) {
+            mapName = parameterName.substring(0, pos);
+            mapFieldName = parameterName.substring(pos + 1);
+        }
+
+        if (parentMap) {
+            // get map fields
+            parameters = parentMap.getChildren();
+        } else {
+            // get all available parameters
+            parameters = this.getParameters();
+        }
+
         for (let parameter of parameters) {
-            if (parameter.getValue('name') === parameterName) {
+            if (mapName !== null && parameter.getValue('type') === Parameter.type.map &&
+                    parameter.getValue('name') === mapName) {
+                // search recursively for parameter inside map
+                return this.getParameterByNameInternal(mapFieldName, parameter);
+            } else if (mapName === null && parameter.getValue('name') === parameterName) {
                 return parameter;
             }
         }
