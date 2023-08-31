@@ -134,7 +134,7 @@ export default class PopupWindow {
                             this.hide();
                         } else if (type === PopupWindow.type.parameterSet ||
                                 type === PopupWindow.type.parameterAppend) {
-                            const paramText = '${' + (item.dataSourceName ? (item.dataSourceName + '.') : '') +
+                            const paramText = '${' + (item.dataSourceName ? (item.dataSourceName + ':') : '') +
                                 item.name + '}';
                             if (type === PopupWindow.type.parameterSet) {
                                 this.input.value = paramText;

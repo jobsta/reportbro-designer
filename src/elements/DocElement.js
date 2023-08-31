@@ -965,8 +965,8 @@ export default class DocElement {
                 this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
             } else if (scopeLevel > 0) {
                 // specify data source name when referencing parameter from outer scope
-                oldParameterText = '${' + arrayName + '.' + oldParameterText.substring(2);
-                newParameterText = '${' + arrayName + '.' + newParameterText.substring(2);
+                oldParameterText = '${' + arrayName + ':' + oldParameterText.substring(2);
+                newParameterText = '${' + arrayName + ':' + newParameterText.substring(2);
                 this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
             }
         } else {
