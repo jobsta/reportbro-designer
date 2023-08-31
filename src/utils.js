@@ -366,7 +366,7 @@ export function tokenize(input, obj) {
 
         if (char === '(' || char === ')') {
             // parse brackets
-            tokens.push(new Token(char, false, char === '(' ? Token.type.bracketOpen : Token.type.bracketClose));
+            tokens.push(new Token(char, char === '(' ? Token.type.bracketOpen : Token.type.bracketClose));
             scanner++;
             continue;
         }
