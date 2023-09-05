@@ -112,6 +112,7 @@ export default class PopupWindow {
                 // item is triggered
                 event.preventDefault();
             });
+
             if (rb.properties.treeMode) {
                 this.createNestedList(ul, items, type, this.quill, this.input);
             }
@@ -212,63 +213,45 @@ export default class PopupWindow {
 
         const ul = utils.createElement('ul');
         container.appendChild(ul);
+
         for (let i = 0; i < data.length; i++) {
             const item = data[i];
 
             const li = utils.createElement('li');
             if (item.separator) {
-                let separatorClass = 'rbroPopupItemSeparator';
-                if (item.separatorClass) {
-                    separatorClass += ' ' + item.separatorClass;
-                }
+                const separatorClass = `rbroPopupItemSeparator ${item.separatorClass ?? ''}`;
                 li.setAttribute('class', separatorClass);
-                let nestedItems;
-                const details = utils.createElement('details');
-                li.appendChild(details);
 
                 const summary = utils.createElement('summary');
                 summary.textContent = item.name.split('.').pop();
 
-
-
-                if ((type === PopupWindow.type.parameterSet ||
-                    type === PopupWindow.type.parameterAppend) && item.id) {
+                if (
+                    (type === PopupWindow.type.parameterSet
+                        || type === PopupWindow.type.parameterAppend)
+                    && item.id
+                ) {
                     summary.setAttribute('id', 'parameter_group_' + item.id);
                 }
+
+                const details = utils.createElement('details');
+                li.appendChild(details);
                 details.appendChild(summary);
 
-                if (item.name === "Parameters") {
-                    nestedItems = data.slice(i + 1);
+                let nestedItems = data.slice(i + 1);
+
+                if (
+                    !(
+                        item.name.startsWith('Data')
+                        && item.id.startsWith("ds0")
+                    )
+                    && data[i].name !== "Parameters"
+                ) {
+                    nestedItems = nestedItems.filter(nestedItem => nestedItem.name.startsWith(item.name));
                 }
 
-                else if (item.name.startsWith('Data')) {
-                    let idDataSource = item.id
-                    if (item.id.startsWith("ds0")) {
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i].name === "Parameters") {
-                                nestedItems = data.slice(1, i);
-                                break;
-                            }
-                        }
-
-                    }
-                    else if (item.id.startsWith(idDataSource)) {
-
-                        for (let i = 0; i < data.length; i++) {
-                            if (data[i].name.startsWith('Data')) {
-                                nestedItems = data.slice(i + 1);
-                                break;
-                            }
-                        }
-
-                    }
-                }
-                else {
-                    nestedItems = data.slice(i + 1).filter((x) => x.name.startsWith(item.name));
-                }
                 this.createNestedList(details, nestedItems, type, quill, input);
-                i += nestedItems.length;
 
+                i += nestedItems.length;
             }
             else {
                 const pattern = /^(\$|€|£|¥|0|#)/;
@@ -276,37 +259,57 @@ export default class PopupWindow {
                     li.textContent = item.name;
                 } else {
                     li.textContent = item.name.split('.').pop();
-
                 }
-                if ((type === PopupWindow.type.parameterSet ||
-                    type === PopupWindow.type.parameterAppend) && item.id) {
+
+                if (
+                    (
+                        type === PopupWindow.type.parameterSet
+                        || type === PopupWindow.type.parameterAppend
+                    )
+                    && item.id
+                ) {
                     li.setAttribute('id', 'parameter_' + item.id);
                 }
-                li.addEventListener('mousedown', (event) => {
-                    if (type === PopupWindow.type.pattern) {
-                        input.value = item.name;
 
-                        input.dispatchEvent(new Event('input'));
-                        this.hide();
-                    } else if (type === PopupWindow.type.parameterSet) {
-                        input.value = '${' + item.name + '}';
-                        input.dispatchEvent(new Event('input'));
-                        autosize.update(input);
-                        this.hide();
-                    } else if (type === PopupWindow.type.parameterAppend) {
-                        const paramText = '${' + item.name + '}';
-                        if (quill) {
-                            if (quillSelectionRange) {
-                                quill.insertText(quillSelectionRange.index, paramText);
-                            }
-                        } else {
-                            utils.insertAtCaret(input, paramText);
-                            autosize.update(input);
-                            input.dispatchEvent(new Event('input'));
-                        }
-                        this.hide();
-                    }
+                li.addEventListener('mousedown', (event) => {
                     event.preventDefault();
+
+                    switch(type) {
+                        case PopupWindow.type.pattern:
+                            input.value = item.name;
+                            input.dispatchEvent(new Event('input'));
+
+                            this.hide();
+
+                            break;
+
+                        case PopupWindow.type.parameterSet:
+                            input.value = '${' + item.name + '}';
+                            input.dispatchEvent(new Event('input'));
+                            autosize.update(input);
+
+                            this.hide();
+
+                            break;
+
+                        case PopupWindow.type.parameterAppend:
+                            const paramText = '${' + item.name + '}';
+
+                            if (quill && quillSelectionRange) {
+                                    quill.insertText(quillSelectionRange.index, paramText);
+                                } else {
+                                utils.insertAtCaret(input, paramText);
+                                autosize.update(input);
+                                input.dispatchEvent(new Event('input'));
+                            }
+
+                            this.hide();
+
+                            break;
+
+                        default:
+                            break;
+                    }
                 });
             }
             if (item.description && item.description !== '') {
