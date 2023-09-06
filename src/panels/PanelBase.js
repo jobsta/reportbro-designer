@@ -254,7 +254,8 @@ export default class PanelBase {
                 }
             }
             if (firstErrorRowId !== '') {
-                document.getElementById('rbro_detail_panel').scrollTop = firstErrorRowOffset;
+                const elErrorRow = document.getElementById(firstErrorRowId);
+                elErrorRow.scrollIntoView({ behavior: 'smooth' });
             }
         }
     }
