@@ -46,6 +46,7 @@ export default class TextElement extends DocElement {
 
         this.cs_condition = '';
         this.cs_styleId = '';
+        this.cs_additionalRules = '';
         this.cs_bold = false;
         this.cs_italic = false;
         this.cs_underline = false;
@@ -157,7 +158,8 @@ export default class TextElement extends DocElement {
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
             'printIf', 'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern', 'link',
-            'cs_condition', 'cs_styleId', 'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
+            'cs_condition', 'cs_styleId', 'cs_additionalRules',
+            'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment',
             'cs_textColor', 'cs_backgroundColor', 'cs_font', 'cs_fontSize',
             'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',

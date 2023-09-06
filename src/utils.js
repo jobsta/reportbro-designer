@@ -243,6 +243,25 @@ export function getEventAbsPos(event) {
     return null;
 }
 
+/**
+ * Populate option tags for all available styles.
+ * @param {Element} elStyle - dom element of the styles drop down. If there are existing options they will be removed.
+ * @param {?String} selectedValue - selected style id, if set it is used to set the option for this style as selected.
+ * @param {ReportBro} rb - ReportBro instance.
+ */
+export function populateStyleSelect(elStyle, selectedValue, rb) {
+    const styles = rb.getStyles();
+    emptyElement(elStyle);
+    elStyle.append(createElement('option', { value: '' }, rb.getLabel('styleNone')));
+    for (let style of styles) {
+        const option = createElement('option', { value: style.getId() }, style.getName());
+        if (selectedValue && selectedValue === String(style.getId())) {
+            option.selected = true;
+        }
+        elStyle.append(option);
+    }
+}
+
 
 class Token {
     constructor(value, type) {

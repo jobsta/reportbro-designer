@@ -325,7 +325,7 @@ export default class ParameterPanel extends PanelBase {
         elTestDataContainer.append(elDiv);
 
         elDiv = utils.createElement('div', { id: 'rbro_parameter_edit_test_data_row', class: 'rbroFormRow' });
-        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_edit_test_data_row');
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'));
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elEditTestDataButton = utils.createElement(
             'button', {
@@ -340,7 +340,8 @@ export default class ParameterPanel extends PanelBase {
                 const fields = selectedObject.getParameterFields();
                 if (fields.length > 0) {
                     this.rb.getPopupWindow().show(
-                        null, selectedObject.getId(), '', 'testData', PopupWindow.type.testData, null, selectedObject);
+                        null, selectedObject.getId(), '', 'testData', PopupWindow.type.data, null, selectedObject,
+                        null, null, null);
                 } else {
                     alert(this.rb.getLabel('parameterEditTestDataNoFields'));
                 }

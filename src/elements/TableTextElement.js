@@ -233,7 +233,7 @@ export default class TableTextElement extends TextElement {
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
             'font', 'fontSize', 'lineSpacing',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
-            'pattern', 'link', 'cs_condition', 'cs_styleId',
+            'pattern', 'link', 'cs_condition', 'cs_styleId', 'cs_additionalStyles',
             'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment', 'cs_textColor', 'cs_backgroundColor',
             'cs_font', 'cs_fontSize', 'cs_lineSpacing',

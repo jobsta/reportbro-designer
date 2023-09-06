@@ -426,6 +426,12 @@ export default class DocElementPanel extends PanelBase {
                 'section': 'cs_style',
                 'allowEmpty': true
             },
+            'cs_additionalRules': {
+                'type': SetValueCmd.type.internal,
+                'fieldId': 'cs_additional_rules',
+                'section': 'cs_style',
+                'allowEmpty': true
+            },
             'cs_bold': {
                 'type': SetValueCmd.type.button,
                 'fieldId': 'cs_bold',
@@ -746,7 +752,7 @@ export default class DocElementPanel extends PanelBase {
             let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
             this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
+                this.rb.getParameterItems(selectedObject, null), null,
                 'rbro_doc_element_content', 'content', PopupWindow.type.parameterAppend);
         });
         elSplit.append(elParameterButton);
@@ -1589,7 +1595,7 @@ export default class DocElementPanel extends PanelBase {
             let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
             this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
+                this.rb.getParameterItems(selectedObject, null), null,
                 'rbro_doc_element_group_expression', 'groupExpression', PopupWindow.type.parameterSet);
         });
         elSplit.append(elParameterButton);
@@ -1679,7 +1685,7 @@ export default class DocElementPanel extends PanelBase {
             let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
             this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
+                this.rb.getParameterItems(selectedObject, null), null,
                 'rbro_doc_element_print_if', 'printIf', PopupWindow.type.parameterAppend);
         });
         elSplit.append(elParameterButton);
@@ -1880,7 +1886,7 @@ export default class DocElementPanel extends PanelBase {
             let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
             this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
+                this.rb.getParameterItems(selectedObject, null), null,
                 'rbro_doc_element_link', 'link', PopupWindow.type.parameterSet);
         });
         elSplit.append(elParameterButton);
@@ -1984,7 +1990,7 @@ export default class DocElementPanel extends PanelBase {
             let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
             this.rb.getPopupWindow().show(
-                this.rb.getParameterItems(selectedObject), null,
+                this.rb.getParameterItems(selectedObject, null), null,
                 'rbro_doc_element_cs_condition', 'cs_condition', PopupWindow.type.parameterAppend);
         });
         elSplit.append(elParameterButton);
@@ -2014,6 +2020,50 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(this.elCsStyle);
+        elDiv.append(elFormField);
+        elCsStyleSectionDiv.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_cs_additional_rules_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementAdditionalRules'));
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elEditAdditionalRulesButton = utils.createElement(
+            'button', {
+                id: 'rbro_doc_element_cs_additional_rules',
+                class: 'rbroButton rbroActionButton'
+            });
+        elEditAdditionalRulesButton.append(utils.createElement('span', {}, this.rb.getLabel('editData')));
+        elEditAdditionalRulesButton.append(utils.createElement('span', { class: 'rbroIcon-edit' }));
+        elEditAdditionalRulesButton.addEventListener('click', (event) => {
+            let selectedObject = this.rb.getSelectedObject();
+            if (selectedObject !== null) {
+                const fields = [
+                    {
+                        name: 'condition', label: this.rb.getLabel('docElementConditionalStyleCondition'),
+                        type: Parameter.type.string, parameter: null,
+                        attributes: { multiLine: true },
+                    },
+                    {
+                        name: 'style_id', label: this.rb.getLabel('docElementStyle'),
+                        type: Parameter.type.string, parameter: null,
+                        attributes: { select: 'style' },
+                    },
+                ];
+                let data = [];
+                if (selectedObject.getValue('cs_additionalRules')) {
+                    try {
+                        data = JSON.parse(selectedObject.getValue('cs_additionalRules'));
+                    } catch (e) {
+                    }
+                }
+                this.rb.getPopupWindow().show(
+                    null, selectedObject.getId(), '', 'cs_additionalRules', PopupWindow.type.data, null, null,
+                    Parameter.type.array, fields, data);
+            }
+        });
+        elFormField.append(elEditAdditionalRulesButton);
+        elFormField.append(
+            utils.createElement(
+                'div', { id: 'rbro_doc_element_cs_additional_rules_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
         elCsStyleSectionDiv.append(elDiv);
 
@@ -2225,15 +2275,8 @@ export default class DocElementPanel extends PanelBase {
     }
 
     renderStyleSelect() {
-        utils.emptyElement(this.elStyle);
-        utils.emptyElement(this.elCsStyle);
-        this.elStyle.append(utils.createElement('option', { value: '' }, this.rb.getLabel('styleNone')));
-        this.elCsStyle.append(utils.createElement('option', { value: '' }, this.rb.getLabel('styleNone')));
-        let styles = this.rb.getStyles();
-        for (let style of styles) {
-            this.elStyle.append(utils.createElement('option', { value: style.getId() }, style.getName()));
-            this.elCsStyle.append(utils.createElement('option', { value: style.getId() }, style.getName()));
-        }
+        utils.populateStyleSelect(this.elStyle, null, this.rb);
+        utils.populateStyleSelect(this.elCsStyle, null, this.rb);
     }
 
     setupRichText() {
@@ -2263,7 +2306,7 @@ export default class DocElementPanel extends PanelBase {
                 let selectedObject = selectedObjects.length === 1 ? selectedObjects[0] : null;
 
                 this.rb.getPopupWindow().show(
-                    this.rb.getParameterItems(selectedObject), null,
+                    this.rb.getParameterItems(selectedObject, null), null,
                     'rbro_doc_element_rich_text_content', 'richTextContent',
                     PopupWindow.type.parameterAppend, this.quill);
             });
