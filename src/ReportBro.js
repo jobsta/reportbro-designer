@@ -27,7 +27,6 @@ import MainPanel from './menu/MainPanel';
 import MainPanelItem from './menu/MainPanelItem';
 import MenuPanel from './menu/MenuPanel';
 import * as utils from './utils';
-import Quill from "quill";
 
 /**
  * Used for the main ReportBro instance.
@@ -37,6 +36,13 @@ export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
         this.nextId = 1;
+        if (properties && properties.additionalLocales) {
+            for (let localeKey in properties.additionalLocales) {
+                if (properties.additionalLocales.hasOwnProperty(localeKey)) {
+                    locales[localeKey] = properties.additionalLocales[localeKey];
+                }
+            }
+        }
         this.locale = locales[(properties && properties.localeKey) || 'en_us'];
 
         this.properties = {
@@ -637,7 +643,7 @@ export default class ReportBro {
      * this object (which is either a doc element or a parameter).
      * For doc elements the parameters from the data source
      * are included (e.g. array field parameters of a table data source).
-     * @param {String[]} allowedTypes - specify allowed parameter types which will be added to the
+     * @param {?String[]} allowedTypes - specify allowed parameter types which will be added to the
      * parameters list. If not set all parameter types are allowed.
      * @returns {Object[]} Each item contains name (String), optional description (String) and
      * optional separator (Boolean).
