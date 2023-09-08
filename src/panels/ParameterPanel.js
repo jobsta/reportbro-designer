@@ -499,8 +499,7 @@ export default class ParameterPanel extends PanelBase {
         if (field === null || field === 'type' || field === 'eval') {
             if (type === Parameter.type.sum || type === Parameter.type.average || showOnlyNameType) {
                 document.getElementById('rbro_parameter_eval_row').style.display = 'none';
-                document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
-                document.getElementById('rbro_parameter_edit_test_data_row').style.display = 'none';
+                document.getElementById('rbro_parameter_test_data_container').style.display = 'none';
             } else {
                 if (type === Parameter.type.image || type === Parameter.type.array ||
                     type === Parameter.type.simpleArray || type === Parameter.type.map) {
