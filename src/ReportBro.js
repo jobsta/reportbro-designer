@@ -36,14 +36,11 @@ export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
         this.nextId = 1;
-        if (properties && properties.additionalLocales) {
-            for (let localeKey in properties.additionalLocales) {
-                if (properties.additionalLocales.hasOwnProperty(localeKey)) {
-                    locales[localeKey] = properties.additionalLocales[localeKey];
-                }
-            }
+        if (properties && properties.locale) {
+            this.locale = properties.locale;
+        } else {
+            this.locale = locales[(properties && properties.localeKey) || 'en_us'];
         }
-        this.locale = locales[(properties && properties.localeKey) || 'en_us'];
 
         this.properties = {
             additionalFonts: [],
