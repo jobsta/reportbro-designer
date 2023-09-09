@@ -116,7 +116,9 @@ export default class DocumentPropertiesPanel extends PanelBase {
         let elPageSizeDiv = utils.createElement(
             'div', { id: 'rbro_document_properties_page_size_row', class: 'rbroTripleSplit' });
         let elPageWidth = utils.createElement(
-            'input', { id: 'rbro_document_properties_page_width', maxlength: '5' });
+            'input', { id: 'rbro_document_properties_page_width', maxlength: '5', type: 'number',
+                autocomplete: 'off'
+            });
         elPageWidth.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -129,7 +131,9 @@ export default class DocumentPropertiesPanel extends PanelBase {
         utils.setInputPositiveInteger(elPageWidth);
         elPageSizeDiv.append(elPageWidth);
         let elPageHeight = utils.createElement(
-            'input', { id: 'rbro_document_properties_page_height', maxlength: '5' });
+            'input', { id: 'rbro_document_properties_page_height', maxlength: '5', type: 'number',
+                autocomplete: 'off'
+            });
         elPageHeight.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -183,7 +187,9 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('contentHeight'), 'rbro_document_properties_content_height');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elContentHeight = utils.createElement('input', { id: 'rbro_document_properties_content_height', type: 'number', autocomplete: 'off' });
+        let elContentHeight = utils.createElement('input', { id: 'rbro_document_properties_content_height',
+            type: 'number', autocomplete: 'off'
+        });
         elContentHeight.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {

@@ -1272,7 +1272,7 @@ export default class StylePanel extends PanelBase {
         utils.appendLabel(elDiv, rb.getLabel('styleBorderWidth'), `rbro_${idPrefix}border_width`);
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elBorderWidth = utils.createElement(
-            'input', { id: `rbro_${idPrefix}border_width`, type: 'number', step: '0.5' });
+            'input', { id: `rbro_${idPrefix}border_width`, type: 'number', step: '0.5', autocomplete: 'off' });
         elBorderWidth.addEventListener('input', (event) => {
             let val = elBorderWidth.value;
             if (val !== '') {
@@ -1325,7 +1325,9 @@ export default class StylePanel extends PanelBase {
 
         let elPaddingTopDiv = utils.createElement('div', { class: 'rbroColumnCenter' });
         let elPaddingTop = utils.createElement(
-            'input', { id: `rbro_${idPrefix}padding_top`, placeholder: rb.getLabel('orientationTop'), type: 'number' });
+            'input', { id: `rbro_${idPrefix}padding_top`, placeholder: rb.getLabel('orientationTop'),
+                type: 'number', autocomplete: 'off'
+            });
         elPaddingTop.addEventListener('input', (event) => {
             let val = elPaddingTop.value;
             let cmdGroup = new CommandGroupCmd('Set value', rb);
@@ -1356,7 +1358,8 @@ export default class StylePanel extends PanelBase {
         let elDiv2 = utils.createElement('div', { class: 'rbroSplit' });
         let elPaddingLeft = utils.createElement(
             'input', {
-                id: `rbro_${idPrefix}padding_left`, placeholder: rb.getLabel('orientationLeft'), type: 'number'
+                id: `rbro_${idPrefix}padding_left`, placeholder: rb.getLabel('orientationLeft'), type: 'number',
+                autocomplete: 'off'
             });
         elPaddingLeft.addEventListener('input', (event) => {
             let val = elPaddingLeft.value;
@@ -1385,7 +1388,8 @@ export default class StylePanel extends PanelBase {
         elDiv2.append(elPaddingLeft);
         let elPaddingRight = utils.createElement(
             'input', {
-                id: `rbro_${idPrefix}padding_right`, placeholder: rb.getLabel('orientationRight'), type: 'number'
+                id: `rbro_${idPrefix}padding_right`, placeholder: rb.getLabel('orientationRight'), type: 'number',
+                autocomplete: 'off'
             });
         elPaddingRight.addEventListener('input', (event) => {
             let val = elPaddingRight.value;
@@ -1417,7 +1421,8 @@ export default class StylePanel extends PanelBase {
         let elPaddingBottomDiv = utils.createElement('div', { class: 'rbroColumnCenter' });
         let elPaddingBottom = utils.createElement(
             'input', {
-                id: `rbro_${idPrefix}padding_bottom`, placeholder: rb.getLabel('orientationBottom'), type: 'number'
+                id: `rbro_${idPrefix}padding_bottom`, placeholder: rb.getLabel('orientationBottom'), type: 'number',
+                autocomplete: 'off'
             });
         elPaddingBottom.addEventListener('input', (event) => {
             let val = elPaddingBottom.value;

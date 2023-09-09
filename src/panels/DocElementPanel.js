@@ -960,7 +960,7 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('docElementBarWidth'), 'rbro_doc_element_bar_width');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elBarWidth = utils.createElement(
-            'input', { id: 'rbro_doc_element_bar_width', type: 'number', step: '0.1' });
+            'input', { id: 'rbro_doc_element_bar_width', type: 'number', step: '0.1', autocomplete: 'off' });
         elBarWidth.addEventListener('input', (event) => {
             let val = elBarWidth.value;
             if (val !== '') {
@@ -1189,7 +1189,7 @@ export default class DocElementPanel extends PanelBase {
             { id: 'rbro_doc_element_position_label' });
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         elSplit = utils.createElement('div', { class: 'rbroSplit' });
-        let elPosX = utils.createElement('input', { id: 'rbro_doc_element_x', type: 'number' });
+        let elPosX = utils.createElement('input', { id: 'rbro_doc_element_x', type: 'number', autocomplete: 'off' });
         elPosX.addEventListener('input', (event) => {
             let val = elPosX.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1205,7 +1205,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elSplit.append(elPosX);
-        let elPosY = utils.createElement('input', { id: 'rbro_doc_element_y', type: 'number' });
+        let elPosY = utils.createElement('input', { id: 'rbro_doc_element_y', type: 'number', autocomplete: 'off' });
         elPosY.addEventListener('input', (event) => {
             let val = elPosY.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1233,7 +1233,7 @@ export default class DocElementPanel extends PanelBase {
             elDiv, this.rb.getLabel('docElementSize'), 'rbro_doc_element_size', { id: 'rbro_doc_element_size_label' });
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         elSplit = utils.createElement('div', { class: 'rbroSplit' });
-        let elWidth = utils.createElement('input', { id: 'rbro_doc_element_width', type: 'number' });
+        let elWidth = utils.createElement('input', { id: 'rbro_doc_element_width', type: 'number', autocomplete: 'off' });
         elWidth.addEventListener('input', (event) => {
             let val = elWidth.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1249,7 +1249,7 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elSplit.append(elWidth);
-        let elHeight = utils.createElement('input', { id: 'rbro_doc_element_height', type: 'number' });
+        let elHeight = utils.createElement('input', { id: 'rbro_doc_element_height', type: 'number', autocomplete: 'off' });
         elHeight.addEventListener('input', (event) => {
             let val = elHeight.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1275,7 +1275,7 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_colspan_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementColspan'), 'rbro_doc_element_colspan');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elColspan = utils.createElement('input', { id: 'rbro_doc_element_colspan', type: 'number' });
+        let elColspan = utils.createElement('input', { id: 'rbro_doc_element_colspan', type: 'number', autocomplete: 'off' });
         elColspan.addEventListener('change', (event) => {
             let val = elColspan.value.trim();
             if (val !== '') {
@@ -1316,7 +1316,7 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_columns_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementColumns'), 'rbro_doc_element_columns');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elColumns = utils.createElement('input', { id: 'rbro_doc_element_columns', type: 'number' });
+        let elColumns = utils.createElement('input', { id: 'rbro_doc_element_columns', type: 'number', autocomplete: 'off' });
         elColumns.addEventListener('change', (event) => {
             let val = utils.checkInputDecimal(elColumns.value, 1, 99);
             if (val !== elColumns.value) {
@@ -1389,7 +1389,9 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_content_rows_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementContentRows'), 'rbro_doc_element_content_rows');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elContentRows = utils.createElement('input', { id: 'rbro_doc_element_content_rows', type: 'number' });
+        let elContentRows = utils.createElement('input', { id: 'rbro_doc_element_content_rows',
+            type: 'number', autocomplete: 'off'
+        });
         elContentRows.addEventListener('change', (event) => {
             let val = utils.checkInputDecimal(elContentRows.value, 1, 99);
             let contentRows = utils.convertInputToNumber(val);
@@ -2138,7 +2140,7 @@ export default class DocElementPanel extends PanelBase {
             elDiv, this.rb.getLabel('docElementSpreadsheetColumn'), 'rbro_doc_element_spreadsheet_column');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elSpreadsheetColumn = utils.createElement(
-            'input', { id: 'rbro_doc_element_spreadsheet_column', type: 'number' });
+            'input', { id: 'rbro_doc_element_spreadsheet_column', type: 'number', autocomplete: 'off' });
         elSpreadsheetColumn.addEventListener('input', (event) => {
             let val = elSpreadsheetColumn.value;
             if (val !== '') {
@@ -2184,7 +2186,7 @@ export default class DocElementPanel extends PanelBase {
             elDiv, this.rb.getLabel('docElementSpreadsheetColspan'), 'rbro_doc_element_spreadsheet_colspan');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elSpreadsheetColspan = utils.createElement(
-            'input', { id: 'rbro_doc_element_spreadsheet_colspan', type: 'number' });
+            'input', { id: 'rbro_doc_element_spreadsheet_colspan', type: 'number', autocomplete: 'off' });
         elSpreadsheetColspan.addEventListener('input', (event) => {
                 let val = elSpreadsheetColspan.value;
                 let cmdGroup = new CommandGroupCmd('Set value', this.rb);
