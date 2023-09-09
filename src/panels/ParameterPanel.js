@@ -343,7 +343,11 @@ export default class ParameterPanel extends PanelBase {
                         null, selectedObject.getId(), '', 'testData', PopupWindow.type.data, null, selectedObject,
                         null, null, null);
                 } else {
-                    alert(this.rb.getLabel('parameterEditTestDataNoFields'));
+                    if (selectedObject.getValue('type') === Parameter.type.map) {
+                        alert(this.rb.getLabel('parameterEditTestDataMapNoFields'));
+                    } else {
+                        alert(this.rb.getLabel('parameterEditTestDataArrayNoFields'));
+                    }
                 }
             }
         });

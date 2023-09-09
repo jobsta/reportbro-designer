@@ -432,7 +432,11 @@ export default class PopupWindow {
                         elExpandableCellIcon.classList.add('rbroIcon-minus');
                         elNestedTableInfo.textContent = '';
                     } else {
-                        alert(this.rb.getLabel('parameterEditTestDataNoFields'));
+                        if (field.parameter.getValue('type') === Parameter.type.map) {
+                            alert(this.rb.getLabel('parameterEditTestDataMapNoFields'));
+                        } else {
+                            alert(this.rb.getLabel('parameterEditTestDataArrayNoFields'));
+                        }
                     }
                 }
             });
