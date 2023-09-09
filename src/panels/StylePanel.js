@@ -160,7 +160,7 @@ export default class StylePanel extends PanelBase {
         let elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('styleName'), 'rbro_style_name');
         let elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elStyleName = utils.createElement('input', { id: 'rbro_style_name' });
+        let elStyleName = utils.createElement('input', { id: 'rbro_style_name', autocomplete: 'off' });
         elStyleName.addEventListener('input', (event) => {
             let obj = this.rb.getSelectedObject();
             if (obj !== null) {
@@ -642,7 +642,7 @@ export default class StylePanel extends PanelBase {
         utils.appendLabel(elDiv, rb.getLabel('styleTextColor'), `rbro_${idPrefix}text_color`);
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elTextColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
-        let elTextColor = utils.createElement('input', { id: `rbro_${idPrefix}text_color` });
+        let elTextColor = utils.createElement('input', { id: `rbro_${idPrefix}text_color`, autocomplete: 'off' });
         elTextColor.addEventListener('change', (event) => {
             let val = elTextColor.value;
             if (utils.isValidColor(val)) {
@@ -679,7 +679,7 @@ export default class StylePanel extends PanelBase {
         utils.appendLabel(elDiv, rb.getLabel('styleBackgroundColor'), `rbro_${idPrefix}background_color`);
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elBgColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
-        let elBgColor = utils.createElement('input', { id: `rbro_${idPrefix}background_color` });
+        let elBgColor = utils.createElement('input', { id: `rbro_${idPrefix}background_color`, autocomplete: 'off' });
         elBgColor.addEventListener('change', (event) => {
             let val = elBgColor.value;
             if (utils.isValidColor(val)) {
@@ -1233,7 +1233,7 @@ export default class StylePanel extends PanelBase {
         utils.appendLabel(elDiv, rb.getLabel('styleBorderColor'), `rbro_${idPrefix}border_color`);
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elBorderColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
-        let elBorderColor = utils.createElement('input', { id: `rbro_${idPrefix}border_color` });
+        let elBorderColor = utils.createElement('input', { id: `rbro_${idPrefix}border_color`, autocomplete: 'off' });
         elBorderColor.addEventListener('change', (event) => {
             let val = elBorderColor.value;
             if (utils.isValidColor(val)) {

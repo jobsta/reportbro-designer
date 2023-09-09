@@ -183,7 +183,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('contentHeight'), 'rbro_document_properties_content_height');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elContentHeight = utils.createElement('input', { id: 'rbro_document_properties_content_height' });
+        let elContentHeight = utils.createElement('input', { id: 'rbro_document_properties_content_height', type: 'number', autocomplete: 'off' });
         elContentHeight.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -229,7 +229,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
             elDiv, this.rb.getLabel('patternCurrencySymbol'), 'rbro_document_properties_pattern_currency_symbol');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elPatternCurrencySymbol = utils.createElement(
-            'input', { id: 'rbro_document_properties_pattern_currency_symbol' });
+            'input', { id: 'rbro_document_properties_pattern_currency_symbol', autocomplete: 'off' });
         elPatternCurrencySymbol.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -249,7 +249,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
             'rbro_document_properties_pattern_number_group_symbol');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elPatternNumberGroupSymbol = utils.createElement(
-            'input', { id: 'rbro_document_properties_pattern_number_group_symbol', maxlength: '1' });
+            'input', { id: 'rbro_document_properties_pattern_number_group_symbol', maxlength: '1', autocomplete: 'off' });
         elPatternNumberGroupSymbol.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -276,7 +276,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         let elMarginTopDiv = utils.createElement('div', { class: 'rbroColumnCenter' });
         let elMarginTop = utils.createElement(
             'input', {
-                id: 'rbro_document_properties_page_margin_top', placeholder: this.rb.getLabel('orientationTop')
+                id: 'rbro_document_properties_page_margin_top', placeholder: this.rb.getLabel('orientationTop'),
+                type: 'number', autocomplete: 'off'
             });
         elMarginTop.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -294,7 +295,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         let elDiv2 = utils.createElement('div', { class: 'rbroSplit' });
         let elMarginLeft = utils.createElement(
             'input', {
-                id: 'rbro_document_properties_page_margin_left', placeholder: this.rb.getLabel('orientationLeft')
+                id: 'rbro_document_properties_page_margin_left', placeholder: this.rb.getLabel('orientationLeft'),
+                type: 'number', autocomplete: 'off'
             });
         elMarginLeft.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -309,7 +311,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv2.append(elMarginLeft);
         let elMarginRight = utils.createElement(
             'input', {
-                id: 'rbro_document_properties_page_margin_right', placeholder: this.rb.getLabel('orientationRight')
+                id: 'rbro_document_properties_page_margin_right', placeholder: this.rb.getLabel('orientationRight'),
+                type: 'number', autocomplete: 'off'
             });
         elMarginRight.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -327,7 +330,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         let elMarginBottomDiv = utils.createElement('div', { class: 'rbroColumnCenter' });
         let elMarginBottom = utils.createElement(
             'input', {
-                id: 'rbro_document_properties_page_margin_bottom', placeholder: this.rb.getLabel('orientationBottom')
+                id: 'rbro_document_properties_page_margin_bottom', placeholder: this.rb.getLabel('orientationBottom'),
+                type: 'number', autocomplete: 'off'
             });
         elMarginBottom.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -374,7 +378,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('headerSize'), 'rbro_document_properties_header_size');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elHeaderSize = utils.createElement('input', { id: 'rbro_document_properties_header_size' });
+        let elHeaderSize = utils.createElement('input', { id: 'rbro_document_properties_header_size',
+            type: 'number', autocomplete: 'off'  });
         elHeaderSize.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -441,7 +446,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('footerSize'), 'rbro_document_properties_footer_size');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elFooterSize = utils.createElement('input', { id: 'rbro_document_properties_footer_size' });
+        let elFooterSize = utils.createElement('input', { id: 'rbro_document_properties_footer_size',
+            type: 'number', autocomplete: 'off' });
         elFooterSize.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {

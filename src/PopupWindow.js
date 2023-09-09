@@ -127,7 +127,8 @@ export default class PopupWindow {
         } else {
             if (type === PopupWindow.type.parameterSet || type === PopupWindow.type.parameterAppend) {
                 elSearch = utils.createElement(
-                    'input', { class: 'rbroPopupSearch', placeholder: this.rb.getLabel('parameterSearchPlaceholder') });
+                    'input', { class: 'rbroPopupSearch', placeholder: this.rb.getLabel('parameterSearchPlaceholder'),
+                    autocomplete: 'off' });
                 elSearch.addEventListener('input', (event) => {
                     this.filterParameters(elSearch.value);
                 });

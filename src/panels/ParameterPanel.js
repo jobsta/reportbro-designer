@@ -73,7 +73,7 @@ export default class ParameterPanel extends PanelBase {
         let elDiv = utils.createElement('div', { id: 'rbro_parameter_name_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterName'), 'rbro_parameter_name');
         let elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elParameterName = utils.createElement('input', { id: 'rbro_parameter_name' });
+        let elParameterName = utils.createElement('input', { id: 'rbro_parameter_name', autocomplete: 'off' });
         elParameterName.addEventListener('input', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -226,7 +226,7 @@ export default class ParameterPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('parameterPattern'), 'rbro_parameter_pattern');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
-        let elPattern = utils.createElement('input', { id: 'rbro_parameter_pattern' });
+        let elPattern = utils.createElement('input', { id: 'rbro_parameter_pattern', autocomplete: 'off' });
         elPattern.addEventListener('input', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -308,7 +308,7 @@ export default class ParameterPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elTestData = utils.createElement('input', { id: 'rbro_parameter_test_data' });
+        let elTestData = utils.createElement('input', { id: 'rbro_parameter_test_data', autocomplete: 'off' });
         elTestData.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {

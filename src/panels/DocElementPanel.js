@@ -663,7 +663,7 @@ export default class DocElementPanel extends PanelBase {
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_label_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementLabel'), 'rbro_doc_element_label');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elLabel = utils.createElement('input', { id: 'rbro_doc_element_label' });
+        let elLabel = utils.createElement('input', { id: 'rbro_doc_element_label', autocomplete: 'off' });
         elLabel.addEventListener('input', (event) => {
             let val = elLabel.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1483,7 +1483,7 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('docElementColor'), 'rbro_doc_element_color');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
-        let elColor = utils.createElement('input', { id: 'rbro_doc_element_color' });
+        let elColor = utils.createElement('input', { id: 'rbro_doc_element_color', autocomplete: 'off' });
         elColor.addEventListener('change', (event) => {
             let val = elColor.value;
             if (utils.isValidColor(val)) {
@@ -1830,7 +1830,7 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('docElementPattern'), 'rbro_doc_element_pattern');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
-        let elPattern = utils.createElement('input', { id: 'rbro_doc_element_pattern' });
+        let elPattern = utils.createElement('input', { id: 'rbro_doc_element_pattern', autocomplete: 'off' });
         elPattern.addEventListener('input', (event) => {
             let val = elPattern.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
@@ -1863,7 +1863,7 @@ export default class DocElementPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('docElementLink'), 'rbro_doc_element_link');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
-        let elLink = utils.createElement('input', { id: 'rbro_doc_element_link' });
+        let elLink = utils.createElement('input', { id: 'rbro_doc_element_link', autocomplete: 'off' });
         elLink.addEventListener('input', (event) => {
             let val = elLink.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);
