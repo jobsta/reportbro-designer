@@ -2034,8 +2034,9 @@ export default class DocElementPanel extends PanelBase {
         elEditAdditionalRulesButton.append(utils.createElement('span', {}, this.rb.getLabel('editData')));
         elEditAdditionalRulesButton.append(utils.createElement('span', { class: 'rbroIcon-edit' }));
         elEditAdditionalRulesButton.addEventListener('click', (event) => {
-            let selectedObject = this.rb.getSelectedObject();
-            if (selectedObject !== null) {
+            const selectedObjects = this.rb.getSelectedObjects();
+            if (selectedObjects.length === 1) {
+                const selectedObject = selectedObjects[0];
                 const fields = [
                     {
                         name: 'condition', label: this.rb.getLabel('docElementConditionalStyleCondition'),
@@ -2058,6 +2059,8 @@ export default class DocElementPanel extends PanelBase {
                 this.rb.getPopupWindow().show(
                     null, selectedObject.getId(), '', 'cs_additionalRules', PopupWindow.type.data, null, null,
                     Parameter.type.array, fields, data);
+            } else if (selectedObjects.length > 1) {
+                alert(this.rb.getLabel('docElementEditMultipleSelectionNotSupported'));
             }
         });
         elFormField.append(elEditAdditionalRulesButton);
