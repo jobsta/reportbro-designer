@@ -420,16 +420,20 @@ export default class PopupWindow {
                     // add 1 for column containing delete button for row
                     const elTdNestedTable = utils.createElement('td', { colspan: String(columnCount + 1) });
                     const nestedFields = field.parameter.getParameterFields();
-                    // get test data from parent data because data could have been updated in the meantime
-                    const testData = parentData[field.name];
-                    this.createDataTable(
-                        elTdNestedTable, field.parameter, field.parameter.type, nestedFields, testData);
-                    elRowNestedTable.append(elTdNestedTable);
-                    elRow.insertAdjacentElement('afterend', elRowNestedTable);
-                    elExpandableCell.classList.add('rbroExpandedCell');
-                    elExpandableCellIcon.classList.remove('rbroIcon-plus');
-                    elExpandableCellIcon.classList.add('rbroIcon-minus');
-                    elNestedTableInfo.textContent = '';
+                    if (nestedFields.length > 0) {
+                        // get test data from parent data because data could have been updated in the meantime
+                        const testData = parentData[field.name];
+                        this.createDataTable(
+                            elTdNestedTable, field.parameter, field.parameter.type, nestedFields, testData);
+                        elRowNestedTable.append(elTdNestedTable);
+                        elRow.insertAdjacentElement('afterend', elRowNestedTable);
+                        elExpandableCell.classList.add('rbroExpandedCell');
+                        elExpandableCellIcon.classList.remove('rbroIcon-plus');
+                        elExpandableCellIcon.classList.add('rbroIcon-minus');
+                        elNestedTableInfo.textContent = '';
+                    } else {
+                        alert(this.rb.getLabel('parameterEditTestDataNoFields'));
+                    }
                 }
             });
             if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
