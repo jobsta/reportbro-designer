@@ -22,6 +22,7 @@ export default class PopupWindow {
         this.rootParameter = null;
         this.rootDataType = null;
         this.rootFields = null;
+        this.dataEmptyBeforeEdit = true;
         this.nextRowId = -1;
         this.rowMap = null;
     }
@@ -63,15 +64,15 @@ export default class PopupWindow {
      * @param {PopupWindow.type} type
      * @param {?Quill} quill - rich text editor instance, must be set if parameter is appended to rich text control,
      * otherwise the text input of element with tagId will be used (default).
-     * @param {?Parameter} parameter - parameter with fields and data, only used when *type* is PopupWindow.type.data.
+     * @param {?Parameter} parameter - parameter with fields and data, only used when "type" is PopupWindow.type.data.
      * @param {?String} rootDataType - root data type (array, simpleArray or map),
-     * only required when *type* is PopupWindow.type.data and
+     * only required when "type" is PopupWindow.type.data and
      * *parameter* is null (when parameter is available then data type will be retrieved from parameter).
-     * @param {?Object[]} fields - list of fields where each entry contains keys for *name* and *type*,
-     * only required when *type* is PopupWindow.type.data and
+     * @param {?Object[]} fields - list of fields where each entry contains keys for "name" and "type",
+     * only required when "type" is PopupWindow.type.data and
      * *parameter* is null (when parameter is available then fields will be retrieved from parameter).
      * @param {?Object} data - object containing existing data (array or map),
-     * only required when *type* is PopupWindow.type.data and
+     * only required when "type" is PopupWindow.type.data and
      * *parameter* is null (when parameter is available data will be retrieved from parameter test data).
      */
     show(items, objId, tagId, field, type, quill, parameter, rootDataType, fields, data) {
@@ -102,6 +103,15 @@ export default class PopupWindow {
                 rootDataType = parameter.type;
                 fields = parameter.getParameterFields();
                 data = parameter.getTestData(true);
+            } else {
+                if (rootDataType === Parameter.type.map) {
+                    this.dataEmptyBeforeEdit = Object.keys(data).length === 0;
+                } else if ((rootDataType === Parameter.type.array || rootDataType === Parameter.type.simpleArray) &&
+                    Array.isArray(data)) {
+                    this.dataEmptyBeforeEdit = (data.length === 0);
+                } else {
+                    this.dataEmptyBeforeEdit = false;
+                }
             }
             this.createDataTable(this.elContent, parameter, rootDataType, fields, data);
             let width = Math.round(winWidth * 0.8);
@@ -219,16 +229,35 @@ export default class PopupWindow {
             }
             if (this.type === PopupWindow.type.data) {
                 let data;
+                let updateData = true;
                 if (this.rootParameter) {
                     data = this.getTestData(this.elContent, this.rootParameter);
                 } else {
                     data = this.getData(this.elContent, this.rootDataType, this.rootFields);
+                    // in case a data field was edited and the value was previously empty we only update the field
+                    // if there is at least one non-empty value. this prevents accidentally adding a row to a
+                    // list because the popup window adds an empty row if a list is empty.
+                    if (this.dataEmptyBeforeEdit) {
+                        if (this.rootDataType === Parameter.type.map) {
+                            updateData = this.isDataEmpty(data, this.rootFields);
+                        } else if ((this.rootDataType === Parameter.type.array ||
+                                this.rootDataType === Parameter.type.simpleArray) && Array.isArray(data)) {
+                            if (data.length === 0) {
+                                updateData = false;
+                            } else if (data.length === 1) {
+                                updateData = !this.isDataEmpty(data[0], this.rootFields);
+                            }
+                        }
+                    }
                 }
-                const obj = this.rb.getDataObject(this.objId);
-                const dataStr = JSON.stringify(data);
-                if (obj !== null && obj.getValue(this.field) !== dataStr) {
-                    let cmd = new SetValueCmd(this.objId, this.field, dataStr, SetValueCmd.type.text, this.rb);
-                    this.rb.executeCommand(cmd);
+
+                if (updateData) {
+                    const obj = this.rb.getDataObject(this.objId);
+                    const dataStr = JSON.stringify(data);
+                    if (obj !== null && obj.getValue(this.field) !== dataStr) {
+                        let cmd = new SetValueCmd(this.objId, this.field, dataStr, SetValueCmd.type.text, this.rb);
+                        this.rb.executeCommand(cmd);
+                    }
                 }
                 document.getElementById('rbro_background_overlay').remove();
             }
@@ -238,6 +267,44 @@ export default class PopupWindow {
             this.visible = false;
             this.items = null;
         }
+    }
+
+    /**
+     * Return true if the given data object has a field with a non-empty value.
+     * @param {Object} data - data object
+     * @param {Object[]} fields - list of fields where each entry contains keys for "name" and "type"
+     * @returns {Boolean}
+     */
+    isDataEmpty(data, fields) {
+        let empty = true;
+        for (const field of fields) {
+            if (field.name in data) {
+                const fieldData = data[field.name];
+                if (field.type === Parameter.type.string || field.type === Parameter.type.number ||
+                    field.type === Parameter.type.date) {
+                    if (fieldData !== '') {
+                        empty = false;
+                    }
+                } else if (field.type === Parameter.type.boolean) {
+                    if (fieldData) {
+                        empty = false;
+                    }
+                } else if (field.type === Parameter.type.image) {
+                    if (typeof fieldData === 'object' && 'filename' in fieldData && fieldData.filename !== '') {
+                        empty = false;
+                    }
+                } else if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray) {
+                    if (fieldData.length > 0) {
+                        empty = false;
+                    }
+                } else if (field.type === Parameter.type.map) {
+                    if (Object.keys(fieldData).length > 0) {
+                        empty = false;
+                    }
+                }
+            }
+        }
+        return empty;
     }
 
     createDataTable(elRoot, parentParameter, parentType, fields, data) {
