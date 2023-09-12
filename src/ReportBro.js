@@ -36,10 +36,9 @@ export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
         this.nextId = 1;
-        if (properties && properties.locale) {
-            this.locale = properties.locale;
-        } else {
-            this.locale = locales[(properties && properties.localeKey) || 'en_us'];
+        this.locale = locales[(properties && properties.localeKey) || 'en_us'];
+        if (properties && properties['locale']) {
+            Object.assign(this.locale, properties['locale']);
         }
 
         this.properties = {
@@ -105,7 +104,6 @@ export default class ReportBro {
                     this.properties[prop] = properties[prop];
                 }
             }
-            Object.assign(this.locale, properties['locale'] || {});
         }
         if (this.properties.additionalFonts.length > 0) {
             this.properties.fonts = this.properties.fonts.concat(this.properties.additionalFonts);
