@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.3.0] - 2023-09-12
+
+### Features
+* Support multiple conditional styles
+
+### Changes
+* Add data source prefix when selecting parameter of outer data source in popup window
+
+### Bug Fixes
+* Show width property for text element
+* Show data source parameters in popup window also for data sources inside collection
+* Fix scrolling error message into view
+* Hide test data rows for "page_count" and "page_number" parameters
+
 ## [3.2.0] - 2023-05-12
 
 ### Features
