@@ -126,9 +126,10 @@ export default class PopupWindow {
             document.body.classList.add('rbroFixedBackground'); // no scroll bars for background while popup is shown
         } else {
             if (type === PopupWindow.type.parameterSet || type === PopupWindow.type.parameterAppend) {
-                elSearch = utils.createElement(
-                    'input', { class: 'rbroPopupSearch', placeholder: this.rb.getLabel('parameterSearchPlaceholder'),
-                    autocomplete: 'off' });
+                elSearch = utils.createElement('input', {
+                    class: 'rbroPopupSearch', placeholder: this.rb.getLabel('parameterSearchPlaceholder'),
+                    autocomplete: 'off'
+                });
                 elSearch.addEventListener('input', (event) => {
                     this.filterParameters(elSearch.value);
                 });

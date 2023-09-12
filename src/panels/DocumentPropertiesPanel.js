@@ -187,8 +187,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv = utils.createElement('div', { class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('contentHeight'), 'rbro_document_properties_content_height');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elContentHeight = utils.createElement('input', { id: 'rbro_document_properties_content_height',
-            type: 'number', autocomplete: 'off'
+        let elContentHeight = utils.createElement('input', {
+            id: 'rbro_document_properties_content_height', type: 'number', autocomplete: 'off'
         });
         elContentHeight.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
@@ -254,8 +254,9 @@ export default class DocumentPropertiesPanel extends PanelBase {
             elDiv, this.rb.getLabel('patternNumberGroupSymbol'),
             'rbro_document_properties_pattern_number_group_symbol');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elPatternNumberGroupSymbol = utils.createElement(
-            'input', { id: 'rbro_document_properties_pattern_number_group_symbol', maxlength: '1', autocomplete: 'off' });
+        let elPatternNumberGroupSymbol = utils.createElement('input', {
+            id: 'rbro_document_properties_pattern_number_group_symbol', maxlength: '1', autocomplete: 'off'
+        });
         elPatternNumberGroupSymbol.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
