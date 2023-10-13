@@ -1656,6 +1656,7 @@ export default class ReportBro {
         const requestParams = this.getRequestParameters();
         const url = requestParams.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx';
         const headers = requestParams.reportServerHeaders;
+        const self = this;
         if (this.reportKey !== null) {
             if (headers && Object.keys(headers).length > 0) {
                 // use ajax request so we can set custom headers
@@ -1664,9 +1665,25 @@ export default class ReportBro {
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         if (xhr.status === 200) {
-                            const url = URL.createObjectURL(xhr.response);
-                            // popup blocker will block window because of async download
-                            window.open(url, '_blank');
+                            if (xhr.response.type === 'application/json') {
+                                const reader = new FileReader();
+                                reader.addEventListener("loadend", function() {
+                                    const data = reader.result;
+                                    try {
+                                        const obj = JSON.parse(data);
+                                        if (obj.errors.length > 0) {
+                                            self.processErrors(obj.errors, false);
+                                        }
+                                    } catch (e) {
+                                        alert('download failed');
+                                    }
+                                });
+                                reader.readAsText(xhr.response);
+                            } else {
+                                const url = URL.createObjectURL(xhr.response);
+                                // popup blocker will block window because of async download
+                                window.open(url, '_blank');
+                            }
                         } else {
                             alert('download failed');
                         }
