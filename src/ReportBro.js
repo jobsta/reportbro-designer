@@ -44,6 +44,7 @@ export default class ReportBro {
         this.properties = {
             additionalFonts: [],
             adminMode: true,
+            autoSaveOnPreview: false,
             cmdExecutedCallback: null,
             colors: [
                 "#000000","#444444","#666666","#999999","#cccccc","#eeeeee","#f3f3f3","#ffffff",
@@ -1396,6 +1397,9 @@ export default class ReportBro {
         }).then((response) => {
             if (!response.ok) {
               throw Error(response.statusText);
+            }
+            if (self.properties.autoSaveOnPreview) {
+                self.save();
             }
             return response;
         }).then((response) => response.text())
