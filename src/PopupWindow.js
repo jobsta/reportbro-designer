@@ -520,20 +520,15 @@ export default class PopupWindow {
                 const elDataImageContainer = utils.createElement('div', { class: 'rbroImageFileContainer' });
                 const elDataImage = utils.createElement('input', { type: 'file' });
                 elDataImage.addEventListener('change', (event) => {
-                    let files = event.target.files;
+                    function setImage(imageData, imageFileName) {
+                        parentData[field.name] = { data: imageData, filename: imageFileName };
+                        elDataFilenameDiv.classList.remove('rbroHidden');
+                        elDataFilename.textContent = imageFileName;
+                    }
+
+                    const files = event.target.files;
                     if (files && files[0]) {
-                        let fileReader = new FileReader();
-                        let rb = this.rb;
-                        let fileName = files[0].name;
-                        fileReader.onload = function(e) {
-                            parentData[field.name] = { data: e.target.result, filename: fileName };
-                            elDataFilenameDiv.classList.remove('rbroHidden');
-                            elDataFilename.textContent = fileName;
-                        };
-                        fileReader.onerror = function(e) {
-                            alert(rb.getLabel('docElementLoadImageErrorMsg'));
-                        };
-                        fileReader.readAsDataURL(files[0]);
+                        utils.readImageData(files[0], setImage, this.rb);
                     }
                 });
                 elDataImageContainer.append(elDataImage);

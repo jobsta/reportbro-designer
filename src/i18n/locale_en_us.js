@@ -49,6 +49,7 @@ const locale_en = {
     docElementLine: 'Line',
     docElementLink: 'Link',
     docElementLoadImageErrorMsg: 'Loading image failed',
+    docElementLoadImageWebPErrorMsg: 'Loading image failed, upgrade browser to latest version',
     docElementPageBreak: 'Page break',
     docElementPattern: 'Pattern',
     docElementPosition: 'Position (x, y)',

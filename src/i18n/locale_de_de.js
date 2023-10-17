@@ -49,6 +49,7 @@ const locale_de = {
     docElementLine: 'Linie',
     docElementLink: 'Link',
     docElementLoadImageErrorMsg: 'Bild laden fehlgeschlagen',
+    docElementLoadImageWebPErrorMsg: 'Bild laden fehlgeschlagen, aktueller Browser benötigt',
     docElementPageBreak: 'Seitenumbruch',
     docElementPattern: 'Pattern',
     docElementPosition: 'Position (x, y)',

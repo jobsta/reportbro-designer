@@ -244,6 +244,64 @@ export function getEventAbsPos(event) {
 }
 
 /**
+ * Read image data from given image and call loadCallback with image data and filename.
+ *
+ * The image will be converted to WebP format to reduce image size. if imageMaxSize property is set and
+ * the image width or height is larger than this value the image will be downscaled so that
+ * width/height are both <= maxImageSize.
+ *
+ * @param {File} file - image file to load.
+ * @param {function(string, string)} loadCallback - callback is executed with image data and filename when loading
+ * image was successful.
+ * @param {ReportBro} rb - ReportBro instance.
+ */
+export function readImageData(file, loadCallback, rb) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(e) {
+        const img = new Image();
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            const maxImageSize = rb.getProperty('imageMaxSize');
+            if (maxImageSize && (img.width > maxImageSize || img.height > maxImageSize)) {
+                if (img.width > img.height) {
+                    img.height = img.height * (maxImageSize / img.width);
+                    img.width = maxImageSize;
+                } else {
+                    img.width = img.width * (maxImageSize / img.height);
+                    img.height = maxImageSize;
+                }
+            }
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            let imageData = canvas.toDataURL('image/webp');
+            if (imageData.substring(0, 15) !== 'data:image/webp') {
+                if (rb.getProperty('imageRequireWebPFormat')) {
+                    imageData = null;
+                    alert(rb.getLabel('docElementLoadImageWebPErrorMsg'));
+                } else {
+                    if (imageData.length > e.target.result.length) {
+                        imageData = e.target.result;
+                    }
+                }
+            }
+
+            if (imageData) {
+                loadCallback(imageData, file.name);
+            }
+        }
+        img.src = e.target.result;
+    };
+    fileReader.onerror = function(e) {
+        alert(rb.getLabel('docElementLoadImageErrorMsg'));
+    };
+    fileReader.readAsDataURL(file);
+}
+
+/**
  * Populate option tags for all available styles.
  * @param {Element} elStyle - dom element of the styles drop down. If there are existing options they will be removed.
  * @param {?String} selectedValue - selected style id, if set it is used to set the option for this style as selected.

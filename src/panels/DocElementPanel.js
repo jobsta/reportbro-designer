@@ -1115,30 +1115,27 @@ export default class DocElementPanel extends PanelBase {
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elImage = utils.createElement('input', { id: 'rbro_doc_element_image', type: 'file' });
         elImage.addEventListener('change', (event) => {
-            let files = event.target.files;
+            const rb = this.rb;
+
+            function setImage(imageData, imageFileName) {
+                const cmdGroup = new CommandGroupCmd('Load image', rb);
+                const selectedObjects = rb.getSelectedObjects();
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    const obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'image', imageData, SetValueCmd.type.file, rb));
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'imageFilename', imageFileName, SetValueCmd.type.filename, rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    rb.executeCommand(cmdGroup);
+                }
+            }
+
+            const files = event.target.files;
             if (files && files[0]) {
-                let fileReader = new FileReader();
-                let rb = this.rb;
-                let fileName = files[0].name;
-                fileReader.onload = function(e) {
-                    let cmdGroup = new CommandGroupCmd('Load image', rb);
-                    let selectedObjects = rb.getSelectedObjects();
-                    for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                        let obj = selectedObjects[i];
-                        cmdGroup.addSelection(obj.getId());
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'image', e.target.result, SetValueCmd.type.file, rb));
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), 'imageFilename', fileName, SetValueCmd.type.filename, rb));
-                    }
-                    if (!cmdGroup.isEmpty()) {
-                        rb.executeCommand(cmdGroup);
-                    }
-                };
-                fileReader.onerror = function(e) {
-                    alert(rb.getLabel('docElementLoadImageErrorMsg'));
-                };
-                fileReader.readAsDataURL(files[0]);
+                utils.readImageData(files[0], setImage, this.rb);
             }
         });
         elFormField.append(elImage);
