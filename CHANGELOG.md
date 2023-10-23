@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.4.0] - 2023-10-23
+
+### Features
+* Add autoSaveOnPreview setting, if set to true the "save" method is called when report is previewed
+* Add imageMaxSize setting to downscale images in report template
+* Convert static images and images for parameter test data to WebP format to reduce report template size
+
+### Changes
+* Display report errors on xlsx download if errors are available
+* Add imageLimit setting to define maximum number of allowed image elements in report template
+
 ## [3.3.0] - 2023-09-12
 
 ### Features
