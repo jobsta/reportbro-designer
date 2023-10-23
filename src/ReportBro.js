@@ -64,6 +64,7 @@ export default class ReportBro {
                 { name: 'Times New Roman', value: Style.font.times }
             ],
             highlightUnusedParameters: false,
+            imageLimit: null,
             imageMaxSize: null,
             imageRequireWebPFormat: false,
             localStorageReportKey: null,

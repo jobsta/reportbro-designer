@@ -273,14 +273,31 @@ export default class Document {
      */
     processDrop(event) {
         if (this.rb.isBrowserDragActive('docElement')) {
+            event.preventDefault();
+            const elContainers = document.querySelectorAll('.rbroElementContainer');
+            for (const elContainer of elContainers) {
+                elContainer.classList.remove('rbroElementDragOver');
+            }
+
+            if (this.dragElementType === DocElement.type.image && this.rb.getProperty('imageLimit') !== null) {
+                let imageCount = 0;
+                const docElements = this.rb.getDocElements(true);
+                for (const docElement of docElements) {
+                    if (docElement.getElementType() === DocElement.type.image) {
+                        imageCount++;
+                    }
+                }
+                if (imageCount >= this.rb.getProperty('imageLimit')) {
+                    alert(this.rb.getLabel('docElementImageCountExceeded').replace(
+                      '{count}', this.rb.getProperty('imageLimit')));
+                    return;
+                }
+            }
+
             const absPos = utils.getEventAbsPos(event);
             if (absPos !== null) {
                 this.dragCurrentX = absPos.x;
                 this.dragCurrentY = absPos.y;
-            }
-            const elContainers = document.querySelectorAll('.rbroElementContainer');
-            for (const elContainer of elContainers) {
-                elContainer.classList.remove('rbroElementDragOver');
             }
             let container = this.getContainer(
                 this.dragCurrentX, this.dragCurrentY, this.dragElementType, []);
@@ -304,7 +321,6 @@ export default class Document {
                     true, this.dragElementType, initialData, this.rb.getUniqueId(), container.getId(), -1, this.rb);
                 this.rb.executeCommand(cmd);
             }
-            event.preventDefault();
         }
     }
 
