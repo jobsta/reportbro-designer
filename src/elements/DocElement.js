@@ -972,6 +972,12 @@ export default class DocElement {
         } else {
             // avoid unintentionally changing name of other parameter in case the name exists in current scope
             if (!parameterNameExistsInCurrentScope) {
+                if (dataSources.length > 0) {
+                    // element has a data source, therefor root parameters are specified with a ':' prefix,
+                    // so they can be explicitly referenced
+                    oldParameterText = '${:' + oldParameterText.substring(2);
+                    newParameterText = '${:' + newParameterText.substring(2);
+                }
                 this.addCommandForChangedText(oldParameterText, newParameterText, field, cmdGroup);
             }
         }

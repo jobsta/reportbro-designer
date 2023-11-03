@@ -672,7 +672,6 @@ export default class ReportBro {
                         id: 'ds' + dataSourceIndex,
                         name: groupName
                     });
-                    dataSourceIndex++;
                     // add all parameters of collections at end of data source parameters
                     // with a header containing the collection name
                     const mapParameters = [];
@@ -690,20 +689,26 @@ export default class ReportBro {
                     }
                 }
                 firstDataSource = false;
+                dataSourceIndex++;
             }
         } else if (obj instanceof Parameter) {
             obj.appendFieldParameterItems(parameters, allowedTypes, true);
         }
 
+        // if there is at least one data source the parameter list is returned for an element with a data source.
+        // therefor we set the data source for root parameters to empty string instead of null. this way
+        // the root parameters are displayed with a colon prefix (e.g. ":address" instead of "address")
+        // in the parameter popup window which makes it possible to explicitly reference a root parameter.
+        const rootDataSourceName = dataSourceIndex > 0 ? '' : null;
         parameters.push({ separator: true, name: this.getLabel('parameters') });
         // add all parameters of collections at end of list with a header containing the collection name
         const mapParameters = [];
         for (const parameterItem of parameterItems) {
             const parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.map) {
-                parameter.appendParameterItems(mapParameters, allowedTypes, null);
+                parameter.appendParameterItems(mapParameters, allowedTypes, rootDataSourceName);
             } else {
-                parameter.appendParameterItems(parameters, allowedTypes, null);
+                parameter.appendParameterItems(parameters, allowedTypes, rootDataSourceName);
             }
         }
         return parameters.concat(mapParameters);
