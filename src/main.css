@@ -618,7 +618,7 @@ ul ul .rbroMenuItemText {
 /* Document Panel - Template layouting and PDF preview */
 
 .rbroDocumentPanel {
-    padding-top: 10px;
+    padding: 10px 0;
     right: 0;
     border: 2px solid #E4E7EA;
 }
