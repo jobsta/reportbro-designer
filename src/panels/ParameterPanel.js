@@ -319,14 +319,6 @@ export default class ParameterPanel extends PanelBase {
             }
         });
         elFormField.append(elTestData);
-        elFormField.append(
-            utils.createElement('div', { id: 'rbro_parameter_test_data_error', class: 'rbroErrorMessage' }));
-        elDiv.append(elFormField);
-        elTestDataContainer.append(elDiv);
-
-        elDiv = utils.createElement('div', { id: 'rbro_parameter_edit_test_data_row', class: 'rbroFormRow' });
-        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'));
-        elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elEditTestDataButton = utils.createElement(
             'button', {
                 id: 'rbro_parameter_edit_test_data',
@@ -353,10 +345,9 @@ export default class ParameterPanel extends PanelBase {
         });
         elFormField.append(elEditTestDataButton);
         elFormField.append(
-            utils.createElement('div', { id: 'rbro_parameter_edit_test_data_error', class: 'rbroErrorMessage' }));
+            utils.createElement('div', { id: 'rbro_parameter_test_data_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
         elTestDataContainer.append(elDiv);
-
         elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_boolean_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data_boolean');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
@@ -518,15 +509,15 @@ export default class ParameterPanel extends PanelBase {
                 }
                 if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
                         type === Parameter.type.map) {
-                    document.getElementById('rbro_parameter_edit_test_data_row').removeAttribute('style');
+                    document.getElementById('rbro_parameter_edit_test_data').removeAttribute('style');
                 } else {
-                    document.getElementById('rbro_parameter_edit_test_data_row').style.display = 'none';
+                    document.getElementById('rbro_parameter_edit_test_data').style.display = 'none';
                 }
                 if (type === Parameter.type.string || type === Parameter.type.number ||
                         type === Parameter.type.date) {
-                    document.getElementById('rbro_parameter_test_data_row').removeAttribute('style');
+                    document.getElementById('rbro_parameter_test_data').removeAttribute('style');
                 } else {
-                    document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
+                    document.getElementById('rbro_parameter_test_data').style.display = 'none';
                 }
                 if (type === Parameter.type.boolean) {
                     document.getElementById('rbro_parameter_test_data_boolean_row').removeAttribute('style');
