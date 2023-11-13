@@ -373,7 +373,7 @@ export default class Parameter {
                     parametersToAppend.push(child);
                 }
             }
-            if (parametersToAppend.length > 0) {
+            // if (parametersToAppend.length < 0) {
                 parameters.push({
                     separator: true, id: this.id,
                     separatorClass: 'rbroParameterGroup', name: parameterPrefix + this.name });
@@ -384,7 +384,7 @@ export default class Parameter {
                         id: parameter.getId(), description: '',
                         dataSourceName: dataSourceName });
                 }
-            }
+            // }
             // append nested map parameters after other parameters of the map
             for (const nestedMapParameter of nestedMapParameters) {
                 nestedMapParameter.appendParameterItemsWithPrefix(

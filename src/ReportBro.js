@@ -44,6 +44,7 @@ export default class ReportBro {
         this.properties = {
             additionalFonts: [],
             adminMode: true,
+            treeMode: false,
             autoSaveOnPreview: false,
             cmdExecutedCallback: null,
             colors: [
