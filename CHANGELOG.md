@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.5.0] - 2023-11-16
+
+### Changes
+* Add prefix for root parameters in popup window when inside an element with a data source
+
+### Bug Fixes
+* Fix display of error message for invalid collection or list parameter
+
 ## [3.4.0] - 2023-10-23
 
 ### Features
