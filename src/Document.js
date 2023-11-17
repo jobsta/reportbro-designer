@@ -289,7 +289,7 @@ export default class Document {
                 }
                 if (imageCount >= this.rb.getProperty('imageLimit')) {
                     alert(this.rb.getLabel('docElementImageCountExceeded').replace(
-                      '{count}', this.rb.getProperty('imageLimit')));
+                      '${count}', this.rb.getProperty('imageLimit')));
                     return;
                 }
             }

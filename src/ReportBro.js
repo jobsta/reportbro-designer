@@ -664,7 +664,7 @@ export default class ReportBro {
                     } else {
                         // include data source name in group label to better distinguish groups
                         // of additional data sources
-                        groupName = this.getLabel('parametersDataSourceName').replace('{name}', dataSource.name);
+                        groupName = this.getLabel('parametersDataSourceName').replace('${name}', dataSource.name);
                     }
                     parameters.push({
                         separator: true,
