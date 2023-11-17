@@ -1,5 +1,10 @@
 # Changelog
 
+## Upcoming Release
+
+### Bug Fixes
+* Set data source prefix for parameters in popup window when used in parameter expression
+
 ## [3.5.0] - 2023-11-16
 
 ### Changes

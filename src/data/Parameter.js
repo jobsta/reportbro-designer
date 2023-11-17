@@ -427,8 +427,9 @@ export default class Parameter {
      * If false then the full name including name of parent parameter will be set.
      * This is used when a parameter is selected for a function, e.g. sum or average
      * of a list field.
+     * @param {?String} dataSourceName - data source name which will be set as prefix for inserted parameter name.
      */
-    appendFieldParameterItems(parameters, allowedTypes, relative) {
+    appendFieldParameterItems(parameters, allowedTypes, relative, dataSourceName) {
         if (this.type === Parameter.type.array) {
             let firstRowParam = true;
             for (let child of this.panelItem.getChildren()) {
@@ -446,13 +447,13 @@ export default class Parameter {
                         let paramName = parameter.getName();
                         parameters.push({
                             name: paramName, nameLowerCase: paramName.toLowerCase(),
-                            id: parameter.getId(), description: ''
+                            id: parameter.getId(), description: '', dataSourceName: dataSourceName
                         });
                     } else {
                         let paramName = this.name + '.' + parameter.getName();
                         parameters.push({
                             name: paramName, nameLowerCase: paramName.toLowerCase(),
-                            id: parameter.getId(), description: ''
+                            id: parameter.getId(), description: '', dataSourceName: dataSourceName
                         });
                     }
                     firstRowParam = false;
@@ -461,8 +462,12 @@ export default class Parameter {
         }
         if (relative) {
             let parent = this.getParent();
-            if (parent !== null) {
-                parent.appendFieldParameterItems(parameters, allowedTypes, relative);
+            while (parent !== null) {
+                if (parent.type === Parameter.type.array) {
+                    parent.appendFieldParameterItems(parameters, allowedTypes, relative, parent.name);
+                    break;
+                }
+                parent = parent.getParent();
             }
         }
     }

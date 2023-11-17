@@ -692,7 +692,17 @@ export default class ReportBro {
                 dataSourceIndex++;
             }
         } else if (obj instanceof Parameter) {
-            obj.appendFieldParameterItems(parameters, allowedTypes, true);
+            let parent = obj.getParent();
+            while (parent !== null) {
+                if (parent.type === Parameter.type.array) {
+                    // parameter is inside a list -> set dataSourceIndex so data source prefix is
+                    // set for root parameters
+                    dataSourceIndex = 1;
+                    parent.appendFieldParameterItems(parameters, allowedTypes, true, null);
+                    break;
+                }
+                parent = parent.getParent();
+            }
         }
 
         // if there is at least one data source the parameter list is returned for an element with a data source.
@@ -729,7 +739,7 @@ export default class ReportBro {
         for (let parameterItem of parameterItems) {
             let parameter = parameterItem.getData();
             if (parameter.getValue('type') === Parameter.type.array) {
-                parameter.appendFieldParameterItems(parameters, allowedTypes, false);
+                parameter.appendFieldParameterItems(parameters, allowedTypes, false, null);
             }
         }
         return parameters;
