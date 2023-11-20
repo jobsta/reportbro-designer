@@ -1,11 +1,11 @@
 # Changelog
 
-## Upcoming Release
+## [3.5.1] - 2023-11-20
 
 ### Bug Fixes
 * Set data source prefix for parameters in popup window when used in parameter expression
 * Show parameter name when displaying error message for missing data
-* Do not show Sum/Average and evaluated Parameters when editing test data for Collection/List 
+* Do not show Sum/Average and evaluated parameters when editing test data for Collection/List parameter
 
 ## [3.5.0] - 2023-11-16
 
