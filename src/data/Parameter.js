@@ -79,6 +79,13 @@ export default class Parameter {
     }
 
     /**
+     * Return true if parameter is a function with range input.
+     */
+    isRangeFunction() {
+        return this.type === Parameter.type.average || this.type === Parameter.type.sum;
+    }
+
+    /**
      * Returns all data fields of this object. The fields are used when serializing the object.
      * @returns {String[]}
      */
@@ -480,7 +487,7 @@ export default class Parameter {
                 fields.push({ name: 'data', type: this.arrayItemType, parameter: this });
             } else {
                 for (let child of this.getChildren()) {
-                    if (!child.showOnlyNameType) {
+                    if (!child.showOnlyNameType && !child.eval && !child.isRangeFunction()) {
                         fields.push({ name: child.getName(), type: child.getValue('type'), parameter: child });
                     }
                 }

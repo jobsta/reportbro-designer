@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 * Set data source prefix for parameters in popup window when used in parameter expression
+* Show parameter name when displaying error message for missing data
+* Do not show Sum/Average and evaluated Parameters when editing test data for Collection/List 
 
 ## [3.5.0] - 2023-11-16
 
