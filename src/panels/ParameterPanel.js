@@ -473,7 +473,7 @@ export default class ParameterPanel extends PanelBase {
                 document.getElementById('rbro_parameter_array_item_type_row').style.display = 'none';
             }
             if (type === Parameter.type.string || type === Parameter.type.number ||
-                    type === Parameter.type.boolean || type === Parameter.type.date ||
+                    type === Parameter.type.boolean || type === Parameter.type.date || type === Parameter.type.image ||
                     type === Parameter.type.array || type === Parameter.type.simpleArray ||
                     type === Parameter.type.map) {
                 document.getElementById('rbro_parameter_nullable_row').removeAttribute('style');
@@ -506,6 +506,13 @@ export default class ParameterPanel extends PanelBase {
                     document.getElementById('rbro_parameter_test_data_container').style.display = 'none';
                 } else {
                     document.getElementById('rbro_parameter_test_data_container').removeAttribute('style');
+                }
+                if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
+                        type === Parameter.type.map || type === Parameter.type.string ||
+                        type === Parameter.type.number || type === Parameter.type.date) {
+                    document.getElementById('rbro_parameter_test_data_row').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_test_data_row').style.display = 'none';
                 }
                 if (type === Parameter.type.array || type === Parameter.type.simpleArray ||
                         type === Parameter.type.map) {
