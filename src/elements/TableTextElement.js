@@ -228,7 +228,7 @@ export default class TableTextElement extends TextElement {
      */
     getProperties() {
         let fields = [
-            'xReadOnly', 'width', 'content', 'eval', 'colspan',
+            'xReadOnly', 'width', 'content', 'richText', 'richTextContent', 'richTextHtml', 'eval', 'colspan',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor',
             'font', 'fontSize', 'lineSpacing',
