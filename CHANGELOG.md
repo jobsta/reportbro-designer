@@ -1,5 +1,15 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* Add parent parameter for createParameter API method to allow creation of field inside Collection/List parameter
+* Support retrieving list field with getParameterByName API method
+
+### Bug Fixes
+* Hide empty test data row for image and boolean parameter
+* Show nullable option for image parameter
+
 ## [3.5.1] - 2023-11-20
 
 ### Bug Fixes
