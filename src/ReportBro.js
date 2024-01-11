@@ -1603,7 +1603,7 @@ export default class ReportBro {
             this.createStyle(styleData);
         }
         for (let parameterData of report.parameters) {
-            this.createParameter(parameterData);
+            this.createParameter(parameterData, null);
         }
         for (let docElementData of report.docElements) {
             this.createDocElement(docElementData);
@@ -1826,7 +1826,7 @@ export default class ReportBro {
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
      * @param {String} parameterName - Name of parameter to search for, parameter could also
-     * be a parameter inside a map (e.g. "Address.Contacts").
+     * be a parameter inside a map (e.g. "Address.Contacts") or an array field.
      * @returns {?Parameter}
      */
     getParameterByName(parameterName) {
@@ -1836,34 +1836,35 @@ export default class ReportBro {
     /**
      * Returns parameter for the given name, or null if parameter does not exist.
      * @param {String} parameterName - Name of parameter to search for, parameter could also
-     * be a parameter inside a map (e.g. "Address.Contacts").
-     * @param {?Parameter} parentMap - map parameter which is used for recursive search of parameter inside map.
+     * be a parameter inside a map (e.g. "Address.Contacts") or an array field.
+     * @param {?Parameter} parent - parameter which is used for recursive search of parameter inside map/array.
      * @returns {?Parameter}
      */
-    getParameterByNameInternal(parameterName, parentMap) {
+    getParameterByNameInternal(parameterName, parent) {
         let parameters;
-        let mapName = null, mapFieldName = null;
+        let parentName = null, fieldName = null;
         const pos = parameterName.indexOf('.');
-        // if parameter name contains a dot the name references a parameter inside a map
+        // if parameter name contains a dot the name references a parameter inside a map/array
         if (pos !== -1) {
-            mapName = parameterName.substring(0, pos);
-            mapFieldName = parameterName.substring(pos + 1);
+            parentName = parameterName.substring(0, pos);
+            fieldName = parameterName.substring(pos + 1);
         }
 
-        if (parentMap) {
-            // get map fields
-            parameters = parentMap.getChildren();
+        if (parent) {
+            // get map/array fields
+            parameters = parent.getChildren();
         } else {
             // get all available parameters
             parameters = this.getParameters();
         }
 
         for (let parameter of parameters) {
-            if (mapName !== null && parameter.getValue('type') === Parameter.type.map &&
-                    parameter.getValue('name') === mapName) {
-                // search recursively for parameter inside map
-                return this.getParameterByNameInternal(mapFieldName, parameter);
-            } else if (mapName === null && parameter.getValue('name') === parameterName) {
+            if (parentName !== null && (parameter.getValue('type') === Parameter.type.map ||
+                    parameter.getValue('type') === Parameter.type.array) &&
+                    parameter.getValue('name') === parentName) {
+                // search recursively for parameter inside map/array
+                return this.getParameterByNameInternal(fieldName, parameter);
+            } else if (parentName === null && parameter.getValue('name') === parameterName) {
                 return parameter;
             }
         }
@@ -1903,11 +1904,20 @@ export default class ReportBro {
      * Creates a parameter with given data.
      * @param {Object} parameterData - Map containing all data for new parameter, must
      * also contain an unique id.
+     * @param {?Parameter} parent - optional parent parameter (must be of type map or array) where
+     * created parameter will be added to (i.e. created parameter is a field inside a map/array).
      * @returns {Parameter} the created parameter.
      */
-    createParameter(parameterData) {
+    createParameter(parameterData, parent) {
         let parameter = new Parameter(parameterData.id, parameterData, this);
-        let parentPanel = this.mainPanel.getParametersItem();
+        let parentPanel = null;
+        if (parent && (parent.getValue('type') === Parameter.type.array ||
+                parent.getValue('type') === Parameter.type.map)) {
+            // create parameter inside parent, i.e. parameter is a field inside a map or array
+            parentPanel = parent.getPanelItem();
+        } else {
+            parentPanel = this.mainPanel.getParametersItem();
+        }
         const adminMode = this.getProperty('adminMode');
         // set hasChildren and showAdd to true (in case adminMode is enabled) because parameters
         // can have children depending on their type (for map and list) -> children and add button
