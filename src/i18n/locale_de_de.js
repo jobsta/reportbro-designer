@@ -120,6 +120,7 @@ const locale_de = {
     errorMsgMissingData: 'Fehlende Daten',
     errorMsgMissingDataSourceParameter: 'Datenquelle Parameter nicht gefunden',
     errorMsgMissingExpression: 'Ausdruck muss gesetzt sein',
+    errorMsgMissingGlyph: 'Text enthält Zeichen, die in der ausgewählten Schrift nicht verfügbar sind',
     errorMsgMissingImage: 'Fehlendes Bild: Keine Bildquelle oder -datei angegeben',
     errorMsgMissingParameter: 'Parameter nicht gefunden',
     errorMsgMissingParameterData: 'Daten für Parameter ${info} nicht gefunden',

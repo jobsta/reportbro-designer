@@ -5,6 +5,7 @@
 ### Changes
 * Add parent parameter for createParameter API method to allow creation of field inside Collection/List parameter
 * Support retrieving list field with getParameterByName API method
+* Show error message when text contains characters that are not contained in font
 
 ### Bug Fixes
 * Hide empty test data row for image and boolean parameter

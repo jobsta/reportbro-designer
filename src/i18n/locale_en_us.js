@@ -120,6 +120,7 @@ const locale_en = {
     errorMsgMissingData: 'Missing data',
     errorMsgMissingDataSourceParameter: 'Data source parameter not found',
     errorMsgMissingExpression: 'Expression must be set',
+    errorMsgMissingGlyph: 'Text contains characters that are not available in the selected font',
     errorMsgMissingImage: 'Missing image, no source or image file specified',
     errorMsgMissingParameter: 'Parameter not found',
     errorMsgMissingParameterData: 'Data for parameter ${info} not found',
