@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [3.6.0] - 2024-01-15
 
 ### Changes
 * Add parent parameter for createParameter API method to allow creation of field inside Collection/List parameter
