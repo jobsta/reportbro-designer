@@ -877,7 +877,7 @@ export default class DocElementPanel extends PanelBase {
 
             let elRichTextContent = utils.createElement('div', { id: 'rbro_doc_element_rich_text_content' });
             elDiv.append(elRichTextContent);
-            elFormField.append(
+            elDiv.append(
                 utils.createElement(
                     'div', { id: 'rbro_doc_element_rich_text_content_error', class: 'rbroErrorMessage' })
             );
