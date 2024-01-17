@@ -115,6 +115,7 @@ const locale_en = {
     errorMsgInvalidParameterName: 'Name must start with a character or underscore, and must only contain characters, digits and underscores (_)',
     errorMsgInvalidPattern: 'Invalid pattern',
     errorMsgInvalidPosition: 'The position is outside the area',
+    errorMsgInvalidRichTextParameter: 'The rich text contains a parameter with invalid tags',
     errorMsgInvalidSize: 'The element is outside the area',
     errorMsgInvalidTestData: 'Invalid test data',
     errorMsgMissingData: 'Missing data',

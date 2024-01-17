@@ -115,6 +115,7 @@ const locale_de = {
     errorMsgInvalidParameterName: 'Name muss mit einem Zeichen oder Unterstrich beginnen und darf nur Zeichen, Ziffern und Unterstriche enthalten',
     errorMsgInvalidPattern: 'Ungültiges Pattern',
     errorMsgInvalidPosition: 'Die Position ist außerhalb des Bereichs',
+    errorMsgInvalidRichTextParameter: 'Der Rich Text enthält einen Parameter mit ungültigen Tags',
     errorMsgInvalidSize: 'Das Element ist außerhalb des Bereichs',
     errorMsgInvalidTestData: 'Ungültige Testdaten',
     errorMsgMissingData: 'Fehlende Daten',
