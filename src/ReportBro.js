@@ -1372,6 +1372,8 @@ export default class ReportBro {
                     rv[parameter.getName()] = parameter.getValue('testDataBoolean');
                 } else if (type === Parameter.type.image) {
                     rv[parameter.getName()] = parameter.getValue('testDataImage');
+                } else if (type === Parameter.type.richText) {
+                    rv[parameter.getName()] = parameter.getValue('testDataRichText');
                 }
             }
         }
