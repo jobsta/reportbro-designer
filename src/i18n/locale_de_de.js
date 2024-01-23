@@ -198,7 +198,7 @@ const locale_de = {
     parameterTestData: 'Testdaten',
     parameterTestDataDatePattern: 'JJJJ-MM-TT',
     parameterTestDataImageInfo: 'Bilder werden in der Berichtsvorlage gespeichert und können die Größe der Berichtsvorlage erheblich erhöhen',
-    parameterTestDataRichTextInfo: 'Rich Text kann Html-Tags für Formatierung enthalten. Siehe <a href="https://www.reportbro.com/doc/userguide#parameter_types" target="_blank" rel="noreferrer">erlaubte Tags</a>',
+    parameterTestDataRichTextInfo: 'Rich Text kann Html-Tags zur Formatierung enthalten. Siehe <a href="https://www.reportbro.com/doc/userguide#parameter_type_rich_text" target="_blank" rel="noreferrer">erlaubte Tags</a>',
     parameterTestDataRowCount: '${count} Zeilen',
     parameterTestDataRowCountEmpty: 'leer',
     parameterTestDataRowCountOne: '1 Zeile',

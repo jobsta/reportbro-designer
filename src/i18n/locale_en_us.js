@@ -198,7 +198,7 @@ const locale_en = {
     parameterTestData: 'Test data',
     parameterTestDataDatePattern: 'YYYY-MM-DD',
     parameterTestDataImageInfo: 'Images are saved in the report template and could significantly increase report template size',
-    parameterTestDataRichTextInfo: 'Rich text can contain formatting with html tags. See <a href="https://www.reportbro.com/doc/userguide#parameter_types" target="_blank" rel="noreferrer">allowed tags</a>',
+    parameterTestDataRichTextInfo: 'Rich text can contain html tags for formatting. See <a href="https://www.reportbro.com/doc/userguide#parameter_type_rich_text" target="_blank" rel="noreferrer">allowed tags</a>',
     parameterTestDataRowCount: '${count} rows',
     parameterTestDataRowCountEmpty: 'empty',
     parameterTestDataRowCountOne: '1 row',
