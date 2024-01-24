@@ -442,7 +442,7 @@ export default class ParameterPanel extends PanelBase {
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         const elTestDataRichText = utils.createElement(
           'textarea', { id: 'rbro_parameter_test_data_rich_text', rows: 1, autocomplete: 'off' });
-        elTestDataRichText.addEventListener('change', (event) => {
+        elTestDataRichText.addEventListener('input', (event) => {
             const selectedObject = rb.getSelectedObject();
             if (selectedObject !== null) {
                 let cmd = new SetValueCmd(
