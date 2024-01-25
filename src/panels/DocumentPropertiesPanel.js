@@ -14,19 +14,27 @@ export default class DocumentPropertiesPanel extends PanelBase {
         this.propertyDescriptors = {
             'pageFormat': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_format'
+                'fieldId': 'page_format',
+                'rowId': 'rbro_document_properties_page_row',
+                'errorMsgId': 'rbro_document_properties_page_error'
             },
             'pageWidth': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_width'
+                'fieldId': 'page_width',
+                'rowId': 'rbro_document_properties_page_row',
+                'errorMsgId': 'rbro_document_properties_page_error'
             },
             'pageHeight': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_height'
+                'fieldId': 'page_height',
+                'rowId': 'rbro_document_properties_page_row',
+                'errorMsgId': 'rbro_document_properties_page_error'
             },
             'unit': {
                 'type': SetValueCmd.type.select,
-                'fieldId': 'unit'
+                'fieldId': 'unit',
+                'rowId': 'rbro_document_properties_page_row',
+                'errorMsgId': 'rbro_document_properties_page_error'
             },
             'orientation': {
                 'type': SetValueCmd.type.select,
