@@ -29,6 +29,7 @@ export default class Parameter {
         this.testDataBoolean = false;
         this.testDataImage = '';
         this.testDataImageFilename = '';
+        this.testDataRichText = '';
         this.children = [];
         this.editable = rb.getProperty('adminMode');
         this.showOnlyNameType = false;
@@ -92,7 +93,8 @@ export default class Parameter {
     getFields() {
         return [
             'id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression',
-            'showOnlyNameType', 'testData', 'testDataBoolean', 'testDataImage', 'testDataImageFilename'
+            'showOnlyNameType', 'testData', 'testDataBoolean', 'testDataImage', 'testDataImageFilename',
+            'testDataRichText',
         ];
     }
 
@@ -664,6 +666,7 @@ Parameter.type = {
     'boolean': 'boolean',
     'date': 'date',
     'image': 'image',
+    'richText': 'rich_text',
     'array': 'array',
     'simpleArray': 'simple_array',
     'map': 'map',

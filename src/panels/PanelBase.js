@@ -189,8 +189,8 @@ export default class PanelBase {
 
                     let errorMsg = this.rb.getLabel(error.msg_key);
                     if (error.info) {
-                        errorMsg = errorMsg.replace('${info}', '<span class="rbroErrorMessageInfo">' +
-                            error.info.replace('<', '&lt;').replace('>', '&gt;') + '</span>');
+                        errorMsg = errorMsg.replaceAll('${info}', '<span class="rbroErrorMessageInfo">' +
+                            error.info.replaceAll('<', '&lt;').replaceAll('>', '&gt;') + '</span>');
                     }
 
                     // highlight row containing error

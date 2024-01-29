@@ -64,6 +64,10 @@ export default class ParameterPanel extends PanelBase {
                 'rowId': 'rbro_parameter_test_data_image_row',
                 'singleRowProperty': false
             },
+            'testDataRichText': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'test_data_rich_text'
+            },
         };
         this.parameterTypeOptions = [];
     }
@@ -167,6 +171,10 @@ export default class ParameterPanel extends PanelBase {
             utils.createElement('option', { value: 'boolean' }, this.rb.getLabel('parameterTypeBoolean')));
         elArrayItemType.append(
             utils.createElement('option', { value: 'date' }, this.rb.getLabel('parameterTypeDate')));
+        if (this.rb.getProperty('showPlusFeatures')) {
+            elArrayItemType.append(
+                utils.createElement('option', { value: 'rich_text' }, this.rb.getLabel('parameterTypeRichText')));
+        }
         elArrayItemType.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
@@ -348,6 +356,7 @@ export default class ParameterPanel extends PanelBase {
             utils.createElement('div', { id: 'rbro_parameter_test_data_error', class: 'rbroErrorMessage' }));
         elDiv.append(elFormField);
         elTestDataContainer.append(elDiv);
+
         elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_boolean_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data_boolean');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
@@ -427,6 +436,30 @@ export default class ParameterPanel extends PanelBase {
             utils.createElement('div', { class: 'rbroInfo' }, this.rb.getLabel('parameterTestDataImageInfo')));
         elDiv.append(elFormField);
         elTestDataContainer.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_parameter_test_data_rich_text_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data_rich_text');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        const elTestDataRichText = utils.createElement(
+          'textarea', { id: 'rbro_parameter_test_data_rich_text', rows: 1, autocomplete: 'off' });
+        elTestDataRichText.addEventListener('input', (event) => {
+            const selectedObject = rb.getSelectedObject();
+            if (selectedObject !== null) {
+                let cmd = new SetValueCmd(
+                    selectedObject.getId(), 'testDataRichText', elTestDataRichText.value,
+                    SetValueCmd.type.text, this.rb);
+                this.rb.executeCommand(cmd);
+            }
+        });
+        autosize(elTestDataRichText);
+        elFormField.append(elTestDataRichText);
+        const elInfoText = utils.createElement(
+            'div', { id: 'rbro_parameter_test_data_rich_text_plus_info', class: 'rbroInfo' });
+        elInfoText.innerHTML = this.rb.getLabel('parameterTestDataRichTextInfo');
+        elFormField.append(elInfoText);
+        elDiv.append(elFormField);
+        elTestDataContainer.append(elDiv);
+
         panel.append(elTestDataContainer);
 
         document.getElementById('rbro_detail_panel').append(panel);
@@ -494,8 +527,9 @@ export default class ParameterPanel extends PanelBase {
                 document.getElementById('rbro_parameter_eval_row').style.display = 'none';
                 document.getElementById('rbro_parameter_test_data_container').style.display = 'none';
             } else {
-                if (type === Parameter.type.image || type === Parameter.type.array ||
-                    type === Parameter.type.simpleArray || type === Parameter.type.map) {
+                if (type === Parameter.type.image || type === Parameter.type.richText ||
+                        type === Parameter.type.array || type === Parameter.type.simpleArray ||
+                        type === Parameter.type.map) {
                     document.getElementById('rbro_parameter_eval_row').style.display = 'none';
                 } else {
                     document.getElementById('rbro_parameter_eval_row').removeAttribute('style');
@@ -536,6 +570,11 @@ export default class ParameterPanel extends PanelBase {
                 } else {
                     document.getElementById('rbro_parameter_test_data_image_row').style.display = 'none';
                 }
+                if (type === Parameter.type.richText) {
+                    document.getElementById('rbro_parameter_test_data_rich_text_row').removeAttribute('style');
+                } else {
+                    document.getElementById('rbro_parameter_test_data_rich_text_row').style.display = 'none';
+                }
             }
 
             if (this.rb.getProperty('showPlusFeaturesInfo')) {
@@ -567,6 +606,9 @@ export default class ParameterPanel extends PanelBase {
             parameterTypeOptions.push({value: 'boolean', label: this.rb.getLabel('parameterTypeBoolean')});
             parameterTypeOptions.push({value: 'date', label: this.rb.getLabel('parameterTypeDate')});
             parameterTypeOptions.push({value: 'image', label: this.rb.getLabel('parameterTypeImage')});
+            if (this.rb.getProperty('showPlusFeatures')) {
+                parameterTypeOptions.push({value: 'rich_text', label: this.rb.getLabel('parameterTypeRichText')});
+            }
             if (parentParameter === null || this.rb.getProperty('showPlusFeatures')) {
                 parameterTypeOptions.push({value: 'array', label: this.rb.getLabel('parameterTypeArray')});
             }
@@ -645,6 +687,9 @@ export default class ParameterPanel extends PanelBase {
     static updateAutosizeInputs(field) {
         if (field === null || field === 'expression') {
             autosize.update(document.getElementById('rbro_parameter_expression'));
+        }
+        if (field === null || field === 'type') {
+            autosize.update(document.getElementById('rbro_parameter_test_data_rich_text'));
         }
     }
 }
