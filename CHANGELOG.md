@@ -1,5 +1,13 @@
 # Changelog
 
+## Upcoming Release
+
+### Features
+* Rich Text parameters for formatted content (PLUS version)
+
+### Bug Fixes
+* Fix display of page dimension errors in document properties
+
 ## [3.6.0] - 2024-01-15
 
 ### Changes
