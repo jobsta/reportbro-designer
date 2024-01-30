@@ -7,6 +7,7 @@
 
 ### Bug Fixes
 * Fix display of page dimension errors in document properties
+* Fix setting boolean parameter test data and clearing parameter test data image
 
 ## [3.6.0] - 2024-01-15
 
