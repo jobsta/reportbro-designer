@@ -364,7 +364,7 @@ export default class ParameterPanel extends PanelBase {
             'input', { id: 'rbro_parameter_test_data_boolean', type: 'checkbox' });
         elTestDataBoolean.addEventListener('change', (event) => {
             const testDataBooleanChecked = elTestDataBoolean.checked;
-            const selectedObject = rb.getSelectedObject();
+            const selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
                 let cmd = new SetValueCmd(
                     selectedObject.getId(), 'testDataBoolean', testDataBooleanChecked,
@@ -416,7 +416,7 @@ export default class ParameterPanel extends PanelBase {
         elTestDataImageFilenameClear.addEventListener('click', (event) => {
             elTestDataImage.value = '';
             let cmdGroup = new CommandGroupCmd('Clear image', this.rb);
-            const selectedObject = rb.getSelectedObject();
+            const selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
                 cmdGroup.addSelection(selectedObject.getId());
                 cmdGroup.addCommand(new SetValueCmd(
@@ -443,7 +443,7 @@ export default class ParameterPanel extends PanelBase {
         const elTestDataRichText = utils.createElement(
           'textarea', { id: 'rbro_parameter_test_data_rich_text', rows: 1, autocomplete: 'off' });
         elTestDataRichText.addEventListener('input', (event) => {
-            const selectedObject = rb.getSelectedObject();
+            const selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
                 let cmd = new SetValueCmd(
                     selectedObject.getId(), 'testDataRichText', elTestDataRichText.value,
