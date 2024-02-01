@@ -630,6 +630,10 @@ export default class Parameter {
                     rv = testData.data;
                 }
             }
+        } else if (fieldType === Parameter.type.richText) {
+            if (typeof testData === 'string') {
+                rv = testData;
+            }
         }
         return rv;
     }
