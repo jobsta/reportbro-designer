@@ -8,6 +8,7 @@
 ### Bug Fixes
 * Fix display of page dimension errors in document properties
 * Fix setting boolean parameter test data and clearing parameter test data image
+* Fix setting save button enabled/disabled for undo/redo command after report was saved
 
 ## [3.6.0] - 2024-01-15
 

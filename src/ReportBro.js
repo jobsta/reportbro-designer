@@ -166,6 +166,7 @@ export default class ReportBro {
 
         this.commandStack = [];
         this.lastCommandIndex = -1;
+        this.savedCommandIndex = -1;
         this.modified = false;
         this.selectionSinceLastCommand = false;
         this.objectMap = {};
@@ -887,7 +888,7 @@ export default class ReportBro {
             let cmd = this.commandStack[this.lastCommandIndex];
             cmd.undo();
             this.lastCommandIndex--;
-            this.modified = (this.lastCommandIndex >= 0);
+            this.modified = (this.lastCommandIndex !== this.savedCommandIndex);
             this.updateMenuButtons();
             if (this.properties.cmdExecutedCallback) {
                 this.properties.cmdExecutedCallback(cmd, false);
@@ -900,7 +901,7 @@ export default class ReportBro {
             this.lastCommandIndex++;
             let cmd = this.commandStack[this.lastCommandIndex];
             cmd.do();
-            this.modified = true;
+            this.modified = (this.lastCommandIndex !== this.savedCommandIndex);
             this.updateMenuButtons();
             if (this.properties.cmdExecutedCallback) {
                 this.properties.cmdExecutedCallback(cmd, false);
@@ -1475,6 +1476,9 @@ export default class ReportBro {
      */
     setModified(modified) {
         this.modified = modified;
+        if (!modified) {
+            this.savedCommandIndex = this.lastCommandIndex;
+        }
         this.updateMenuButtons();
     }
 
@@ -1521,7 +1525,7 @@ export default class ReportBro {
                     let report = this.getReport();
                     // console.log(JSON.stringify(report));
                     window.localStorage.setItem(this.properties.localStorageReportKey, JSON.stringify(report));
-                    this.modified = false;
+                    this.setModified(false);
                 } catch (e) {
                 }
             }
@@ -1535,8 +1539,6 @@ export default class ReportBro {
                 }
             }
         }
-
-        this.updateMenuButtons();
     }
 
     /**
@@ -1643,6 +1645,7 @@ export default class ReportBro {
 
         this.commandStack = [];
         this.lastCommandIndex = -1;
+        this.savedCommandIndex = -1;
         this.modified = false;
         this.updateMenuButtons();
     }
