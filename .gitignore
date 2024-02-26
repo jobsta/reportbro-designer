@@ -67,3 +67,5 @@ typings/
 
 # demos for local testing
 demos/temp/
+
+.DS_Store
