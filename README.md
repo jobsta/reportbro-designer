@@ -15,7 +15,7 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 + Download ReportBro Designer (`reportbro-designer-<version>.tgz`) from https://github.com/jobsta/reportbro-designer/releases
 + Extract .tgz file and move `dist` folder to your application
-+ In your .html document reference reportbro.js (or reportbro.min.js) and reportbro.css. See basic usage below.
++ In your .html document reference reportbro.js and reportbro.css. See basic usage below.
 
 ### Install via npm:
 

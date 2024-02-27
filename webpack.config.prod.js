@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { merge } = require('webpack-merge');
+const common = require('./webpack.common.js');
 
 const banner =
 `Copyright (C) 2023 jobsta
@@ -19,35 +19,14 @@ Details for ReportBro commercial license can be found at
 https://www.reportbro.com/license/agreement
 `;
 
-
-module.exports = {
+module.exports = merge(common, {
   mode: 'production',
-  entry: ['./src/main.js', './src/main.css', './src/fonts/font_style.css', './src/iconfonts/style.css', './src/toggle-switch.css', './src/quill.reportbro.css'],
-  output: {
-    filename: 'reportbro.js',
-    path: __dirname + '/dist'
-  },
   devtool: 'source-map',
-  performance : {
-    hints : false // disable warning for asset size limit (generated js file)
+  output: {
+		clean: true,
   },
   module: {
     rules: [
-      { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'], },
-      {
-        test: /\.(png|gif)([\?]?.*)$/,
-        type: 'asset/resource',
-        generator: {
-          filename: '[path][name][ext]'
-        }
-      },
-      {
-        test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9=&.]+)?$/,
-        type: 'asset/resource',
-        generator: {
-          filename: '[path][name][ext]?[hash]'
-        }
-      },
       {
         test: /\.js$/,
         include: [path.resolve(__dirname, "src")],
@@ -61,6 +40,5 @@ module.exports = {
   },
   plugins: [
     new webpack.BannerPlugin({ banner: banner, test: 'reportbro.js' }),
-    new MiniCssExtractPlugin({filename: "reportbro.css"}),
   ]
-};
+});
