@@ -23,7 +23,7 @@ See the ReportBro project website on https://www.reportbro.com for full document
 
 ## Basic usage
 
-Go to the [docs](https://www.reportbro.com/doc/api) for more information. There are demos for different use cases available at: https://www.reportbro.com/demo/invoice.
+Go to the [docs](https://www.reportbro.com/framework/api) for more information. There are demos for different use cases available at: https://www.reportbro.com/demo/invoice.
 
 Include the ReportBro JavaScript file as well as the ReportBro stylesheet in the `<head>` of your page.
 
@@ -84,7 +84,7 @@ at least once before starting any local demos. This build step creates ReportBro
 
 ### Commercial license
 
-If you want to use ReportBro to develop commercial applications and projects, the Commercial license is the appropriate license. With this license, your source code is kept proprietary. Purchase a ReportBro Commercial license at https://www.reportbro.com/license/
+If you want to use ReportBro to develop commercial applications and projects, the Commercial license is the appropriate license. With this license, your source code is kept proprietary. Purchase a ReportBro Commercial license at https://www.reportbro.com/framework/license
 
 This license includes ReportBro PLUS with additional features.
 
@@ -92,4 +92,4 @@ This license includes ReportBro PLUS with additional features.
 
 If you are creating an open-source application under a license compatible with the [GNU AGPL license v3](https://www.gnu.org/licenses/agpl-3.0.html), you may use ReportBro under the terms of the AGPLv3.
 
-Read more about ReportBro's license options at https://www.reportbro.com/license.
+Read more about ReportBro's license options at https://www.reportbro.com/framework/license.
