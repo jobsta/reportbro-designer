@@ -18,6 +18,8 @@ export default class SectionBandElement extends DocElement {
         this.band = null;
         this.bandType = bandType;
         this.repeatHeader = false;
+        this.backgroundColor = '';
+        this.alternateBackgroundColor = '';
         this.alwaysPrintOnSamePage = true;
         this.shrinkToContentHeight = false;
         this.parentId = initialData.parentId;
@@ -82,6 +84,8 @@ export default class SectionBandElement extends DocElement {
             if (parent !== null) {
                 parent.updateBands(this);
             }
+        } else if (field === 'backgroundColor') {
+            this.updateStyle();
         }
     }
 
@@ -100,11 +104,15 @@ export default class SectionBandElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        let fields;
+        let fields = ['height', 'backgroundColor', 'shrinkToContentHeight'];
         if (this.bandType === Band.bandType.header) {
-            fields = ['height', 'repeatHeader', 'shrinkToContentHeight'];
+            fields.push('repeatHeader');
         } else {
-            fields = ['height', 'alwaysPrintOnSamePage', 'shrinkToContentHeight'];
+            fields.push('alwaysPrintOnSamePage');
+            fields.push('shrinkToContentHeight');
+            if (this.bandType === Band.bandType.content) {
+                fields.push('alternateBackgroundColor');
+            }
         }
         return fields;
     }
@@ -122,6 +130,10 @@ export default class SectionBandElement extends DocElement {
                 }
             }
         }
+    }
+
+    updateStyle() {
+        this.el.style.backgroundColor = this.backgroundColor;
     }
 
     select() {
