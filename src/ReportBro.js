@@ -100,7 +100,8 @@ export default class ReportBro {
             showGrid: true,
             showPlusFeatures: true,
             showPlusFeaturesInfo: true,
-            theme: ''
+            theme: '',
+            treeMode: false
         };
         if (properties) {
             for (let prop in properties) {

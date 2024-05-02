@@ -1463,3 +1463,92 @@ button.rbroMenuButton[disabled], button.rbroMenuButton[disabled]:hover,
     padding: 2px;
     text-align: center;
 }
+.rbroPopupWindowContentTreeMode {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.rbroPopupWindowContentTreeMode ul {
+    list-style: none;
+    line-height: 2em;
+    margin-left: 20px !important;
+
+}
+
+.rbroPopupWindowContentTreeMode ul summary {
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+}
+
+.rbroPopupWindowContentTreeMode ul li {
+    position: relative;
+
+}
+
+.rbroPopupWindowContentTreeMode ul li::before {
+    position: absolute;
+    left: -10px;
+    top: 0px;
+    border-left: 2px solid gray;
+    border-bottom: 2px solid gray;
+    content: "";
+    width: 8px;
+    height: 1em;
+}
+
+.rbroPopupWindowContentTreeMode ul li::after {
+    position: absolute;
+    left: -10px;
+    bottom: 0px;
+    border-left: 2px solid gray;
+    content: "";
+    width: 8px;
+    height: 100%;
+}
+
+.rbroPopupWindowContentTreeMode ul li:last-child::after {
+    display: none;
+
+}
+
+.rbroPopupWindowContentTreeMode ul.tree>li:after,
+ul.tree>li::before {
+    display: none;
+}
+
+.rbroPopupWindowContentTreeMode ul summary::before {
+    position: absolute;
+    left: -1.75em;
+    top: .55em;
+    content: "+";
+    background:#1d394b;
+    display: block;
+    width: 15px;
+    height: 15px;
+    border-radius: 50em;
+    z-index: 999;
+    text-align: center;
+    line-height: 16px;
+    color: white;
+
+}
+
+.rbroPopupWindowContentTreeMode ul details[open]>summary::before {
+    content: "-";
+    color: white;
+}
+
+
+.rbroPopupWindowContentTreeMode .rbroPopupItemSeparator {
+    font-weight: 500;
+    padding: 8px 10px;
+    background-color: white;
+    color: black;
+    text-align: left;
+}
+
+.rbroPopupWindowContentTreeMode .rbroPopupItemSeparator.rbroParameterGroup {
+    background-color: white;
+}

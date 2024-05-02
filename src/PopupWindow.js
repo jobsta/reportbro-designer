@@ -29,7 +29,8 @@ export default class PopupWindow {
 
     render() {
         this.elWindow = utils.createElement('div', { class: 'rbroPopupWindow rbroHidden' });
-        this.elContent = utils.createElement('div', { class: 'rbroPopupWindowContent' });
+        const className = this.rb.properties.treeMode ? 'rbroPopupWindowContentTreeMode rbroPopupWindowContent' : 'rbroPopupWindowContent';
+        this.elContent = utils.createElement('div', { class: className });
         this.elContent.addEventListener('mouseup', (event) => {
             // stop propagation so popup window is not closed
             event.stopPropagation();
@@ -97,7 +98,7 @@ export default class PopupWindow {
             quillSelectionRange = quill.getSelection();
         }
 
-        if (type === PopupWindow.type.data)  {
+        if (type === PopupWindow.type.data) {
             if (parameter) {
                 console.assert(rootDataType === null && fields === null && data === null);
                 rootDataType = parameter.type;
@@ -142,57 +143,62 @@ export default class PopupWindow {
                 // item is triggered
                 event.preventDefault();
             });
-            for (const item of items) {
-                const li = utils.createElement('li');
-                if (item.separator) {
-                    if ((type === PopupWindow.type.parameterSet ||
+            if (!rb.properties.treeMode) {
+                for (const item of items) {
+                    const li = utils.createElement('li');
+                    if (item.separator) {
+                        if ((type === PopupWindow.type.parameterSet ||
                             type === PopupWindow.type.parameterAppend) && item.id) {
-                        li.setAttribute('id', 'parameter_group_' + item.id);
-                    }
-                    let separatorClass = 'rbroPopupItemSeparator';
-                    if (item.separatorClass) {
-                        separatorClass += ' ' + item.separatorClass;
-                    }
-                    li.setAttribute('class', separatorClass);
-                } else {
-                    if ((type === PopupWindow.type.parameterSet ||
-                            type === PopupWindow.type.parameterAppend) && item.id) {
-                        li.setAttribute('id', 'parameter_' + item.id);
-                    }
-                    li.addEventListener('mousedown', (event) => {
-                        if (type === PopupWindow.type.pattern) {
-                            this.input.value = item.name;
-                            this.input.dispatchEvent(new Event('input'));
-                            this.hide();
-                        } else if (type === PopupWindow.type.parameterSet ||
-                                type === PopupWindow.type.parameterAppend) {
-                            const dataSourcePrefix = (item.dataSourceName !== null) ? (item.dataSourceName + ':') : '';
-                            const paramText = '${' + dataSourcePrefix + item.name + '}';
-                            if (type === PopupWindow.type.parameterSet) {
-                                this.input.value = paramText;
-                                this.input.dispatchEvent(new Event('input'));
-                                autosize.update(this.input);
-                            } else {
-                                if (quill) {
-                                    if (quillSelectionRange) {
-                                        quill.insertText(quillSelectionRange.index, paramText);
-                                    }
-                                } else {
-                                    utils.insertAtCaret(this.input, paramText);
-                                    autosize.update(this.input);
-                                    this.input.dispatchEvent(new Event('input'));
-                                }
-                            }
-                            this.hide();
+                            li.setAttribute('id', 'parameter_group_' + item.id);
                         }
-                        event.preventDefault();
-                    });
+                        let separatorClass = 'rbroPopupItemSeparator';
+                        if (item.separatorClass) {
+                            separatorClass += ' ' + item.separatorClass;
+                        }
+                        li.setAttribute('class', separatorClass);
+                    } else {
+                        if ((type === PopupWindow.type.parameterSet ||
+                            type === PopupWindow.type.parameterAppend) && item.id) {
+                            li.setAttribute('id', 'parameter_' + item.id);
+                        }
+                        li.addEventListener('mousedown', (event) => {
+                            if (type === PopupWindow.type.pattern) {
+                                this.input.value = item.name;
+                                this.input.dispatchEvent(new Event('input'));
+                                this.hide();
+                            } else if (type === PopupWindow.type.parameterSet ||
+                                type === PopupWindow.type.parameterAppend) {
+                                const dataSourcePrefix = (item.dataSourceName !== null) ? (item.dataSourceName + ':') : '';
+                                const paramText = '${' + dataSourcePrefix + item.name + '}';
+                                if (type === PopupWindow.type.parameterSet) {
+                                    this.input.value = paramText;
+                                    this.input.dispatchEvent(new Event('input'));
+                                    autosize.update(this.input);
+                                } else {
+                                    if (quill) {
+                                        if (quillSelectionRange) {
+                                            quill.insertText(quillSelectionRange.index, paramText);
+                                        }
+                                    } else {
+                                        utils.insertAtCaret(this.input, paramText);
+                                        autosize.update(this.input);
+                                        this.input.dispatchEvent(new Event('input'));
+                                    }
+                                }
+                                this.hide();
+                            }
+                            event.preventDefault();
+                        });
+                    }
+                    li.append(utils.createElement('div', { class: 'rbroPopupItemHeader' }, item.name));
+                    if (item.description && item.description !== '') {
+                        li.append(utils.createElement('div', { class: 'rbroPopupItemDescription' }, item.description));
+                    }
+                    ul.append(li);
                 }
-                li.append(utils.createElement('div', { class: 'rbroPopupItemHeader' }, item.name));
-                if (item.description && item.description !== '') {
-                    li.append(utils.createElement('div', { class: 'rbroPopupItemDescription' }, item.description));
-                }
-                ul.append(li);
+            }
+            else {
+                this.createNestedList(ul, items, type, this.quill, this.input);
             }
             this.elContent.append(ul);
             const offset = utils.getElementOffset(this.input);
@@ -206,10 +212,18 @@ export default class PopupWindow {
             } else {
                 top -= 300;
             }
-            this.elWindow.style.left = offset.left + 'px';
-            this.elWindow.style.top = top + 'px';
-            this.elWindow.style.width = '400px';
-            this.elWindow.style.height = '300px';
+            if (!rb.properties.treeMode) {
+                this.elWindow.style.left = offset.left + 'px';
+                this.elWindow.style.top = top + 'px';
+                this.elWindow.style.width = '400px';
+                this.elWindow.style.height = '300px';
+            }
+            else {
+                this.elWindow.style.left = 170 + 'px';
+                this.elWindow.style.top = top + 'px';
+                this.elWindow.style.width = '850px';
+                this.elWindow.style.height = '700px';
+            }
         }
 
         this.elWindow.classList.remove('rbroHidden');
@@ -221,6 +235,125 @@ export default class PopupWindow {
         const elTextareas = this.elWindow.querySelectorAll('textarea');
         for (const elTextarea of elTextareas) {
             autosize.update(elTextarea);
+        }
+    }
+    createNestedList(container, data, type, quill, input) {
+        this.type = type;
+        this.input = input;
+        let quillSelectionRange = null;
+        if (quill) {
+            // save selection of rich text editor because selection is lost when editor looses focus
+            quillSelectionRange = quill.getSelection();
+        }
+        const ul = utils.createElement('ul');
+        container.appendChild(ul);
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+
+            const li = utils.createElement('li');
+            // ul.appendChild(li);
+
+            if (item.separator) {
+                let separatorClass = 'rbroPopupItemSeparator';
+                if (item.separatorClass) {
+                    separatorClass += ' ' + item.separatorClass;
+                }
+                li.setAttribute('class', separatorClass);
+                let nestedItems;
+                const details = utils.createElement('details');
+                li.appendChild(details);
+
+                const summary = utils.createElement('summary');
+                summary.textContent = item.name.split('.').pop();
+
+
+
+                if ((type === PopupWindow.type.parameterSet ||
+                    type === PopupWindow.type.parameterAppend) && item.id) {
+                    summary.setAttribute('id', 'parameter_group_' + item.id);
+                }
+                details.appendChild(summary);
+
+                if (item.name === "Parameters") {
+                    nestedItems = data.slice(i + 1);
+                }
+
+                else if (item.name.startsWith('Data')) {
+                    let idDataSource = item.id
+                    if (item.id.startsWith("ds0")) {
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].name === "Parameters") {
+                                nestedItems = data.slice(1, i);
+                                break;
+                            }
+                        }
+
+                    }
+                    else if (item.id.startsWith(idDataSource)) {
+
+                        for (let i = 0; i < data.length; i++) {
+                            if (data[i].name.startsWith('Data')) {
+                                nestedItems = data.slice(i + 1);
+                                break;
+                            }
+                        }
+
+                    }
+                }
+                else {
+                    nestedItems = data.slice(i + 1).filter((x) => x.name.startsWith(item.name + '.'));
+                }
+                this.createNestedList(details, nestedItems, type, quill, input);
+                i += nestedItems.length;
+
+            }
+            else {
+                const pattern = /^(\$|€|£|¥|0|#)/;
+                if (pattern.test(item.name)) {
+                    li.textContent = item.name;
+                } else {
+                    li.textContent = item.name.split('.').pop();
+
+                }
+                if ((type === PopupWindow.type.parameterSet ||
+                    type === PopupWindow.type.parameterAppend) && item.id) {
+                    li.setAttribute('id', 'parameter_' + item.id);
+                }
+                li.addEventListener('mousedown', (event) => {
+                    if (type === PopupWindow.type.pattern) {
+                        input.value = item.name;
+
+                        input.dispatchEvent(new Event('input'));
+                        this.hide();
+                    } else if (type === PopupWindow.type.parameterSet) {
+                        const dataSourcePrefix = (item.dataSourceName !== null) ? (item.dataSourceName + ':') : '';
+                        const paramText = '${' + dataSourcePrefix + item.name + '}';
+                        input.value = paramText;
+                        input.dispatchEvent(new Event('input'));
+                        autosize.update(input);
+                        this.hide();
+                    } else if (type === PopupWindow.type.parameterAppend) {
+                        const dataSourcePrefix = (item.dataSourceName !== null) ? (item.dataSourceName + ':') : '';
+                        const paramText = '${' + dataSourcePrefix + item.name + '}';
+                        if (quill) {
+                            if (quillSelectionRange) {
+                                quill.insertText(quillSelectionRange.index, paramText);
+                            }
+                        } else {
+                            utils.insertAtCaret(input, paramText);
+                            autosize.update(input);
+                            input.dispatchEvent(new Event('input'));
+                        }
+                        this.hide();
+                    }
+                    event.preventDefault();
+                });
+            }
+            if (item.description && item.description !== '') {
+                li.append(utils.createElement('div', { class: 'rbroPopupItemDescription' }, item.description));
+            }
+            ul.append(li);
+
         }
     }
 
@@ -243,7 +376,7 @@ export default class PopupWindow {
                         if (this.rootDataType === Parameter.type.map) {
                             updateData = this.isDataEmpty(data, this.rootFields);
                         } else if ((this.rootDataType === Parameter.type.array ||
-                                this.rootDataType === Parameter.type.simpleArray) && Array.isArray(data)) {
+                            this.rootDataType === Parameter.type.simpleArray) && Array.isArray(data)) {
                             if (data.length === 0) {
                                 updateData = false;
                             } else if (data.length === 1) {
@@ -360,7 +493,7 @@ export default class PopupWindow {
             if (items.length === 0) {
                 this.addEmptyDataRow(tableBody, parentParameter, parentType, fields);
             } else {
-                for (i=0; i < items.length; i++) {
+                for (i = 0; i < items.length; i++) {
                     this.addDataRow(tableBody, parentParameter, parentType, fields, items, i);
                 }
             }
@@ -438,7 +571,7 @@ export default class PopupWindow {
     appendColumn(elRow, field, data, parentData, columnCount) {
         const elTd = utils.createElement('td');
         if (field.type === Parameter.type.array || field.type === Parameter.type.simpleArray ||
-                field.type === Parameter.type.map) {
+            field.type === Parameter.type.map) {
             const elExpandableCell = utils.createElement('div', { class: 'expandableCell' });
             const elExpandableCellIcon = utils.createElement('span', { class: 'rbroIcon-plus' });
             elExpandableCell.append(elExpandableCellIcon);
@@ -466,7 +599,7 @@ export default class PopupWindow {
                                         nestedTable, rowMapEntry.field.parameter);
 
                                     if (rowMapEntry.field.type === Parameter.type.array ||
-                                            rowMapEntry.field.type === Parameter.type.simpleArray) {
+                                        rowMapEntry.field.type === Parameter.type.simpleArray) {
                                         // update nested table info for collapsed cell
                                         const arrayLength = (rowMapEntry.field.name in parentData &&
                                             Array.isArray(parentData[rowMapEntry.field.name])) ?
@@ -646,7 +779,7 @@ export default class PopupWindow {
                     // updated in the next row in case the array/map was expanded.
                     // see code in block for (rowMapEntry.type === 'table') above
                     if (field.type !== Parameter.type.array && field.type !== Parameter.type.simpleArray &&
-                            field.type !== Parameter.type.map) {
+                        field.type !== Parameter.type.map) {
                         const input = inputs[i];
                         if (field.type === Parameter.type.boolean) {
                             rowData[field.name] = input.checked;
@@ -693,40 +826,136 @@ export default class PopupWindow {
     filterParameters(searchVal) {
         let currentGroupId = null;
         let groupCount = 0;
-        if (this.items !== null) {
-            searchVal = searchVal.toLowerCase();
-            for (let item of this.items) {
-                if (item.separator) {
-                    if (currentGroupId !== null) {
-                        // hide groups (data source parameters and parameter maps) if they do not contain
-                        // any visible items
-                        if (groupCount > 0) {
-                            document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
-                        } else {
-                            document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
+        if (!this.rb.properties.treeMode) {
+            if (this.items !== null) {
+                searchVal = searchVal.toLowerCase();
+                for (let item of this.items) {
+                    if (item.separator) {
+                        if (currentGroupId !== null) {
+                            // hide groups (data source parameters and parameter maps) if they do not contain
+                            // any visible items
+                            if (groupCount > 0) {
+                                document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
+                            } else {
+                                document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
+                            }
                         }
-                    }
-                    currentGroupId = item.id ? item.id : null;
-                    groupCount = 0;
-                } else {
-                    if (item.nameLowerCase.indexOf(searchVal) !== -1) {
-                        document.getElementById('parameter_' + item.id).style.display = 'block';
-                        if (currentGroupId !== -1) {
-                            groupCount++;
-                        }
+                        currentGroupId = item.id ? item.id : null;
+                        groupCount = 0;
                     } else {
-                        document.getElementById('parameter_' + item.id).style.display = 'none';
+                        if (item.nameLowerCase.indexOf(searchVal) !== -1) {
+                            document.getElementById('parameter_' + item.id).style.display = 'block';
+                            if (currentGroupId !== -1) {
+                                groupCount++;
+                            }
+                        } else {
+                            document.getElementById('parameter_' + item.id).style.display = 'none';
+                        }
                     }
                 }
-            }
-            if (currentGroupId !== null) {
-                if (groupCount > 0) {
-                    document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
-                } else {
-                    document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
+                if (currentGroupId !== null) {
+                    if (groupCount > 0) {
+                        document.getElementById('parameter_group_' + currentGroupId).style.display = 'block';
+                    } else {
+                        document.getElementById('parameter_group_' + currentGroupId).style.display = 'none';
+                    }
                 }
             }
         }
+        else {
+            if (this.items !== null) {
+                searchVal = searchVal.toLowerCase();
+                for (let item of this.items) {
+                    if (item.separator) {
+                        if (currentGroupId !== null) {
+                            // hide groups (data source parameters and parameter maps) if they do not contain
+                            // any visible items
+                            if (searchVal.length === 0) {
+                                const detailsElements = document.querySelectorAll("details");
+                                detailsElements.forEach(function (details) {
+                                    details.open = false;
+                                });
+                            }
+                            else if (groupCount > 0) {
+                                const summaryElement = document.getElementById('parameter_group_' + currentGroupId);
+                                const detailsElement = summaryElement.parentElement;
+                                if (detailsElement) {
+                                    detailsElement.open = true;
+                                }
+                                const parentLi = detailsElement.closest('li');
+                                if (parentLi) {
+                                    let style = "block"
+                                    parentLi.style.display = style;
+                                    this.setDisplayForParentLiElementsById(parentLi, style)
+                                }
+                            }
+
+                            else {
+                                const summaryElement = document.getElementById('parameter_group_' + currentGroupId);
+                                const detailsElement = summaryElement.parentElement;
+                                if (detailsElement) {
+                                    detailsElement.open = false;
+                                }
+                                const parentLi = detailsElement.closest('li');
+                                if (parentLi) {
+                                    parentLi.style.display = "none";
+                                }
+
+                            }
+                        }
+                        currentGroupId = item.id ? item.id : null;
+                        groupCount = 0;
+                    } else {
+                        if (item.nameLowerCase.indexOf(searchVal) !== -1) {
+                            document.getElementById('parameter_' + item.id).style.display = 'block';
+                            this.setDisplayForParentDetailsElementsById(document.getElementById('parameter_' + item.id))
+                            if (currentGroupId !== -1) {
+                                groupCount++;
+                            }
+                        } else {
+                            document.getElementById('parameter_' + item.id).style.display = 'none';
+                        }
+                    }
+                }
+                if (currentGroupId !== null) {
+                    if (groupCount > 0) {
+                        const summaryElement = document.getElementById('parameter_group_' + currentGroupId);
+                        const detailsElement = summaryElement.parentElement;
+                        if (detailsElement) {
+                            detailsElement.open = true;
+
+                        }
+                        const parentLi = detailsElement.closest('li');
+                        if (parentLi) {
+                            let style = "block"
+                            parentLi.style.display = style;
+                            this.setDisplayForParentLiElementsById(parentLi, style)
+
+                        }
+                        if (searchVal.length === 0) {
+                            const liElements = document.querySelectorAll('li');
+                            liElements.forEach((li) => {
+                                li.style.display = "block";
+                            });
+                        }
+
+                    } else {
+                        const summaryElement = document.getElementById('parameter_group_' + currentGroupId);
+                        const detailsElement = summaryElement.parentElement;
+                        if (detailsElement) {
+                            detailsElement.open = false;
+                        }
+                        const parentLi = detailsElement.closest('li');
+                        if (parentLi) {
+                            parentLi.style.display = "none";
+
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 }
 
