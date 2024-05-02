@@ -228,7 +228,10 @@ export default class MainPanelItem {
     }
 
     setInactive() {
-        document.getElementById(`rbro_menu_item${this.id}`).classList.remove('rbroMenuItemActive');
+        let element = document.getElementById(`rbro_menu_item${this.id}`);
+        if (element) {
+            element.classList.remove('rbroMenuItemActive');
+        }
     }
 
     getParentIds() {
