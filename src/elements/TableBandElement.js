@@ -2,7 +2,6 @@ import DocElement from './DocElement';
 import TableTextElement from './TableTextElement';
 import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
-import SetValueCmd from '../commands/SetValueCmd';
 import Band from '../container/Band';
 import MainPanelItem from '../menu/MainPanelItem';
 import * as utils from '../utils';
@@ -438,15 +437,15 @@ export default class TableBandElement extends DocElement {
                     table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
                 cmdGroup.addCommand(cmd);
 
-                // decrease content row count of table
-                table.setValue('contentRows', contentRows - 1);
-
-                // remove content row
-                table.getValue('contentDataRows').splice(rowIndex, 1);
+                const tableData = table.toJS();
+                // decrease content row count in table data for updated table
+                tableData.contentRows = contentRows - 1;
+                // remove content row in table data for updated table
+                tableData.contentDataRows.splice(rowIndex, 1);
 
                 // restore table with new content row count and updated settings
                 cmd = new AddDeleteDocElementCmd(true, table.getPanelItem().getPanelName(),
-                    table.toJS(), table.getId(), table.getContainerId(), -1, this.rb);
+                    tableData, table.getId(), table.getContainerId(), -1, this.rb);
                 cmdGroup.addCommand(cmd);
 
                 this.rb.executeCommand(cmdGroup);
