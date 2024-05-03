@@ -1,7 +1,12 @@
 # Changelog
 
 ## Upcoming Release
+
+### Features
 * Support background color for section bands
+
+### Bug Fixes
+* Fix deleting table row
 
 ## [3.7.0] - 2024-02-09
 
