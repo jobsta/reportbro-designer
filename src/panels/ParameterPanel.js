@@ -317,7 +317,7 @@ export default class ParameterPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('parameterTestData'), 'rbro_parameter_test_data');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elTestData = utils.createElement('input', { id: 'rbro_parameter_test_data', autocomplete: 'off' });
-        elTestData.addEventListener('change', (event) => {
+        elTestData.addEventListener('input', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {
                 let cmd = new SetValueCmd(
