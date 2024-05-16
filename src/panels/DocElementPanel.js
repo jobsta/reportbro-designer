@@ -617,6 +617,16 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'spreadsheet_add_empty_row',
                 'section': 'spreadsheet'
             },
+            'spreadsheet_type': {
+                'type': SetValueCmd.type.select,
+                'fieldId': 'spreadsheet_type',
+                'section': 'spreadsheet'
+            },
+            'spreadsheet_pattern': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'spreadsheet_pattern',
+                'section': 'spreadsheet'
+            },
             'spreadsheet_textWrap': {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'spreadsheet_text_wrap',
@@ -2234,6 +2244,81 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elSpreadsheetAddEmptyRow);
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_spreadsheet_type_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementSpreadsheetType'), 'rbro_doc_element_spreadsheet_type');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elSpreadsheetType = utils.createElement('select', { id: 'rbro_doc_element_spreadsheet_type' });
+        elSpreadsheetType.append(
+            utils.createElement('option', { value: '' }, this.rb.getLabel('docElementSpreadsheetTypeNone')));
+        elSpreadsheetType.append(
+            utils.createElement('option', { value: 'number' }, this.rb.getLabel('docElementSpreadsheetTypeNumber')));
+        elSpreadsheetType.append(
+            utils.createElement('option', { value: 'date' }, this.rb.getLabel('docElementSpreadsheetTypeDate')));
+        elSpreadsheetType.addEventListener('change', (event) => {
+            let val = elSpreadsheetType.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'spreadsheet_type', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elSpreadsheetType);
+        elFormField.append(utils.createElement(
+          'div', { id: 'rbro_doc_element_spreadsheet_type_error', class: 'rbroErrorMessage' }));
+        elDiv.append(elFormField);
+        elSpreadsheetSectionDiv.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_spreadsheet_pattern_row', class: 'rbroFormRow' });
+        utils.appendLabel(
+          elDiv, this.rb.getLabel('docElementSpreadsheetPattern'), 'rbro_doc_element_spreadsheet_pattern');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        elSplit = utils.createElement('div', { class: 'rbroSplit rbroSelector' });
+        let elSpreadsheetPattern = utils.createElement(
+          'input', { id: 'rbro_doc_element_spreadsheet_pattern', autocomplete: 'off' });
+        elSpreadsheetPattern.addEventListener('input', (event) => {
+            let val = elSpreadsheetPattern.value;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'spreadsheet_pattern', val, SetValueCmd.type.text, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elSplit.append(elSpreadsheetPattern);
+        elParameterButton = utils.createElement('div', { class: 'rbroButton rbroRoundButton rbroIcon-select' });
+        elParameterButton.addEventListener('click', (event) => {
+            let patterns;
+            if (elSpreadsheetType.value === 'date') {
+                patterns = this.rb.getProperty('patternDates');
+            } else if (elSpreadsheetType.value === 'number') {
+                patterns = this.rb.getProperty('patternNumbers');
+            } else {
+                patterns = this.rb.getPatterns();
+            }
+
+            this.rb.getPopupWindow().show(
+                patterns, null, 'rbro_doc_element_spreadsheet_pattern', 'spreadsheet_pattern',
+                PopupWindow.type.pattern);
+        });
+        elSplit.append(elParameterButton);
+        elFormField.append(elSplit);
+        elFormField.append(
+            utils.createElement('div', { id: 'rbro_doc_element_spreadsheet_pattern_error', class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elSpreadsheetSectionDiv.append(elDiv);
 

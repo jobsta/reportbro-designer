@@ -78,6 +78,8 @@ export default class TextElement extends DocElement {
         this.spreadsheet_column = '';
         this.spreadsheet_colspan = '';
         this.spreadsheet_addEmptyRow = false;
+        this.spreadsheet_type = '';
+        this.spreadsheet_pattern = '';
         this.spreadsheet_textWrap = false;
         this.setInitialData(initialData);
 
@@ -166,7 +168,7 @@ export default class TextElement extends DocElement {
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan',
-            'spreadsheet_addEmptyRow', 'spreadsheet_textWrap'
+            'spreadsheet_addEmptyRow', 'spreadsheet_type', 'spreadsheet_pattern', 'spreadsheet_textWrap'
         ];
     }
 

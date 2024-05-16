@@ -4,6 +4,7 @@
 
 ### Features
 * Support background color for section bands
+* Options to set spreadsheet cell type and pattern
 
 ### Bug Fixes
 * Fix deleting table row
