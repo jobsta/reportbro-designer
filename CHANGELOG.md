@@ -6,6 +6,9 @@
 * Support background color for section bands
 * Options to set spreadsheet cell type and pattern
 
+### Changes
+* Allow custom parameters in reportServerUrl
+
 ### Bug Fixes
 * Fix deleting table row
 
