@@ -1429,8 +1429,10 @@ export default class ReportBro {
             self.hideLoading();
             if (data.substring(0, 4) === 'key:') {
                 self.reportKey = data.substring(4);
-                self.getDocument().openPdfPreviewTab(
-                    requestParams.reportServerUrl + '?key=' + self.reportKey + '&outputFormat=pdf', headers);
+                const url = new URL(requestParams.reportServerUrl, document.location);
+                url.searchParams.set('key', self.reportKey);
+                url.searchParams.set('outputFormat', 'pdf');
+                self.getDocument().openPdfPreviewTab(url.toString(), headers);
             } else {
                 self.reportKey = null;
                 try {
@@ -1681,7 +1683,9 @@ export default class ReportBro {
      */
     downloadSpreadsheet() {
         const requestParams = this.getRequestParameters();
-        const url = requestParams.reportServerUrl + '?key=' + this.reportKey + '&outputFormat=xlsx';
+        const url = new URL(requestParams.reportServerUrl, document.location);
+        url.searchParams.set('key', self.reportKey);
+        url.searchParams.set('outputFormat', 'xlsx');
         const headers = requestParams.reportServerHeaders;
         const self = this;
         if (this.reportKey !== null) {
@@ -1717,7 +1721,7 @@ export default class ReportBro {
                     }
                 };
 
-                xhr.open('GET', url, true);
+                xhr.open('GET', url.toString(), true);
                 for (const headerName in headers) {
                     if (headers.hasOwnProperty(headerName)) {
                         xhr.setRequestHeader(headerName, headers[headerName]);
@@ -1726,7 +1730,7 @@ export default class ReportBro {
                 xhr.send();
             } else {
                 // easy way (no custom headers), open a new window with the file url
-                window.open(url, '_blank');
+                window.open(url.toString(), '_blank');
             }
         }
     }
