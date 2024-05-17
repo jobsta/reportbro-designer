@@ -77,7 +77,7 @@ const locale_de = {
     docElementSpreadsheetTextWrap: 'Zeilenumbruch',
     docElementSpreadsheetType: 'Typ',
     docElementSpreadsheetTypeDate: 'Datum',
-    docElementSpreadsheetTypeNone: 'Keiner',
+    docElementSpreadsheetTypeNone: 'Standard',
     docElementSpreadsheetTypeNumber: 'Number',
     docElementStyle: 'Formatvorlage',
     docElementTable: 'Tabelle',

@@ -625,7 +625,8 @@ export default class DocElementPanel extends PanelBase {
             'spreadsheet_pattern': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'spreadsheet_pattern',
-                'section': 'spreadsheet'
+                'section': 'spreadsheet',
+                'visibleIf': 'spreadsheet_type'
             },
             'spreadsheet_textWrap': {
                 'type': SetValueCmd.type.checkbox,

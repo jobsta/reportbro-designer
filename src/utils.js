@@ -386,7 +386,7 @@ export function tokenize(input, obj) {
             // * field: used to reference object field value
             let word = '';
 
-            while (scanner < input.length && /[a-zA-Z0-9]/.test(input[scanner])) {
+            while (scanner < input.length && /[a-zA-Z0-9_]/.test(input[scanner])) {
                 word += input[scanner++];
             }
 

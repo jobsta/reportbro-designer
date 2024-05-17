@@ -77,7 +77,7 @@ const locale_en = {
     docElementSpreadsheetTextWrap: 'Text wrap',
     docElementSpreadsheetType: 'Type',
     docElementSpreadsheetTypeDate: 'Date',
-    docElementSpreadsheetTypeNone: 'None',
+    docElementSpreadsheetTypeNone: 'Default',
     docElementSpreadsheetTypeNumber: 'Number',
     docElementStyle: 'Style',
     docElementTable: 'Table',
