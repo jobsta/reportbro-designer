@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [3.8.0] - 2024-05-23
 
 ### Features
 * Support background color for section bands
