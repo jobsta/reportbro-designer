@@ -4,9 +4,8 @@
 name: Node.js CI
 
 on:
-  create:
-    tags:
-      - v*
+  release:
+    types: [released]
   
 jobs:
   build:
@@ -24,13 +23,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12]
+        node-version: [20]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -39,12 +38,12 @@ jobs:
     - run: npm pack
   
     - name: Upload Release Assets
-      uses: alexellis/upload-assets@0.3.0
+      uses: alexellis/upload-assets@0.4.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         asset_paths: '["reportbro-designer-*.tgz", "reportbro-designer-*.zip"]'
 
-    - uses: JS-DevTools/npm-publish@v1
+    - uses: JS-DevTools/npm-publish@v3
       with:
         token: ${{ secrets.NPM_TOKEN }}
