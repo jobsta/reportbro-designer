@@ -88,7 +88,7 @@ export default class Style {
      */
     getStyleProperties() {
         // get all properties except name and type
-        return this.getFields().slice(2);
+        return this.getProperties().slice(2);
     }
 
     getId() {

@@ -508,7 +508,7 @@ export default class DocElement {
                 for (let styleProperty of styleProperties) {
                     // test if style property is part of doc element properties (style contains properties for
                     // all different doc element types)
-                    if (styleProperty in docElementProperties) {
+                    if (docElementProperties.indexOf(styleProperty) !== -1) {
                         const objField = fieldPrefix + styleProperty;
                         const value = style.getValue(styleProperty);
                         if (value !== this.getValue(objField)) {
