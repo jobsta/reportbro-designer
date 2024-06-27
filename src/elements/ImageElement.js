@@ -55,7 +55,7 @@ export default class ImageElement extends DocElement {
     getProperties() {
         return [
             'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
-            'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
+            'styleId', 'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
             'printIf', 'removeEmptyElement', 'link',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
         ];

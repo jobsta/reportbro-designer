@@ -91,8 +91,18 @@ export default class Parameter {
      * @returns {String[]}
      */
     getFields() {
+        const fields = this.getProperties();
+        fields.splice(0, 0, 'id');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
         return [
-            'id', 'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression',
+            'name', 'type', 'arrayItemType', 'eval', 'nullable', 'pattern', 'expression',
             'showOnlyNameType', 'testData', 'testDataBoolean', 'testDataImage', 'testDataImageFilename',
             'testDataRichText',
         ];
@@ -146,6 +156,17 @@ export default class Parameter {
         if (field === 'type') {
             this.updateMenuItemDisplay();
         }
+    }
+
+    /**
+     * Returns value to use for updating input control.
+     * Can be overridden in case update value can be different from internal value, e.g.
+     * width for table cells with colspan > 1.
+     * @param {String} field - field name.
+     * @param {String} value - value for update.
+     */
+    getUpdateValue(field, value) {
+        return value;
     }
 
     /**

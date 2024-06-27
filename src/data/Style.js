@@ -16,17 +16,21 @@ export default class Style {
         this.panelItem = null;
         this.errors = [];
 
+        this.type = Style.type.text;
         this.bold = false;
         this.italic = false;
         this.underline = false;
         this.strikethrough = false;
         this.horizontalAlignment = Style.alignment.left;
         this.verticalAlignment = Style.alignment.top;
+        this.color = '#000000';
         this.textColor = '#000000';
         this.backgroundColor = '';
+        this.alternateBackgroundColor = '';
         this.font = rb.getProperty('defaultFont');
         this.fontSize = 12;
         this.lineSpacing = 1;
+        this.border = 'grid';
         this.borderColor = '#000000';
         this.borderWidth = '1';
         this.borderAll = false;
@@ -58,13 +62,33 @@ export default class Style {
      * @returns {String[]}
      */
     getFields() {
+        const fields = this.getProperties();
+        fields.splice(0, 0, 'id');
+        return fields;
+    }
+
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
         return [
-            'id', 'name', 'bold', 'italic', 'underline', 'strikethrough',
+            'name', 'type', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment',
-            'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
-            'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
+            'color', 'textColor', 'backgroundColor', 'alternateBackgroundColor',
+            'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
+            'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'border',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'
         ];
+    }
+
+    /**
+     * Returns all fields of this object that are style properties which are also available .
+     * @returns {String[]}
+     */
+    getStyleProperties() {
+        // get all properties except name and type
+        return this.getFields().slice(2);
     }
 
     getId() {
@@ -102,6 +126,17 @@ export default class Style {
                 docElement.updateChangedStyle(this.getId());
             }
         }
+    }
+
+    /**
+     * Returns value to use for updating input control.
+     * Can be overridden in case update value can be different from internal value, e.g.
+     * width for table cells with colspan > 1.
+     * @param {String} field - field name.
+     * @param {String} value - value for update.
+     */
+    getUpdateValue(field, value) {
+        return value;
     }
 
     /**
@@ -224,6 +259,16 @@ export default class Style {
     getClassName() {
         return 'Style';
     }
+}
+
+Style.type = {
+    text: 'text',
+    line: 'line',
+    image: 'image',
+    table: 'table',
+    tableBand: 'tableBand',
+    frame: 'frame',
+    sectionBand: 'sectionBand',
 }
 
 // Verdana, Arial

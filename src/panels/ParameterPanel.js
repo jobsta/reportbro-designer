@@ -70,6 +70,7 @@ export default class ParameterPanel extends PanelBase {
             },
         };
         this.parameterTypeOptions = [];
+        super.initVisibleIfFields();
     }
 
     render(data) {
@@ -465,17 +466,22 @@ export default class ParameterPanel extends PanelBase {
         document.getElementById('rbro_detail_panel').append(panel);
     }
 
+    /**
+     * Update visibility of all property rows.
+     * @param {Parameter} obj - selected parameter.
+     * @param {?String} field - affected field in case of change operation.
+     */
     updateVisibileRows(obj, field) {
-        let type = obj.getValue('type');
-        let valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
-        let showOnlyNameType = obj.getValue('showOnlyNameType');
+        const type = obj.getValue('type');
+        const valueType = (type === Parameter.type.simpleArray) ? obj.getValue('arrayItemType') : type;
+        const showOnlyNameType = obj.getValue('showOnlyNameType');
         let parentParameter = null;
         if (obj.getPanelItem() !== null && obj.getPanelItem().getParent().getData() instanceof Parameter) {
             parentParameter = obj.getPanelItem().getParent().getData();
         }
 
         if (field === null) {
-            let editable = obj.getValue('editable');
+            const editable = obj.getValue('editable');
             document.getElementById('rbro_parameter_name').disabled = !editable;
             document.getElementById('rbro_parameter_type').disabled = !editable;
             document.getElementById('rbro_parameter_eval').disabled = !editable;
@@ -596,9 +602,9 @@ export default class ParameterPanel extends PanelBase {
         }
 
         if (field === null) {
-            let parameterTypeOptions = [];
+            const parameterTypeOptions = [];
             // do not allow sum/average parameter in list
-            let listFieldParameter = (parentParameter !== null &&
+            const listFieldParameter = (parentParameter !== null &&
                 parentParameter.getValue('type') === Parameter.type.array);
 
             parameterTypeOptions.push({value: 'string', label: this.rb.getLabel('parameterTypeString')});
@@ -648,23 +654,14 @@ export default class ParameterPanel extends PanelBase {
 
     /**
      * Is called when the selection is changed or the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
+     * The panel is updated to show the values of the selected data objects.
      * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
-        let selectedObject = this.rb.getSelectedObject();
-
+        const selectedObject = this.rb.getSelectedObject();
         if (selectedObject !== null && selectedObject instanceof Parameter) {
             // must be called before setValue so all parameter type options are available
             this.updateVisibileRows(selectedObject, field);
-
-            for (let property in this.propertyDescriptors) {
-                if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
-                    let propertyDescriptor = this.propertyDescriptors[property];
-                    let value = selectedObject.getValue(property);
-                    super.setValue(propertyDescriptor, value, false);
-                }
-            }
 
             if (field === null || field === 'type') {
                 if (selectedObject.getValue('type') === Parameter.type.date) {
@@ -674,17 +671,15 @@ export default class ParameterPanel extends PanelBase {
                     document.getElementById('rbro_parameter_test_data').setAttribute('placeholder', '');
                 }
             }
-
-            ParameterPanel.updateAutosizeInputs(field);
         }
+        super.updateDisplay(field);
     }
 
     /**
-     * Is called when the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
-     * @param {String} [field] - affected field in case of change operation.
+     * Update size of all autosize textareas in panel.
+     * @param {?String} field - affected field in case of change operation.
      */
-    static updateAutosizeInputs(field) {
+    updateAutosizeInputs(field) {
         if (field === null || field === 'expression') {
             autosize.update(document.getElementById('rbro_parameter_expression'));
         }

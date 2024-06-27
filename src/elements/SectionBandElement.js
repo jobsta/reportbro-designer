@@ -104,7 +104,7 @@ export default class SectionBandElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        let fields = ['height', 'backgroundColor', 'shrinkToContentHeight'];
+        let fields = ['height', 'styleId', 'backgroundColor', 'shrinkToContentHeight'];
         if (this.bandType === Band.bandType.header) {
             fields.push('repeatHeader');
         } else {

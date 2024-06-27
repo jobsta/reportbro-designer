@@ -304,19 +304,23 @@ export function readImageData(file, loadCallback, rb) {
 /**
  * Populate option tags for all available styles.
  * @param {Element} elStyle - dom element of the styles drop down. If there are existing options they will be removed.
+ * @param {String} styleType - if set then only styles which match the given type will be populated, e.g.
+ * a text properties panel should only should text styles.
  * @param {?String} selectedValue - selected style id, if set it is used to set the option for this style as selected.
  * @param {ReportBro} rb - ReportBro instance.
  */
-export function populateStyleSelect(elStyle, selectedValue, rb) {
+export function populateStyleSelect(elStyle, styleType, selectedValue, rb) {
     const styles = rb.getStyles();
     emptyElement(elStyle);
     elStyle.append(createElement('option', { value: '' }, rb.getLabel('styleNone')));
     for (let style of styles) {
-        const option = createElement('option', { value: style.getId() }, style.getName());
-        if (selectedValue && selectedValue === String(style.getId())) {
-            option.selected = true;
+        if (!styleType || style.getValue('type') === styleType) {
+            const option = createElement('option', { value: style.getId() }, style.getName());
+            if (selectedValue && selectedValue === String(style.getId())) {
+                option.selected = true;
+            }
+            elStyle.append(option);
         }
-        elStyle.append(option);
     }
 }
 
@@ -394,13 +398,13 @@ export function tokenize(input, obj) {
                 tokens.push(new Token(true, Token.type.boolean));
             } else if (word === 'false') {
                 tokens.push(new Token(false, Token.type.boolean));
-            } else if (word === 'type') {
+            } else if (word === 'docElementType') {
                 if (obj !== null) {
                     // insert object type as string
                     tokens.push(new Token(obj.getElementType(), Token.type.string));
                 } else {
                     // add string placeholder for object type
-                    tokens.push(new Token('type', Token.type.string));
+                    tokens.push(new Token('', Token.type.string));
                 }
             } else {
                 if (obj === null) {

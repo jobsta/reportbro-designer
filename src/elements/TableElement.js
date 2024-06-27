@@ -246,7 +246,7 @@ export default class TableElement extends DocElement {
     getProperties() {
         return [
             'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
-            'border', 'borderColor', 'borderWidth',
+            'styleId', 'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
         ];

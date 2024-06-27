@@ -21,20 +21,23 @@ export default class DocumentPropertiesPanel extends PanelBase {
             'pageWidth': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'page_width',
-                'rowId': 'rbro_document_properties_page_row',
-                'errorMsgId': 'rbro_document_properties_page_error'
+                'rowId': 'rbro_document_properties_page_size_row',
+                'errorMsgId': 'rbro_document_properties_page_error',
+                'visibleIf': "pageFormat == 'user_defined'",
             },
             'pageHeight': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'page_height',
-                'rowId': 'rbro_document_properties_page_row',
-                'errorMsgId': 'rbro_document_properties_page_error'
+                'rowId': 'rbro_document_properties_page_size_row',
+                'errorMsgId': 'rbro_document_properties_page_error',
+                'visibleIf': "pageFormat == 'user_defined'",
             },
             'unit': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'unit',
-                'rowId': 'rbro_document_properties_page_row',
-                'errorMsgId': 'rbro_document_properties_page_error'
+                'rowId': 'rbro_document_properties_page_size_row',
+                'errorMsgId': 'rbro_document_properties_page_error',
+                'visibleIf': "pageFormat == 'user_defined'",
             },
             'orientation': {
                 'type': SetValueCmd.type.select,
@@ -46,19 +49,23 @@ export default class DocumentPropertiesPanel extends PanelBase {
             },
             'marginLeft': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_margin_left'
+                'fieldId': 'page_margin_left',
+                'rowId': 'rbro_document_properties_page_margin_row',
             },
             'marginTop': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_margin_top'
+                'fieldId': 'page_margin_top',
+                'rowId': 'rbro_document_properties_page_margin_row',
             },
             'marginRight': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_margin_right'
+                'fieldId': 'page_margin_right',
+                'rowId': 'rbro_document_properties_page_margin_row',
             },
             'marginBottom': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'page_margin_bottom'
+                'fieldId': 'page_margin_bottom',
+                'rowId': 'rbro_document_properties_page_margin_row',
             },
             'header': {
                 'type': SetValueCmd.type.checkbox,
@@ -66,11 +73,13 @@ export default class DocumentPropertiesPanel extends PanelBase {
             },
             'headerSize': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'header_size'
+                'fieldId': 'header_size',
+                'visibleIf': 'header',
             },
             'headerDisplay': {
                 'type': SetValueCmd.type.select,
-                'fieldId': 'header_display'
+                'fieldId': 'header_display',
+                'visibleIf': 'header',
             },
             'footer': {
                 'type': SetValueCmd.type.checkbox,
@@ -78,11 +87,13 @@ export default class DocumentPropertiesPanel extends PanelBase {
             },
             'footerSize': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'footer_size'
+                'fieldId': 'footer_size',
+                'visibleIf': 'footer',
             },
             'footerDisplay': {
                 'type': SetValueCmd.type.select,
-                'fieldId': 'footer_display'
+                'fieldId': 'footer_display',
+                'visibleIf': 'footer',
             },
             'patternLocale': {
                 'type': SetValueCmd.type.select,
@@ -97,6 +108,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 'fieldId': 'pattern_number_group_symbol'
             },
         };
+
+        super.initVisibleIfFields();
     }
 
     render(data) {
@@ -171,7 +184,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_orientation_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('orientation'), 'rbro_document_properties_orientation');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elOrientation = utils.createElement('select', { id: 'rbro_document_properties_orientation' });
@@ -192,7 +205,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_content_height_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('contentHeight'), 'rbro_document_properties_content_height');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elContentHeight = utils.createElement('input', {
@@ -216,7 +229,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         this.renderMarginControls(panel);
         this.renderHeaderFooter(panel);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_pattern_locale_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('patternLocale'), 'rbro_document_properties_pattern_locale');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elPatternLocale = utils.createElement('select', { id: 'rbro_document_properties_pattern_locale' });
@@ -238,7 +251,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement(
+          'div', { id: 'rbro_document_properties_pattern_currency_symbol_row', class: 'rbroFormRow' });
         utils.appendLabel(
             elDiv, this.rb.getLabel('patternCurrencySymbol'), 'rbro_document_properties_pattern_currency_symbol');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
@@ -257,7 +271,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement(
+          'div', { id: 'rbro_document_properties_pattern_number_group_symbol_row', class: 'rbroFormRow' });
         utils.appendLabel(
             elDiv, this.rb.getLabel('patternNumberGroupSymbol'),
             'rbro_document_properties_pattern_number_group_symbol');
@@ -284,7 +299,8 @@ export default class DocumentPropertiesPanel extends PanelBase {
     }
 
     renderMarginControls(panel) {
-        let elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        let elDiv = utils.createElement(
+          'div', { id: 'rbro_document_properties_page_margin_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('pageMargins'), 'rbro_document_properties_page_margin_top');
         let elFormField = utils.createElement('div', { class: 'rbroFormField rbroSmallInput' });
 
@@ -366,7 +382,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
 
     renderHeaderFooter(panel) {
         let elHeaderDiv = utils.createElement('div', { class: 'rbroFormRowContainer' });
-        let elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        let elDiv = utils.createElement('div', { id: 'rbro_document_properties_header_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('header'), 'rbro_document_properties_header');
         let elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elHeaderLabel = utils.createElement('label', { class: 'switch-light switch-material' });
@@ -390,7 +406,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         elHeaderDiv.append(elDiv);
         let elHeaderSettings = utils.createElement('div', { id: 'rbro_document_properties_header_settings' });
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_header_size_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('headerSize'), 'rbro_document_properties_header_size');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elHeaderSize = utils.createElement('input', { id: 'rbro_document_properties_header_size',
@@ -409,7 +425,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         elHeaderSettings.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_header_display_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('headerDisplay'), 'rbro_document_properties_header_display');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elHeaderDisplay = utils.createElement('select', { id: 'rbro_document_properties_header_display' });
@@ -434,7 +450,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         panel.append(elHeaderDiv);
 
         let elFooterDiv = utils.createElement('div', { class: 'rbroFormRowContainer' });
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_footer_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('footer'), 'rbro_document_properties_footer');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elFooterLabel = utils.createElement('label', { class: 'switch-light switch-material' });
@@ -458,7 +474,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         elFooterDiv.append(elDiv);
         let elFooterSettings = utils.createElement('div', { id: 'rbro_document_properties_footer_settings' });
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_footer_size_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('footerSize'), 'rbro_document_properties_footer_size');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elFooterSize = utils.createElement('input', { id: 'rbro_document_properties_footer_size',
@@ -477,7 +493,7 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elDiv.append(elFormField);
         elFooterSettings.append(elDiv);
 
-        elDiv = utils.createElement('div', { class: 'rbroFormRow' });
+        elDiv = utils.createElement('div', { id: 'rbro_document_properties_footer_display_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('footerDisplay'), 'rbro_document_properties_footer_display');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elFooterDisplay = utils.createElement('select', { id: 'rbro_document_properties_footer_display' });
@@ -500,56 +516,5 @@ export default class DocumentPropertiesPanel extends PanelBase {
         elFooterSettings.append(elDiv);
         elFooterDiv.append(elFooterSettings);
         panel.append(elFooterDiv);
-    }
-
-    /**
-     * Is called when the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
-     * @param {DocumentProperties} obj - currently selected object.
-     * @param {String} [field] - affected field in case of change operation.
-     */
-    static updateVisibileRows(obj, field) {
-        if (field === null || field === 'pageFormat') {
-            if (obj.getValue('pageFormat') === DocumentProperties.pageFormat.userDefined) {
-                document.getElementById('rbro_document_properties_page_size_row').style.display = 'flex';
-            } else {
-                document.getElementById('rbro_document_properties_page_size_row').style.display = 'none';
-            }
-        }
-        if (field === null || field === 'header') {
-            if (obj.getValue('header')) {
-                document.getElementById('rbro_document_properties_header_settings').style.display = 'block';
-            } else {
-                document.getElementById('rbro_document_properties_header_settings').style.display = 'none';
-            }
-        }
-        if (field === null || field === 'footer') {
-            if (obj.getValue('footer')) {
-                document.getElementById('rbro_document_properties_footer_settings').style.display = 'block';
-            } else {
-                document.getElementById('rbro_document_properties_footer_settings').style.display = 'none';
-            }
-        }
-    }
-
-    /**
-     * Is called when the selection is changed or the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
-     * @param {String} [field] - affected field in case of change operation.
-     */
-    updateDisplay(field) {
-        let selectedObject = this.rb.getSelectedObject();
-
-        if (selectedObject !== null && selectedObject instanceof DocumentProperties) {
-            for (let property in this.propertyDescriptors) {
-                if (this.propertyDescriptors.hasOwnProperty(property) && (field === null || property === field)) {
-                    let propertyDescriptor = this.propertyDescriptors[property];
-                    let value = selectedObject.getValue(property);
-                    super.setValue(propertyDescriptor, value, false);
-                }
-            }
-
-            DocumentPropertiesPanel.updateVisibileRows(selectedObject, field);
-        }
     }
 }

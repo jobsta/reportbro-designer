@@ -9,7 +9,6 @@ import DocElement from '../elements/DocElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 import Quill from 'quill';
-import Delta from 'quill-delta';
 import autosize from 'autosize';
 
 /**
@@ -83,7 +82,7 @@ export default class DocElementPanel extends PanelBase {
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
                 'singlePropertyLabel': 'docElementWidth',
-                'visibleIf': "type != 'bar_code' || (format != 'QRCode' && rotate)"
+                'visibleIf': "docElementType != 'bar_code' || (format != 'QRCode' && rotate)"
             },
             'height': {
                 'type': SetValueCmd.type.text,
@@ -641,30 +640,7 @@ export default class DocElementPanel extends PanelBase {
             delete this.propertyDescriptors['richTextContent'];
         }
 
-        // collect all fields which are referenced in the visibleIf property
-        this.visibleIfFields = [];
-        for (let property in this.propertyDescriptors) {
-            if (this.propertyDescriptors.hasOwnProperty(property)) {
-                let propertyDescriptor = this.propertyDescriptors[property];
-                if ('visibleIf' in propertyDescriptor) {
-                    // add all fields used in visibleIf expression to visibileIfFields list of property descriptor
-                    const tokens = utils.tokenize(propertyDescriptor['visibleIf'], null);
-                    for (const token of tokens) {
-                        if (token.type === 'field') {
-                            if (!('visibleIfFields' in propertyDescriptor)) {
-                                propertyDescriptor.visibleIfFields = [token.value];
-                            } else if (!propertyDescriptor.visibleIfFields.includes(token.value)) {
-                                propertyDescriptor.visibleIfFields.push(token.value);
-                            }
-
-                            if (!this.visibleIfFields.includes(token.value)) {
-                                this.visibleIfFields.push(token.value);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        super.initVisibleIfFields();
     }
 
     render() {
@@ -1491,33 +1467,6 @@ export default class DocElementPanel extends PanelBase {
         elStyleSectionContainer.append(elDiv);
 
         let elStyleSectionDiv = utils.createElement('div', { id: 'rbro_doc_element_style_section' });
-
-        elDiv = utils.createElement('div', { id: 'rbro_doc_element_color_row', class: 'rbroFormRow' });
-        utils.appendLabel(elDiv, this.rb.getLabel('docElementColor'), 'rbro_doc_element_color');
-        elFormField = utils.createElement('div', { class: 'rbroFormField' });
-        let elColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
-        let elColor = utils.createElement('input', { id: 'rbro_doc_element_color', autocomplete: 'off' });
-        elColor.addEventListener('change', (event) => {
-            let val = elColor.value;
-            if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
-                let selectedObjects = this.rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'color', val, SetValueCmd.type.color, this.rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    this.rb.executeCommand(cmdGroup);
-                }
-            }
-        });
-        elColorContainer.append(elColor);
-        this.controls['color'] = utils.createColorPicker(elColorContainer, elColor, false, this.rb);
-        elFormField.append(elColorContainer);
-        elDiv.append(elFormField);
-        elStyleSectionDiv.append(elDiv);
 
         elDiv = utils.createElement('div', { id: 'rbro_doc_element_style_id_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('docElementStyle'), 'rbro_doc_element_style_id');
@@ -2366,8 +2315,20 @@ export default class DocElementPanel extends PanelBase {
     }
 
     renderStyleSelect() {
-        utils.populateStyleSelect(this.elStyle, null, this.rb);
-        utils.populateStyleSelect(this.elCsStyle, null, this.rb);
+        let elementType = '';
+        const selectedObjects = this.rb.getSelectedObjects();
+        if (selectedObjects.length > 0) {
+            elementType = selectedObjects[0].getElementType();
+            for (const selectedObject of this.rb.getSelectedObjects()) {
+                if (elementType !== selectedObject.getElementType()) {
+                    elementType = 'mixed';
+                    break;
+                }
+            }
+        }
+
+        utils.populateStyleSelect(this.elStyle, elementType, null, this.rb);
+        utils.populateStyleSelect(this.elCsStyle, elementType, null, this.rb);
     }
 
     setupRichText() {
@@ -2475,172 +2436,10 @@ export default class DocElementPanel extends PanelBase {
     }
 
     /**
-     * Is called when the selection is changed or the selected element was changed.
-     * The panel is updated to show the values of the selected data objects.
-     * @param {String} [field] - affected field in case of change operation.
+     * Update size of all autosize textareas in panel.
+     * @param {?String} field - affected field in case of change operation.
      */
-    updateDisplay(field) {
-        let selectedObjects = this.rb.getSelectedObjects();
-
-        let sectionPropertyCount = {};
-        let sharedProperties = {};
-        for (let obj of selectedObjects) {
-            let properties = obj.getProperties();
-            for (let property of properties) {
-                if (property in sharedProperties) {
-                    sharedProperties[property] += 1;
-                } else {
-                    sharedProperties[property] = 1;
-                }
-            }
-        }
-
-        // show/hide property depending if it is available in all selected objects
-        for (let property in this.propertyDescriptors) {
-            if (this.propertyDescriptors.hasOwnProperty(property)) {
-                const propertyDescriptor = this.propertyDescriptors[property];
-                let visibleIf = '';
-                if ('visibleIf' in propertyDescriptor) {
-                    visibleIf = propertyDescriptor['visibleIf'];
-                }
-
-                if (field === null || property === field ||
-                        (visibleIf && propertyDescriptor.visibleIfFields.includes(field))) {
-                    let show = false;
-                    if (property in sharedProperties) {
-                        if (sharedProperties[property] === selectedObjects.length) {
-                            let value = null;
-                            let differentValues = false;
-                            for (let obj of selectedObjects) {
-                                let objValue = obj.getUpdateValue(property, obj.getValue(property));
-                                if (value === null) {
-                                    value = objValue;
-                                } else if (propertyDescriptor['type'] === SetValueCmd.type.richText) {
-                                    if (objValue && value) {
-                                        let diff = new Delta(objValue).diff(new Delta(value));
-                                        if (diff.ops.length > 0) {
-                                            differentValues = true;
-                                            break;
-                                        }
-                                    }
-                                } else if (objValue !== value) {
-                                    differentValues = true;
-                                    break;
-                                }
-                            }
-
-                            if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
-                                propertyDescriptor['allowEmpty']) {
-                                // if values are different and dropdown has empty option then select
-                                // empty dropdown option
-                                value = '';
-                            }
-                            super.setValue(propertyDescriptor, value, differentValues);
-
-                            if ('section' in propertyDescriptor) {
-                                let sectionName = propertyDescriptor['section'];
-                                if (sectionName in sectionPropertyCount) {
-                                    sectionPropertyCount[sectionName] += 1;
-                                } else {
-                                    sectionPropertyCount[sectionName] = 1;
-                                }
-                            }
-                            show = true;
-                        } else {
-                            delete sharedProperties[property];
-                        }
-                    }
-
-                    if (show && visibleIf) {
-                        for (let obj of selectedObjects) {
-                            if (!utils.evaluateExpression(visibleIf, obj)) {
-                                show = false;
-                                delete sharedProperties[property];
-                                break;
-                            }
-                        }
-                    }
-
-                    if ('singleRowProperty' in propertyDescriptor &&
-                        !propertyDescriptor['singleRowProperty']) {
-                        // only handle visibility of control and not of whole row.
-                        // row visibility will be handled below, e.g. for button groups
-                        let propertyId = `rbro_doc_element_${propertyDescriptor['fieldId']}`;
-                        if (show) {
-                            document.getElementById(propertyId).classList.remove('rbroHidden');
-                        } else {
-                            document.getElementById(propertyId).classList.add('rbroHidden');
-                        }
-                    } else {
-                        let rowId = this.getRowId(propertyDescriptor);
-                        if (show) {
-                            document.getElementById(rowId).classList.remove('rbroHidden');
-                        } else {
-                            document.getElementById(rowId).classList.add('rbroHidden');
-                        }
-                    }
-                }
-            }
-        }
-
-        if (field === null || this.visibleIfFields.includes(field)) {
-            // only update labels, visible rows and sections if selection was changed (no specific field update)
-            // or field is referenced in visibleIf property (and therefor could have
-            // influence on visibility of other fields)
-
-            // sharedProperties now only contains properties shared by all objects
-
-            for (let property in this.propertyDescriptors) {
-                if (this.propertyDescriptors.hasOwnProperty(property)) {
-                    let propertyDescriptor = this.propertyDescriptors[property];
-                    if ('rowId' in propertyDescriptor && 'rowProperties' in propertyDescriptor) {
-                        let shownPropertyCount = 0;
-                        for (let rowProperty of propertyDescriptor['rowProperties']) {
-                            if (rowProperty in sharedProperties) {
-                                shownPropertyCount++;
-                            }
-                        }
-                        if ('labelId' in propertyDescriptor) {
-                            let label = propertyDescriptor['defaultLabel'];
-                            if (shownPropertyCount === 1) {
-                                // get label of single property shown in this property group, e.g. label
-                                // is changed to "Width" instead of "Size (Width, Height)" if only width property
-                                // is shown and not both width and height.
-                                for (let rowProperty of propertyDescriptor['rowProperties']) {
-                                    if (rowProperty in sharedProperties) {
-                                        label = this.propertyDescriptors[rowProperty]['singlePropertyLabel'];
-                                        break;
-                                    }
-                                }
-                            }
-                            document.getElementById(propertyDescriptor['labelId']).textContent =
-                                this.rb.getLabel(label) + ':';
-                        }
-                        if (shownPropertyCount > 0) {
-                            document.getElementById(propertyDescriptor['rowId']).classList.remove('rbroHidden');
-                        } else {
-                            document.getElementById(propertyDescriptor['rowId']).classList.add('rbroHidden');
-                        }
-                    }
-                }
-            }
-
-            // show section if there is at least one property shown in section
-            for (let section of ['style', 'print', 'cs_style', 'spreadsheet']) {
-                if (section in sectionPropertyCount) {
-                    document.getElementById(`rbro_doc_element_${section}_section_container`)
-                        .classList.remove('rbroHidden');
-                } else {
-                    document.getElementById(`rbro_doc_element_${section}_section_container`)
-                        .classList.add('rbroHidden');
-                }
-            }
-        }
-
-        DocElementPanel.updateAutosizeInputs(field);
-    }
-
-    static updateAutosizeInputs(field) {
+    updateAutosizeInputs(field) {
         if (field === null || field === 'dataSource') {
             autosize.update(document.getElementById('rbro_doc_element_data_source'));
         }
@@ -2662,7 +2461,6 @@ export default class DocElementPanel extends PanelBase {
     }
 
     show() {
-        this.renderStyleSelect();
         super.show();
     }
 
@@ -2682,5 +2480,22 @@ export default class DocElementPanel extends PanelBase {
         } else {
             super.notifyEvent(obj, operation, field);
         }
+    }
+
+    /**
+     * Is called when the selected element was changed.
+     */
+    selectionChanged() {
+        // render style selects before values are set (in super.selectionChanged), otherwise selection gets lost
+        this.renderStyleSelect();
+        super.selectionChanged();
+    }
+
+    /**
+     * Return available sections in the property panel.
+     * @returns {[String]}
+     */
+    getSections() {
+        return ['style', 'print', 'cs_style', 'spreadsheet'];
     }
 }

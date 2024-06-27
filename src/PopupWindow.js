@@ -1,5 +1,6 @@
 import SetValueCmd from './commands/SetValueCmd';
 import Parameter from './data/Parameter';
+import DocElement from './elements/DocElement';
 import * as utils from './utils';
 import autosize from 'autosize';
 
@@ -565,7 +566,7 @@ export default class PopupWindow {
                     console.assert(field.type === Parameter.type.string || field.type === Parameter.type.number);
                     control = utils.createElement('select');
                     if (field.attributes.select === 'style') {
-                        utils.populateStyleSelect(control, data ? data : null, this.rb);
+                        utils.populateStyleSelect(control, DocElement.type.text, data ? data : null, this.rb);
                     }
                 } else {
                     control = utils.createElement('input');

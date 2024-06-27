@@ -1,6 +1,7 @@
 import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
 import * as utils from '../utils';
+import Delta from 'quill-delta';
 
 /**
  * Base class for all panels. Contains shared functionality.
@@ -21,6 +22,36 @@ export default class PanelBase {
 
         this.quill = null;
         this.controls = {};
+        // fields which are referenced in the visibleIf property
+        this.visibleIfFields = [];
+    }
+
+    /**
+     * Collect all fields which are referenced in the visibleIf property.
+     */
+    initVisibleIfFields() {
+        for (let property in this.propertyDescriptors) {
+            if (this.propertyDescriptors.hasOwnProperty(property)) {
+                let propertyDescriptor = this.propertyDescriptors[property];
+                if ('visibleIf' in propertyDescriptor) {
+                    // add all fields used in visibleIf expression to visibileIfFields list of property descriptor
+                    const tokens = utils.tokenize(propertyDescriptor['visibleIf'], null);
+                    for (const token of tokens) {
+                        if (token.type === 'field') {
+                            if (!('visibleIfFields' in propertyDescriptor)) {
+                                propertyDescriptor.visibleIfFields = [token.value];
+                            } else if (!propertyDescriptor.visibleIfFields.includes(token.value)) {
+                                propertyDescriptor.visibleIfFields.push(token.value);
+                            }
+
+                            if (!this.visibleIfFields.includes(token.value)) {
+                                this.visibleIfFields.push(token.value);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     render(data) {
@@ -124,10 +155,173 @@ export default class PanelBase {
 
     /**
      * Is called when the selection is changed or the selected element was changed.
-     * The panel is updated to show the values of the selected data object.
+     * The panel is updated to show the values of the selected data objects.
      * @param {String} [field] - affected field in case of change operation.
      */
     updateDisplay(field) {
+        let selectedObjects = this.rb.getSelectedObjects();
+
+        let sectionPropertyCount = {};
+        let sharedProperties = {};
+        for (let obj of selectedObjects) {
+            let properties = obj.getProperties();
+            for (let property of properties) {
+                if (property in sharedProperties) {
+                    sharedProperties[property] += 1;
+                } else {
+                    sharedProperties[property] = 1;
+                }
+            }
+        }
+
+        // show/hide property depending on if it is available in all selected objects
+        for (let property in this.propertyDescriptors) {
+            if (this.propertyDescriptors.hasOwnProperty(property)) {
+                const propertyDescriptor = this.propertyDescriptors[property];
+                let visibleIf = '';
+                if ('visibleIf' in propertyDescriptor) {
+                    visibleIf = propertyDescriptor['visibleIf'];
+                }
+
+                if (field === null || property === field ||
+                        (visibleIf && propertyDescriptor.visibleIfFields.includes(field))) {
+                    let show = false;
+                    if (property in sharedProperties) {
+                        if (sharedProperties[property] === selectedObjects.length) {
+                            let value = null;
+                            let differentValues = false;
+                            for (let obj of selectedObjects) {
+                                let objValue = obj.getUpdateValue(property, obj.getValue(property));
+                                if (value === null) {
+                                    value = objValue;
+                                } else if (propertyDescriptor['type'] === SetValueCmd.type.richText) {
+                                    if (objValue && value) {
+                                        let diff = new Delta(objValue).diff(new Delta(value));
+                                        if (diff.ops.length > 0) {
+                                            differentValues = true;
+                                            break;
+                                        }
+                                    }
+                                } else if (objValue !== value) {
+                                    differentValues = true;
+                                    break;
+                                }
+                            }
+
+                            if (differentValues && propertyDescriptor['type'] === SetValueCmd.type.select &&
+                                    propertyDescriptor['allowEmpty']) {
+                                // if values are different and dropdown has empty option then select
+                                // empty dropdown option
+                                value = '';
+                            }
+                            this.setValue(propertyDescriptor, value, differentValues);
+
+                            if ('section' in propertyDescriptor) {
+                                let sectionName = propertyDescriptor['section'];
+                                if (sectionName in sectionPropertyCount) {
+                                    sectionPropertyCount[sectionName] += 1;
+                                } else {
+                                    sectionPropertyCount[sectionName] = 1;
+                                }
+                            }
+                            show = true;
+                        } else {
+                            delete sharedProperties[property];
+                        }
+                    }
+
+                    if (show && visibleIf) {
+                        for (let obj of selectedObjects) {
+                            if (!utils.evaluateExpression(visibleIf, obj)) {
+                                show = false;
+                                delete sharedProperties[property];
+                                break;
+                            }
+                        }
+                    }
+
+                    if ('singleRowProperty' in propertyDescriptor && !propertyDescriptor['singleRowProperty']) {
+                        // only handle visibility of control and not of whole row.
+                        // row visibility will be handled below, e.g. for button groups
+                        const propertyId = `${this.idPrefix}_${propertyDescriptor['fieldId']}`;
+                        if (show) {
+                            document.getElementById(propertyId).classList.remove('rbroHidden');
+                        } else {
+                            document.getElementById(propertyId).classList.add('rbroHidden');
+                        }
+                    } else {
+                        const rowId = this.getRowId(propertyDescriptor);
+                        if (show) {
+                            document.getElementById(rowId).classList.remove('rbroHidden');
+                        } else {
+                            document.getElementById(rowId).classList.add('rbroHidden');
+                        }
+                    }
+                }
+            }
+        }
+
+        if (field === null || this.visibleIfFields.includes(field)) {
+            // only update labels, visible rows and sections if selection was changed (no specific field update)
+            // or field is referenced in visibleIf property (and therefor could have
+            // influence on visibility of other fields)
+
+            // sharedProperties now only contains properties shared by all objects
+
+            for (let property in this.propertyDescriptors) {
+                if (this.propertyDescriptors.hasOwnProperty(property)) {
+                    let propertyDescriptor = this.propertyDescriptors[property];
+                    if ('rowId' in propertyDescriptor && 'rowProperties' in propertyDescriptor) {
+                        let shownPropertyCount = 0;
+                        for (let rowProperty of propertyDescriptor['rowProperties']) {
+                            if (rowProperty in sharedProperties) {
+                                shownPropertyCount++;
+                            }
+                        }
+                        if ('labelId' in propertyDescriptor) {
+                            let label = propertyDescriptor['defaultLabel'];
+                            if (shownPropertyCount === 1) {
+                                // get label of single property shown in this property group, e.g. label
+                                // is changed to "Width" instead of "Size (Width, Height)" if only width property
+                                // is shown and not both width and height.
+                                for (let rowProperty of propertyDescriptor['rowProperties']) {
+                                    if (rowProperty in sharedProperties) {
+                                        label = this.propertyDescriptors[rowProperty]['singlePropertyLabel'];
+                                        break;
+                                    }
+                                }
+                            }
+                            document.getElementById(propertyDescriptor['labelId']).textContent =
+                                this.rb.getLabel(label) + ':';
+                        }
+                        if (shownPropertyCount > 0) {
+                            document.getElementById(propertyDescriptor['rowId']).classList.remove('rbroHidden');
+                        } else {
+                            document.getElementById(propertyDescriptor['rowId']).classList.add('rbroHidden');
+                        }
+                    }
+                }
+            }
+
+            // show section if there is at least one property shown in section
+            for (const section of this.getSections()) {
+                const sectionId = `${this.idPrefix}_${section}_section_container`;
+                if (section in sectionPropertyCount) {
+                    document.getElementById(sectionId).classList.remove('rbroHidden');
+                } else {
+                    document.getElementById(sectionId).classList.add('rbroHidden');
+                }
+            }
+        }
+
+        this.updateAutosizeInputs(field);
+    }
+
+    /**
+     * Update size of all autosize textareas in panel.
+     * @param {?String} field - affected field in case of change operation.
+     */
+    updateAutosizeInputs(field) {
     }
 
     show() {
@@ -215,6 +409,14 @@ export default class PanelBase {
     selectionChanged() {
         this.updateDisplay(null);
         this.updateErrors();
+    }
+
+    /**
+     * Return available sections in the property panel.
+     * @returns {[String]}
+     */
+    getSections() {
+        return [];
     }
 
     /**

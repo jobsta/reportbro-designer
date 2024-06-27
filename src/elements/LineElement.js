@@ -31,7 +31,7 @@ export default class LineElement extends DocElement {
      * @returns {String[]}
      */
     getProperties() {
-        return ['x', 'y', 'width', 'height', 'color', 'printIf'];
+        return ['x', 'y', 'width', 'height', 'styleId', 'color', 'printIf'];
     }
 
     getElementType() {

@@ -189,51 +189,6 @@ export default class TextElement extends DocElement {
         this.elContentText.style.height = this.rb.toPixel(contentSize.height);
     }
 
-    getStyle() {
-        let style = this;
-        if (this.styleId !== '') {
-            let styleObj = this.rb.getDataObject(this.styleId);
-            if (styleObj !== null) {
-                style = styleObj;
-            }
-        }
-        return style;
-    }
-
-    /**
-     * Adds commands to command group parameter to set style properties of given style.
-     *
-     * This should be called when the style was changed so all style properties
-     * will be updated as well.
-     *
-     * @param {String} styleId - id of new style or empty string if no style was selected.
-     * @param {String} fieldPrefix - field prefix when accessing properties.
-     * @param {Object[]} propertyDescriptors - list of all property descriptors to get
-     * property type for SetValueCmd.
-     * @param {CommandGroupCmd} cmdGroup - commands will be added to this command group.
-     */
-    addCommandsForChangedStyle(styleId, fieldPrefix, propertyDescriptors, cmdGroup) {
-        if (styleId !== '') {
-            let style = this.rb.getStyleById(styleId);
-            if (style !== null) {
-                let fields = style.getFields().slice(2);  // get all fields except id and name
-                for (let field of fields) {
-                    let objField = fieldPrefix + field;
-                    let value = style.getValue(field);
-                    if (value !== this.getValue(objField)) {
-                        let propertyDescriptor = propertyDescriptors[objField];
-                        let cmd = new SetValueCmd(
-                            this.getId(), objField, value, propertyDescriptor['type'], this.rb);
-                        cmd.disableSelect();
-                        cmdGroup.addCommand(cmd);
-                    }
-                }
-            }
-        }
-        cmdGroup.addCommand(new SetValueCmd(
-            this.getId(), fieldPrefix + 'styleId', styleId, SetValueCmd.type.select, this.rb));
-    }
-
     getContentSize(width, height, style) {
         let borderWidth = style.getValue('borderWidthVal');
         width -= utils.convertInputToNumber(style.getValue('paddingLeft')) + utils.convertInputToNumber(style.getValue('paddingRight'));

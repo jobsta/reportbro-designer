@@ -24,6 +24,7 @@ export default class DocElement {
         this.linkedContainerId = null;
         this.printIf = '';
         this.removeEmptyElement = false;
+        this.styleId = '';
 
         this.el = null;
         this.selected = false;
@@ -473,6 +474,56 @@ export default class DocElement {
             this.el.style.width = this.rb.toPixel(width);
             this.el.style.height = this.rb.toPixel(height);
         }
+    }
+
+    getStyle() {
+        let style = this;
+        if (this.styleId !== '') {
+            let styleObj = this.rb.getDataObject(this.styleId);
+            if (styleObj !== null) {
+                style = styleObj;
+            }
+        }
+        return style;
+    }
+
+    /**
+     * Adds commands to command group parameter to set style properties of given style.
+     *
+     * This should be called when the style was changed so all style properties
+     * will be updated as well.
+     *
+     * @param {Number|String} styleId - id of new style or empty string if no style was selected.
+     * @param {String} fieldPrefix - field prefix when accessing properties.
+     * @param {Object[]} propertyDescriptors - list of all property descriptors to get
+     * property type for SetValueCmd.
+     * @param {CommandGroupCmd} cmdGroup - commands will be added to this command group.
+     */
+    addCommandsForChangedStyle(styleId, fieldPrefix, propertyDescriptors, cmdGroup) {
+        if (styleId) {
+            const style = this.rb.getStyleById(styleId);
+            if (style !== null) {
+                const docElementProperties = this.getProperties();
+                const styleProperties = style.getStyleProperties();
+                for (let styleProperty of styleProperties) {
+                    // test if style property is part of doc element properties (style contains properties for
+                    // all different doc element types)
+                    if (styleProperty in docElementProperties) {
+                        const objField = fieldPrefix + styleProperty;
+                        const value = style.getValue(styleProperty);
+                        if (value !== this.getValue(objField)) {
+                            const propertyDescriptor = propertyDescriptors[objField];
+                            const cmd = new SetValueCmd(
+                              this.getId(), objField, value, propertyDescriptor['type'], this.rb);
+                            cmd.disableSelect();
+                            cmdGroup.addCommand(cmd);
+                        }
+                    }
+                }
+            }
+        }
+        cmdGroup.addCommand(new SetValueCmd(
+            this.getId(), fieldPrefix + 'styleId', styleId, SetValueCmd.type.select, this.rb));
     }
 
     updateStyle() {

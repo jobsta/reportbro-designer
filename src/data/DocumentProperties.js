@@ -86,6 +86,15 @@ export default class DocumentProperties {
         ];
     }
 
+    /**
+     * Returns all fields of this object that can be modified in the properties panel.
+     * @returns {String[]}
+     */
+    getProperties() {
+        return this.getFields();
+    }
+
+
     getId() {
         return this.id;
     }
@@ -132,6 +141,17 @@ export default class DocumentProperties {
             let size = this.getPageSize();
             this.updatePageSize(size);
         }
+    }
+
+    /**
+     * Returns value to use for updating input control.
+     * Can be overridden in case update value can be different from internal value, e.g.
+     * width for table cells with colspan > 1.
+     * @param {String} field - field name.
+     * @param {String} value - value for update.
+     */
+    getUpdateValue(field, value) {
+        return value;
     }
 
     updatePageSize(size) {
