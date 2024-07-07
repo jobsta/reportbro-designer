@@ -270,28 +270,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleBold')
             });
         elBold.addEventListener('click', (event) => {
-            let val = !elBold.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}bold`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}bold`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'bold', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elBold.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('bold', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elTextStyle.append(elBold);
         let elItalic = utils.createElement(
@@ -302,28 +282,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleItalic')
             });
         elItalic.addEventListener('click', (event) => {
-            let val = !elItalic.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}italic`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}italic`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'italic', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elItalic.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('italic', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elTextStyle.append(elItalic);
         let elUnderline = utils.createElement(
@@ -334,28 +294,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleUnderline')
             });
         elUnderline.addEventListener('click', (event) => {
-            let val = !elUnderline.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}underline`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}underline`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'underline', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elUnderline.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('underline', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elTextStyle.append(elUnderline);
         let elStrikethrough = utils.createElement(
@@ -366,28 +306,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleStrikethrough')
             });
         elStrikethrough.addEventListener('click', (event) => {
-            let val = !elStrikethrough.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}strikethrough`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}strikethrough`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'strikethrough', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elStrikethrough.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('strikethrough', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elTextStyle.append(elStrikethrough);
         elFormField.append(elTextStyle);
@@ -407,8 +327,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleHAlignmentLeft')
             });
         elHAlignmentLeft.addEventListener('click', (event) => {
-            let val = Style.alignment.left;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.left;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
@@ -418,27 +338,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}horizontalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'horizontalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'horizontalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elHAlignment.append(elHAlignmentLeft);
@@ -451,8 +352,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleHAlignmentCenter')
             });
         elHAlignmentCenter.addEventListener('click', (event) => {
-            let val = Style.alignment.center;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.center;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
@@ -462,27 +363,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}horizontalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'horizontalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'horizontalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elHAlignment.append(elHAlignmentCenter);
@@ -495,8 +377,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleHAlignmentRight')
             });
         elHAlignmentRight.addEventListener('click', (event) => {
-            let val = Style.alignment.right;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.right;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
@@ -506,27 +388,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}horizontalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'horizontalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'horizontalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elHAlignment.append(elHAlignmentRight);
@@ -539,8 +402,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleHAlignmentJustify')
             });
         elHAlignmentJustify.addEventListener('click', (event) => {
-            let val = Style.alignment.justify;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.justify;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
@@ -550,27 +413,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}horizontalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}horizontalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'horizontalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'horizontalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elHAlignment.append(elHAlignmentJustify);
@@ -586,8 +430,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleVAlignmentTop')
             });
         elVAlignmentTop.addEventListener('click', (event) => {
-            let val = Style.alignment.top;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.top;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}verticalAlignment`) !== val) {
@@ -597,27 +441,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}verticalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}verticalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'verticalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'verticalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elVAlignment.append(elVAlignmentTop);
@@ -630,8 +455,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleVAlignmentMiddle')
             });
         elVAlignmentMiddle.addEventListener('click', (event) => {
-            let val = Style.alignment.middle;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.middle;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}verticalAlignment`) !== val) {
@@ -641,27 +466,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}verticalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}verticalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'verticalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'verticalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elVAlignment.append(elVAlignmentMiddle);
@@ -674,8 +480,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleVAlignmentBottom')
             });
         elVAlignmentBottom.addEventListener('click', (event) => {
-            let val = Style.alignment.bottom;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = Style.alignment.bottom;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}verticalAlignment`) !== val) {
@@ -685,27 +491,8 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}verticalAlignment`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}verticalAlignment`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'verticalAlignment', val, SetValueCmd.type.buttonGroup, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'verticalAlignment', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elVAlignment.append(elVAlignmentBottom);
@@ -719,19 +506,9 @@ export default class StylePanel extends PanelBase {
         let elColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
         let elColor = utils.createElement('input', { id: `rbro_${idPrefix}color`, autocomplete: 'off' });
         elColor.addEventListener('change', (event) => {
-            let val = elColor.value;
+            const val = elColor.value;
             if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                let selectedObjects = rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), 'color', val, SetValueCmd.type.color, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('color', val, SetValueCmd.type.color, fieldPrefix, rb);
             }
         });
         elColorContainer.append(elColor);
@@ -746,29 +523,9 @@ export default class StylePanel extends PanelBase {
         let elTextColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
         let elTextColor = utils.createElement('input', { id: `rbro_${idPrefix}text_color`, autocomplete: 'off' });
         elTextColor.addEventListener('change', (event) => {
-            let val = elTextColor.value;
+            const val = elTextColor.value;
             if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                let selectedObjects = rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}textColor`, val, SetValueCmd.type.color, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}textColor`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'textColor', val, SetValueCmd.type.color, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('textColor', val, SetValueCmd.type.color, fieldPrefix, rb);
             }
         });
         elTextColorContainer.append(elTextColor);
@@ -783,30 +540,9 @@ export default class StylePanel extends PanelBase {
         let elBgColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
         let elBgColor = utils.createElement('input', { id: `rbro_${idPrefix}background_color`, autocomplete: 'off' });
         elBgColor.addEventListener('change', (event) => {
-            let val = elBgColor.value;
+            const val = elBgColor.value;
             if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                let selectedObjects = rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}backgroundColor`, val,
-                        SetValueCmd.type.color, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}backgroundColor`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'backgroundColor', val, SetValueCmd.type.color, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('backgroundColor', val, SetValueCmd.type.color, fieldPrefix, rb);
             }
         });
         elBgColorContainer.append(elBgColor);
@@ -824,30 +560,10 @@ export default class StylePanel extends PanelBase {
         let elAlternateBgColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
         let elAlternateBgColor = utils.createElement('input', { id: `rbro_${idPrefix}alternate_background_color` });
         elAlternateBgColor.addEventListener('change', (event) => {
-            let val = elAlternateBgColor.value;
+            const val = elAlternateBgColor.value;
             if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                let selectedObjects = rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}alternateBackgroundColor`, val,
-                        SetValueCmd.type.color, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}alternateBackgroundColor`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'alternateBackgroundColor', val, SetValueCmd.type.color, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty(
+                    'alternateBackgroundColor', val, SetValueCmd.type.color, fieldPrefix, rb);
             }
         });
         elAlternateBgColorContainer.append(elAlternateBgColor);
@@ -866,28 +582,8 @@ export default class StylePanel extends PanelBase {
             elFont.append(utils.createElement('option', { value: font.value }, font.name));
         }
         elFont.addEventListener('change', (event) => {
-            let val = elFont.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}font`, val, SetValueCmd.type.select, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}font`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'font', val, SetValueCmd.type.select, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elFont.value;
+            this.executeCommandsForChangedProperty('font', val, SetValueCmd.type.select, fieldPrefix, rb);
         });
         elSplit.append(elFont);
         let elFontSize = utils.createElement('select', { id: `rbro_${idPrefix}font_size` });
@@ -895,28 +591,8 @@ export default class StylePanel extends PanelBase {
             elFontSize.append(utils.createElement('option', { value: size }, String(size)));
         }
         elFontSize.addEventListener('change', (event) => {
-            let val = elFontSize.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}fontSize`, val, SetValueCmd.type.select, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}fontSize`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'fontSize', val, SetValueCmd.type.select, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elFontSize.value;
+            this.executeCommandsForChangedProperty('fontSize', val, SetValueCmd.type.select, fieldPrefix, rb);
         });
         elSplit.append(elFontSize);
         elSplit.append(utils.createElement('span', {}, rb.getLabel('styleFontSizeUnit')));
@@ -933,28 +609,8 @@ export default class StylePanel extends PanelBase {
             elLineSpacing.append(utils.createElement('option', { value: lineSpacing }, lineSpacing));
         }
         elLineSpacing.addEventListener('change', (event) => {
-            let val = elLineSpacing.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}lineSpacing`, val, SetValueCmd.type.select, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}lineSpacing`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'lineSpacing', val, SetValueCmd.type.select, cmdGroup);
-                }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
-            }
+            const val = elLineSpacing.value;
+            this.executeCommandsForChangedProperty('lineSpacing', val, SetValueCmd.type.select, fieldPrefix, rb);
         });
         elFormField.append(elLineSpacing);
         elDiv.append(elFormField);
@@ -974,9 +630,9 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('styleBorderAll')
             });
         elBorderAll.addEventListener('click', (event) => {
-            let val = !elBorderAll.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
+            const val = !elBorderAll.classList.contains('rbroButtonActive');
+            const cmdGroup = new CommandGroupCmd('Set value', rb);
+            const selectedObjects = rb.getSelectedObjects();
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 let obj = selectedObjects[i];
                 cmdGroup.addSelection(obj.getId());
@@ -1022,28 +678,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('orientationLeft')
             });
         elBorderLeft.addEventListener('click', (event) => {
-            let val = !elBorderLeft.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}borderLeft`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}borderLeft`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'borderLeft', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elBorderLeft.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('borderLeft', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elBorderStyle.append(elBorderLeft);
         let elBorderTop = utils.createElement(
@@ -1055,28 +691,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('orientationTop')
             });
         elBorderTop.addEventListener('click', (event) => {
-            let val = !elBorderTop.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}borderTop`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}borderTop`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'borderTop', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elBorderTop.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('borderTop', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elBorderStyle.append(elBorderTop);
         let elBorderRight = utils.createElement(
@@ -1088,28 +704,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('orientationRight')
             });
         elBorderRight.addEventListener('click', (event) => {
-            let val = !elBorderRight.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}borderRight`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}borderRight`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'borderRight', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elBorderRight.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('borderRight', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elBorderStyle.append(elBorderRight);
         let elBorderBottom = utils.createElement(
@@ -1121,28 +717,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('orientationBottom')
             });
         elBorderBottom.addEventListener('click', (event) => {
-            let val = !elBorderBottom.classList.contains('rbroButtonActive');
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}borderBottom`, val, SetValueCmd.type.button, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}borderBottom`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'borderBottom', val, SetValueCmd.type.button, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = !elBorderBottom.classList.contains('rbroButtonActive');
+            this.executeCommandsForChangedProperty('borderBottom', val, SetValueCmd.type.button, fieldPrefix, rb);
         });
         elBorderStyle.append(elBorderBottom);
         elFormField.append(elBorderStyle);
@@ -1162,8 +738,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('docElementBorderGrid')
             });
         elBorderGrid.addEventListener('click', (event) => {
-            let val = TableElement.border.grid;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = TableElement.border.grid;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}border`) !== val) {
@@ -1173,17 +749,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}border`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('border', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elBorder.append(elBorderGrid);
@@ -1196,8 +762,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('docElementBorderFrameRow')
             });
         elBorderFrameRow.addEventListener('click', (event) => {
-            let val = TableElement.border.frameRow;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = TableElement.border.frameRow;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}border`) !== val) {
@@ -1207,17 +773,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}border`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('border', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elBorder.append(elBorderFrameRow);
@@ -1230,8 +786,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('docElementBorderFrame')
             });
         elBorderFrame.addEventListener('click', (event) => {
-            let val = TableElement.border.frame;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = TableElement.border.frame;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}border`) !== val) {
@@ -1241,17 +797,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}border`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('border', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elBorder.append(elBorderFrame);
@@ -1264,8 +810,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('docElementBorderRow')
             });
         elBorderRow.addEventListener('click', (event) => {
-            let val = TableElement.border.row;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = TableElement.border.row;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}border`) !== val) {
@@ -1275,17 +821,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}border`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('border', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elBorder.append(elBorderRow);
@@ -1298,8 +834,8 @@ export default class StylePanel extends PanelBase {
                 title: rb.getLabel('docElementBorderNone')
             });
         elBorderNone.addEventListener('click', (event) => {
-            let val = TableElement.border.none;
-            let selectedObjects = rb.getSelectedObjects();
+            const val = TableElement.border.none;
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}border`) !== val) {
@@ -1309,17 +845,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i = selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}border`, val,
-                        SetValueCmd.type.buttonGroup, rb));
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('border', val, SetValueCmd.type.buttonGroup, fieldPrefix, rb);
             }
         });
         elBorder.append(elBorderNone);
@@ -1333,30 +859,9 @@ export default class StylePanel extends PanelBase {
         let elBorderColorContainer = utils.createElement('div', { class: 'rbroColorPickerContainer' });
         let elBorderColor = utils.createElement('input', { id: `rbro_${idPrefix}border_color`, autocomplete: 'off' });
         elBorderColor.addEventListener('change', (event) => {
-            let val = elBorderColor.value;
+            const val = elBorderColor.value;
             if (utils.isValidColor(val)) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                let selectedObjects = rb.getSelectedObjects();
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}borderColor`, val,
-                        SetValueCmd.type.color, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}borderColor`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'borderColor', val, SetValueCmd.type.color, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('borderColor', val, SetValueCmd.type.color, fieldPrefix, rb);
             }
         });
         elBorderColorContainer.append(elBorderColor);
@@ -1379,7 +884,7 @@ export default class StylePanel extends PanelBase {
             if (val !== elBorderWidth.value) {
                 elBorderWidth.value = val;
             }
-            let selectedObjects = rb.getSelectedObjects();
+            const selectedObjects = rb.getSelectedObjects();
             let valueChanged = false;
             for (let i=selectedObjects.length - 1; i >= 0; i--) {
                 if (selectedObjects[i].getValue(`${fieldPrefix}borderWidth`) !== val) {
@@ -1389,27 +894,7 @@ export default class StylePanel extends PanelBase {
             }
 
             if (valueChanged) {
-                let cmdGroup = new CommandGroupCmd('Set value', rb);
-                for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                    let obj = selectedObjects[i];
-                    cmdGroup.addSelection(obj.getId());
-                    cmdGroup.addCommand(new SetValueCmd(
-                        obj.getId(), `${fieldPrefix}borderWidth`, val,
-                        SetValueCmd.type.text, rb));
-
-                    if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                        if (obj.getValue(`${fieldPrefix}borderWidth`) !== val) {
-                            cmdGroup.addCommand(new SetValueCmd(
-                                obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                        }
-                    } else if (obj instanceof Style) {
-                        obj.addCommandsForChangedProperty(
-                            'borderWidth', val, SetValueCmd.type.text, cmdGroup);
-                    }
-                }
-                if (!cmdGroup.isEmpty()) {
-                    rb.executeCommand(cmdGroup);
-                }
+                this.executeCommandsForChangedProperty('borderWidth', val, SetValueCmd.type.text, fieldPrefix, rb);
             }
         });
         elFormField.append(elBorderWidth);
@@ -1427,28 +912,8 @@ export default class StylePanel extends PanelBase {
                 type: 'number', autocomplete: 'off'
             });
         elPaddingTop.addEventListener('input', (event) => {
-            let val = elPaddingTop.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}paddingTop`, val, SetValueCmd.type.text, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}paddingTop`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'paddingTop', val, SetValueCmd.type.text, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elPaddingTop.value;
+            this.executeCommandsForChangedProperty('paddingTop', val, SetValueCmd.type.text, fieldPrefix, rb);
         });
         elPaddingTopDiv.append(elPaddingTop);
         elFormField.append(elPaddingTopDiv);
@@ -1460,28 +925,8 @@ export default class StylePanel extends PanelBase {
                 autocomplete: 'off'
             });
         elPaddingLeft.addEventListener('input', (event) => {
-            let val = elPaddingLeft.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}paddingLeft`, val, SetValueCmd.type.text, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}paddingLeft`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'paddingLeft', val, SetValueCmd.type.text, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elPaddingLeft.value;
+            this.executeCommandsForChangedProperty('paddingLeft', val, SetValueCmd.type.text, fieldPrefix, rb);
         });
         elDiv2.append(elPaddingLeft);
         let elPaddingRight = utils.createElement(
@@ -1490,28 +935,8 @@ export default class StylePanel extends PanelBase {
                 autocomplete: 'off'
             });
         elPaddingRight.addEventListener('input', (event) => {
-            let val = elPaddingRight.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}paddingRight`, val, SetValueCmd.type.text, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}paddingRight`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'paddingRight', val, SetValueCmd.type.text, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elPaddingRight.value;
+            this.executeCommandsForChangedProperty('paddingRight', val, SetValueCmd.type.text, fieldPrefix, rb);
         });
         elDiv2.append(elPaddingRight);
         elFormField.append(elDiv2);
@@ -1523,28 +948,8 @@ export default class StylePanel extends PanelBase {
                 autocomplete: 'off'
             });
         elPaddingBottom.addEventListener('input', (event) => {
-            let val = elPaddingBottom.value;
-            let cmdGroup = new CommandGroupCmd('Set value', rb);
-            let selectedObjects = rb.getSelectedObjects();
-            for (let i=selectedObjects.length - 1; i >= 0; i--) {
-                let obj = selectedObjects[i];
-                cmdGroup.addSelection(obj.getId());
-                cmdGroup.addCommand(new SetValueCmd(
-                    obj.getId(), `${fieldPrefix}paddingBottom`, val, SetValueCmd.type.text, rb));
-
-                if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
-                    if (obj.getValue(`${fieldPrefix}paddingBottom`) !== val) {
-                        cmdGroup.addCommand(new SetValueCmd(
-                            obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
-                    }
-                } else if (obj instanceof Style) {
-                    obj.addCommandsForChangedProperty(
-                        'paddingBottom', val, SetValueCmd.type.text, cmdGroup);
-                }
-            }
-            if (!cmdGroup.isEmpty()) {
-                rb.executeCommand(cmdGroup);
-            }
+            const val = elPaddingBottom.value;
+            this.executeCommandsForChangedProperty('paddingBottom', val, SetValueCmd.type.text, fieldPrefix, rb);
         });
         elPaddingBottomDiv.append(elPaddingBottom);
         elFormField.append(elPaddingBottomDiv);
@@ -1554,6 +959,42 @@ export default class StylePanel extends PanelBase {
 
     destroy() {
         StylePanel.destroyStyle('', this.controls);
+    }
+
+    /**
+     * Execute commands to set changed style property value for selected objects.
+     * If selected object is a style then the property value will also be set
+     * for all document elements using this style.
+     *
+     * @param {String} field - changed field.
+     * @param {Object} value - new value for given field.
+     * @param {String} type - property type for SetValueCmd.
+     * @param {String} fieldPrefix - prefix for field name, this is useful for additional style properties
+     * of document elements (e.g. 'cs_' prefix for conditional style properties).
+     * @param {ReportBro} rb - ReportBro instance.
+     */
+    static executeCommandsForChangedProperty(field, value, type, fieldPrefix, rb) {
+        const cmdGroup = new CommandGroupCmd('Set value', rb);
+        const selectedObjects = rb.getSelectedObjects();
+        for (let i=selectedObjects.length - 1; i >= 0; i--) {
+            const obj = selectedObjects[i];
+            cmdGroup.addSelection(obj.getId());
+            cmdGroup.addCommand(new SetValueCmd(
+                obj.getId(), `${fieldPrefix}${field}`, value, type, rb));
+
+            if (obj instanceof DocElement && obj.getValue(`${fieldPrefix}styleId`) !== '') {
+                if (obj.getValue(`${fieldPrefix}textColor`) !== value) {
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), `${fieldPrefix}styleId`, '', SetValueCmd.type.select, rb));
+                }
+            } else if (obj instanceof Style) {
+                obj.addCommandsForChangedProperty(field, value, type, cmdGroup);
+            }
+
+        }
+        if (!cmdGroup.isEmpty()) {
+            rb.executeCommand(cmdGroup);
+        }
     }
 
     static destroyStyle(fieldPrefix, controls) {
