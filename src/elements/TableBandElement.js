@@ -460,12 +460,12 @@ export default class TableBandElement extends DocElement {
     }
 
     toJS() {
-        let ret = super.toJS();
-        ret['columnData'] = [];
-        for (let column of this.columnData) {
-            ret['columnData'].push(column.toJS());
+        const rv = super.toJS();
+        rv['columnData'] = [];
+        for (const column of this.columnData) {
+            rv['columnData'].push(column.toJS());
         }
-        return ret;
+        return rv;
     }
 
     /**

@@ -8,6 +8,7 @@ import CommandGroupCmd from './commands/CommandGroupCmd';
 import SetValueCmd from './commands/SetValueCmd';
 import Band from './container/Band';
 import Container from './container/Container';
+import Page from './container/Page';
 import DocumentProperties from './data/DocumentProperties';
 import Parameter from './data/Parameter';
 import Style from './data/Style';
@@ -148,6 +149,8 @@ export default class ReportBro {
         this.footerBand = new Band(Band.bandType.footer, false, '', '', this);
         this.parameterContainer = new Container('0_parameters', this.getLabel('parameters'), this);
         this.styleContainer = new Container('0_styles', this.getLabel('styles'), this);
+        this.watermarkTextContainer = new Page('0_watermark_texts', this.getLabel('watermarkTexts'), this);
+        this.watermarkImageContainer = new Page('0_watermark_images', this.getLabel('watermarkImages'), this);
         this.documentProperties = new DocumentProperties(this);
         this.clipboardElements = [];
 
@@ -474,6 +477,30 @@ export default class ReportBro {
     }
 
     /**
+     * Add main panel items for sub categories like watermark texts and images.
+     *
+     * This must be called after the main panel was rendered because children of main panel items can
+     * only be added after the parent is rendered.
+     */
+    addMainPanelItemSubCategories() {
+        const watermarkTextsItem = new MainPanelItem(
+            'watermarkText', this.mainPanel.getWatermarksItem(), this.watermarkTextContainer, {
+                hasChildren: true, showAdd: true, showDelete: false, hasDetails: false, draggable: false }, this,
+        );
+        this.watermarkTextContainer.setPanelItem(watermarkTextsItem);
+        this.mainPanel.getWatermarksItem().appendChild(watermarkTextsItem);
+        this.watermarkTextContainer.setup();
+
+        const watermarkImagesItem = new MainPanelItem(
+            'watermarkImage', this.mainPanel.getWatermarksItem(), this.watermarkImageContainer, {
+                hasChildren: true, showAdd: true, showDelete: false, hasDetails: false, draggable: false }, this,
+        );
+        this.watermarkImageContainer.setPanelItem(watermarkImagesItem);
+        this.mainPanel.getWatermarksItem().appendChild(watermarkImagesItem);
+        this.watermarkImageContainer.setup();
+    }
+
+    /**
      * Adds default parameters like page count/number.
      */
     addDefaultParameters() {
@@ -557,6 +584,7 @@ export default class ReportBro {
     }
 
     setup() {
+        this.addMainPanelItemSubCategories();
         this.addDefaultParameters();
         this.headerBand.setup();
         this.contentBand.setup();
@@ -570,6 +598,8 @@ export default class ReportBro {
         this.addDataObject(this.footerBand);
         this.addDataObject(this.parameterContainer);
         this.addDataObject(this.styleContainer);
+        this.addDataObject(this.watermarkTextContainer);
+        this.addDataObject(this.watermarkImageContainer);
         this.addDataObject(this.documentProperties);
     }
 
@@ -811,7 +841,7 @@ export default class ReportBro {
      * Is called when a data object was modified (including new and deleted data objects).
      * @param {*} obj - new/deleted/modified data object.
      * @param {String} operation - operation which caused the notification.
-     * @param {?String} field - affected field in case of change operation.
+     * @param {String} [field] - affected field in case of change operation.
      */
     notifyEvent(obj, operation, field) {
         this.detailPanels[this.activeDetailPanel].notifyEvent(obj, operation, field);
@@ -828,18 +858,29 @@ export default class ReportBro {
 
     getStyles() {
         let styles = [];
-        for (let styleItem of this.getMainPanel().getStylesItem().getChildren()) {
+        for (const styleItem of this.getMainPanel().getStylesItem().getChildren()) {
             styles.push(styleItem.getData());
         }
         return styles;
     }
 
     getParameters() {
-        let parameters = [];
-        for (let parameterItem of this.getMainPanel().getParametersItem().getChildren()) {
+        const parameters = [];
+        for (const parameterItem of this.getMainPanel().getParametersItem().getChildren()) {
             parameters.push(parameterItem.getData());
         }
         return parameters;
+    }
+
+    getWatermarks() {
+        const watermarks = [];
+        for (const watermarkTextItem of this.watermarkTextContainer.getPanelItem().getChildren()) {
+            watermarks.push(watermarkTextItem.getData());
+        }
+        for (const watermarkImageItem of this.watermarkImageContainer.getPanelItem().getChildren()) {
+            watermarks.push(watermarkImageItem.getData());
+        }
+        return watermarks;
     }
 
     addDocElement(element) {
@@ -1158,6 +1199,12 @@ export default class ReportBro {
     getContainer(posX, posY, elementType, ignoreContainers) {
         let bestMatch = null;
         let bestMatchLevel = -1;
+        // watermark text and image elements always stay in their container for page background
+        if (elementType === DocElement.type.watermarkText) {
+            return this.watermarkTextContainer;
+        } else if (elementType === DocElement.type.watermarkImage) {
+            return this.watermarkImageContainer;
+        }
         for (let i = 0; i < this.containers.length; i++) {
             const container = this.containers[i];
             if (container.getLevel() > bestMatchLevel && container.isElementAllowed(elementType) &&
@@ -1501,14 +1548,16 @@ export default class ReportBro {
      * @returns {Object}
      */
     getReport() {
-        let rv = { docElements: [], parameters: [], styles: [], version: 4 };
-        let i;
+        const rv = { docElements: [], parameters: [], styles: [], watermarks: [], version: 5 };
         rv.docElements = this.getDocElements(false);
-        for (let parameter of this.getParameters()) {
+        for (const parameter of this.getParameters()) {
             rv.parameters.push(parameter.toJS());
         }
-        for (let style of this.getStyles()) {
+        for (const style of this.getStyles()) {
             rv.styles.push(style.toJS());
+        }
+        for (const watermark of this.getWatermarks()) {
+            rv.watermarks.push(watermark.toJS());
         }
         rv.documentProperties = this.documentProperties.toJS();
 
@@ -1548,10 +1597,10 @@ export default class ReportBro {
      * @param {Object} report - the report object.
      */
     load(report) {
-        for (let parameter of this.getParameters()) {
+        for (const parameter of this.getParameters()) {
             this.deleteDataObject(parameter);
         }
-        for (let style of this.getStyles()) {
+        for (const style of this.getStyles()) {
             this.deleteDataObject(style);
         }
         this.deleteDocElements();
@@ -1567,6 +1616,7 @@ export default class ReportBro {
         this.getMainPanel().getFooterItem().close();
         this.getMainPanel().getParametersItem().close();
         this.getMainPanel().getStylesItem().close();
+        this.getMainPanel().getWatermarksItem().close();
 
         if (report.version < 2) {
             for (const docElementData of report.docElements) {
@@ -1601,18 +1651,24 @@ export default class ReportBro {
                 }
             }
         }
+        if (report.version < 5) {
+            report.watermarks = [];
+        }
 
         this.documentProperties.setInitialData(report.documentProperties);
         this.documentProperties.setup();
 
-        for (let styleData of report.styles) {
+        for (const styleData of report.styles) {
             this.createStyle(styleData);
         }
-        for (let parameterData of report.parameters) {
+        for (const parameterData of report.parameters) {
             this.createParameter(parameterData, null);
         }
-        for (let docElementData of report.docElements) {
+        for (const docElementData of report.docElements) {
             this.createDocElement(docElementData);
+        }
+        for (const watermarkData of report.watermarks) {
+            this.createDocElement(watermarkData);
         }
 
         if (this.getProperty('highlightUnusedParameters')) {

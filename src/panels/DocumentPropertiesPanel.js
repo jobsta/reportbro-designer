@@ -95,6 +95,10 @@ export default class DocumentPropertiesPanel extends PanelBase {
                 'fieldId': 'footer_display',
                 'visibleIf': 'footer',
             },
+            'watermark': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'watermark'
+            },
             'patternLocale': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'pattern_locale'
@@ -228,6 +232,42 @@ export default class DocumentPropertiesPanel extends PanelBase {
 
         this.renderMarginControls(panel);
         this.renderHeaderFooter(panel);
+
+        if (this.rb.getProperty('showPlusFeatures')) {
+            elDiv = utils.createElement('div', { id: 'rbro_document_properties_watermark_row', class: 'rbroFormRow' });
+            utils.appendLabel(elDiv, this.rb.getLabel('watermarks'), 'rbro_document_properties_watermark');
+            elFormField = utils.createElement('div', { class: 'rbroFormField' });
+            let elWatermarkLabel = utils.createElement('label', { class: 'switch-light switch-material' });
+            let elWatermark = utils.createElement(
+                'input', { id: 'rbro_document_properties_watermark', type: 'checkbox' });
+            elWatermark.addEventListener('change', (event) => {
+                let watermarkChecked = elWatermark.checked;
+                let selectedObject = this.rb.getSelectedObject();
+                if (selectedObject !== null) {
+                    let cmd = new SetValueCmd(
+                        selectedObject.getId(), 'watermark', watermarkChecked, SetValueCmd.type.checkbox, this.rb)
+                    this.rb.executeCommand(cmd);
+                }
+            });
+            elWatermarkLabel.append(elWatermark);
+            let elWatermarkSpan = utils.createElement('span');
+            elWatermarkSpan.append(utils.createElement('span'));
+            elWatermarkSpan.append(utils.createElement('span'));
+            elWatermarkSpan.append(utils.createElement('a'));
+            elWatermarkLabel.append(elWatermarkSpan);
+            elFormField.append(elWatermarkLabel);
+            elFormField.append(
+                utils.createElement(
+                    'div', { id: 'rbro_document_properties_watermark_error', class: 'rbroErrorMessage' })
+            );
+            if (this.rb.getProperty('showPlusFeaturesInfo')) {
+                const elInfoText = utils.createElement('div', { class: 'rbroInfo' });
+                elInfoText.innerHTML = this.rb.getLabel('plusFeatureInfo');
+                elFormField.append(elInfoText);
+            }
+            elDiv.append(elFormField);
+            panel.append(elDiv);
+        }
 
         elDiv = utils.createElement('div', { id: 'rbro_document_properties_pattern_locale_row', class: 'rbroFormRow' });
         utils.appendLabel(elDiv, this.rb.getLabel('patternLocale'), 'rbro_document_properties_pattern_locale');

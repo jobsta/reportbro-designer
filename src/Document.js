@@ -706,6 +706,10 @@ export default class Document {
         return null;
     }
 
+    getRootElement() {
+        return this.elDocContent;
+    }
+
     isDragging() {
         return this.dragging;
     }

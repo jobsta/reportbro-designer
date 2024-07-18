@@ -114,7 +114,7 @@ export default class TextElement extends DocElement {
             // Style.setBorderValue needs to be called before super.setValue
             // because it calls updateStyle() which expects the correct border settings
             this[field] = value;
-            if (field.substr(0, 3) === 'cs_') {
+            if (field.substring(0, 3) === 'cs_') {
                 if (field === 'cs_borderWidth') {
                     this.borderWidthVal = utils.convertInputToNumber(value);
                 }
@@ -332,7 +332,7 @@ export default class TextElement extends DocElement {
             text = text.replace(/(?:\r\n|\r|\n)/g, ' ');
             // truncate text if it is too long
             if (text.length > 80) {
-                text = text.substr(0, 80);
+                text = text.substring(0, 80);
             }
             text = text.trim();
         }
@@ -371,12 +371,16 @@ export default class TextElement extends DocElement {
     }
 
     toJS() {
-        let ret = super.toJS();
-        for (let field of ['borderWidth', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
-                'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom']) {
-            ret[field] = utils.convertInputToNumber(this.getValue(field));
+        const rv = super.toJS();
+        const numericFields = ['borderWidth', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'];
+        // watermark text does not have conditional style properties
+        if (this.getElementType() !== DocElement.type.watermarkText) {
+            numericFields.push('cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom');
         }
-        return ret;
+        for (const field of numericFields) {
+            rv[field] = utils.convertInputToNumber(this.getValue(field));
+        }
+        return rv;
     }
 
     /**

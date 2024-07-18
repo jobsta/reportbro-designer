@@ -236,7 +236,7 @@ export default class Style {
     static setBorderValue(obj, field, fieldPrefix, value, rb) {
         let fieldWithoutPrefix = field;
         if (fieldPrefix.length > 0) {
-            fieldWithoutPrefix = fieldWithoutPrefix.substr(fieldPrefix.length);
+            fieldWithoutPrefix = fieldWithoutPrefix.substring(fieldPrefix.length);
         }
         if (fieldWithoutPrefix === 'borderLeft' || fieldWithoutPrefix === 'borderTop' ||
                 fieldWithoutPrefix === 'borderRight' || fieldWithoutPrefix === 'borderBottom') {

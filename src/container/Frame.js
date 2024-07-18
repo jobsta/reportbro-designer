@@ -1,7 +1,5 @@
 import Container from './Container';
 import DocElement from '../elements/DocElement';
-import Document from '../Document';
-import * as utils from '../utils';
 
 /**
  * A frame container which can contain various doc elements.

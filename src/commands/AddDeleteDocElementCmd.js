@@ -8,6 +8,8 @@ import PageBreakElement from '../elements/PageBreakElement';
 import SectionElement from '../elements/SectionElement';
 import TableElement from '../elements/TableElement';
 import TextElement from '../elements/TextElement';
+import WatermarkImageElement from '../elements/WatermarkImageElement';
+import WatermarkTextElement from '../elements/WatermarkTextElement';
 import MainPanelItem from '../menu/MainPanelItem';
 
 /**
@@ -98,6 +100,10 @@ export default class AddDeleteDocElementCmd extends Command {
             properties.hasChildren = true;
         } else if (elementType === DocElement.type.barCode) {
             element = new BarCodeElement(id, data, rb);
+        } else if (elementType === DocElement.type.watermarkText) {
+            element = new WatermarkTextElement(id, data, rb);
+        } else if (elementType === DocElement.type.watermarkImage) {
+            element = new WatermarkImageElement(id, data, rb);
         }
         rb.addDocElement(element);
         let parentPanel = element.getContainer().getPanelItem();

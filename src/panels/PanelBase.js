@@ -30,9 +30,9 @@ export default class PanelBase {
      * Collect all fields which are referenced in the visibleIf property.
      */
     initVisibleIfFields() {
-        for (let property in this.propertyDescriptors) {
+        for (const property in this.propertyDescriptors) {
             if (this.propertyDescriptors.hasOwnProperty(property)) {
-                let propertyDescriptor = this.propertyDescriptors[property];
+                const propertyDescriptor = this.propertyDescriptors[property];
                 if ('visibleIf' in propertyDescriptor) {
                     // add all fields used in visibleIf expression to visibileIfFields list of property descriptor
                     const tokens = utils.tokenize(propertyDescriptor['visibleIf'], null);
@@ -302,7 +302,11 @@ export default class PanelBase {
                     }
                 }
             }
+        }
 
+        // only update section visibility when selection was changed, otherwise section could be hidden when
+        // no section property was updated (i.e. no section property changed or affected by changed field)
+        if (field === null) {
             // show section if there is at least one property shown in section
             for (const section of this.getSections()) {
                 const sectionId = `${this.idPrefix}_${section}_section_container`;

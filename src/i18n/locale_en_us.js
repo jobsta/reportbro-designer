@@ -51,6 +51,7 @@ const locale_en = {
     docElementLink: 'Link',
     docElementLoadImageErrorMsg: 'Loading image failed',
     docElementLoadImageWebPErrorMsg: 'Loading image failed, upgrade browser to latest version',
+    docElementOpacity: 'Opacity %',
     docElementPageBreak: 'Page break',
     docElementPattern: 'Pattern',
     docElementPosition: 'Position (x, y)',
@@ -64,6 +65,7 @@ const locale_en = {
     docElementRichText: 'Rich text',
     docElementRoot: 'Document',
     docElementRotate: 'Rotate',
+    docElementRotateDeg: 'Rotate °',
     docElementSection: 'Section',
     docElementShrinkToContentHeight: 'Shrink to content height',
     docElementSize: 'Size (width, height)',
@@ -278,7 +280,10 @@ const locale_en = {
     styleVAlignmentBottom: 'Bottom',
     styleVAlignmentMiddle: 'Middle',
     styleVAlignmentTop: 'Top',
-    styles: 'Styles'
+    styles: 'Styles',
+    watermarkImages: 'Image watermarks',
+    watermarkTexts: 'Text watermarks',
+    watermarks: 'Watermarks',
 };
 
 export default locale_en;

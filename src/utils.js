@@ -76,7 +76,7 @@ export function setInputDecimal(el) {
             if (pos2 !== -1) {
                 places = parseInt(className.substring(pos, pos2), 10);
             } else {
-                places = parseInt(className.substr(pos), 10);
+                places = parseInt(className.substring(pos), 10);
             }
             if (!isNaN(places)) {
                 pos = nvalue.indexOf('.');
@@ -414,11 +414,11 @@ export function tokenize(input, obj) {
                     // get object field value by field name and set value for token
                     const val = obj.getValue(word);
                     let tokenType;
-                    if (val instanceof Number) {
+                    if (typeof val === 'number') {
                         tokenType = Token.type.number;
-                    } else if (val instanceof String) {
+                    } else if (typeof val === 'string') {
                         tokenType = Token.type.string;
-                    } else if (val instanceof Boolean) {
+                    } else if (typeof val === 'boolean') {
                         tokenType = Token.type.boolean;
                     } else {
                         tokenType = Token.type.undefined;

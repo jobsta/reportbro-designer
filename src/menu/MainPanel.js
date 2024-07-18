@@ -52,6 +52,18 @@ export default class MainPanel {
                 hasDetails: false
             }, rb);
 
+        this.watermarksItem = new MainPanelItem(
+            'watermark', null, null, {
+                hasChildren: true,
+                showAdd: false,
+                showDelete: false,
+                hasDetails: false,
+                id: '0_watermarks',
+                name: rb.getLabel('watermarks'),
+                // set static flag to prevent child nodes (sub categories) being cleared when report is loaded
+                static: true,
+            }, rb);
+
         this.documentPropertiesItem = new MainPanelItem(
             'documentProperties', null, rb.getDocumentProperties(), {
                 showDelete: false,
@@ -64,7 +76,8 @@ export default class MainPanel {
             this.footerItem,
             this.parametersItem,
             this.stylesItem,
-            this.documentPropertiesItem
+            this.watermarksItem,
+            this.documentPropertiesItem,
         ];
 
         this.dragMainPanelSizer = false;
@@ -97,6 +110,10 @@ export default class MainPanel {
 
     getStylesItem() {
         return this.stylesItem;
+    }
+
+    getWatermarksItem() {
+        return this.watermarksItem;
     }
 
     getContainerByItem(item) {
@@ -205,8 +222,16 @@ export default class MainPanel {
         this.footerItem.hide();
     }
 
+    showWatermarks() {
+        this.watermarksItem.show();
+    }
+
+    hideWatermarks() {
+        this.watermarksItem.hide();
+    }
+
     clearAll() {
-        for (let item of this.items) {
+        for (const item of this.items) {
             item.clear();
         }
     }

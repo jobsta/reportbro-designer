@@ -51,6 +51,7 @@ const locale_de = {
     docElementLink: 'Link',
     docElementLoadImageErrorMsg: 'Bild laden fehlgeschlagen',
     docElementLoadImageWebPErrorMsg: 'Bild laden fehlgeschlagen, aktueller Browser benötigt',
+    docElementOpacity: 'Deckkraft %',
     docElementPageBreak: 'Seitenumbruch',
     docElementPattern: 'Pattern',
     docElementPosition: 'Position (x, y)',
@@ -64,6 +65,7 @@ const locale_de = {
     docElementRichText: 'Rich Text',
     docElementRoot: 'Dokument',
     docElementRotate: 'Drehen',
+    docElementRotateDeg: 'Drehen °',
     docElementSection: 'Sektion',
     docElementShrinkToContentHeight: 'Auf Inhaltshöhe reduzieren',
     docElementSize: 'Größe (Breite, Höhe)',
@@ -278,7 +280,10 @@ const locale_de = {
     styleVAlignmentBottom: 'Unten',
     styleVAlignmentMiddle: 'Mittig',
     styleVAlignmentTop: 'Oben',
-    styles: 'Formatvorlagen'
+    styles: 'Formatvorlagen',
+    watermarkImages: 'Bild-Wasserzeichen',
+    watermarkTexts: 'Text-Wasserzeichen',
+    watermarks: 'Wasserzeichen',
 };
 
 export default locale_de;

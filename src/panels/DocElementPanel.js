@@ -39,7 +39,7 @@ export default class DocElementPanel extends PanelBase {
             },
             'richText': {
                 'type': SetValueCmd.type.checkbox,
-                'fieldId': 'rich_text'
+                'fieldId': 'rich_text',
             },
             'richTextContent': {
                 'type': SetValueCmd.type.richText,
@@ -139,20 +139,20 @@ export default class DocElementPanel extends PanelBase {
             },
             'source': {
                 'type': SetValueCmd.type.text,
-                'fieldId': 'source'
+                'fieldId': 'source',
             },
             'image': {
                 'type': SetValueCmd.type.file,
                 'fieldId': 'image',
                 'rowId': 'rbro_doc_element_image_row',
                 'singleRowProperty': false,
-                'rowProperties': ['image', 'imageFilename']
+                'rowProperties': ['image', 'imageFilename'],
             },
             'imageFilename': {
                 'type': SetValueCmd.type.filename,
                 'fieldId': 'image_filename',
                 'rowId': 'rbro_doc_element_image_row',
-                'singleRowProperty': false
+                'singleRowProperty': false,
             },
             'columns': {
                 'type': SetValueCmd.type.text,
@@ -170,17 +170,25 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.checkbox,
                 'fieldId': 'footer'
             },
-            'color': {
-                'type': SetValueCmd.type.color,
-                'allowEmpty': false,
-                'fieldId': 'color',
-                'section': 'style'
+            'rotateDeg': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'rotate_deg',
+            },
+            'opacity': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'opacity',
             },
             'styleId': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'style_id',
                 'section': 'style',
                 'allowEmpty': true
+            },
+            'color': {
+                'type': SetValueCmd.type.color,
+                'allowEmpty': false,
+                'fieldId': 'color',
+                'section': 'style'
             },
             'bold': {
                 'type': SetValueCmd.type.button,
@@ -1447,6 +1455,84 @@ export default class DocElementPanel extends PanelBase {
         elDiv.append(elFormField);
         panel.append(elDiv);
 
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_rotate_deg_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementRotateDeg'), 'rbro_doc_element_rotate_deg');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elRotateDeg = utils.createElement(
+            'input', { id: 'rbro_doc_element_rotate_deg', type: 'number', step: '15', autocomplete: 'off' });
+        elRotateDeg.addEventListener('input', (event) => {
+            let val = elRotateDeg.value;
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 0, 360);
+            }
+            if (val !== elRotateDeg.value) {
+                elRotateDeg.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('rotateDeg') !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
+
+            if (valueChanged) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'rotateDeg', val, SetValueCmd.type.text, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
+        elFormField.append(elRotateDeg);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_opacity_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementOpacity'), 'rbro_doc_element_opacity');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elOpacity = utils.createElement(
+            'input', { id: 'rbro_doc_element_opacity', type: 'number', step: '10', autocomplete: 'off' });
+        elOpacity.addEventListener('input', (event) => {
+            let val = elOpacity.value;
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 0, 100);
+            }
+            if (val !== elOpacity.value) {
+                elOpacity.value = val;
+            }
+            let selectedObjects = this.rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue('opacity') !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
+
+            if (valueChanged) {
+                let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+                for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                    let obj = selectedObjects[i];
+                    cmdGroup.addSelection(obj.getId());
+                    cmdGroup.addCommand(new SetValueCmd(
+                        obj.getId(), 'opacity', val, SetValueCmd.type.text, this.rb));
+                }
+                if (!cmdGroup.isEmpty()) {
+                    this.rb.executeCommand(cmdGroup);
+                }
+            }
+        });
+        elFormField.append(elOpacity);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
         // ---------------------------
         // --- Style Section Begin ---
         // ---------------------------
@@ -2333,6 +2419,11 @@ export default class DocElementPanel extends PanelBase {
                     break;
                 }
             }
+        }
+        if (elementType === DocElement.type.watermarkText) {
+            elementType = DocElement.type.text;
+        } else if (elementType === DocElement.type.watermarkImage) {
+            elementType = DocElement.type.image;
         }
 
         utils.populateStyleSelect(this.elStyle, styleType, null, this.rb);

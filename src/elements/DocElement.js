@@ -869,7 +869,7 @@ export default class DocElement {
     getDataSourceParameterName() {
         if (this.hasDataSource()) {
             const dataSource = this.getValue('dataSource').trim();
-            if (dataSource.length >= 3 && dataSource.substr(0, 2) === '${' &&
+            if (dataSource.length >= 3 && dataSource.substring(0, 2) === '${' &&
                     dataSource.charAt(dataSource.length - 1) === '}') {
                 return dataSource.substring(2, dataSource.length - 1);
             }
@@ -1116,15 +1116,15 @@ export default class DocElement {
     }
 
     toJS() {
-        let ret = { elementType: this.getElementType() };
-        for (let field of this.getFields()) {
+        const rv = { elementType: this.getElementType() };
+        for (const field of this.getFields()) {
             if (['x', 'y', 'width', 'height'].indexOf(field) === -1) {
-                ret[field] = this.getValue(field);
+                rv[field] = this.getValue(field);
             } else {
-                ret[field] = this.getValue(field + 'Val');
+                rv[field] = this.getValue(field + 'Val');
             }
         }
-        return ret;
+        return rv;
     }
 }
 
@@ -1138,7 +1138,9 @@ DocElement.type = {
     tableText: 'table_text',
     barCode: 'bar_code',
     frame: 'frame',
-    section: 'section'
+    section: 'section',
+    watermarkText: 'watermark_text',
+    watermarkImage: 'watermark_image',
 };
 
 DocElement.dragType = {

@@ -1,3 +1,4 @@
+import AddDeleteDocElementCmd from '../commands/AddDeleteDocElementCmd';
 import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import AddDeleteStyleCmd from '../commands/AddDeleteStyleCmd';
 import CommandGroupCmd from '../commands/CommandGroupCmd';
@@ -16,11 +17,12 @@ import * as utils from '../utils';
 export default class MainPanelItem {
     constructor(panelName, parent, data, properties, rb) {
         this.properties = {
-            hasChildren: false, showAdd: false, showDelete: true, hasDetails: true, visible: true, draggable: false
+            hasChildren: false, showAdd: false, showDelete: true, hasDetails: true, visible: true, draggable: false,
+            static: false,
         };
         Object.assign(this.properties, properties);
         this.panelName = panelName;
-        let name = (data !== null) ? data.getName() : '';
+        const name = (data !== null) ? data.getName() : (properties.name ? properties.name : '');
         this.id = (data !== null) ? data.getId() : properties.id;
         this.parent = parent;
         this.data = data;
@@ -32,7 +34,7 @@ export default class MainPanelItem {
         if (!this.properties.visible) {
             this.element.classList.add('rbroHidden');
         }
-        let itemDiv = utils.createElement('div', { id: `rbro_menu_item${this.id}`, class: 'rbroMenuItem' });
+        const itemDiv = utils.createElement('div', { id: `rbro_menu_item${this.id}`, class: 'rbroMenuItem' });
         if (this.properties.draggable) {
             itemDiv.setAttribute('draggable', 'true');
             itemDiv.addEventListener('dragstart', (event) => {
@@ -105,7 +107,7 @@ export default class MainPanelItem {
             }
         });
 
-        let nameDiv = utils.createElement('div', { class: 'rbroMenuItemText' });
+        const nameDiv = utils.createElement('div', { class: 'rbroMenuItemText' });
         nameDiv.append(utils.createElement('span', { id: `rbro_menu_item_name${this.id}` }, name));
         if (this.properties.showAdd) {
             const elAddButton = utils.createElement(
@@ -119,6 +121,17 @@ export default class MainPanelItem {
                     this.rb.executeCommand(cmd);
                 } else if (panelName === 'style') {
                     let cmd = new AddDeleteStyleCmd(true, {}, this.rb.getUniqueId(), this.getId(), -1, this.rb);
+                    this.rb.executeCommand(cmd);
+                } else if (panelName === 'watermarkText' || panelName === 'watermarkImage') {
+                    const initialData = { containerId: this.getId() };
+                    let docElementType;
+                    if (panelName === 'watermarkText') {
+                        docElementType = DocElement.type.watermarkText;
+                    } else {
+                        docElementType = DocElement.type.watermarkImage;
+                    }
+                    const cmd = new AddDeleteDocElementCmd(
+                        true, docElementType, initialData, this.rb.getUniqueId(), this.getId(), -1, this.rb);
                     this.rb.executeCommand(cmd);
                 }
                 let newItem = this.children[this.children.length - 1];
@@ -388,8 +401,16 @@ export default class MainPanelItem {
 
     clear() {
         if (this.children.length > 0) {
-            utils.emptyElement(document.getElementById(`rbro_menu_item_children${this.id}`));
-            this.children = [];
+            // static items (e.g. sub category for watermarks) are not cleared, therefor the children have
+            // to be cleared individually
+            if (this.properties.static) {
+                for (const child of this.children) {
+                    child.clear();
+                }
+            } else {
+                utils.emptyElement(document.getElementById(`rbro_menu_item_children${this.id}`));
+                this.children = [];
+            }
         }
     }
 
