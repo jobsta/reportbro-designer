@@ -6,6 +6,14 @@ import SetValueCmd from '../commands/SetValueCmd';
 import Parameter from '../data/Parameter';
 import Style from '../data/Style';
 import DocElement from '../elements/DocElement';
+import FrameElement from '../elements/FrameElement';
+import ImageElement from '../elements/ImageElement';
+import LineElement from '../elements/LineElement';
+import SectionBandElement from '../elements/SectionBandElement';
+import TableElement from '../elements/TableElement';
+import TableBandElement from '../elements/TableBandElement';
+import TableTextElement from '../elements/TableTextElement';
+import TextElement from '../elements/TextElement';
 import PopupWindow from '../PopupWindow';
 import * as utils from '../utils';
 import Quill from 'quill';
@@ -2315,20 +2323,20 @@ export default class DocElementPanel extends PanelBase {
     }
 
     renderStyleSelect() {
-        let elementType = '';
+        let styleType = '';
         const selectedObjects = this.rb.getSelectedObjects();
         if (selectedObjects.length > 0) {
-            elementType = selectedObjects[0].getElementType();
+            styleType = DocElementPanel.getElementStyleType(selectedObjects[0]);
             for (const selectedObject of this.rb.getSelectedObjects()) {
-                if (elementType !== selectedObject.getElementType()) {
-                    elementType = 'mixed';
+                if (styleType !== DocElementPanel.getElementStyleType(selectedObject)) {
+                    styleType = 'mixed';
                     break;
                 }
             }
         }
 
-        utils.populateStyleSelect(this.elStyle, elementType, null, this.rb);
-        utils.populateStyleSelect(this.elCsStyle, elementType, null, this.rb);
+        utils.populateStyleSelect(this.elStyle, styleType, null, this.rb);
+        utils.populateStyleSelect(this.elCsStyle, styleType, null, this.rb);
     }
 
     setupRichText() {
@@ -2497,5 +2505,30 @@ export default class DocElementPanel extends PanelBase {
      */
     getSections() {
         return ['style', 'print', 'cs_style', 'spreadsheet'];
+    }
+
+    /**
+     * Return style type for given element (needed for rendering of style select) or empty string if
+     * element does not have a style.
+     * @param {DocElement} element - doc element
+     * @return {string} style type
+     */
+    static getElementStyleType(element) {
+        if (element instanceof TextElement || element instanceof TableTextElement) {
+            return Style.type.text;
+        } else if (element instanceof LineElement) {
+            return Style.type.line;
+        } else if (element instanceof ImageElement) {
+            return Style.type.image;
+        } else if (element instanceof TableElement) {
+            return Style.type.table;
+        } else if (element instanceof TableBandElement) {
+            return Style.type.tableBand;
+        } else if (element instanceof FrameElement) {
+            return Style.type.frame;
+        } else if (element instanceof SectionBandElement) {
+            return Style.type.sectionBand;
+        }
+        return '';
     }
 }

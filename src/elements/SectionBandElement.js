@@ -1,6 +1,5 @@
 import DocElement from './DocElement';
 import Band from '../container/Band';
-import Document from '../Document';
 import * as utils from '../utils';
 
 /**

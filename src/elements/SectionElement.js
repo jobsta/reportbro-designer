@@ -405,6 +405,13 @@ export default class SectionElement extends DocElement {
         return true;
     }
 
+    addChildren(docElements) {
+        docElements.push(this.headerData);
+        docElements.push(this.contentData);
+        docElements.push(this.footerData);
+        // children of section bands will be added through linked containers of section
+    }
+
     /**
      * Adds SetValue commands to command group parameter in case the specified parameter is used in any of
      * the object fields.
