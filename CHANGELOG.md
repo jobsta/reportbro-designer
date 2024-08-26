@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.9.0] - 2024-08-27
+
+### Features
+* Add text and image watermarks with rotation and transparency (PLUS version)
+* Support styles for various element types
+
 ## [3.8.0] - 2024-05-23
 
 ### Features
