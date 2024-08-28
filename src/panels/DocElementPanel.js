@@ -2420,11 +2420,6 @@ export default class DocElementPanel extends PanelBase {
                 }
             }
         }
-        if (elementType === DocElement.type.watermarkText) {
-            elementType = DocElement.type.text;
-        } else if (elementType === DocElement.type.watermarkImage) {
-            elementType = DocElement.type.image;
-        }
 
         utils.populateStyleSelect(this.elStyle, styleType, null, this.rb);
         utils.populateStyleSelect(this.elCsStyle, styleType, null, this.rb);
