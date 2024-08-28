@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.9.1] - 2024-08-28
+
+### Bug Fixes
+* Fix rendering style select
+
 ## [3.9.0] - 2024-08-27
 
 ### Features
