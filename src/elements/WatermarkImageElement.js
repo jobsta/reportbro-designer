@@ -10,6 +10,13 @@ export default class WatermarkElement extends ImageElement {
         super(id, initialData, rb);
         this.rotateDeg = 0;
         this.opacity = 30;
+        this.showInForeground = false;
+        // watermark properties must be set explicitly because they did not exist in ImageElement constructor
+        for (const key of ['rotateDeg', 'opacity', 'showInForeground']) {
+            if (initialData.hasOwnProperty(key) && this.hasOwnProperty(key)) {
+                this[key] = initialData[key];
+            }
+        }
     }
 
     setValue(field, value) {
@@ -26,7 +33,8 @@ export default class WatermarkElement extends ImageElement {
      */
     getProperties() {
         return [
-            'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename', 'rotateDeg', 'opacity',
+            'x', 'y', 'width', 'height', 'source', 'image', 'imageFilename',
+            'rotateDeg', 'opacity', 'showInForeground',
             'styleId', 'horizontalAlignment', 'verticalAlignment', 'backgroundColor',
             'printIf',
         ];

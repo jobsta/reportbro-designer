@@ -67,6 +67,7 @@ const locale_de = {
     docElementRotate: 'Drehen',
     docElementRotateDeg: 'Drehen °',
     docElementSection: 'Sektion',
+    docElementShowInForeground: 'Im Vorderground anzeigen',
     docElementShrinkToContentHeight: 'Auf Inhaltshöhe reduzieren',
     docElementSize: 'Größe (Breite, Höhe)',
     docElementSource: 'Bildquelle',

@@ -67,6 +67,7 @@ const locale_en = {
     docElementRotate: 'Rotate',
     docElementRotateDeg: 'Rotate °',
     docElementSection: 'Section',
+    docElementShowInForeground: 'Show in foreground',
     docElementShrinkToContentHeight: 'Shrink to content height',
     docElementSize: 'Size (width, height)',
     docElementSource: 'Source',

@@ -10,6 +10,13 @@ export default class WatermarkTextElement extends TextElement {
         super(id, initialData, rb);
         this.rotateDeg = 0;
         this.opacity = 30;
+        this.showInForeground = false;
+        // watermark properties must be set explicitly because they did not exist in TextElement constructor
+        for (const key of ['rotateDeg', 'opacity', 'showInForeground']) {
+            if (initialData.hasOwnProperty(key) && this.hasOwnProperty(key)) {
+                this[key] = initialData[key];
+            }
+        }
     }
 
     setValue(field, value) {
@@ -26,7 +33,7 @@ export default class WatermarkTextElement extends TextElement {
      */
     getProperties() {
         return [
-            'x', 'y', 'width', 'height', 'content', 'eval', 'rotateDeg', 'opacity',
+            'x', 'y', 'width', 'height', 'content', 'eval', 'rotateDeg', 'opacity', 'showInForeground',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
             'lineSpacing', 'borderColor', 'borderWidth',

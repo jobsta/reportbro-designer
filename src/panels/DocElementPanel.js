@@ -178,6 +178,10 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'opacity',
             },
+            'showInForeground': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'show_in_foreground',
+            },
             'styleId': {
                 'type': SetValueCmd.type.select,
                 'fieldId': 'style_id',
@@ -1530,6 +1534,30 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elOpacity);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement(
+          'div', { id: 'rbro_doc_element_show_in_foreground_row', class: 'rbroFormRow rbroHidden' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementShowInForeground'), 'rbro_doc_element_show_in_foreground');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elShowInForeground = utils.createElement(
+          'input', { id: 'rbro_doc_element_show_in_foreground', type: 'checkbox' });
+        elShowInForeground.addEventListener('change', (event) => {
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            let showInForegroundChecked = elShowInForeground.checked;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(), 'showInForeground', showInForegroundChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elShowInForeground);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
