@@ -1,5 +1,16 @@
 # Changelog
 
+## Upcoming Release
+
+### Features
+* Add option for watermark elements to show in foreground
+
+### Changes
+* Do not restrict watermark elements to page boundaries
+
+### Bug Fixes
+* Fix error on xlsx download
+
 ## [3.9.1] - 2024-08-28
 
 ### Bug Fixes
