@@ -70,6 +70,16 @@ export default class WatermarkElement extends ImageElement {
     }
 
     /**
+     * Returns true if element is restricted within container boundaries.
+     *
+     * Watermark elements are not restricted to any containers.
+     * @returns {boolean}
+     */
+    hasBoundaries() {
+        return false;
+    }
+
+    /**
      * Returns class name.
      * This can be useful for introspection when the class names are mangled
      * due to the webpack uglification process.

@@ -61,7 +61,7 @@ export default class DocElement {
      */
     setup(openPanelItem) {
         let container = this.getContainer();
-        if (container !== null) {
+        if (container !== null && this.hasBoundaries()) {
             // adapt position if new element is outside container
             let containerSize = container.getContentSize();
             if (this.xVal + this.widthVal > containerSize.width) {
@@ -299,10 +299,9 @@ export default class DocElement {
     }
 
     /**
-     * Check element bounds within container and adapt position/size if necessary.
+     * Add commands for updated position/size.
      *
-     * This should be called when an element is resized or moved to another container to guarantee that
-     * the element is not out of bounds.
+     * This should be called when an element is moved, resized or moved to another container.
      * @param {Number} x - x value of doc element.
      * @param {Number} y - y value of doc element.
      * @param {Number} width - width value of doc element.
@@ -310,24 +309,27 @@ export default class DocElement {
      * @param {Object} containerSize - width and height of container where this doc element belongs to.
      * @param {CommandGroupCmd} cmdGroup - possible SetValue commands will be added to this command group.
      */
-    checkBounds(x, y, width, height, containerSize, cmdGroup) {
-        if ((x + width) > containerSize.width) {
-            x = containerSize.width - width;
-        }
-        if (x < 0)  {
-            x = 0;
-        }
-        if ((x + width) > containerSize.width) {
-            width = containerSize.width - x;
-        }
-        if ((y + height) > containerSize.height) {
-            y = containerSize.height - height;
-        }
-        if (y < 0)  {
-            y = 0;
-        }
-        if ((y + height) > containerSize.height) {
-            height = containerSize.height - y;
+    updatePositionAndSize(x, y, width, height, containerSize, cmdGroup) {
+        if (this.hasBoundaries()) {
+            // Check element bounds within container and adapt position/size if necessary
+            if ((x + width) > containerSize.width) {
+                x = containerSize.width - width;
+            }
+            if (x < 0)  {
+                x = 0;
+            }
+            if ((x + width) > containerSize.width) {
+                width = containerSize.width - x;
+            }
+            if ((y + height) > containerSize.height) {
+                y = containerSize.height - height;
+            }
+            if (y < 0)  {
+                y = 0;
+            }
+            if ((y + height) > containerSize.height) {
+                height = containerSize.height - y;
+            }
         }
 
         if (x !== this.xVal && this.hasProperty('x')) {
@@ -358,7 +360,7 @@ export default class DocElement {
             for (let child of linkedContainer.getPanelItem().getChildren()) {
                 if (child.getData() instanceof DocElement) {
                     let docElement = child.getData();
-                    docElement.checkBounds(docElement.getValue('xVal'), docElement.getValue('yVal'),
+                    docElement.updatePositionAndSize(docElement.getValue('xVal'), docElement.getValue('yVal'),
                         docElement.getDisplayWidth(), docElement.getDisplayHeight(),
                         linkedContainerSize, cmdGroup);
                 }
@@ -697,7 +699,7 @@ export default class DocElement {
             }
             if (!containerChanged || dragContainer.isElementAllowed(this.getElementType())) {
                 const cmdCountBefore = cmdGroup.getCommands().length;
-                this.checkBounds(posX1, posY1, width, height, containerSize, cmdGroup);
+                this.updatePositionAndSize(posX1, posY1, width, height, containerSize, cmdGroup);
 
                 if (containerChanged) {
                     let cmd = new SetValueCmd(
@@ -783,6 +785,14 @@ export default class DocElement {
 
     hasBorderSettings() {
         return false;
+    }
+
+    /**
+     * Returns true if element is restricted within container boundaries.
+     * @returns {boolean}
+     */
+    hasBoundaries() {
+        return true;
     }
 
     /**

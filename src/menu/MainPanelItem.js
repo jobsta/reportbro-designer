@@ -88,7 +88,7 @@ export default class MainPanelItem {
                     let draggedObj = this.rb.getDataObject(this.rb.getBrowserDragId());
                     if (draggedObj instanceof DocElement &&
                             draggedObj.getValue('containerId') !== dropInfo.container.getId()) {
-                        draggedObj.checkBounds(draggedObj.getValue('xVal'), draggedObj.getValue('yVal'),
+                        draggedObj.updatePositionAndSize(draggedObj.getValue('xVal'), draggedObj.getValue('yVal'),
                             draggedObj.getValue('widthVal'), draggedObj.getValue('heightVal'),
                             dropInfo.container.getSize(), cmdGroup);
 
