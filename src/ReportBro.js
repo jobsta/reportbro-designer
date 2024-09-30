@@ -1740,7 +1740,7 @@ export default class ReportBro {
     downloadSpreadsheet() {
         const requestParams = this.getRequestParameters();
         const url = new URL(requestParams.reportServerUrl, document.location);
-        url.searchParams.set('key', self.reportKey);
+        url.searchParams.set('key', this.reportKey);
         url.searchParams.set('outputFormat', 'xlsx');
         const headers = requestParams.reportServerHeaders;
         const self = this;
