@@ -7,6 +7,7 @@
 
 ### Changes
 * Do not restrict watermark elements to page boundaries
+* Do not allow to delete default parameters "page_count" and "page_number"
 
 ### Bug Fixes
 * Fix error on xlsx download
