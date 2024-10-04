@@ -2,7 +2,6 @@ import AddDeleteParameterCmd from '../commands/AddDeleteParameterCmd';
 import Command from '../commands/Command';
 import SetValueCmd from '../commands/SetValueCmd';
 import MainPanelItem from '../menu/MainPanelItem';
-import * as utils from '../utils';
 
 /**
  * Parameter data object. Contains all parameter settings including test data.
@@ -64,12 +63,15 @@ export default class Parameter {
             for (let child of this.children) {
                 let parameter = new Parameter(child.id || this.rb.getUniqueId(), child, this.rb);
                 this.rb.addParameter(parameter);
-                // set hasChildren and showAdd to true (in case adminMode is enabled) because parameters
-                // can have children depending on their type (for map and list) -> children and add button
-                // are shown/hidden dynamically
+                const showOnlyNameType = parameter.getValue('showOnlyNameType');
+                const showAddDelete = adminMode && !showOnlyNameType;
+                // in case children and add/delete buttons exist: the visibility depends on parameter
+                // type which can be modified (e.g. map and list have children and add button) and
+                // is updated dynamically
                 let panelItem = new MainPanelItem(
-                    'parameter', this.panelItem, parameter,
-                    { hasChildren: true, showAdd: adminMode, showDelete: adminMode, draggable: true }, this.rb);
+                    'parameter', this.panelItem, parameter, {
+                        hasChildren: !showOnlyNameType, showAdd: showAddDelete, showDelete: showAddDelete,
+                        draggable: true }, this.rb);
                 parameter.setPanelItem(panelItem);
                 this.panelItem.appendChild(panelItem);
                 parameter.setup();
@@ -175,7 +177,9 @@ export default class Parameter {
      * Must be called initially and when parameter type changes.
      */
     updateMenuItemDisplay() {
-        if (this.rb.getProperty('adminMode')) {
+        // for parameters where only name and type are shown (showOnlyNameType == true)
+        // there are no buttons for add / delete and toggle children (e.g. page_count, page_number)
+        if (this.rb.getProperty('adminMode') && !this.showOnlyNameType) {
             if (this.type === Parameter.type.array || this.type === Parameter.type.map) {
                 document.getElementById(`rbro_menu_item_add${this.getId()}`).removeAttribute('style');
                 document.getElementById(`rbro_menu_item_children${this.getId()}`).style.display = 'block';
@@ -333,7 +337,6 @@ export default class Parameter {
                 showOnlyNameType: true
             };
             let cmd = new AddDeleteParameterCmd(true, initialData, this.rb.getUniqueId(), this.getId(), 0, this.rb);
-            cmd.setShowDelete(false);
             cmdGroup.addCommand(cmd);
         } else if (this.type === Parameter.type.array && newParameterType !== Parameter.type.array) {
             let children = this.getChildren();

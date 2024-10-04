@@ -15,7 +15,6 @@ export default class AddDeleteParameterCmd extends Command {
         this.position = position;
         this.rb = rb;
         this.id = id;
-        this.showDelete = true;
     }
 
     getName() {
@@ -24,10 +23,6 @@ export default class AddDeleteParameterCmd extends Command {
         } else {
             return 'Delete parameter';
         }
-    }
-
-    setShowDelete(showDelete) {
-        this.showDelete = showDelete;
     }
 
     do() {
@@ -51,9 +46,11 @@ export default class AddDeleteParameterCmd extends Command {
         if (parent !== null) {
             let parameter = new Parameter(this.id, this.initialData, this.rb);
             this.rb.addParameter(parameter);
+            const showOnlyNameType = parameter.getValue('showOnlyNameType');
             let panelItem = new MainPanelItem(
-                'parameter', parent.getPanelItem(), parameter,
-                { hasChildren: true, showAdd: true, showDelete: this.showDelete, draggable: true }, this.rb);
+                'parameter', parent.getPanelItem(), parameter, {
+                    hasChildren: !showOnlyNameType, showAdd: !showOnlyNameType, showDelete: !showOnlyNameType,
+                    draggable: true }, this.rb);
             panelItem.openParentItems();
             parameter.setPanelItem(panelItem);
             parent.getPanelItem().insertChild(this.position, panelItem);

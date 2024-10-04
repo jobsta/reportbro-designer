@@ -510,11 +510,9 @@ export default class ReportBro {
             ]) {
             let parameter = new Parameter(this.getUniqueId(), parameterData, this);
             let parentPanel = this.mainPanel.getParametersItem();
-            // set hasChildren and showAdd to true because parameters can have children depending on their
-            // type (for map and list) -> children and add button are shown/hidden dynamically
             let panelItem = new MainPanelItem(
                 'parameter', parentPanel, parameter, {
-                    hasChildren: true, showAdd: true, showDelete: true, draggable: false }, this
+                    hasChildren: false, showAdd: false, showDelete: false, draggable: false }, this
             );
             parameter.setPanelItem(panelItem);
             parentPanel.appendChild(panelItem);
@@ -1984,19 +1982,21 @@ export default class ReportBro {
             parentPanel = this.mainPanel.getParametersItem();
         }
         const adminMode = this.getProperty('adminMode');
-        // set hasChildren and showAdd to true (in case adminMode is enabled) because parameters
-        // can have children depending on their type (for map and list) -> children and add button
-        // are shown/hidden dynamically
+        const showOnlyNameType = parameter.getValue('showOnlyNameType');
+        const showAddDelete = adminMode && !showOnlyNameType;
+        // in case children and add/delete buttons exist: the visibility depends on parameter
+        // type which can be modified (e.g. map and list have children and add button) and
+        // is updated dynamically
         let panelItem = new MainPanelItem(
             'parameter', parentPanel, parameter,
-            { hasChildren: true, showAdd: adminMode, showDelete: adminMode, draggable: true }, this);
+            { hasChildren: !showOnlyNameType, showAdd: showAddDelete, showDelete: showAddDelete, draggable: true },
+            this);
         parameter.setPanelItem(panelItem);
         parentPanel.appendChild(panelItem);
         parameter.setup();
-        if (parameter.getValue('type') !== Parameter.type.array && parameter.getValue('type') !== Parameter.type.map) {
-            if (adminMode) {
-                document.getElementById(`rbro_menu_item_add${parameter.getId()}`).style.display = 'none';
-            }
+        if (adminMode && !showOnlyNameType && parameter.getValue('type') !== Parameter.type.array &&
+                parameter.getValue('type') !== Parameter.type.map) {
+            document.getElementById(`rbro_menu_item_add${parameter.getId()}`).style.display = 'none';
             document.getElementById(`rbro_menu_item_children${parameter.getId()}`).style.display = 'none';
             document.getElementById(`rbro_menu_item_children_toggle${parameter.getId()}`).style.display = 'none';
         }
