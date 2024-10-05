@@ -67,7 +67,7 @@ export function setInputDecimal(el) {
     el.addEventListener('keyup', (event) => {
         const val = event.target.value;
         let nvalue = val.reverse().replace(/[^0-9\-\.,]|[\-](?=.)|[\.,](?=[0-9]*[\.,])/g, '').reverse();
-        const className = this.className;
+        const className = event.target.className;
         let pos = className ? className.indexOf('decimalPlaces') : -1;
         if (pos !== -1) {
             pos += 13;
