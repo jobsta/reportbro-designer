@@ -13,7 +13,7 @@ export default class Page extends Container {
      * Called after initialization is finished.
      */
     setup() {
-        this.el = this.rb.getDocument().getRootElement();
+        this.el = this.rb.getDocument().getPageElement();
         this.elContent = this.el;
     }
 
