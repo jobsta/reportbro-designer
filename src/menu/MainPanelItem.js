@@ -499,6 +499,7 @@ export default class MainPanelItem {
         return this.panelName === DocElement.type.text || this.panelName === DocElement.type.image ||
             this.panelName === DocElement.type.line || this.panelName === DocElement.type.table ||
             this.panelName === DocElement.type.pageBreak || this.panelName === DocElement.type.barCode ||
-            this.panelName === DocElement.type.frame || this.panelName === DocElement.type.section;
+            this.panelName === DocElement.type.frame || this.panelName === DocElement.type.section ||
+            this.panelName === DocElement.type.watermarkText || this.panelName === DocElement.type.watermarkImage;
     }
 }
