@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [3.9.2] - 2024-10-07
 
 ### Features
 * Add option for watermark elements to show in foreground
@@ -11,6 +11,8 @@
 
 ### Bug Fixes
 * Fix error on xlsx download
+* Fix deleting watermark element
+* Fix validating decimal input value in test data popup
 
 ## [3.9.1] - 2024-08-28
 
