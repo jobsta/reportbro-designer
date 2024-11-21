@@ -37,6 +37,8 @@ export default class ReportBro {
     constructor(element, properties) {
         this.element = element;
         this.nextId = 1;
+        // version of returned report data, version is needed when loading reports in older format
+        this.version = 5;
         this.locale = locales[(properties && properties.localeKey) || 'en_us'];
         if (properties && properties['locale']) {
             Object.assign(this.locale, properties['locale']);
@@ -153,7 +155,6 @@ export default class ReportBro {
         this.watermarkTextContainer = new Page('0_watermark_texts', this.getLabel('watermarkTexts'), this);
         this.watermarkImageContainer = new Page('0_watermark_images', this.getLabel('watermarkImages'), this);
         this.documentProperties = new DocumentProperties(this);
-        this.clipboardElements = [];
 
         this.mainPanel = new MainPanel(
             element, this.headerBand, this.contentBand, this.footerBand,
@@ -184,6 +185,176 @@ export default class ReportBro {
         this.documentProperties.setPanelItem(this.mainPanel.getDocumentPropertiesItem());
         this.initObjectMap();
 
+        // Ctrl + C: copy
+        document.addEventListener('copy', (event) => {
+            if (!(event.target instanceof HTMLInputElement ||
+                    event.target instanceof HTMLTextAreaElement)) {
+                const clipboardElements = [];
+                const idMap = {};
+                let serializedObj;
+                let i;
+                for (let selectionId of this.selections) {
+                    let obj = this.getDataObject(selectionId);
+                    if ((obj instanceof DocElement && !(obj instanceof TableTextElement)) ||
+                            (obj instanceof Parameter && !obj.showOnlyNameType) ||
+                            (obj instanceof Style)) {
+                        if (!(obj.getId() in idMap)) {
+                            idMap[obj.getId()] = true;
+                            serializedObj = obj.toJS();
+                            clipboardElements.push(serializedObj);
+                            if (obj instanceof DocElement) {
+                                serializedObj.baseClass = 'DocElement';
+                                if (obj instanceof FrameElement) {
+                                    let nestedElements = [];
+                                    obj.appendContainerChildren(nestedElements);
+                                    for (let nestedElement of nestedElements) {
+                                        if (nestedElement.getId() in idMap) {
+                                            // in case a nested element is also selected we make sure
+                                            // to add it only once to the clipboard objects and to
+                                            // add it after its parent element
+                                            for (i = 0; i < clipboardElements.length; i++) {
+                                                if (nestedElement.getId() === clipboardElements[i].id) {
+                                                    clipboardElements.splice(i, 1);
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            idMap[nestedElement.getId()] = true;
+                                        }
+                                        serializedObj = nestedElement.toJS();
+                                        serializedObj.baseClass = 'DocElement';
+                                        clipboardElements.push(serializedObj);
+                                    }
+                                }
+                            } else if (obj instanceof Parameter) {
+                                serializedObj.baseClass = 'Parameter';
+                            } else if (obj instanceof Style) {
+                                serializedObj.baseClass = 'Style';
+                            }
+                        }
+                    }
+                }
+                event.preventDefault();
+                const json = JSON.stringify({ elements: clipboardElements, version: this.version });
+                event.clipboardData.setData("application/json", json);
+            }
+        });
+        // Ctrl + V: paste
+        document.addEventListener('paste', (event) => {
+            for (const item of event.clipboardData.items) {
+                const { kind, type } = item;
+                if (kind === 'string' && type === 'application/json') {
+                    item.getAsString((content) => {
+                        try {
+                            const data = JSON.parse(content);
+                            // only paste elements in clipboard if they are stored in the same report version
+                            // as the current ReportBro version
+                            if (data.version === this.version && !(event.target instanceof HTMLInputElement ||
+                                    event.target instanceof HTMLTextAreaElement)) {
+                                let cmd;
+                                let cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
+                                let mappedContainerIds = {};
+                                let pastedElements = [];
+                                for (let clipboardElement of data.elements) {
+                                    // create new pasted element to change properties (id, name, etc.) and
+                                    // leave clipboard elements unchanged
+                                    let pastedElement = Object.assign({}, clipboardElement);
+                                    pastedElement.id = this.getUniqueId();
+                                    pastedElements.push(pastedElement);
+
+                                    if (pastedElement.baseClass === 'DocElement') {
+                                        if (pastedElement.linkedContainerId) {
+                                            let linkedContainerId = this.getUniqueId();
+                                            mappedContainerIds[pastedElement.linkedContainerId] = linkedContainerId;
+                                            pastedElement.linkedContainerId = linkedContainerId;
+                                        }
+                                        if (pastedElement.elementType === DocElement.type.table) {
+                                            TableElement.removeIds(pastedElement);
+                                        }
+                                    }
+                                }
+                                for (let pastedElement of pastedElements) {
+                                    if (pastedElement.baseClass === 'DocElement') {
+                                        // map id of container in case element is inside other
+                                        // pasted container (frame/band)
+                                        if (pastedElement.containerId in mappedContainerIds) {
+                                            pastedElement.containerId = mappedContainerIds[pastedElement.containerId];
+                                            // since element is inside pasted container we can keep x/y coordinates
+                                        } else {
+                                            let pasteToY = 0;
+                                            let container = this.getDataObject(pastedElement.containerId);
+                                            if (container !== null) {
+                                                // determine new y-coord so pasted element is in
+                                                // visible area of scrollable document
+                                                let containerOffset = container.getOffset();
+                                                let containerSize = container.getContentSize();
+                                                let contentScrollY = this.getDocument().getContentScrollPosY();
+                                                if (contentScrollY > containerOffset.y &&
+                                                        (contentScrollY + pastedElement.height) <
+                                                        (containerOffset.y + containerSize.height)) {
+                                                    pasteToY = contentScrollY - containerOffset.y;
+                                                }
+                                            }
+                                            pastedElement.x = 0;
+                                            pastedElement.y = pasteToY;
+                                        }
+                                        cmd = new AddDeleteDocElementCmd(
+                                            true, pastedElement.elementType, pastedElement,
+                                            pastedElement.id, pastedElement.containerId, -1, this);
+                                        cmdGroup.addCommand(cmd);
+
+                                    } else if (pastedElement.baseClass === 'Parameter' ||
+                                            pastedElement.baseClass === 'Style') {
+                                        // try to find unique name for pasted element by using a suffix
+                                        let copySuffix = this.getLabel('nameCopySuffix');
+                                        let pastedElementName = pastedElement.name + ` (${copySuffix})`;
+                                        let panelItem = (pastedElement.baseClass === 'Parameter') ?
+                                            this.parameterContainer.getPanelItem() : this.styleContainer.getPanelItem();
+                                        if (panelItem !== null) {
+                                            if (panelItem.getChildByName(pastedElementName)) {
+                                                for (let paramNr = 2; paramNr <= 99; paramNr++) {
+                                                    pastedElementName = pastedElement.name +
+                                                        ` (${copySuffix} ${paramNr})`;
+                                                    if (panelItem.getChildByName(pastedElementName) === null) {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        pastedElement.name = pastedElementName;
+
+                                        if (pastedElement.baseClass === 'Parameter') {
+                                            Parameter.removeIds(pastedElement);
+                                            cmd = new AddDeleteParameterCmd(
+                                                true, pastedElement, pastedElement.id,
+                                                this.parameterContainer.getId(), -1, this);
+                                            cmdGroup.addCommand(cmd);
+                                        } else if (pastedElement.baseClass === 'Style') {
+                                            cmd = new AddDeleteStyleCmd(
+                                                true, pastedElement, pastedElement.id,
+                                                this.styleContainer.getId(), -1, this);
+                                            cmdGroup.addCommand(cmd);
+                                        }
+                                    }
+                                }
+                                if (!cmdGroup.isEmpty()) {
+                                    this.executeCommand(cmdGroup);
+                                    let clearSelection = true;
+                                    for (let pastedElement of pastedElements) {
+                                        this.selectObject(pastedElement.id, clearSelection);
+                                        clearSelection = false;
+                                    }
+                                }
+                                event.preventDefault();
+                            }
+
+                        } catch (e) {
+                        }
+                    });
+                }
+            }
+        });
+
         this.keydownEventListener = (event) => {
             if (this.detailPanels[this.activeDetailPanel].isKeyEventDisabled()) {
                 return;
@@ -192,163 +363,6 @@ export default class ReportBro {
             // check metaKey instead of ctrl for Mac
             if (event.metaKey || event.ctrlKey) {
                 switch (event.which) {
-                    case 67: {
-                        // Ctrl + C: copy
-                        if (!(event.target instanceof HTMLInputElement ||
-                                event.target instanceof HTMLTextAreaElement)) {
-                            let cleared = false;
-                            let idMap = {};
-                            let serializedObj;
-                            let i;
-                            for (let selectionId of this.selections) {
-                                let obj = this.getDataObject(selectionId);
-                                if ((obj instanceof DocElement && !(obj instanceof TableTextElement)) ||
-                                        (obj instanceof Parameter && !obj.showOnlyNameType) ||
-                                        (obj instanceof Style)) {
-                                    if (!cleared) {
-                                        this.clipboardElements = [];
-                                        cleared = true;
-                                    }
-                                    if (!(obj.getId() in idMap)) {
-                                        idMap[obj.getId()] = true;
-                                        serializedObj = obj.toJS();
-                                        this.clipboardElements.push(serializedObj);
-                                        if (obj instanceof DocElement) {
-                                            serializedObj.baseClass = 'DocElement';
-                                            if (obj instanceof FrameElement) {
-                                                let nestedElements = [];
-                                                obj.appendContainerChildren(nestedElements);
-                                                for (let nestedElement of nestedElements) {
-                                                    if (nestedElement.getId() in idMap) {
-                                                        // in case a nested element is also selected we make sure
-                                                        // to add it only once to the clipboard objects and to
-                                                        // add it after its parent element
-                                                        for (i = 0; i < this.clipboardElements.length; i++) {
-                                                            if (nestedElement.getId() === this.clipboardElements[i].id) {
-                                                                this.clipboardElements.splice(i, 1);
-                                                                break;
-                                                            }
-                                                        }
-                                                    } else {
-                                                        idMap[nestedElement.getId()] = true;
-                                                    }
-                                                    serializedObj = nestedElement.toJS();
-                                                    serializedObj.baseClass = 'DocElement';
-                                                    this.clipboardElements.push(serializedObj);
-                                                }
-                                            }
-                                        } else if (obj instanceof Parameter) {
-                                            serializedObj.baseClass = 'Parameter';
-                                        } else if (obj instanceof Style) {
-                                            serializedObj.baseClass = 'Style';
-                                        }
-                                    }
-                                }
-                            }
-                            event.preventDefault();
-                        }
-                        break;
-                    }
-                    case 86: {
-                        // Ctrl + V: paste
-                        if (!(event.target instanceof HTMLInputElement ||
-                                event.target instanceof HTMLTextAreaElement)) {
-                            let cmd;
-                            let cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
-                            let mappedContainerIds = {};
-                            let pastedElements = [];
-                            for (let clipboardElement of this.clipboardElements) {
-                                // create new pasted element to change properties (id, name, etc.) and
-                                // leave clipboard elements unchanged
-                                let pastedElement = Object.assign({}, clipboardElement);
-                                pastedElement.id = this.getUniqueId();
-                                pastedElements.push(pastedElement);
-
-                                if (pastedElement.baseClass === 'DocElement') {
-                                    if (pastedElement.linkedContainerId) {
-                                        let linkedContainerId = this.getUniqueId();
-                                        mappedContainerIds[pastedElement.linkedContainerId] = linkedContainerId;
-                                        pastedElement.linkedContainerId = linkedContainerId;
-                                    }
-                                    if (pastedElement.elementType === DocElement.type.table) {
-                                        TableElement.removeIds(pastedElement);
-                                    }
-                                }
-                            }
-                            for (let pastedElement of pastedElements) {
-                                if (pastedElement.baseClass === 'DocElement') {
-                                    // map id of container in case element is inside other pasted container (frame/band)
-                                    if (pastedElement.containerId in mappedContainerIds) {
-                                        pastedElement.containerId = mappedContainerIds[pastedElement.containerId];
-                                        // since element is inside pasted container we can keep x/y coordinates
-                                    } else {
-                                        let pasteToY = 0;
-                                        let container = this.getDataObject(pastedElement.containerId);
-                                        if (container !== null) {
-                                            // determine new y-coord so pasted element is in
-                                            // visible area of scrollable document
-                                            let containerOffset = container.getOffset();
-                                            let containerSize = container.getContentSize();
-                                            let contentScrollY = this.getDocument().getContentScrollPosY();
-                                            if (contentScrollY > containerOffset.y &&
-                                                    (contentScrollY + pastedElement.height) <
-                                                    (containerOffset.y + containerSize.height)) {
-                                                pasteToY = contentScrollY - containerOffset.y;
-                                            }
-                                        }
-                                        pastedElement.x = 0;
-                                        pastedElement.y = pasteToY;
-                                    }
-                                    cmd = new AddDeleteDocElementCmd(
-                                        true, pastedElement.elementType, pastedElement,
-                                        pastedElement.id, pastedElement.containerId, -1, this);
-                                    cmdGroup.addCommand(cmd);
-
-                                } else if (pastedElement.baseClass === 'Parameter' ||
-                                        pastedElement.baseClass === 'Style') {
-                                    // try to find unique name for pasted element by using a suffix
-                                    let copySuffix = this.getLabel('nameCopySuffix');
-                                    let pastedElementName = pastedElement.name + ` (${copySuffix})`;
-                                    let panelItem = (pastedElement.baseClass === 'Parameter') ?
-                                        this.parameterContainer.getPanelItem() : this.styleContainer.getPanelItem();
-                                    if (panelItem !== null) {
-                                        if (panelItem.getChildByName(pastedElementName)) {
-                                            for (let paramNr = 2; paramNr <= 99; paramNr++) {
-                                                pastedElementName = pastedElement.name + ` (${copySuffix} ${paramNr})`;
-                                                if (panelItem.getChildByName(pastedElementName) === null) {
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    pastedElement.name = pastedElementName;
-
-                                    if (pastedElement.baseClass === 'Parameter') {
-                                        Parameter.removeIds(pastedElement);
-                                        cmd = new AddDeleteParameterCmd(
-                                            true, pastedElement, pastedElement.id,
-                                            this.parameterContainer.getId(), -1, this);
-                                        cmdGroup.addCommand(cmd);
-                                    } else if (pastedElement.baseClass === 'Style') {
-                                        cmd = new AddDeleteStyleCmd(
-                                            true, pastedElement, pastedElement.id,
-                                            this.styleContainer.getId(), -1, this);
-                                        cmdGroup.addCommand(cmd);
-                                    }
-                                }
-                            }
-                            if (!cmdGroup.isEmpty()) {
-                                this.executeCommand(cmdGroup);
-                                let clearSelection = true;
-                                for (let pastedElement of pastedElements) {
-                                    this.selectObject(pastedElement.id, clearSelection);
-                                    clearSelection = false;
-                                }
-                            }
-                            event.preventDefault();
-                        }
-                        break;
-                    }
                     case 89: {
                         // Ctrl + Y: redo
                         this.redoCommand();
@@ -1551,7 +1565,7 @@ export default class ReportBro {
      * @returns {Object}
      */
     getReport() {
-        const rv = { docElements: [], parameters: [], styles: [], watermarks: [], version: 5 };
+        const rv = { docElements: [], parameters: [], styles: [], watermarks: [], version: this.version };
         rv.docElements = this.getDocElements(false);
         for (const parameter of this.getParameters()) {
             rv.parameters.push(parameter.toJS());
