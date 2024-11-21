@@ -273,11 +273,9 @@ export default class DocumentPropertiesPanel extends PanelBase {
         utils.appendLabel(elDiv, this.rb.getLabel('patternLocale'), 'rbro_document_properties_pattern_locale');
         elFormField = utils.createElement('div', { class: 'rbroFormField' });
         let elPatternLocale = utils.createElement('select', { id: 'rbro_document_properties_pattern_locale' });
-        elPatternLocale.append(utils.createElement('option', { value: 'de' }, 'de'));
-        elPatternLocale.append(utils.createElement('option', { value: 'en' }, 'en'));
-        elPatternLocale.append(utils.createElement('option', { value: 'es' }, 'es'));
-        elPatternLocale.append(utils.createElement('option', { value: 'fr' }, 'fr'));
-        elPatternLocale.append(utils.createElement('option', { value: 'it' }, 'it'));
+        for (const patternLocale of this.rb.getProperty('patternLocales')) {
+          elPatternLocale.append(utils.createElement('option', { value: patternLocale }, patternLocale));
+        }
         elPatternLocale.addEventListener('change', (event) => {
             let selectedObject = this.rb.getSelectedObject();
             if (selectedObject !== null) {

@@ -82,6 +82,7 @@ export default class ReportBro {
                 { name: 'MM/dd/yyyy', description: this.locale['patternDate4'] }
             ],
             patternLocale: 'en',
+            patternLocales: ['de', 'en', 'es', 'fr', 'it', 'pt'],
             patternNumberGroupSymbol: '',
             patternNumbers: [
                 { name: '#,##0', description: this.locale['patternNumber1'] },
@@ -472,6 +473,10 @@ export default class ReportBro {
                 console.error('"fontSizes" property must contain only numbers (> 0)');
                 return false;
             }
+        }
+        if (!Array.isArray(properties.patternLocales)) {
+            console.error('"patternLocales" property must be an array');
+            return false;
         }
         return true;
     }
