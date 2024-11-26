@@ -187,14 +187,14 @@ export default class ReportBro {
 
         // Ctrl + C: copy
         document.addEventListener('copy', (event) => {
-            if (!(event.target instanceof HTMLInputElement ||
-                    event.target instanceof HTMLTextAreaElement)) {
+            if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) &&
+                    this.selections.length > 0) {
                 const clipboardElements = [];
                 const idMap = {};
                 let serializedObj;
                 let i;
-                for (let selectionId of this.selections) {
-                    let obj = this.getDataObject(selectionId);
+                for (const selectionId of this.selections) {
+                    const obj = this.getDataObject(selectionId);
                     if ((obj instanceof DocElement && !(obj instanceof TableTextElement)) ||
                             (obj instanceof Parameter && !obj.showOnlyNameType) ||
                             (obj instanceof Style)) {
@@ -236,7 +236,7 @@ export default class ReportBro {
                 }
                 event.preventDefault();
                 const json = JSON.stringify({ elements: clipboardElements, version: this.version });
-                event.clipboardData.setData("application/json", json);
+                event.clipboardData.setData('application/json', json);
             }
         });
         // Ctrl + V: paste
