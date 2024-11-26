@@ -187,8 +187,13 @@ export default class ReportBro {
 
         // Ctrl + C: copy
         document.addEventListener('copy', (event) => {
-            if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) &&
-                    this.selections.length > 0) {
+            if (document.activeElement instanceof HTMLInputElement ||
+                    document.activeElement instanceof HTMLTextAreaElement) {
+                // if current active element is an input or textarea we ignore the copy event and
+                // keep the default behavior
+                return;
+            }
+            if (this.selections.length > 0) {
                 const clipboardElements = [];
                 const idMap = {};
                 let serializedObj;
@@ -241,6 +246,13 @@ export default class ReportBro {
         });
         // Ctrl + V: paste
         document.addEventListener('paste', (event) => {
+            if (document.activeElement instanceof HTMLInputElement ||
+                    document.activeElement instanceof HTMLTextAreaElement) {
+                // if current active element is an input or textarea we ignore the paste event and
+                // keep the default behavior
+                return;
+            }
+
             for (const item of event.clipboardData.items) {
                 const { kind, type } = item;
                 if (kind === 'string' && type === 'application/json') {
@@ -249,8 +261,7 @@ export default class ReportBro {
                             const data = JSON.parse(content);
                             // only paste elements in clipboard if they are stored in the same report version
                             // as the current ReportBro version
-                            if (data.version === this.version && !(event.target instanceof HTMLInputElement ||
-                                    event.target instanceof HTMLTextAreaElement)) {
+                            if (data.version === this.version) {
                                 let cmd;
                                 let cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
                                 let mappedContainerIds = {};
