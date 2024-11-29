@@ -1,5 +1,16 @@
 # Changelog
 
+## Upcoming Release
+
+### Features
+* Support copy & paste of elements across ReportBro instances
+* Add "patternLocales" setting to set available pattern locales in document properties
+
+### Changes
+* Add "pt" locale to pattern locales in document properties
+
+### Bug Fixes
+
 ## [3.9.2] - 2024-10-07
 
 ### Features
