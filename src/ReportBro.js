@@ -188,9 +188,10 @@ export default class ReportBro {
         // Ctrl + C: copy
         document.addEventListener('copy', (event) => {
             if (document.activeElement instanceof HTMLInputElement ||
-                    document.activeElement instanceof HTMLTextAreaElement) {
-                // if current active element is an input or textarea we ignore the copy event and
-                // keep the default behavior
+                    document.activeElement instanceof HTMLTextAreaElement ||
+                    (document.activeElement && document.activeElement.classList.contains('ql-editor'))) {
+                // if current active element is an input, textarea or rich text editor we ignore the copy event
+                // and keep the default behavior
                 return;
             }
             if (this.selections.length > 0) {
@@ -247,9 +248,10 @@ export default class ReportBro {
         // Ctrl + V: paste
         document.addEventListener('paste', (event) => {
             if (document.activeElement instanceof HTMLInputElement ||
-                    document.activeElement instanceof HTMLTextAreaElement) {
-                // if current active element is an input or textarea we ignore the paste event and
-                // keep the default behavior
+                    document.activeElement instanceof HTMLTextAreaElement ||
+                    (document.activeElement && document.activeElement.classList.contains('ql-editor'))) {
+                // if current active element is an input, textarea or rich text editor we ignore the paste event
+                // and keep the default behavior
                 return;
             }
 
