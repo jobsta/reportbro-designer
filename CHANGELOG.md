@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [3.10.0] - 2025-01-03
 
 ### Features
 * Support copy & paste of elements across ReportBro instances
