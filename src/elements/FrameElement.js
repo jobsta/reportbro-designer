@@ -26,6 +26,7 @@ export default class FrameElement extends DocElement {
         this.borderWidth = '1';
 
         this.shrinkToContentHeight = false;
+        this.alignToPageBottom = false;
 
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
