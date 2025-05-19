@@ -512,7 +512,7 @@ function toRPN(tokens) {
         } else if (token.type === Token.type.bracketOpen) {
             operators.push(token);
         } else if (token.type === Token.type.bracketClose) {
-            while (operators.length > 0 && operators[operators.length - 1] !== Token.type.bracketOpen) {
+            while (operators.length > 0 && operators[operators.length - 1].type !== Token.type.bracketOpen) {
                 out.push(operators.pop());
             }
             operators.pop();
