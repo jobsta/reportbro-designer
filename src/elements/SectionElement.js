@@ -23,7 +23,6 @@ export default class SectionElement extends DocElement {
         this.headerData = null;
         this.contentData = null;
         this.footerData = null;
-
         this.setInitialData(initialData);
     }
 
@@ -119,18 +118,6 @@ export default class SectionElement extends DocElement {
             id = this.footerData.getMaxId();
         }
         return id;
-    }
-
-    appendContainerChildren(elements) {
-        if (this.headerData !== null) {
-            this.headerData.appendContainerChildren(elements);
-        }
-        if (this.contentData !== null) {
-            this.contentData.appendContainerChildren(elements);
-        }
-        if (this.footerData !== null) {
-            this.footerData.appendContainerChildren(elements);
-        }
     }
 
     setValue(field, value) {

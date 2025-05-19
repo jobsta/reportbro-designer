@@ -19,7 +19,6 @@ export default class Band extends Container {
             } else if (bandType === Band.bandType.content) {
                 this.id = '0_content';
                 this.name = rb.getLabel('bandContent');
-                this.allowAllElements = true;
             } else if (bandType === Band.bandType.footer) {
                 this.id = '0_footer';
                 this.name = rb.getLabel('bandFooter');

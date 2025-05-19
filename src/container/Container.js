@@ -1,3 +1,5 @@
+import DocElement from "../elements/DocElement";
+
 /**
  * Container can contain doc elements. The doc elements are always relative to the container offset.
  * @class
@@ -49,6 +51,34 @@ export default class Container {
     appendElement(el) {
         if (this.elContent !== null) {
             this.elContent.append(el);
+        }
+    }
+
+    /**
+     * Append document elements of this container.
+     * @param {Boolean} asObjects - if true the document element instances are returned, otherwise
+     * each instance is transformed to a js map.
+     * @param {DocElement[]} docElements - list where document elements will be appended to.
+     */
+    appendDocElements(asObjects, docElements) {
+        for (const child of this.getPanelItem().getChildren()) {
+            if (child.getData() instanceof DocElement) {
+                const docElement = child.getData();
+                if (asObjects) {
+                    docElements.push(docElement);
+                    // we are also adding all internal children (document elements which belong
+                    // to other document elements and cannot be created independently),
+                    // e.g. a table band or a table cell (table text) of a table element.
+                    docElement.addChildren(docElements);
+                } else {
+                    // js map also includes data of internal children
+                    docElements.push(docElement.toJS());
+                }
+                // add children of doc elements which represent containers, e.g. frames or section bands
+                for (const container of docElement.getLinkedContainers()) {
+                    container.appendDocElements(asObjects, docElements);
+                }
+            }
         }
     }
 

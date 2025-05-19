@@ -133,6 +133,11 @@ export function roundValueToUpperInterval(val, interval) {
     return Math.ceil(val / interval) * interval;
 }
 
+export function generateUniqueId() {
+    return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+}
+
+
 export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     let inputId = elInput.getAttribute('id');
     let instance = {
