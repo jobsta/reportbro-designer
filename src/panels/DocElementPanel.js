@@ -89,8 +89,7 @@ export default class DocElementPanel extends PanelBase {
                 'rowProperties': ['width', 'height'],
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
-                'singlePropertyLabel': 'docElementWidth',
-                'visibleIf': "docElementType != 'bar_code' || (format != 'QRCode' && rotate)"
+                'singlePropertyLabel': 'docElementWidth'
             },
             'height': {
                 'type': SetValueCmd.type.text,

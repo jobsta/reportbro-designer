@@ -1,6 +1,7 @@
 import DocElement from './DocElement';
 import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
+import Style from '../data/Style';
 import * as utils from '../utils';
 
 /**
@@ -19,6 +20,7 @@ export default class BarCodeElement extends DocElement {
         this.guardBar = false;
         this.errorCorrectionLevel = 'M';
         this.rotate = false;
+        this.horizontalAlignment = Style.alignment.left;
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_colspan = '';
@@ -42,16 +44,11 @@ export default class BarCodeElement extends DocElement {
         if (field === 'content' ||field === 'format' || field === 'displayValue' ||
                 field === 'barWidth' || field === 'guardBar' ||
                 field === 'width' || field === 'height' || field === 'errorCorrectionLevel' || field === 'rotate') {
+            if (field === 'rotate') {
+                this.updateStyle();
+            }
             this.updateBarCode();
             this.updateDisplay();
-            if (field === 'rotate') {
-                // if rotate setting was changed and object is selected we select it again so the
-                // sizers are shown correctly (sizers for x axis are only available when bar code is rotated)
-                if (this.rb.isSelectedObject(this.getId())) {
-                    this.rb.deselectObject(this.getId());
-                    this.rb.selectObject(this.getId());
-                }
-            }
         }
     }
 
@@ -63,7 +60,7 @@ export default class BarCodeElement extends DocElement {
         return [
             'x', 'y', 'width', 'height', 'content', 'format', 'displayValue',
             'barWidth', 'guardBar', 'errorCorrectionLevel',
-            'printIf', 'removeEmptyElement', 'rotate',
+            'printIf', 'removeEmptyElement', 'rotate', 'horizontalAlignment',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'
         ];
     }
@@ -81,20 +78,18 @@ export default class BarCodeElement extends DocElement {
         }
     }
 
-    /**
-     * Returns allowed sizers when element is selected.
-     * @returns {String[]}
-     */
-    getSizers() {
-        if (this.format !== 'QRCode' && this.rotate) {
-            // when the bar code is rotated it is possible to set the width (i.e. the actual bar code height)
-            // and the height, the height is only relevant for layout of following elements since the
-            // actual height depends on the generated bar code
-            return ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-        } else {
-            return ['N', 'S'];
-        }
-    }
+    updateStyle() {
+        this.elContent.style.textAlign = '';
+        this.elContent.className = '';
+        if (!this.rotate) {
+            const horizontalAlignment = this.getValue('horizontalAlignment');
+            const alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() +
+                horizontalAlignment.slice(1);
+            this.elContent.style.textAlign = horizontalAlignment;
+            this.elContent.classList.add('rbroContentContainerHelper');
+            this.elContent.classList.add(alignClass);
+         }
+     }
 
     createElement() {
         this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroBarCodeElement' });
@@ -194,8 +189,6 @@ export default class BarCodeElement extends DocElement {
                 this.elBarCode.style.transform = `translate(${offset_x}px, ${offset_y}px) rotate(90deg)`;
                 this.elContent.style.overflow = 'hidden';
             } else {
-                this.widthVal = this.elBarCode.clientWidth;
-                this.width = '' + this.widthVal;
                 this.clearRotateStyle();
             }
         }
