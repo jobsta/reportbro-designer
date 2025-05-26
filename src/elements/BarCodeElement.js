@@ -94,7 +94,7 @@ export default class BarCodeElement extends DocElement {
     createElement() {
         this.el = utils.createElement('div', { id: `rbro_el${this.id}`, class: 'rbroDocElement rbroBarCodeElement' });
         // content element is needed for overflow hidden which is set for rotated bar code
-        this.elContent = utils.createElement('div', { id: `rbro_el_content${this.id}`, style: 'height: 100%' });
+        this.elContent = utils.createElement('div', { id: `rbro_el_content${this.id}` });
         this.elBarCode = utils.createElement('canvas', { id: `rbro_el_barcode${this.id}` } );
         this.elContent.append(this.elBarCode);
         this.el.append(this.elContent);

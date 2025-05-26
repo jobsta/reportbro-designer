@@ -771,7 +771,7 @@ ul ul .rbroMenuItemText {
     overflow: initial;
 }
 
-.rbroImageElement .rbroContentContainerHelper {
+.rbroImageElement .rbroContentContainerHelper, .rbroBarCodeElement .rbroContentContainerHelper {
     height: calc(100% + 2px);
     width: calc(100% + 2px);
 }
@@ -814,7 +814,7 @@ ul ul .rbroMenuItemText {
     align-items: flex-end;
 }
 
-.rbroTextElement, .rbroImageElement, .rbroFrameElement {
+.rbroTextElement, .rbroImageElement, .rbroFrameElement, .rbroBarCodeElement {
     border: 1px dotted #8C8C8C;
 }
 
