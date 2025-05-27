@@ -109,18 +109,16 @@ export default class BarCodeElement extends DocElement {
 
     updateBarCode() {
         if (this.format === 'QRCode') {
-            this.widthVal = this.heightVal;
-            this.width = '' + this.widthVal;
             let content = this.content;
             if (content === '') {
                 content = 'https://www.reportbro.com';
             }
             let options = {
-                width: this.widthVal,
+                width: this.heightVal,
                 margin: 0,
                 errorCorrectionLevel : this.errorCorrectionLevel
             };
-            this.clearRotateStyle();
+            this.elBarCode.style.transform = '';
             QRCode.toCanvas(this.elBarCode, content, options);
         } else {
             let valid = false;
@@ -148,7 +146,7 @@ export default class BarCodeElement extends DocElement {
                 options.width = barWidthVal;
             }
 
-            // clear width and height which is set on canvas element when QR code is generated
+            // clear width and height which is set on canvas element when barcode is generated
             this.elBarCode.style.width = '';
             this.elBarCode.style.height = '';
 
@@ -187,19 +185,10 @@ export default class BarCodeElement extends DocElement {
                 const offset_x = -(this.elBarCode.clientWidth - this.widthVal) / 2;
                 const offset_y = -offset_x;
                 this.elBarCode.style.transform = `translate(${offset_x}px, ${offset_y}px) rotate(90deg)`;
-                this.elContent.style.overflow = 'hidden';
             } else {
-                this.clearRotateStyle();
+                this.elBarCode.style.transform = '';
             }
         }
-    }
-
-    /**
-     * Must be called when bar code is created / updated and bar code is not rotated.
-     */
-    clearRotateStyle() {
-        this.elBarCode.style.transform = '';
-        this.elContent.style.overflow = '';
     }
 
     /**
