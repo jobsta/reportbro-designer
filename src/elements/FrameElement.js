@@ -24,6 +24,7 @@ export default class FrameElement extends DocElement {
         this.borderBottom = false;
         this.borderColor = '#000000';
         this.borderWidth = '1';
+        this.borderRadius = '0';
 
         this.shrinkToContentHeight = false;
         this.alignToPageBottom = false;
@@ -119,21 +120,28 @@ export default class FrameElement extends DocElement {
     }
 
     updateStyle() {
-        let borderStyleProperties = {};
-        let borderStyle;
+        let borderStyle, borderWidth = '', borderColor = '', borderRadius = '';
         if (this.getValue('borderLeft') || this.getValue('borderTop') ||
                 this.getValue('borderRight') || this.getValue('borderBottom')) {
             borderStyle = this.getValue('borderTop') ? 'solid' : 'none';
             borderStyle += this.getValue('borderRight') ? ' solid' : ' none';
             borderStyle += this.getValue('borderBottom') ? ' solid' : ' none';
             borderStyle += this.getValue('borderLeft') ? ' solid' : ' none';
-            this.elContent.style.borderWidth = this.getValue('borderWidthVal') + 'px';
-            this.elContent.style.borderColor = this.getValue('borderColor');
+            borderWidth = this.getValue('borderWidthVal') + 'px';
+            borderColor = this.getValue('borderColor');
         } else {
             borderStyle = 'none';
         }
+        // border radius is only allowed if there are full borders or no borders at all and a background color
+        if (this.getValue('borderRadius') !== '0' && (this.getValue('borderAll') ||
+                (borderStyle === 'none' && this.getValue('backgroundColor') !== ''))) {
+            borderRadius = this.getValue('borderRadius') + 'px';
+        }
         this.elContent.style.borderStyle = borderStyle;
-        this.el.style.backgroundColor = this.getValue('backgroundColor');
+        this.elContent.style.borderWidth = borderWidth;
+        this.elContent.style.borderColor = borderColor;
+        this.elContent.style.borderRadius = borderRadius;
+        this.elContent.style.backgroundColor = this.getValue('backgroundColor');
     }
 
     /**
@@ -153,7 +161,8 @@ export default class FrameElement extends DocElement {
     getProperties() {
         return [
             'label', 'x', 'y', 'width', 'height', 'styleId', 'backgroundColor',
-            'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'borderWidth',
+            'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
+            'borderColor', 'borderWidth', 'borderRadius',
             'printIf', 'removeEmptyElement', 'shrinkToContentHeight', 'alignToPageBottom',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
         ];

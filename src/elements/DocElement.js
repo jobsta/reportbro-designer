@@ -402,7 +402,8 @@ export default class DocElement {
             this.updateDisplay();
         } else if (['styleId', 'bold', 'italic', 'underline', 'strikethrough',
                 'horizontalAlignment', 'verticalAlignment',
-                'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
+                'textColor', 'backgroundColor', 'font', 'fontSize', 'lineSpacing',
+                'borderColor', 'borderWidth', 'borderRadius',
                 'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
                 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'].indexOf(field) !== -1) {
 

@@ -167,6 +167,11 @@ export default class StylePanel extends PanelBase {
                 'fieldId': 'border_width',
                 'visibleIf': "type == 'text' || type == 'table' || type == 'frame'",
             },
+            'borderRadius': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'border_radius',
+                'visibleIf': "type == 'text' || type == 'frame'",
+            },
             'paddingLeft': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_left',
@@ -898,6 +903,40 @@ export default class StylePanel extends PanelBase {
             }
         });
         elFormField.append(elBorderWidth);
+        elDiv.append(elFormField);
+        elBorderDiv.append(elDiv);
+        elPanel.append(elBorderDiv);
+
+        elDiv = utils.createElement('div', { id: `rbro_${idPrefix}border_radius_row`, class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, rb.getLabel('styleBorderRadius'), `rbro_${idPrefix}border_radius`);
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elBorderRadius = utils.createElement(
+            'input', { id: `rbro_${idPrefix}border_radius`, type: 'number', step: '1', autocomplete: 'off' });
+        elBorderRadius.addEventListener('input', (event) => {
+            let val = elBorderRadius.value;
+            if (val !== '') {
+                val = utils.checkInputDecimal(val, 0, 99);
+            }
+            if (val !== elBorderRadius.value) {
+                elBorderRadius.value = val;
+            }
+            const selectedObjects = rb.getSelectedObjects();
+            let valueChanged = false;
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                if (selectedObjects[i].getValue(`${fieldPrefix}borderRadius`) !== val) {
+                    valueChanged = true;
+                    break;
+                }
+            }
+
+            if (valueChanged) {
+                this.executeCommandsForChangedProperty('borderRadius', val, SetValueCmd.type.text, fieldPrefix, rb);
+            }
+        });
+        elFormField.append(elBorderRadius);
+        elFormField.append(
+            utils.createElement('div', { id: `rbro_${idPrefix}border_radius_error`, class: 'rbroErrorMessage' })
+        );
         elDiv.append(elFormField);
         elBorderDiv.append(elDiv);
         elPanel.append(elBorderDiv);

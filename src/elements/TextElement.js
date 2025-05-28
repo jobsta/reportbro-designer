@@ -34,6 +34,7 @@ export default class TextElement extends DocElement {
         this.lineSpacing = 1;
         this.borderColor = '#000000';
         this.borderWidth = '1';
+        this.borderRadius = '0';
         this.borderAll = false;
         this.borderLeft = false;
         this.borderTop = false;
@@ -60,6 +61,7 @@ export default class TextElement extends DocElement {
         this.cs_lineSpacing = 1;
         this.cs_borderColor = '#000000';
         this.cs_borderWidth = '1';
+        this.cs_borderRadius = '0';
         this.cs_borderAll = false;
         this.cs_borderLeft = false;
         this.cs_borderTop = false;
@@ -156,7 +158,7 @@ export default class TextElement extends DocElement {
             'x', 'y', 'width', 'height', 'content', 'richText', 'richTextContent', 'richTextHtml', 'eval',
             'styleId', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment', 'textColor', 'backgroundColor', 'font', 'fontSize',
-            'lineSpacing', 'borderColor', 'borderWidth',
+            'lineSpacing', 'borderColor', 'borderWidth', 'borderRadius',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom',
             'printIf', 'removeEmptyElement', 'alwaysPrintOnSamePage', 'pattern', 'link',
@@ -164,7 +166,7 @@ export default class TextElement extends DocElement {
             'cs_bold', 'cs_italic', 'cs_underline', 'cs_strikethrough',
             'cs_horizontalAlignment', 'cs_verticalAlignment',
             'cs_textColor', 'cs_backgroundColor', 'cs_font', 'cs_fontSize',
-            'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth',
+            'cs_lineSpacing', 'cs_borderColor', 'cs_borderWidth', 'cs_borderRadius',
             'cs_borderAll', 'cs_borderLeft', 'cs_borderTop', 'cs_borderRight', 'cs_borderBottom',
             'cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan',
@@ -211,7 +213,7 @@ export default class TextElement extends DocElement {
     updateStyle() {
         let styleProperties = {};
         let style = this.getStyle();
-        let borderStyle, borderWidth = '', borderColor = '';
+        let borderStyle, borderWidth = '', borderColor = '', borderRadius = '';
         let contentSize = this.getContentSize(this.getDisplayWidth(), this.getDisplayHeight(), style);
         styleProperties['width'] = this.rb.toPixel(contentSize.width);
         styleProperties['height'] = this.rb.toPixel(contentSize.height);
@@ -261,6 +263,11 @@ export default class TextElement extends DocElement {
         } else {
             borderStyle = 'none';
         }
+        // border radius is only allowed if there are full borders or no borders at all and a background color
+        if (style.getValue('borderRadius') !== '0' && (style.getValue('borderAll') ||
+                (borderStyle === 'none' && style.getValue('backgroundColor') !== ''))) {
+            borderRadius = style.getValue('borderRadius') + 'px';
+        }
         if (style.getValue('paddingLeft') !== '' || style.getValue('paddingTop') !== '' ||
                 style.getValue('paddingRight') !== '' || style.getValue('paddingBottom') !== '') {
             styleProperties['padding'] = this.rb.toPixel(style.getValue('paddingTop'));
@@ -273,6 +280,7 @@ export default class TextElement extends DocElement {
         this.elContent.style.borderStyle = borderStyle;
         this.elContent.style.borderWidth = borderWidth;
         this.elContent.style.borderColor = borderColor;
+        this.elContent.style.borderRadius = borderRadius;
         this.elContent.className = '';
         this.elContent.classList.add('rbroContentContainerHelper');
         this.elContent.classList.add(alignClass);
@@ -372,7 +380,8 @@ export default class TextElement extends DocElement {
 
     toJS() {
         const rv = super.toJS();
-        const numericFields = ['borderWidth', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'];
+        const numericFields = [
+          'borderWidth', 'borderRadius', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'];
         // watermark text does not have conditional style properties
         if (this.getElementType() !== DocElement.type.watermarkText) {
             numericFields.push('cs_paddingLeft', 'cs_paddingTop', 'cs_paddingRight', 'cs_paddingBottom');
