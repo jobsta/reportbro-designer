@@ -18,7 +18,7 @@ FROM nginx:alpine
 
 WORKDIR /usr/share/nginx/html
 
-COPY --from=build /usr/app/dist .
+COPY --from=build /usr/app/dist dist
 COPY index.html .
 
 CMD [ "nginx", "-g", "daemon off;" ]
