@@ -44,6 +44,28 @@ Initialize ReportBro:
     </script>
 ````
 
+### Install via docker:
+
+Clone the repository
+
+```
+git clone https://github.com/jobsta/reportbro-designer.git
+cd reportbro-designer
+```
+
+Build the dockerfile
+
+```
+docker build reportbro .
+```
+
+Run the container
+
+
+```
+docker run -it --rm -p 80:80 reportbro
+```
+
 ## Build
 
 ### prerequisites:
