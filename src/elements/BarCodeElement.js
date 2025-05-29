@@ -21,6 +21,7 @@ export default class BarCodeElement extends DocElement {
         this.errorCorrectionLevel = 'M';
         this.rotate = false;
         this.horizontalAlignment = Style.alignment.left;
+        this.verticalAlignment = Style.alignment.top;
         this.spreadsheet_hide = false;
         this.spreadsheet_column = '';
         this.spreadsheet_colspan = '';
@@ -60,7 +61,7 @@ export default class BarCodeElement extends DocElement {
         return [
             'x', 'y', 'width', 'height', 'content', 'format', 'displayValue',
             'barWidth', 'guardBar', 'errorCorrectionLevel',
-            'printIf', 'removeEmptyElement', 'rotate', 'horizontalAlignment',
+            'printIf', 'removeEmptyElement', 'rotate', 'horizontalAlignment', 'verticalAlignment',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'
         ];
     }
@@ -81,14 +82,18 @@ export default class BarCodeElement extends DocElement {
     updateStyle() {
         this.elContent.style.textAlign = '';
         this.elContent.className = '';
+        this.elContent.classList.add('rbroContentContainerHelper');
         if (!this.rotate) {
             const horizontalAlignment = this.getValue('horizontalAlignment');
             const alignClass = 'rbroDocElementAlign' + horizontalAlignment.charAt(0).toUpperCase() +
                 horizontalAlignment.slice(1);
-            this.elContent.style.textAlign = horizontalAlignment;
-            this.elContent.classList.add('rbroContentContainerHelper');
             this.elContent.classList.add(alignClass);
-         }
+        } else {
+            const verticalAlignment = this.getValue('verticalAlignment');
+            const alignClass = 'rbroDocElementVAlign' + verticalAlignment.charAt(0).toUpperCase() +
+                verticalAlignment.slice(1);
+            this.elContent.classList.add(alignClass);
+        }
      }
 
     createElement() {
@@ -108,13 +113,14 @@ export default class BarCodeElement extends DocElement {
     }
 
     updateBarCode() {
+        let size = this.rotate ? this.widthVal : this.heightVal;
         if (this.format === 'QRCode') {
             let content = this.content;
             if (content === '') {
                 content = 'https://www.reportbro.com';
             }
             let options = {
-                width: this.heightVal,
+                width: size,
                 margin: 0,
                 errorCorrectionLevel : this.errorCorrectionLevel
             };
@@ -122,18 +128,17 @@ export default class BarCodeElement extends DocElement {
             QRCode.toCanvas(this.elBarCode, content, options);
         } else {
             let valid = false;
-            let height = this.rotate ? this.widthVal : this.heightVal;
             // height is total height for bar code element,
             // remove height for value and guard bars if necessary so the bar code plus value and guard bars
             // does not exceed the total height
             if (this.displayValue) {
-                height -= 22;
+                size -= 22;
             }
             if ((this.format === 'EAN8' || this.format === 'EAN13') && this.guardBar) {
-                height -= 12;
+                size -= 12;
             }
             let options = {
-                format: this.format, height: height,
+                format: this.format, height: size,
                 margin: 0, displayValue: this.displayValue, width: 2
             };
             if (this.format === 'EAN8' || this.format === 'EAN13') {
