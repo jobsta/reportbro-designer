@@ -45,11 +45,9 @@ export default class BarCodeElement extends DocElement {
         if (field === 'content' ||field === 'format' || field === 'displayValue' ||
                 field === 'barWidth' || field === 'guardBar' ||
                 field === 'width' || field === 'height' || field === 'errorCorrectionLevel' || field === 'rotate') {
-            if (field === 'rotate') {
-                this.updateStyle();
-            }
             this.updateBarCode();
             this.updateDisplay();
+            this.updateStyle();
         }
     }
 
@@ -94,6 +92,20 @@ export default class BarCodeElement extends DocElement {
                 verticalAlignment.slice(1);
             this.elContent.classList.add(alignClass);
         }
+
+        if (this.format !== 'QRCode' && this.rotate) {
+            const verticalAlignment = this.getValue('verticalAlignment');
+            const offset_x = -(this.elBarCode.clientWidth - this.widthVal) / 2;
+            let offset_y = 0;
+            if (verticalAlignment === Style.alignment.top) {
+                offset_y = -offset_x;
+            } else if (verticalAlignment === Style.alignment.bottom) {
+                offset_y = offset_x;
+            }
+            this.elBarCode.style.transform = `translate(${offset_x}px, ${offset_y}px) rotate(90deg)`;
+        } else {
+            this.elBarCode.style.transform = '';
+        }
      }
 
     createElement() {
@@ -124,7 +136,6 @@ export default class BarCodeElement extends DocElement {
                 margin: 0,
                 errorCorrectionLevel : this.errorCorrectionLevel
             };
-            this.elBarCode.style.transform = '';
             QRCode.toCanvas(this.elBarCode, content, options);
         } else {
             let valid = false;
@@ -185,13 +196,6 @@ export default class BarCodeElement extends DocElement {
                     content = '1234';
                 }
                 JsBarcode('#' + this.elBarCode.id, content, options);
-            }
-            if (this.rotate) {
-                const offset_x = -(this.elBarCode.clientWidth - this.widthVal) / 2;
-                const offset_y = -offset_x;
-                this.elBarCode.style.transform = `translate(${offset_x}px, ${offset_y}px) rotate(90deg)`;
-            } else {
-                this.elBarCode.style.transform = '';
             }
         }
     }
