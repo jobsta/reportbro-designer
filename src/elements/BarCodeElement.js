@@ -95,7 +95,7 @@ export default class BarCodeElement extends DocElement {
 
         if (this.format !== 'QRCode' && this.rotate) {
             const verticalAlignment = this.getValue('verticalAlignment');
-            const offset_x = -(this.elBarCode.clientWidth - this.widthVal) / 2;
+            const offset_x = -(this.elBarCode.width - this.widthVal) / 2;
             let offset_y = 0;
             if (verticalAlignment === Style.alignment.top) {
                 offset_y = -offset_x;
