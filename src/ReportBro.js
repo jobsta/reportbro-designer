@@ -267,6 +267,7 @@ export default class ReportBro {
                             // only paste elements in clipboard if they are stored in the same report version
                             // as the current ReportBro version
                             if (data.version === this.version) {
+                                const isSameReport = (data.reportId === this.reportId);
                                 let cmd;
                                 const cmdGroup = new CommandGroupCmd('Paste from clipboard', this);
                                 const contentScrollY = this.getDocument().getContentScrollPosY();
@@ -281,6 +282,12 @@ export default class ReportBro {
                                     pastedElements.push(pastedElement);
 
                                     if (pastedElement.baseClass === 'DocElement') {
+                                        if (!isSameReport && pastedElement.styleId) {
+                                            // delete style reference if pasted to different report because
+                                            // the style id is not valid
+                                            pastedElement.styleId = '';
+                                        }
+
                                         if (pastedElement.containerId in containerInfo) {
                                             const containerInfoEntry = containerInfo[pastedElement.containerId];
                                             if (pastedElement.x < containerInfoEntry.minX) {
@@ -345,7 +352,7 @@ export default class ReportBro {
 
                                             let container = this.getDataObject(pastedElement.containerId);
                                             if (container === null || !(container instanceof Container) ||
-                                                    data.reportId !== this.reportId) {
+                                                    !isSameReport) {
                                                 // if container does not exist (e.g. deleted after copy) or this
                                                 // is a different report the element is pasted to the main content band
                                                 pastedElement.containerId = this.contentBand.getId();
