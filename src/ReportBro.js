@@ -281,14 +281,6 @@ export default class ReportBro {
                                     pastedElements.push(pastedElement);
 
                                     if (pastedElement.baseClass === 'DocElement') {
-                                        const container = this.getDataObject(pastedElement.containerId);
-                                        if (container === null || !(container instanceof Container) ||
-                                                (container.getLevel() > 0 && data.reportId !== this.reportId)) {
-                                            // if container does not exist (e.g. deleted after copy) or this
-                                            // is a non-root container in a different report the element is
-                                            // pasted to the main content band
-                                            pastedElement.containerId = this.contentBand.getId();
-                                        }
                                         if (pastedElement.containerId in containerInfo) {
                                             const containerInfoEntry = containerInfo[pastedElement.containerId];
                                             if (pastedElement.x < containerInfoEntry.minX) {
@@ -335,17 +327,32 @@ export default class ReportBro {
                                         }
                                     }
                                 }
+
+                                // after all container ids of pasted elements are mapped we can test if
+                                // the container of pasted elements is valid and adjust the y-coord (to keep
+                                // relative position of elements in case multiple elements are pasted)
+
                                 for (const pastedElement of pastedElements) {
                                     if (pastedElement.baseClass === 'DocElement') {
                                         // map id of container in case element is inside other
                                         // pasted container (frame/band)
                                         if (pastedElement.containerId in mappedContainerIds) {
                                             pastedElement.containerId = mappedContainerIds[pastedElement.containerId];
+
                                             // since element is inside pasted container we can keep x/y coordinates
                                         } else {
+                                            let container = this.getDataObject(pastedElement.containerId);
+                                            if (container === null || !(container instanceof Container) ||
+                                                    (container.getLevel() > 0 && data.reportId !== this.reportId)) {
+                                                // if container does not exist (e.g. deleted after copy) or this
+                                                // is a non-root container in a different report the element is
+                                                // pasted to the main content band
+                                                pastedElement.containerId = this.contentBand.getId();
+                                                container = this.contentBand;
+                                            }
+
                                             const containerInfoEntry = containerInfo[pastedElement.containerId];
                                             let pasteToY = pastedElement.y - containerInfoEntry.minY;
-                                            const container = this.getDataObject(pastedElement.containerId);
                                             const containerOffset = container.getOffset();
                                             const containerSize = container.getContentSize();
                                             // adjusted y-coord so element is in visible area
