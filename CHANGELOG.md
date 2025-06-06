@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.11.0] - 2025-06-06
+
+### Features
+* Support alignment for barcode
+
+### Changes
+* Keep relative position of elements for copy & paste of multiple elements
+
+### Bug Fixes
+* Fix copy & paste of section element
+* Various fixes of copy & paste of elements into different report
+
 ## [3.10.0] - 2025-01-03
 
 ### Features
