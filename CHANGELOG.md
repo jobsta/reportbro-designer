@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.11.3] - 2025-08-26
+
+### Changes
+* Add label for table element
+
 ## [3.11.0] - 2025-06-06
 
 ### Features
