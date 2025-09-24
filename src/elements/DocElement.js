@@ -172,9 +172,9 @@ export default class DocElement {
                 let allowSelection = true;
                 if (event.shiftKey) {
                     // do not allow selecting element if one of its children is already selected
-                    let children = [];
-                    this.appendContainerChildren(children);
-                    for (let child of children) {
+                    const children = [];
+                    this.appendContainerChildren(true, children);
+                    for (const child of children) {
                         if (this.rb.isSelectedObject(child.getId())) {
                             allowSelection = false;
                             break;
@@ -269,17 +269,17 @@ export default class DocElement {
         return false;
     }
 
-    appendContainerChildren(elements) {
-        if (this.linkedContainerId !== null) {
-            if (this.panelItem !== null) {
-                let children = this.panelItem.getChildren();
-                for (let child of children) {
-                    if (child.getData() instanceof DocElement) {
-                        elements.push(child.getData());
-                        child.getData().appendContainerChildren(elements);
-                    }
-                }
-            }
+    /**
+     * Append document elements of all linked containers (e.g. a frame has a container for all frame elements,
+     * a table has a container for each band).
+     * @param {Boolean} asObjects - if true the document element instances are returned, otherwise
+     * each instance is transformed to a js map.
+     * @param {DocElement[]} docElements - list where document elements will be appended to.
+     */
+    appendContainerChildren(asObjects, docElements) {
+        // add children of doc elements which represent containers, e.g. frames or section bands
+        for (const container of this.getLinkedContainers()) {
+            container.appendDocElements(asObjects, docElements);
         }
     }
 
@@ -1078,10 +1078,10 @@ export default class DocElement {
      * @param {CommandGroupCmd} cmdGroup - AddDeleteDocElementCmd commands will be added to this command group.
      */
     addCommandsForDelete(cmdGroup) {
-        let elements = [];
-        this.appendContainerChildren(elements);
+        const elements = [];
+        this.appendContainerChildren(true, elements);
         elements.push(this);
-        for (let element of elements) {
+        for (const element of elements) {
             let cmd = new AddDeleteDocElementCmd(
                 false, element.getPanelItem().getPanelName(),
                 element.toJS(), element.getId(), element.getContainerId(),

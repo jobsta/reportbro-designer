@@ -133,6 +133,11 @@ export function roundValueToUpperInterval(val, interval) {
     return Math.ceil(val / interval) * interval;
 }
 
+export function generateUniqueId() {
+    return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+}
+
+
 export function createColorPicker(elContainer, elInput, allowEmpty, rb) {
     let inputId = elInput.getAttribute('id');
     let instance = {
@@ -512,7 +517,7 @@ function toRPN(tokens) {
         } else if (token.type === Token.type.bracketOpen) {
             operators.push(token);
         } else if (token.type === Token.type.bracketClose) {
-            while (operators.length > 0 && operators[operators.length - 1] !== Token.type.bracketOpen) {
+            while (operators.length > 0 && operators[operators.length - 1].type !== Token.type.bracketOpen) {
                 out.push(operators.pop());
             }
             operators.pop();

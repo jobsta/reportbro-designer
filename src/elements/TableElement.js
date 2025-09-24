@@ -14,6 +14,7 @@ export default class TableElement extends DocElement {
         super(rb.getLabel('docElementTable'), id, 200, 40, rb);
         this.setupComplete = false;
         this.dataSource = '';
+        this.label = '';
         this.borderColor = '#000000';
         this.borderWidth = '1';
         this.border = TableElement.border.grid;
@@ -126,7 +127,7 @@ export default class TableElement extends DocElement {
 
     setValue(field, value) {
         super.setValue(field, value);
-        if (field === 'dataSource') {
+        if (field === 'label' || field === 'dataSource') {
             this.updateName();
         } else if (field === 'header') {
             this.headerData.show(value);
@@ -245,7 +246,7 @@ export default class TableElement extends DocElement {
      */
     getProperties() {
         return [
-            'x', 'y', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
+            'x', 'y', 'label', 'dataSource', 'columns', 'header', 'contentRows', 'footer',
             'styleId', 'border', 'borderColor', 'borderWidth',
             'printIf', 'removeEmptyElement',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_addEmptyRow'
@@ -383,9 +384,13 @@ export default class TableElement extends DocElement {
     }
 
     updateName() {
-        this.name = this.rb.getLabel('docElementTable');
-        if (this.dataSource.trim() !== '') {
-            this.name += ' ' + this.dataSource;
+        if (this.label.trim() !== '') {
+            this.name = this.label;
+        } else {
+            this.name = this.rb.getLabel('docElementTable');
+            if (this.dataSource.trim() !== '') {
+                this.name += ' ' + this.dataSource;
+            }
         }
         document.getElementById(`rbro_menu_item_name${this.id}`).textContent = this.name;
     }

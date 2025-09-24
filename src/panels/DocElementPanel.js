@@ -89,8 +89,7 @@ export default class DocElementPanel extends PanelBase {
                 'rowProperties': ['width', 'height'],
                 'labelId': 'rbro_doc_element_size_label',
                 'defaultLabel': 'docElementSize',
-                'singlePropertyLabel': 'docElementWidth',
-                'visibleIf': "docElementType != 'bar_code' || (format != 'QRCode' && rotate)"
+                'singlePropertyLabel': 'docElementWidth'
             },
             'height': {
                 'type': SetValueCmd.type.text,
@@ -234,14 +233,15 @@ export default class DocElementPanel extends PanelBase {
                 'singleRowProperty': false,
                 'rowProperties': ['horizontalAlignment', 'verticalAlignment'],
                 'section': 'style',
-                'visibleIf': '!richText'
+                'visibleIf': "(docElementType != 'bar_code' && !richText) || (docElementType == 'bar_code' && rotate == false)"
             },
             'verticalAlignment': {
                 'type': SetValueCmd.type.buttonGroup,
                 'fieldId': 'valignment',
                 'rowId': 'rbro_doc_element_alignment_row',
                 'singleRowProperty': false,
-                'section': 'style'
+                'section': 'style',
+                'visibleIf': "docElementType != 'bar_code' || rotate == true"
             },
             'textColor': {
                 'type': SetValueCmd.type.color,

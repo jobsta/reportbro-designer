@@ -4,7 +4,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 
 const banner =
-`Copyright (C) 2023 jobsta
+`Copyright (C) 2025 jobsta
 
 This file is part of ReportBro, a library to generate PDF and Excel reports.
 Demos can be found at https://www.reportbro.com
@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see https://www.gnu.org/licenses/
 
 Details for ReportBro commercial license can be found at
-https://www.reportbro.com/license/agreement
+https://www.reportbro.com/framework/license_agreement
 `;
 
 module.exports = merge(common, {
