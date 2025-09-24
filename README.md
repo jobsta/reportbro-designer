@@ -56,7 +56,7 @@ cd reportbro-designer
 Build the dockerfile
 
 ```
-docker build reportbro .
+docker build -t reportbro .
 ```
 
 Run the container
