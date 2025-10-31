@@ -645,7 +645,7 @@ export default class DocElementPanel extends PanelBase {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'spreadsheet_pattern',
                 'section': 'spreadsheet',
-                'visibleIf': 'spreadsheet_type'
+                'visibleIf': "spreadsheet_type == 'number' || spreadsheet_type == 'date'"
             },
             'spreadsheet_textWrap': {
                 'type': SetValueCmd.type.checkbox,
@@ -2329,6 +2329,8 @@ export default class DocElementPanel extends PanelBase {
             utils.createElement('option', { value: 'number' }, this.rb.getLabel('docElementSpreadsheetTypeNumber')));
         elSpreadsheetType.append(
             utils.createElement('option', { value: 'date' }, this.rb.getLabel('docElementSpreadsheetTypeDate')));
+        elSpreadsheetType.append(
+            utils.createElement('option', { value: 'text' }, this.rb.getLabel('docElementSpreadsheetTypeText')));
         elSpreadsheetType.addEventListener('change', (event) => {
             let val = elSpreadsheetType.value;
             let cmdGroup = new CommandGroupCmd('Set value', this.rb);

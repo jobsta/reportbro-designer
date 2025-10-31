@@ -82,6 +82,7 @@ const locale_en = {
     docElementSpreadsheetTypeDate: 'Date',
     docElementSpreadsheetTypeNone: 'Default',
     docElementSpreadsheetTypeNumber: 'Number',
+    docElementSpreadsheetTypeText: 'Text',
     docElementStyle: 'Style',
     docElementTable: 'Table',
     docElementTableBandPageBreak: 'Page break with each new group',
