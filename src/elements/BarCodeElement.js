@@ -16,6 +16,7 @@ export default class BarCodeElement extends DocElement {
         this.content = '';
         this.format = 'CODE128';
         this.displayValue = false;
+        this.addChecksum = false;
         this.barWidth = '2';
         this.guardBar = false;
         this.errorCorrectionLevel = 'M';
@@ -42,7 +43,7 @@ export default class BarCodeElement extends DocElement {
 
     setValue(field, value) {
         super.setValue(field, value);
-        if (field === 'content' ||field === 'format' || field === 'displayValue' ||
+        if (field === 'content' ||field === 'format' || field === 'displayValue' || field === 'addChecksum' ||
                 field === 'barWidth' || field === 'guardBar' ||
                 field === 'width' || field === 'height' || field === 'errorCorrectionLevel' || field === 'rotate') {
             this.updateBarCode();
@@ -57,7 +58,7 @@ export default class BarCodeElement extends DocElement {
      */
     getProperties() {
         return [
-            'x', 'y', 'width', 'height', 'content', 'format', 'displayValue',
+            'x', 'y', 'width', 'height', 'content', 'format', 'displayValue', 'addChecksum',
             'barWidth', 'guardBar', 'errorCorrectionLevel',
             'printIf', 'removeEmptyElement', 'rotate', 'horizontalAlignment', 'verticalAlignment',
             'spreadsheet_hide', 'spreadsheet_column', 'spreadsheet_colspan', 'spreadsheet_addEmptyRow'
@@ -152,7 +153,9 @@ export default class BarCodeElement extends DocElement {
                 format: this.format, height: size,
                 margin: 0, displayValue: this.displayValue, width: 2
             };
-            if (this.format === 'EAN8' || this.format === 'EAN13') {
+            if (this.format === 'CODE39') {
+                options.mod43 = this.addChecksum
+            } else if (this.format === 'EAN8' || this.format === 'EAN13') {
                 options.flat = !this.guardBar;
             } else if (this.format === 'UPC') {
                 options.flat = true; // guard bars are currently not supported in reportbro-lib for UPC

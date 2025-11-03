@@ -115,6 +115,11 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'display_value',
                 'visibleIf': "format != 'QRCode'"
             },
+            'addChecksum': {
+                'type': SetValueCmd.type.checkbox,
+                'fieldId': 'add_checksum',
+                'visibleIf': "format == 'CODE39'"
+            },
             'barWidth': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'bar_width',
@@ -960,6 +965,28 @@ export default class DocElementPanel extends PanelBase {
             }
         });
         elFormField.append(elDisplayValue);
+        elDiv.append(elFormField);
+        panel.append(elDiv);
+
+        elDiv = utils.createElement('div', { id: 'rbro_doc_element_add_checksum_row', class: 'rbroFormRow' });
+        utils.appendLabel(elDiv, this.rb.getLabel('docElementAddChecksum'), 'rbro_doc_element_add_checksum');
+        elFormField = utils.createElement('div', { class: 'rbroFormField' });
+        let elChecksum = utils.createElement('input', { id: 'rbro_doc_element_add_checksum', type: 'checkbox' });
+        elChecksum.addEventListener('change', (event) => {
+            let checksumChecked = elChecksum.checked;
+            let cmdGroup = new CommandGroupCmd('Set value', this.rb);
+            let selectedObjects = this.rb.getSelectedObjects();
+            for (let i=selectedObjects.length - 1; i >= 0; i--) {
+                let obj = selectedObjects[i];
+                cmdGroup.addSelection(obj.getId());
+                cmdGroup.addCommand(new SetValueCmd(
+                    obj.getId(),'addChecksum', checksumChecked, SetValueCmd.type.checkbox, this.rb));
+            }
+            if (!cmdGroup.isEmpty()) {
+                this.rb.executeCommand(cmdGroup);
+            }
+        });
+        elFormField.append(elChecksum);
         elDiv.append(elFormField);
         panel.append(elDiv);
 
