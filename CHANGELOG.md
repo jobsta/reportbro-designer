@@ -1,5 +1,11 @@
 # Changelog
 
+## Upcoming Release
+
+### Changes
+* Add "text" option for spreadsheet type
+* Add "Add checksum" option for CODE39 barcode
+
 ## [3.11.3] - 2025-08-26
 
 ### Changes
