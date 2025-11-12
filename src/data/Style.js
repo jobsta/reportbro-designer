@@ -33,6 +33,7 @@ export default class Style {
         this.border = 'grid';
         this.borderColor = '#000000';
         this.borderWidth = '1';
+        this.borderRadius = '0';
         this.borderAll = false;
         this.borderLeft = false;
         this.borderTop = false;
@@ -76,7 +77,7 @@ export default class Style {
             'name', 'type', 'bold', 'italic', 'underline', 'strikethrough',
             'horizontalAlignment', 'verticalAlignment',
             'color', 'textColor', 'backgroundColor', 'alternateBackgroundColor',
-            'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth',
+            'font', 'fontSize', 'lineSpacing', 'borderColor', 'borderWidth', 'borderRadius',
             'borderAll', 'borderLeft', 'borderTop', 'borderRight', 'borderBottom', 'border',
             'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom'
         ];

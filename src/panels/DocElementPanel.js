@@ -345,6 +345,11 @@ export default class DocElementPanel extends PanelBase {
                 'fieldId': 'border_width',
                 'section': 'style'
             },
+            'borderRadius': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'border_radius',
+                'section': 'style'
+            },
             'paddingLeft': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'padding_left',
@@ -590,6 +595,11 @@ export default class DocElementPanel extends PanelBase {
             'cs_borderWidth': {
                 'type': SetValueCmd.type.text,
                 'fieldId': 'cs_border_width',
+                'section': 'cs_style'
+            },
+            'cs_borderRadius': {
+                'type': SetValueCmd.type.text,
+                'fieldId': 'cs_border_radius',
                 'section': 'cs_style'
             },
             'cs_paddingLeft': {
