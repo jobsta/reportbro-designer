@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming Release
+## [3.12.0] - 2025-12-01
 
 ### Changes
 * Add "text" option for spreadsheet type
