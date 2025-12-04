@@ -2,6 +2,9 @@
 
 ## [3.12.0] - 2025-12-01
 
+### Features
+* Support border radius
+
 ### Changes
 * Add "text" option for spreadsheet type
 * Add "Add checksum" option for CODE39 barcode
