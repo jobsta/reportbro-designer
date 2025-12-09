@@ -20,6 +20,7 @@ jobs:
       pull-requests: read
       repository-projects: read
       statuses: read
+      id-token: write  # Required for OIDC
 
     strategy:
       matrix:
@@ -33,6 +34,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+    # Ensure npm 11.5.1 or later is installed
+    - name: Update npm
+      run: npm install -g npm@latest
     - run: npm ci
     - run: npm run build-prod
     - run: npm pack
@@ -44,6 +49,5 @@ jobs:
       with:
         asset_paths: '["reportbro-designer-*.tgz", "reportbro-designer-*.zip"]'
 
-    - uses: JS-DevTools/npm-publish@v3
-      with:
-        token: ${{ secrets.NPM_TOKEN }}
+    - name: Publish to npm
+      run: npm publish
