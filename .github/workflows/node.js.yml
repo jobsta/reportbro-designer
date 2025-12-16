@@ -1,6 +1,5 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: Node.js CI
 
 on:
@@ -20,34 +19,30 @@ jobs:
       pull-requests: read
       repository-projects: read
       statuses: read
-      id-token: write  # Required for OIDC
-
-    strategy:
-      matrix:
-        node-version: [20]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+      # Required for OIDC
+      id-token: write
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        registry-url: 'https://registry.npmjs.org'
-    # Ensure npm 11.5.1 or later is installed
-    - name: Update npm
-      run: npm install -g npm@latest
-    - run: npm ci
-    - run: npm run build-prod
-    - run: npm pack
-  
-    - name: Upload Release Assets
-      uses: alexellis/upload-assets@0.4.1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        asset_paths: '["reportbro-designer-*.tgz", "reportbro-designer-*.zip"]'
-
-    - name: Publish to npm
-      run: npm publish
+      - uses: actions/checkout@v6
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      # Ensure npm 11.5.1 or later is installed
+      - name: Udate to latest npm
+        run: npm install -g npm@latest
+      - name: Build and pack
+        run: |
+          npm ci
+          npm run build-prod
+          npm pack
+      - name: Upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Uploading to built to release with tag: ${{ github.event.release.tag_name }}"
+          gh release upload "${{ github.event.release.tag_name }}" reportbro-designer-*.tgz
+    # - name: Publish to npm
+    #   run: npm publish
