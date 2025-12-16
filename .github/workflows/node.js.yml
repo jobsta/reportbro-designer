@@ -44,5 +44,5 @@ jobs:
         run: |
           echo "Uploading to built to release with tag: ${{ github.event.release.tag_name }}"
           gh release upload "${{ github.event.release.tag_name }}" reportbro-designer-*.tgz
-    # - name: Publish to npm
-    #   run: npm publish
+      - name: Publish to npm
+        run: npm publish
