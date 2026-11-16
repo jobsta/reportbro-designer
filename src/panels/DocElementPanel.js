@@ -2493,7 +2493,7 @@ export default class DocElementPanel extends PanelBase {
     }
 
     setupRichText() {
-        // add protocol to link if not present, by default quill discards the link if there is not protocol
+        // add protocol to link if not present, by default quill discards the link if there is no protocol
         let Link = Quill.import('formats/link');
         let sanitizeLinkSuper = Link.sanitize;
         Link.sanitize = function customSanitizeLinkInput(linkValueInput) {
