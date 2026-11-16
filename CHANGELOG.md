@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.13.0] - 2026-11-16
+
+### Changes
+* Upgrade Quill rich text editor to v2.0.3
+
 ## [3.12.0] - 2025-12-01
 
 ### Features
